@@ -18,8 +18,8 @@ const dbUser = process.env.MONGO_USER;
 const dbPwd = process.env.MONGO_PWD;
 const dbHost = process.env.MONGO_HOST;
 const dbName = process.env.MONGO_SITE;
-const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}/${dbName}`;
-
+// login mongodb
+const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}/${dbName}?authSource=admin`;
 // Connessione a MongoDB tramite Mongoose
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connesso a MongoDB!'))
