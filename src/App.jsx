@@ -4,31 +4,25 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <div style={{textAlign: "center", marginTop: "100px"}}>
+      <h1>ArtAround</h1>
+
+      <p>
+        Visita i musei in modo personalizzato e scopri le opere
+        con spiegazioni adattate ai tuoi interessi.
       </p>
-    </>
+
+      <div style={{marginTop: "30px"}}>
+        <button style={{marginRight: "10px"}}>
+          Inizia la visita
+        </button>
+
+        <button>
+          Login
+        </button>
+      </div>
+    </div>
   )
 }
 
