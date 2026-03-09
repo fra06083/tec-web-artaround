@@ -1,0 +1,1 @@
+PARTE SENZA FRAMEWORK, il navigator
