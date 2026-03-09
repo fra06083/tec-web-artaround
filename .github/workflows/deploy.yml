@@ -1,0 +1,24 @@
+name: Deploy Automatico su Rosina
+
+on:
+  push:
+    branches:
+      - main  # Si attiva ogni volta che pushi su main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connessione SSH e aggiornamento
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: rosina.cs.unibo.it
+          username: francesco.biglieri
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Se il tuo utente è diverso da quello della cartella, 
+          # potresti dover aggiungere una porta o opzioni specifiche, 
+          # ma proviamo prima così:
+          script: |
+            cd /home/web/site252632/html/
+            git fetch origin main
+            git reset --hard origin/main
