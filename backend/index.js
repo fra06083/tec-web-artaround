@@ -8,7 +8,16 @@ const jwt = require('jsonwebtoken');
 const Admin = require('./models/admin'); // modello admin
 const api_login = "/api/login";
 const app = express();
+const path = require('path');
 
+// Serve i file statici della root
+app.use(express.static(path.join(__dirname, '../')));
+
+// Serve per il marketplace
+app.use('/marketplace', express.static(path.join(__dirname, '../marketplace')));
+
+// Serve il navigator (dopo che hai fatto il comando 'npm run build' in React)
+app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
 app.use(cors()); // Permette al frontend React (Vite) di comunicare col backend
 app.use(express.json()); // Permette al server di leggere i dati JSON nel body
 
