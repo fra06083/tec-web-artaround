@@ -1,10 +1,20 @@
 services:
   database:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongo_site252632  # Questo fa funzionare MONGO_HOST=mongo_site252632
     ports:
       - "27017:27017"
     environment:
+      # Queste due righe creano in automatico l'utente root dentro 'admin'
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PWD}
+      # Questa riga crea il database del tuo sito (prende il nome da MONGO_SITE)
+      - MONGO_INITDB_DATABASE=${MONGO_SITE}
+    volumes:
+      # Salva i dati in modo permanente, così sopravvivono ai riavvii
+      - mongo_data:/data/db
     restart: unless-stopped
+
+# Dichiariamo il volume in fondo al file (non dimenticare questa parte!)
+volumes:
+  mongo_data:

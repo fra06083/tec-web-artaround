@@ -2,15 +2,14 @@
 global.rootDir = __dirname;
 global.startDate = null; // Aggiunto come nel file del prof
 
-require('dotenv').config(); // Assicurati che il file .env sia fisicamente presente su Gocker!
-
+// Assicurati che il file .env sia fisicamente presente su Gocker!
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 // Assicurati che questo percorso sia corretto rispetto a index.js
 const Admin = require('./models/admin'); 
 
@@ -31,22 +30,23 @@ app.use('/marketplace', express.static(path.join(__dirname, '../marketplace')));
 app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
 
 // 4. CONNESSIONE MONGODB
-const dbUser = process.env.MONGO_USER;
-const dbPwd = process.env.MONGO_PWD;
-const dbHost = process.env.MONGO_HOST;
-const dbName = process.env.MONGO_SITE;
+const dbUser = process.env.MONGO_USER.trim();
+const dbPwd = process.env.MONGO_PWD.trim();
+const dbHost = process.env.MONGO_HOST.trim(); 
+const PORT = process.env.PORT.trim() || 27017;
+const dbName = "musei";
 
 // Controllo di sicurezza: se manca il .env, non facciamo crashare l'app in modo silenzioso
-if (dbUser && dbPwd && dbHost && dbName) {
-    const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}/${dbName}?authSource=admin`;
+if (dbUser && dbPwd && dbHost) {
+    const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}:${PORT}/${dbName}?authSource=admin&writeConcern=majority`;
     mongoose.connect(MONGODB_URI)
-     .then(() => console.log('✅ Connesso a MongoDB!'))
-     .catch((err) => console.error('❌ Errore di connessione a MongoDB:', err));
+     .then(() => console.log('Connesso a MongoDB!!'))
+     .catch((err) => console.error('<!>> Errore di connessione a MongoDB:', err));
 } else {
-    console.error('❌ ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
+    console.error('ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
 }
 
-// 5. ROTTE
+// 5. ROTTE dopo vediamo come gestirle meglio
 const api_login = "/api/login";
 app.post(api_login, async (req, res) => {
   try {
@@ -78,9 +78,7 @@ app.post(api_login, async (req, res) => {
 
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 // Se process.env.PORT non esiste, FORZIAMO la porta 8000 come fa il professore.
-const PORT = process.env.PORT || 8000;
-
-app.listen(PORT, () => {
+app.listen(8000, () => {
     global.startDate = new Date();
-    console.log(`✅ Server in ascolto sulla porta ${PORT} started ${global.startDate.toLocaleString()}`);
+    console.log(`✅ Server in ascolto sulla porta 8000 started ${global.startDate.toLocaleString()}`);
 });
