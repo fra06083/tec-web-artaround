@@ -35,7 +35,6 @@ const dbPwd = process.env.MONGO_PWD.trim();
 const dbHost = process.env.MONGO_HOST.trim(); 
 const PORT = process.env.PORT.trim() || 27017;
 const dbName = "musei";
-
 // Controllo di sicurezza: se manca il .env, non facciamo crashare l'app in modo silenzioso
 if (dbUser && dbPwd && dbHost) {
     const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}:${PORT}/${dbName}?authSource=admin&writeConcern=majority`;

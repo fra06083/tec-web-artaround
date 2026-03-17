@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtAround - Editor & Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="bg-dark text-white" x-data="appArtAround()">
+
+    <nav class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" @click.prevent="vistaAttuale = 'marketplace'">ArtAround</a>
+
+            <div class="d-flex align-items-center text-white">
+                <button x-show="!login" class="btn btn-primary btn-sm"
+                    @click="vistaAttuale = 'pagina_login'">Login</button>
+
+                <div x-show="login" style="display: none !important;"
+                    x-bind:style="login ? 'display: block !important;' : ''">
+                    <span class="me-3">Benvenuto, <strong x-text="login"></strong>!</span>
+                    <button class="btn btn-outline-light btn-sm" @click="eseguiLogout()">Esci</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5" x-show="vistaAttuale === 'marketplace'">
+        <h2 class="mb-4">Marketplace - Esplora i contenuti</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <template x-for="visita in visiteMarketplace" :key="visita.id">
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary" x-text="visita.titolo"></h5>
+                            <p class="card-text text-muted mb-2" x-text="'Autore: ' + visita.autore"></p>
+                            <p class="card-text fw-bold" x-text="visita.prezzo === 0 ? 'Gratis' : '€ ' + visita.prezzo">
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-0 text-end">
+                            <button class="btn btn-sm btn-outline-primary">Dettagli</button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <div class="container py-5" x-show="vistaAttuale === 'pagina_login'" style="display: none;">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h4 class="text-center mb-4">Accedi ad ArtAround</h4>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" placeholder="es. autore1 o visitatore1"
+                                x-model="formLogin.username">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" placeholder="La password è 12345678"
+                                x-model="formLogin.password">
+                        </div>
+                        <button class="btn btn-primary w-100" @click="eseguiLogin()">Entra</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('appArtAround', () => ({
+                login: null, // settato su nullo (dovremo mettere che prende da api)
+                vistaAttuale: 'marketplace', // Gestisce quale "pagina" mostrare
+                formLogin: {
+                    username: '',
+                    password: ''
+                },
+
+                visiteMarketplace: [], // prende info da api di express in futuro
+
+                eseguiLogin() {
+                    // Verifica base richiesta dalle specifiche del progetto
+                    if (this.formLogin.username !== '' && this.formLogin.password === '12345678') {
+                        this.login = this.formLogin.username;
+                        this.vistaAttuale = 'marketplace'; // Riporta al marketplace dopo il login
+                        this.formLogin.password = ''; // Pulisce la password per sicurezza
+                    } else {
+                        alert('Credenziali errate. Ricorda che la password di default è 12345678.');
+                    }
+                },
+
+                eseguiLogout() {
+                    this.login = null;
+                    this.formLogin.username = '';
+                    this.formLogin.password = '';
+                    this.vistaAttuale = 'marketplace';
+                }
+            }))
+        })
+    </script>
+</body>
+
+</html>
