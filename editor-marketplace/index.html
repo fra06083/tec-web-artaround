@@ -66,6 +66,10 @@
                             <input type="password" class="form-control" placeholder="La password è 12345678"
                                 x-model="formLogin.password">
                         </div>
+                        <div x-show="error_login" style="display: none" class="alert alert-danger py-2 text-center"
+                            role="alert">
+                            <small x-text="error_login"></small>
+                        </div>
                         <button class="btn btn-primary w-100" @click="eseguiLogin()">Entra</button>
                     </div>
                 </div>

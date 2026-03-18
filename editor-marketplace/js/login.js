@@ -2,6 +2,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('appArtAround', () => ({
         login: null, // settato su nullo (dovremo mettere che prende da api)
         vistaAttuale: 'marketplace', // Gestisce quale "pagina" mostrare
+        error_login: '',
         formLogin: {
             username: '',
             password: ''
@@ -10,6 +11,7 @@ document.addEventListener('alpine:init', () => {
         visiteMarketplace: [], // prende info da api di express in futuro
 
         async eseguiLogin() {
+            this.error_login = '';
             try {
                 const value = {
                     name: this.formLogin.username,
@@ -25,7 +27,8 @@ document.addEventListener('alpine:init', () => {
                 const data = await result.json(); // prende risultato da richiesta post
                 console.log("richiesta post su api/login");
                 if (!result.ok) {
-                    throw new Error(data.message);
+                    this.error_login = 'Credenziali non valide.';
+                    return;
                 }
                 this.login = this.formLogin.username;
                 this.vistaAttuale = "marketplace";
