@@ -63,3 +63,45 @@
     bottom: -60px;
     transform: rotate(-10deg);
 }
+
+/* =========================================================
+   EFFETTI BOTTONI (Micro-interazioni)
+========================================================= */
+
+/* Allinea perfettamente testo e icone nei bottoni */
+.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    /* Spazio fisso tra icona e testo */
+}
+
+/* Effetto comparsa icona (Tasto Accedi) */
+.btn-reveal-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-reveal-icon .reveal-icon {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-15px);
+    /* Parte leggermente spostata a sinistra */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Animazione super fluida */
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.btn-reveal-icon:hover .reveal-icon {
+    max-width: 24px;
+    /* Spazio sufficiente per mostrare l'icona */
+    opacity: 1;
+    transform: translateX(0);
+    /* Torna alla posizione originale */
+    margin-left: 8px;
+    /* Crea lo spazio tra il testo e l'icona */
+}
