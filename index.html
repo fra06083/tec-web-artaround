@@ -17,6 +17,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="js/index.js"></script>
+
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class="bg-white text-dark font-sans" x-data="homeApp()">
@@ -41,13 +47,13 @@
                     </a>
 
                     <a href="editor-marketplace/"
-                        class="btn btn-outline-primary rounded-pill px-4 fw-medium btn-with-icon">
+                        class="btn btn-outline-orange rounded-pill px-4 fw-medium btn-with-icon">
                         <i class="bi bi-pencil-square"></i> Editor & Marketplace
                     </a>
 
                     <template x-if="!isLoggedIn">
                         <a href="login.html"
-                            class="btn bg-orange text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
+                            class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
                             <span>Sign in</span>
                             <i class="bi bi-cursor reveal-icon"></i>
                         </a>
@@ -57,19 +63,19 @@
                         <div class="position-relative d-inline-block" x-data="{ open: false }">
 
                             <button @click="open = !open" @click.outside="open = false"
-                                class="btn bg-orange text-white rounded-pill px-4 fw-bold shadow-sm btn-with-icon m-auto">
+                                class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-with-icon m-auto">
                                 <i class="bi bi-person-circle"></i>
                                 <span>Hello, <span x-text="username"></span>!</span>
                                 <i class="bi bi-chevron-down small"></i>
                             </button>
 
                             <div x-show="open" x-transition.opacity x-cloak
-                                class="auth-dropdown-menu shadow border-0 rounded-4 py-2">
+                                class="auth-dropdown-menu shadow border-0 rounded-4 py-2 position-absolute bg-white mt-2"
+                                style="min-width: 150px; right: 0; z-index: 1050; text-align: left;">
 
                                 <a href="#" @click.prevent="logout()"
-                                    class="d-flex align-items-center px-4 py-2 text-danger text-decoration-none fw-bold hover-bg-light">
-                                    <i class="bi bi-box-arrow-right me-2"></i>
-                                    Log out
+                                    class="d-block px-4 py-2 text-danger text-decoration-none fw-bold hover-bg-light">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Log out
                                 </a>
                             </div>
                         </div>
@@ -145,6 +151,87 @@
                         <h4 class="fw-bold text-dark">Listen & explore</h4>
                         <p class="text-secondary small mb-0">Enjoy an audio guide tailored completely to you.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container-lg py-5 my-4" id="roles">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3 text-dark">Choose your path</h2>
+            <p class="lead text-secondary">How do you want to use ArtAround?</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-md-6 col-lg-5 d-flex">
+                <div
+                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-primary text-white text-center text-md-start hover-lift">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                        <div
+                            class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle shadow-sm icon-box-lg">
+                            <i class="bi bi-phone fs-2"></i>
+                        </div>
+                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-medium">Visitor</span>
+                    </div>
+                    <h3 class="fw-bold mb-3">Navigator</h3>
+                    <p class="text-white-50 mb-4 flex-grow-1">
+                        In-person guided visits with audio descriptions adapted to your profile. Language, depth, and
+                        pace — all tuned to you.
+                    </p>
+                    <a href="navigator/"
+                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-primary shadow-sm btn-reveal-icon">
+                        <span>Start your visit</span>
+                        <i class="bi bi-arrow-right reveal-icon"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-5 d-flex">
+                <div
+                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-orange text-white text-center text-md-start hover-lift">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                        <div
+                            class="d-inline-flex align-items-center justify-content-center bg-white text-orange rounded-circle shadow-sm icon-box-lg">
+                            <i class="bi bi-pencil-square fs-2"></i>
+                        </div>
+                        <span class="badge bg-white text-orange rounded-pill px-3 py-2 fw-medium">Institution /
+                            Creator</span>
+                    </div>
+                    <h3 class="fw-bold mb-3">Editor &amp; Marketplace</h3>
+                    <p class="text-white mb-4 flex-grow-1 text-opacity-90">
+                        Prepare content, build curated routes, and publish to the marketplace. One simple config file —
+                        any museum.
+                    </p>
+                    <a href="./editor-marketplace/"
+                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-orange shadow-sm btn-reveal-icon">
+                        <span>Create &amp; manage</span>
+                        <i class="bi bi-arrow-right reveal-icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container-lg py-5 mb-5">
+        <div
+            class="card border-0 shadow-sm rounded-5 p-4 p-md-5 overflow-hidden position-relative bg-primary bg-opacity-10">
+            <i class="bi bi-bank position-absolute text-primary opacity-25 icon-bg-cta"></i>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-12 col-md-8 text-center text-md-start mb-4 mb-md-0">
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm">For
+                        Institutions</span>
+                    <h2 class="display-6 fw-bold text-dark mb-3">Are you a museum?</h2>
+                    <p class="lead text-secondary mb-0 mx-auto mx-md-0 max-w-550">
+                        Deploy ArtAround with <strong>just your content</strong>. <strong>No custom apps</strong>,
+                        <strong>no messy development</strong>.
+                    </p>
+                </div>
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <a href="./editor-marketplace"
+                        class="btn btn-primary btn-lg rounded-pill px-4 py-3 fw-bold w-100 w-md-auto shadow btn-reveal-icon hover-lift">
+                        <span>Request a Demo</span>
+                        <i class="bi bi-arrow-right reveal-icon text-white"></i>
+                    </a>
                 </div>
             </div>
         </div>

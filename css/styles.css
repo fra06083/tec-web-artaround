@@ -26,10 +26,60 @@
     color: #ffffff;
 }
 
+.btn-outline-orange {
+    color: #fd7e14;
+    border: 1px solid #fd7e14;
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-orange:hover,
+.btn-outline-orange:focus {
+    background-color: #fd7e14;
+    color: #ffffff;
+    border-color: #fd7e14;
+}
+
+/* Tasto Profilo Utente (Slate - Grigio/Blu scuro elegante) */
+.bg-slate {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.bg-slate:hover {
+    background-color: #1e293b !important;
+    /* Diventa leggermente più scuro al passaggio del mouse */
+    color: #ffffff !important;
+}
 
 /* =========================================================
    UTILITY E LAYOUT
 ========================================================= */
+.thumbnail-160 {
+    height: 160px;
+}
+
+/* Icona gigante per lo stato vuoto (Empty State) */
+.icon-5xl {
+    font-size: 5rem;
+}
+
+/* Spinner ingrandito per il caricamento */
+.spinner-lg {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* (Nota: .max-w-450 e .min-vh-50 dovrebbero già essere nel tuo CSS dalle fasi precedenti, 
+   ma se non ci sono, aggiungile qui sotto) */
+.max-w-450 {
+    max-width: 450px;
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
 
 /* Dimensioni per i cerchi delle icone grandi */
 .icon-box-lg {
