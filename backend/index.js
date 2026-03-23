@@ -2,7 +2,6 @@
 global.rootDir = __dirname;
 global.startDate = null; // Aggiunto come nel file del prof
 
-// Assicurati che il file .env sia fisicamente presente su Gocker!
 /* ========= importing modules ========= */
 const express = require('express');
 const mongoose = require('mongoose');
@@ -11,12 +10,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
-// Assicurati che questo percorso sia corretto rispetto a index.js
 const login = require('./models/admin');
 
 const app = express();
 
-// 1. IMPOSTAZIONI PROXY (Dal file del prof - Fondamentale su Gocker)
 app.enable('trust proxy');
 
 // 2. MIDDLEWARE BASE
@@ -25,7 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Dal file del prof, utile per leggere i body delle richieste
 
 // 3. FILE STATICI, dato che il percorso non cambia mai
-// NOTA: Assicurati che usare '../' sia corretto. Se avvii da 'backend/index.js', ../ va nella root.
 app.use(express.static(path.join(__dirname, '../')));
 app.use('/marketplace', express.static(path.join(__dirname, '../editor-marketplace')));
 app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
@@ -37,7 +33,6 @@ const dbHost = process.env.MONGO_HOST;
 const PORT = process.env.PORT || 27017;
 const dbName = "musei";
 
-// Controllo di sicurezza: se manca il .env, non facciamo crashare l'app in modo silenzioso
 if (dbUser && dbPwd && dbHost) {
     const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}:${PORT}/${dbName}?authSource=admin&writeConcern=majority`;
     mongoose.connect(MONGODB_URI)
@@ -47,12 +42,54 @@ if (dbUser && dbPwd && dbHost) {
     console.error('ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
 }
 
-// 5. ROTTE dopo vediamo come gestirle meglio
-const api_login = "/api/login";
-app.post(api_login, async (req, res) => {
+// --- REGISTRAZIONE ---
+app.post('/api/register', async (req, res) => {
+    try {
+        console.log("PRESA IN GESTIONE RICHIESTA REGISTRAZIONE");
+
+        // FORM DATAS
+        const { name, password } = req.body;
+
+        // CHECK IF NULL
+        if (!name || !password) {
+            return res.status(400).json({ error: 'Nome e password sono obbligatori' });
+        }
+
+        // CHECK EXISTING USER (NOT OVERWRITE)
+        const existingUser = await login.findOne({ name });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Nome utente già in uso' });
+        }
+
+        // HASHING
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const newUser = new login({
+            name: name,
+            password: hashedPassword,
+            permissions: 'visitatore' // always check visitatore, if we let choose the role we might have security problems!
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: 'Registrazione completata!' });
+
+    } catch (error) {
+        console.error("Errore nella registrazione:", error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+});
+
+
+// --- LOGIN ---
+app.post('/api/login', async (req, res) => {
     try {
         console.log("PRESA IN GESTIONE RICHIESTA LOGIN");
         const { name, password } = req.body;
+
+        if (!name || !password) {
+            return res.status(400).json({ error: 'Nome e password sono obbligatori' });
+        }
 
         const adminUser = await login.findOne({ name });
         if (!adminUser) {
@@ -64,23 +101,44 @@ app.post(api_login, async (req, res) => {
             return res.status(401).json({ error: 'Credenziali non valide' });
         }
 
+        // 3. Generazione del Token JWT
+        // Includiamo l'ID, il nome e le PERMISSIONS (corretto da 'role')
         const token = jwt.sign(
-            { id: adminUser._id, name: adminUser.name },
-            process.env.JWT_SECRET, // Evita crash se manca il secret
-            { expiresIn: '2h' }
+            {
+                id: adminUser._id,
+                name: adminUser.name,
+                permissions: adminUser.permissions
+            },
+            // AGGIUNTO FALLBACK: Previene crash fatali se manca JWT_SECRET nel file .env
+            process.env.JWT_SECRET,
+            { expiresIn: '4h' }
         );
 
         res.json({ message: 'Login effettuato!', token });
 
     } catch (error) {
-        console.error("Errore nel login:", error);
+        console.error("Errore nel login: ", error);
         res.status(500).json({ error: 'Errore interno del server' });
     }
 });
+// --- VERIFICA TOKEN (Middleware, used to check if the saved token is expired or changed manually!) ---
+app.get('/api/check', (req, res) => {
+    const token = req.headers.authorization;
 
+    if (!token) {
+        return res.status(401).json({ error: 'Nessun token fornito' });
+    }
+
+    try {
+        // Decodifichiamo direttamente la stringa passata
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+        res.json({ valid: true, user: decoded });
+    } catch (error) {
+        res.status(401).json({ error: 'Token non valido o scaduto' });
+    }
+});
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
-// Se process.env.PORT non esiste, FORZIAMO la porta 8000 come fa il professore.
 app.listen(8000, () => {
     global.startDate = new Date();
-    console.log(`✅ Server in ascolto sulla porta 8000 started ${global.startDate.toLocaleString()}`);
+    console.log(`Server in ascolto sulla porta 8000 started ${global.startDate.toLocaleString()}`);
 });

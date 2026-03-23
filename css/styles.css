@@ -105,3 +105,50 @@
     margin-left: 8px;
     /* Crea lo spazio tra il testo e l'icona */
 }
+
+.font-sans {
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+/* Limite di larghezza per la card di login */
+.max-w-450 {
+    max-width: 450px;
+}
+
+/* Dimensione testo personalizzata (1.1rem) */
+.text-11 {
+    font-size: 1.1rem;
+}
+
+/* =========================================================
+   UTILITY ALPINE.JS
+========================================================= */
+
+/* Nasconde gli elementi finché Alpine non è completamente caricato */
+[x-cloak] {
+    display: none !important;
+}
+
+/* =========================================================
+   AUTH DROPDOWN CUSTOM
+========================================================= */
+
+.auth-dropdown-menu {
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 160px;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    z-index: 1050;
+    text-align: left;
+    overflow: hidden;
+}
+
+.auth-dropdown-menu i {
+    font-size: 1.1rem;
+}
+
+.text-11 {
+    font-size: 1.1rem;
+}
