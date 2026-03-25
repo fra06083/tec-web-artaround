@@ -48,10 +48,10 @@ function marketplaceApp() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    this.isLoggedIn = true;
                     // Se il backend restituisce il nome, usiamo quello, altrimenti teniamo quello del localStorage
-                    this.username = data.user?.name || savedUsername || 'Utente';
-                    this.permissions = data.user?.permissions || '';
+                    this.username = data.user?.name || savedUsername;
+                    this.permissions = data.user?.permissions;
+                    this.isLoggedIn = true;
                 } else {
                     // Se il token è scaduto o non valido, puliamo tutto
                     this.logout();
