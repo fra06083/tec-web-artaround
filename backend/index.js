@@ -42,6 +42,23 @@ if (dbUser && dbPwd && dbHost) {
     console.error('ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
 }
 
+// Middleware per verificare il token in ogni richiesta sensibile
+const authenticateToken = (req, res, next) => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ error: 'Accesso negato. Token mancante.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded; // dati dell'utente nella richiesta
+        next(); // Passiamo al prossimo passaggio (la rotta vera e propria)
+    } catch (error) {
+        res.status(403).json({ error: 'Token non valido o scaduto.' });
+    }
+};
+
 // --- REGISTRAZIONE ---
 app.post('/api/register', async (req, res) => {
     try {
@@ -121,8 +138,10 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ error: 'Errore interno del server' });
     }
 });
+
+
 // --- VERIFICA TOKEN (Middleware, used to check if the saved token is expired or changed manually!) ---
-app.get('/api/check', (req, res) => {
+app.get('/api/check', authenticateToken, (req, res) => {
     const token = req.headers.authorization;
 
     if (!token) {
@@ -137,6 +156,8 @@ app.get('/api/check', (req, res) => {
         res.status(401).json({ error: 'Token non valido o scaduto' });
     }
 });
+
+
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {
     global.startDate = new Date();
