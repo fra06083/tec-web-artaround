@@ -15,6 +15,10 @@ const loginSchema = new mongoose.Schema({
         enum: ["visitatore", 'autore', "admin"],
         required: true
     },
+    museums: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'museum'
+    }]
 });
 
 module.exports = mongoose.model('login', loginSchema);

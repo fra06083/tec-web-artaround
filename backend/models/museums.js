@@ -1,0 +1,38 @@
+const mongoose = require('mongoose');
+
+// 1. IL MUSEO (Il contenitore)
+const museumSchema = new mongoose.Schema({
+    museum: { type: String, required: true, unique: true },
+    region: { type: String, required: true },
+    provence: { type: String, required: true },
+    address: { type: String, required: true }
+});
+
+// 2. L'OPERA (Contenuta nel museo)
+const itemSchema = new mongoose.Schema({
+    item: { type: String, required: true, unique: true },
+    img_path: { type: String, required: true },
+    museum_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'museum', // Collega l'opera al suo museo
+        required: true
+    }
+});
+
+// 3. IL DIALOGO (Collegato all'opera)
+const languageSchema = new mongoose.Schema({
+    type: { type: String, enum: ['semplice', 'normale', 'dettagliato'], required: true },
+    text: { type: String, required: true },
+    item_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'item', // Collega il testo all'opera
+        required: true
+    }
+});
+
+const museum = mongoose.model('museum', museumSchema);
+const item = mongoose.model('item', itemSchema);
+const language = mongoose.model('language', languageSchema);
+
+// Esportiamo tutto correttamente
+module.exports = { museum, item, language };
