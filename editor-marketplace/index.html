@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - ArtAround</title>
+    <title>Museum Marketplace - ArtAround</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,156 +24,147 @@
     <div x-show="!isReady">
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
             <div class="spinner-border text-orange spinner-lg mb-4" role="status">
-                <span class="visually-hidden">Caricamento in corso...</span>
+                <span class="visually-hidden">Loading...</span>
             </div>
-            <h3 class="fw-bold">Verifica accessi...</h3>
-            <p class="text-white-50">Stiamo preparando la tua dashboard.</p>
+            <h3 class="fw-bold">Loading Marketplace...</h3>
         </div>
     </div>
-    <div x-show="isReady && isLoggedIn && permissions === 'admin'" x-cloak>
 
-        <aside class="sidebar bg-dark shadow">
-            <div class="p-4 mb-3">
+    <div x-show="isReady" x-cloak class="d-flex flex-column min-vh-100">
+
+        <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4">
+            <div class="container-fluid">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2" href="../index.html">
                     <i class="bi bi-box text-orange"></i> ArtAround
                 </a>
-            </div>
 
-            <nav class="mt-4">
-                <a href="#" class="nav-link-admin active">
-                    <i class="bi bi-grid-fill"></i> Dashboard
-                </a>
-                <a href="editor.html" class="nav-link-admin">
-                    <i class="bi bi-pencil-square"></i> Crea Tour
-                </a>
-                <a href="#" class="nav-link-admin">
-                    <i class="bi bi-people"></i> Gestione Utenti
-                </a>
-                <a href="#" class="nav-link-admin">
-                    <i class="bi bi-bar-chart"></i> Statistiche
-                </a>
-                <div class="border-top border-secondary my-4 opacity-25"></div>
-                <a href="#" @click.prevent="logout()" class="nav-link-admin text-danger">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </nav>
-        </aside>
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <div class="input-group d-none d-lg-flex w-auto">
+                        <span class="input-group-text bg-secondary border-0 text-white-50 ps-3">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
+                            placeholder="Cerca visite o musei..." x-model="searchQuery">
+                    </div>
 
-        <main class="main-content">
+                    <a href="editor.html" class="btn btn-outline-light d-flex align-items-center gap-2"
+                        x-show="isLoggedIn && permissions === 'admin'">
+                        <i class="bi bi-pencil-square text-orange"></i>
+                        <span class="d-none d-md-inline">Gestisci Visite</span>
+                    </a>
 
-            <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4">
-                <div class="container-fluid">
-                    <h5 class="m-0 fw-bold d-none d-md-block">Benvenuto, <span class="text-orange"
-                            x-text="username"></span></h5>
-
-                    <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="input-group d-none d-lg-flex" style="width: 300px;">
-                            <span class="input-group-text bg-secondary border-0 text-white-50 ps-3">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
-                                placeholder="Cerca...">
-                        </div>
-                        <button class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center"
-                            style="width: 40px; height: 40px;">
-                            <i class="bi bi-bell"></i>
+                    <div class="d-flex align-items-center gap-2 border-start border-secondary ps-3 ms-1"
+                        x-show="isLoggedIn">
+                        <span class="d-none d-md-block text-white-50 small me-2" x-text="username"></span>
+                        <button class="btn bg-slate rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="bi bi-cart"></i>
                         </button>
                     </div>
                 </div>
-            </header>
-
-            <div class="p-4 p-lg-5">
-
-                <div class="row g-4 mb-5">
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="card bg-secondary bg-opacity-10 border-0 p-4 rounded-4 shadow-sm">
-                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Tour Pubblicati</p>
-                            <h2 class="fw-bold mb-0">12</h2>
-                            <div class="text-success small mt-2"><i class="bi bi-arrow-up"></i> +15% vs mese
-                                scorso
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="card bg-secondary bg-opacity-10 border-0 p-4 rounded-4 shadow-sm">
-                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Download Totali</p>
-                            <h2 class="fw-bold mb-0">1.284</h2>
-                            <div class="text-orange small mt-2"><i class="bi bi-star-fill"></i> Top 5 musei
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="card bg-secondary bg-opacity-10 border-0 p-4 rounded-4 shadow-sm">
-                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Utenti Attivi</p>
-                            <h2 class="fw-bold mb-0">459</h2>
-                            <div class="text-white-50 small mt-2">Nelle ultime 24h</div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-xl-3">
-                        <div class="card bg-orange border-0 p-4 rounded-4 shadow-sm">
-                            <p class="text-white small fw-bold text-uppercase mb-1">Stato Server</p>
-                            <h2 class="fw-bold mb-0">Online</h2>
-                            <div class="text-white small mt-2"><i class="bi bi-check-circle"></i> Tutti i
-                                sistemi ok
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden shadow-sm">
-                    <div
-                        class="card-header bg-transparent border-bottom border-secondary p-4 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold">Ultimi Tour Gestiti</h5>
-                        <button class="btn btn-outline-orange btn-sm rounded-pill px-3">Vedi tutti</button>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover m-0 align-middle">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th class="ps-4 py-3">Titolo Museo</th>
-                                        <th>Categoria</th>
-                                        <th>Autore</th>
-                                        <th>Data</th>
-                                        <th class="text-end pe-4">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="item in items" :key="item.id">
-                                        <tr>
-                                            <td class="ps-4 py-3 fw-bold" x-text="item.title"></td>
-                                            <td><span class="badge bg-slate px-2 py-1" x-text="item.category"></span>
-                                            </td>
-                                            <td x-text="username"></td>
-                                            <td class="text-white-50 small">20 Mar 2026</td>
-                                            <td class="text-end pe-4">
-                                                <button class="btn btn-sm btn-outline-light border-0"><i
-                                                        class="bi bi-pencil"></i></button>
-                                                <button class="btn btn-sm btn-outline-danger border-0 ms-2"><i
-                                                        class="bi bi-trash"></i></button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </main>
-    </div>
+        </header>
 
-    <div class="vh-100 d-flex align-items-center justify-content-center text-center px-4"
-        x-show="isReady && (!isLoggedIn || permissions !== 'admin')" x-cloak>
-        <div class="max-w-450">
-            <i class="bi bi-shield-lock text-orange icon-5xl mb-4 d-block"></i>
-            <h1 class="fw-bold">Area Riservata</h1>
-            <p class="text-white-50 lead">Spiacenti, il tuo account non dispone dei permessi necessari per
-                accedere alla
-                Dashboard di amministrazione.</p>
-            <a href="../index.html" class="btn btn-orange rounded-pill px-4 mt-3 fw-bold">Torna alla Home</a>
-        </div>
+        <main class="flex-grow-1 p-4 p-lg-5">
+
+            <div class="mb-5 text-center text-md-start">
+                <h1 class="fw-bold mb-2">Esplora le Visite</h1>
+                <p class="text-white-50 lead">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
+            </div>
+
+            <div class="alert bg-slate border-0 rounded-4 mb-5 shadow-sm text-white">
+                <h5 class="fw-bold text-orange mb-3"><i class="bi bi-server"></i> TODO: Mapping Dati MongoDB</h5>
+                <p class="mb-2">Una volta collegata la rotta <code>GET /api/visite</code>, ogni card riceverà un oggetto
+                    (documento) <strong>Visita</strong>. I campi da mappare nella UI sono:</p>
+                <div class="row row-cols-1 row-cols-md-2 g-2 small">
+                    <div class="col"><strong>_id:</strong> Chiave univoca per <code>:key</code> e per il carrello.</div>
+                    <div class="col"><strong>name:</strong> Titolo (es. "Tour Rinascimento").</div>
+                    <div class="col"><strong>description:</strong> Descrizione da mostrare nella card.</div>
+                    <div class="col"><strong>museum_id:</strong> Oggetto popolato (nome museo e città).</div>
+                    <div class="col"><strong>items:</strong> Array delle opere, utile per mostrare "Contiene X opere".
+                    </div>
+                    <div class="col"><strong>logistic_info:</strong> Info d'accesso, se necessarie in vetrina.</div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div
+                        class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden shadow-sm h-100 d-flex flex-column">
+
+                        <div
+                            class="ratio ratio-16x9 bg-slate border-bottom border-secondary position-relative d-flex align-items-center justify-content-center">
+
+                            <img src="" alt="Cover Museo"
+                                class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+
+                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-10"></div>
+
+                            <div class="position-absolute top-0 start-0 m-3 z-3">
+                                <span
+                                    class="badge bg-dark bg-opacity-75 text-white fw-bold px-3 py-2 rounded-pill shadow-sm">
+                                    Tour Guidato
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h5 class="fw-bold mb-1">Nome della Visita</h5>
+
+                            <p class="text-white-50 small mb-3">
+                                <i class="bi bi-geo-alt-fill text-orange"></i>
+                                <span>Nome Museo (Provincia)</span>
+                            </p>
+
+                            <p class="text-white-50 small flex-grow-1">
+                                Questa è una descrizione di esempio per verificare la resa grafica della card nel
+                                marketplace. [cite: 188]
+                            </p>
+
+                            <div
+                                class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+                                <span class="fs-4 fw-bold text-white">Free</span>
+                                <button class="btn btn-orange rounded-pill px-4 fw-bold">Seleziona</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="row g-4">
+                <template x-for="tour in tours" :key="tour._id">
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                        <div
+                            class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden shadow-sm h-100 d-flex flex-column">
+
+                            <div
+                                class="ratio ratio-16x9 bg-dark border-bottom border-secondary d-flex align-items-center justify-content-center position-relative">
+                                <i class="bi bi-image text-white-50 fs-1"></i>
+                                <span class="badge bg-slate position-absolute top-0 start-0 m-3 z-1"
+                                    x-text="tour.category || 'Tour'"></span>
+                            </div>
+
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="fw-bold mb-1" x-text="tour.name"></h5>
+
+                                <p class="text-white-50 small mb-3">
+                                    <i class="bi bi-geo-alt-fill text-orange"></i>
+                                    <span x-text="tour.museum_id.museum + ' (' + tour.museum_id.provence + ')'"></span>
+                                </p>
+
+                                <p class="text-white-50 small flex-grow-1" x-text="tour.description"></p>
+
+                                <div
+                                    class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+                                    <span class="fs-4 fw-bold text-white">Free</span>
+                                    <button class="btn btn-orange rounded-pill px-4 fw-bold">Seleziona</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+                -->
+        </main>
     </div>
 
 </body>
