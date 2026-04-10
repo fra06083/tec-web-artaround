@@ -42,6 +42,6 @@ const languageSchema = new mongoose.Schema({
 const museum = mongoose.model('museum', museumSchema);
 const item = mongoose.model('item', itemSchema);
 const language = mongoose.model('language', languageSchema);
-
+const visit = mongoose.model('visit', visitSchema);
 // Esportiamo tutto correttamente
-module.exports = { museum, item, language };
+module.exports = { museum, item, visit, language };

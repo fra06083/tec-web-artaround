@@ -46,7 +46,8 @@ if (dbUser && dbPwd && dbHost) {
 const authRoutes = require("./routes/auth.js");
 const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
 app.use("/api", authRoutes);
-
+const adminRoutes = require("./routes/admin.js");
+app.use("/admin", adminRoutes);
 
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {

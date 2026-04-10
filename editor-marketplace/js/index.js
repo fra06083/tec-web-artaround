@@ -7,7 +7,12 @@ function marketplaceApp() {
         searchQuery: '', // cose che vengono scritte nella barra di ricerca
         isLoading: true, // true di default così nella console non rompe le balle
         isReady: false,
-
+        stats: {
+            publishedTours: 0,
+            totalDownloads: 0,
+            activeUsers: 0,
+            serverStatus: 'Offline'
+        },
         async init() {
             // veriFICA del token all'avvio
             await this.checkAuth();
@@ -19,6 +24,7 @@ function marketplaceApp() {
             }
 
             this.isLoading = false;
+            this.refreshStats();
             this.isReady = true;
         },
 
@@ -61,7 +67,16 @@ function marketplaceApp() {
                 this.isLoggedIn = false;
             }
         },
-
+        async refreshStats() {
+            try {
+                const response = await fetch('/admin/stats');
+                if (response.ok) {
+                    this.stats = await response.json();
+                }
+            } catch (error) {
+                console.error("Errore caricamento statistiche:", error);
+            }
+        },
         async fetchTours() {
             try {
                 const token = localStorage.getItem('artaround_token');
