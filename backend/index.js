@@ -1,4 +1,4 @@
-// File: index.js
+
 global.rootDir = __dirname;
 global.startDate = null; // Aggiunto come nel file del prof
 
@@ -42,120 +42,10 @@ if (dbUser && dbPwd && dbHost) {
     console.error('ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
 }
 
-// Middleware per verificare il token in ogni richiesta sensibile
-const authenticateToken = (req, res, next) => {
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ error: 'Accesso negato. Token mancante.' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // dati dell'utente nella richiesta
-        next(); // Passiamo al prossimo passaggio (la rotta vera e propria)
-    } catch (error) {
-        res.status(403).json({ error: 'Token non valido o scaduto.' });
-    }
-};
-
-// --- REGISTRAZIONE ---
-app.post('/api/register', async (req, res) => {
-    try {
-        console.log("PRESA IN GESTIONE RICHIESTA REGISTRAZIONE");
-
-        // FORM DATAS
-        const { name, password } = req.body;
-
-        // CHECK IF NULL
-        if (!name || !password) {
-            return res.status(400).json({ error: 'Nome e password sono obbligatori' });
-        }
-
-        // CHECK EXISTING USER (NOT OVERWRITE)
-        const existingUser = await login.findOne({ name });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Nome utente già in uso' });
-        }
-
-        // HASHING
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const newUser = new login({
-            name: name,
-            password: hashedPassword,
-            permissions: req.body.permissions || 'visitatore' // always check visitatore, if we let choose the role we might have security problems!
-        });
-
-        await newUser.save();
-        res.status(201).json({ message: 'Registrazione completata!' });
-
-    } catch (error) {
-        console.error("Errore nella registrazione:", error);
-        res.status(500).json({ error: 'Errore interno del server' });
-    }
-});
-
-
-// --- LOGIN ---
-app.post('/api/login', async (req, res) => {
-    try {
-        console.log("PRESA IN GESTIONE RICHIESTA LOGIN");
-        const { name, password } = req.body;
-
-        if (!name || !password) {
-            return res.status(400).json({ error: 'Nome e password sono obbligatori' });
-        }
-
-        const adminUser = await login.findOne({ name });
-        if (!adminUser) {
-            return res.status(401).json({ error: 'Credenziali non valide' });
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, adminUser.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Credenziali non valide' });
-        }
-
-        // 3. Generazione del Token JWT
-        // Includiamo l'ID, il nome e le PERMISSIONS (corretto da 'role')
-        const token = jwt.sign(
-            {
-                id: adminUser._id,
-                name: adminUser.name,
-                permissions: adminUser.permissions
-            },
-            // AGGIUNTO FALLBACK: Previene crash fatali se manca JWT_SECRET nel file .env
-            process.env.JWT_SECRET,
-            { expiresIn: '4h' }
-        );
-
-        res.json({ message: 'Login effettuato!', token });
-
-    } catch (error) {
-        console.error("Errore nel login: ", error);
-        res.status(500).json({ error: 'Errore interno del server' });
-    }
-});
-
-
-// --- VERIFICA TOKEN (Middleware, used to check if the saved token is expired or changed manually!) ---
-app.get('/api/check', authenticateToken, (req, res) => {
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ error: 'Nessun token fornito' });
-    }
-
-    try {
-        // Decodifichiamo direttamente la stringa passata
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
-        res.json({ valid: true, user: decoded });
-    } catch (error) {
-        res.status(401).json({ error: 'Token non valido o scaduto' });
-    }
-});
+// ROUTES 
+const authRoutes = require("./routes/auth.js");
+const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
+app.use("/api", authRoutes);
 
 
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)

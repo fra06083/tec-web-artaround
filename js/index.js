@@ -13,7 +13,7 @@ function homeApp() {
             try {
                 // Using your specified endpoint: /api/check
                 const response = await fetch('/api/check', {
-                    method: 'GET',
+                    method: 'POST',
                     headers: { 'Authorization': token }
                 });
 
