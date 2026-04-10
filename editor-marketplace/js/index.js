@@ -39,7 +39,7 @@ function marketplaceApp() {
                 }
 
                 const response = await fetch('/api/check', {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': token
