@@ -50,7 +50,7 @@ router.post('/register', async (req, res) => {
         const newUser = new login({
             name: name,
             password: hashedPassword,
-            permissions: req.body.permissions || 'visitatore' // always check visitatore, if we let choose the role we might have security problems!
+            permissions: 'visitatore' // always check visitatore, if we let choose the role we might have security problems!
         });
 
         await newUser.save();
