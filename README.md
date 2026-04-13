@@ -1,18 +1,103 @@
-# React + Vite
+# ArtAround Backend Architecture
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project follows the **MVC (Model-View-Controller)** pattern to ensure a clean separation between data, logic, and presentation.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Structure
 
-## React Compiler
+```
+backend/
+├── models/      # used for: defining Mongoose schemas and database structure
+├── middleware/  # used for: protecting routes and verifying JWT tokens (The Guard)
+├── controllers/ # used for: business logic, data processing, and responses (The Brain)
+├── routes/      # used for: mapping URLs to specific controller functions (The Map)
+├── views/       # used for: storing protected HTML files for the editor (The Vault)
+├── index.js     # used for: server configuration and database connection
+└── .env         # used for: storing environment variables and secrets
+```
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
 
-Note: This will impact Vite dev & build performances.
+## Components Detail
 
-## Expanding the ESLint configuration
+### 1. Models (`models/`)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Used for:** defining the structure of MongoDB documents.
+
+Example:  
+`museums.js` handles schemas for visits and items.
+
+---
+
+### 2. Middleware (`middleware/`)
+
+**Used for:** intercepting requests before they reach the controller.
+
+File:  
+`auth.js` checks for a valid JWT in cookies or URL parameters.
+
+---
+
+### 3. Controllers (`controllers/`)
+
+**Used for:** the actual "intelligence" of the application.
+
+Logic:
+
+- Fetches data from **Models**
+- Processes business logic
+- Chooses which **View (HTML)** or **JSON** data to return
+
+---
+
+### 4. Routes (`routes/`)
+
+**Used for:** defining the API and View endpoints.
+
+Example:  
+`admin.js` connects `/admin/stats` to the `getStats` function in the controller.
+
+---
+
+### 5. Views (`views/`)
+
+**Used for:** keeping admin-only HTML files safe and hidden from the public.
+
+Security:
+These files are only served via `res.sendFile()` after a successful authentication check.
+
+---
+
+## Core Files
+
+### `index.js`
+
+Used for:
+
+- Main entry point of the Node.js application
+- Connecting to MongoDB
+- Initializing Express middleware (CORS, JSON parsing, Cookies)
+- Serving the `/public` folder for static assets
+
+---
+
+### `.env`
+
+Used for storing sensitive credentials such as:
+
+- `MONGO_PWD`
+- `JWT_SECRET`
+
+Note:  
+This file is ignored by Git for security reasons.
+
+---
+
+## Workflow Example
+
+1. User clicks a link to `/admin/tours`.
+2. **Middleware (`auth.js`)** verifies the identity.
+3. **Route (`admin.js`)** triggers the correct controller function.
+4. **Controller (`adminController.js`)** sends the protected HTML from the `views/` folder.
+5. The browser receives the HTML and fetches CSS/JS from the `/public` directory.

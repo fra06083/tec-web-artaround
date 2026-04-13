@@ -9,6 +9,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const login = require('./models/admin');
 
@@ -16,6 +17,7 @@ const app = express();
 
 app.enable('trust proxy');
 
+app.use(cookieParser());
 // 2. MIDDLEWARE BASE
 app.use(cors());
 app.use(express.json());
@@ -47,8 +49,11 @@ const authRoutes = require("./routes/auth.js");
 const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
 app.use("/api", authRoutes);
 const adminRoutes = require("./routes/admin.js");
-app.use("/admin", adminRoutes);
-
+app.use("/editor", adminRoutes);
+// used for serving public files (CSS, JS, Images)
+// everything in "public" is accessible via "/"
+app.use('/', express.static(path.join(__dirname, '../public')));
+app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {
     global.startDate = new Date();

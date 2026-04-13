@@ -1,31 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const { visit, item } = require('../models/museums.js'); // requiring models
-const login = require('../models/admin.js');
+const router = express.Router();             // used for creating modular route handlers
+const auth = require('../middleware/auth.js'); // used for protecting routes
+const adminCtrl = require('../controllers/adminController.js'); // used for logic
 
-router.get('/stats', async (req, res) => {
-    try {
-        const publishedTours = await visit.countDocuments();
+// GET /editor/dashboard -> used for viewing the admin panel
+router.get('/dashboard', auth, adminCtrl.serveDashboard);
 
-        const totalUsers = await login.countDocuments();
+// GET /editor/stats -> used for fetching dashboard numbers
+router.get('/stats', auth, adminCtrl.getStats);
 
-        res.json({
-            publishedTours: publishedTours,
-            totalDownloads: 0, // TODO: cosa si puo` mettere qui?
-            activeUsers: totalUsers,
-            serverStatus: "Online"
-        });
-    } catch (error) {
-        res.status(500).json({ error: "Errore nel recupero dei dati" });
-    }
-});
-router.get('/tours', async (req, res) => {
-    try {
-        // find all tours
-        const tours = await visit.find().populate('museum_id');
-        res.json(tours);
-    } catch (error) {
-        res.status(500).json({ error: "Errore nel caricamento dei tour" });
-    }
-});
-module.exports = router;
+// GET /editor/tours -> used for fetching the list of tours
+router.get('/getTours', auth, adminCtrl.getAllTours);
+router.get('/tours', auth, adminCtrl.serveTours);
+module.exports = router; // used for exporting the router to app.js

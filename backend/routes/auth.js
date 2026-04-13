@@ -19,7 +19,14 @@ router.post('/login', async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '4h' }
         );
-        res.json({ message: 'Login effettuato!', token });
+        res.cookie('artaround_token', token, {
+            httpOnly: true,
+            secure: false,  // Metti true solo se hai HTTPS
+            sameSite: 'lax',
+            maxAge: 4 * 60 * 60 * 1000 // Scade tra 4 ore
+        });
+
+        res.json({ message: "Login ok", token });
     } catch (error) {
         res.status(500).json({ error: 'Errore interno' });
     }
