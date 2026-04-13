@@ -19,8 +19,6 @@ backend/
 ├── views/       # used for: storing protected HTML files for the editor (The Vault)
 ├── index.js     # used for: server configuration and database connection
 └── .env         # used for: storing environment variables and secrets
-public/
-├──
 ```
 
 ---
@@ -102,7 +100,7 @@ This file is ignored by Git for security reasons.
 
 ## Workflow Example
 
-1. User clicks a link to `/admin/tours`.
+1. User clicks a link to `/editor/tours`.
 2. **Middleware (`auth.js`)** verifies the identity.
 3. **Route (`admin.js`)** triggers the correct controller function.
 4. **Controller (`adminController.js`)** sends the protected HTML from the `views/` folder.
