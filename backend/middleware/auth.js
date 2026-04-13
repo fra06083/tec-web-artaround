@@ -6,7 +6,7 @@ const auth = (req, res, next) => {
 
     if (!token) {
         // used for blocking unauthorized access
-        return res.redirect('/marketplace/login.html');
+        return res.redirect('/login.html');
     }
 
     try {
@@ -16,7 +16,7 @@ const auth = (req, res, next) => {
         next();             // used for moving to the next function (controller)
     } catch (err) {
         // used for handling invalid tokens
-        res.redirect('/marketplace/login.html');
+        res.redirect('/login.html');
     }
 };
 
