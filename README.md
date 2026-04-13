@@ -7,6 +7,10 @@ This project follows the **MVC (Model-View-Controller)** pattern to ensure a cle
 ## Project Structure
 
 ```
+public/             # used for: public static files (CSS, client-side JS, images)
+├── css/            # used for: global styles
+├── js/             # used for: frontend logic (Alpine.js, fetch calls)
+└── marketplace/    # used for: public pages (index, login, signup)
 backend/
 ├── models/      # used for: defining Mongoose schemas and database structure
 ├── middleware/  # used for: protecting routes and verifying JWT tokens (The Guard)
@@ -15,6 +19,8 @@ backend/
 ├── views/       # used for: storing protected HTML files for the editor (The Vault)
 ├── index.js     # used for: server configuration and database connection
 └── .env         # used for: storing environment variables and secrets
+public/
+├──
 ```
 
 ---
