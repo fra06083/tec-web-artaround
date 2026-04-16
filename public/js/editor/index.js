@@ -69,7 +69,11 @@ function marketplaceApp() {
         },
         async refreshStats() {
             try {
-                const response = await fetch('/admin/stats');
+                const token = localStorage.getItem('artaround_token'); // Recupera il token
+                const response = await fetch('/editor/stats', {
+                    method: "GET",
+                    'Authorization': token
+                });
                 if (response.ok) {
                     this.stats = await response.json();
                 }
