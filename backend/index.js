@@ -6,12 +6,9 @@ global.startDate = null; // Aggiunto come nel file del prof
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
-const login = require('./models/admin');
 
 const app = express();
 
@@ -47,8 +44,8 @@ if (dbUser && dbPwd && dbHost) {
 // ROUTES 
 const authRoutes = require("./routes/auth.js");
 const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
-app.use("/api", authRoutes);
 const adminRoutes = require("./routes/admin.js");
+app.use("/api", authRoutes);
 app.use("/editor", adminRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"
