@@ -12,4 +12,5 @@ router.get('/stats', auth, adminCtrl.getStats);
 // GET /editor/tours -> used for fetching the list of tours
 router.get('/getTours', auth, adminCtrl.getAllTours);
 router.get('/tours', auth, adminCtrl.serveTours);
+router.get('/museum', auth, adminCtrl.serveMuseums);
 module.exports = router; // used for exporting the router to app.js

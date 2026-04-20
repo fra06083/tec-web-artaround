@@ -251,3 +251,68 @@
         margin-left: 0;
     }
 }
+
+/*  NAVBAR */
+/* Stile per i titoli delle sezioni nella sidebar */
+.nav-section-header {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    pointer-events: none;
+    user-select: none;
+}
+
+.nav-section-header span {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+/* Ottimizzazione Link Admin */
+.nav-link-admin {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-link-admin:hover {
+    background: rgba(255, 120, 0, 0.1);
+    color: #ff7800;
+}
+
+.nav-link-admin.active {
+    background: #ff7800;
+    color: white !important;
+}
+
+.nav-link-admin i {
+    font-size: 1.2rem;
+}
+
+/* Responsività Mobile */
+@media (max-width: 991px) {
+    .sidebar {
+        width: 80px !important;
+        /* Sidebar stretta su tablet/mobile */
+        transition: width 0.3s ease;
+    }
+
+    .sidebar span,
+    .nav-section-header {
+        display: none;
+        /* Nascondi i testi, lascia solo le icone */
+    }
+
+    .nav-link-admin {
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .main-content {
+        margin-left: 80px;
+    }
+}

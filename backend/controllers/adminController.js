@@ -34,6 +34,11 @@ module.exports = {
         // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/dashboard.html'));
     },
+    serveMuseums: (req, res) => {
+        // sends the physical file from the "views" folder
+        res.sendFile(path.join(__dirname, '../views/editor/museum.html'));
+    },
+
     serveTours: (req, res) => {
         // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/tours.html'));
