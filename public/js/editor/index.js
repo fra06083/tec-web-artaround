@@ -16,12 +16,7 @@ function marketplaceApp() {
         async init() {
             // veriFICA del token all'avvio
             await this.checkAuth();
-
-            // se loggato, si caricano i dati, altrimenti si resta in modalità "ospite"
-            // o si potrebbe reindirizzare da qualche parte idk
-            if (this.isLoggedIn) {
-                await this.fetchTours();
-            }
+            await this.fetchTours();
 
             this.isLoading = false;
             this.refreshStats();
@@ -83,15 +78,7 @@ function marketplaceApp() {
         },
         async fetchTours() {
             try {
-                const token = localStorage.getItem('artaround_token');
-                // manca la gestione della rotta /api/tours :3
-                const response = await fetch('/api/tours', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': token
-                    }
-                });
-
+                const response = await fetch('/api/visite');
                 if (response.ok) {
                     this.items = await response.json();
                 }

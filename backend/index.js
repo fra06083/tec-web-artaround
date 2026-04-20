@@ -47,6 +47,7 @@ const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!
 const adminRoutes = require("./routes/admin.js");
 app.use("/api", authRoutes);
 app.use("/editor", adminRoutes);
+app.use("/api/visite", visitRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"
 app.use('/', express.static(path.join(__dirname, '../public')));
