@@ -28,7 +28,7 @@ const getMuseumById = async (req, res) => {
 // Richiede Auth (il middleware va nella rotta)
 const createMuseum = async (req, res) => {
     try {
-        const { museum, city, provence, region, description, image } = req.body;
+        const { museum, city, provence, region, address, description, image } = req.body;
 
         if (!museum) {
             return res.status(400).json({ error: 'Il nome del museo è obbligatorio' });
@@ -39,6 +39,7 @@ const createMuseum = async (req, res) => {
             city,
             provence,
             region,
+            address,
             description,
             image
         });

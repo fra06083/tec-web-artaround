@@ -18,6 +18,7 @@ function museumManager() {
             city: '',
             provence: '',
             region: '',
+            address: '',
             description: '',
             image: ''
         },
