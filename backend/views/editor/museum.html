@@ -157,14 +157,12 @@
                                                             class="rounded-3 object-fit-cover img-thumbnail-custom shadow-sm"
                                                             alt="Museum">
                                                     </template>
-
                                                     <template x-if="!m.image">
                                                         <div
                                                             class="rounded-3 d-flex align-items-center justify-content-center bg-orange bg-opacity-10 border border-orange border-opacity-25 img-thumbnail-custom shadow-sm">
                                                             <i class="bi bi-bank text-orange fs-5"></i>
                                                         </div>
                                                     </template>
-
                                                     <div>
                                                         <span class="d-block fw-bold text-white mb-0"
                                                             x-text="m.museum"></span>
@@ -173,17 +171,26 @@
                                                     </div>
                                                 </div>
                                             </td>
+
                                             <td class="py-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <i class="bi bi-geo-alt-fill text-orange"></i>
-                                                    <span class="text-white-50" x-text="m.city || 'N/D'"></span>
-                                                    <span class="badge badge-provence" x-show="m.provence"
-                                                        x-text="m.provence"></span>
+                                                <div class="d-flex flex-column gap-1">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <i class="bi bi-geo-alt-fill text-orange small"></i>
+                                                        <span class="text-white fw-medium"
+                                                            x-text="m.city || 'N/D'"></span>
+                                                        <span class="badge badge-provence" x-show="m.provence"
+                                                            x-text="m.provence"></span>
+                                                    </div>
+                                                    <div class="ps-4 small text-white-50 fst-italic">
+                                                        <span x-text="m.address || 'Indirizzo non presente'"></span>
+                                                    </div>
                                                 </div>
                                             </td>
+
                                             <td class="py-3">
                                                 <span class="text-white-50 fw-medium" x-text="m.region || '—'"></span>
                                             </td>
+
                                             <td class="text-end pe-4 py-3">
                                                 <div class="btn-group rounded-3 overflow-hidden shadow-sm">
                                                     <button @click="openMuseumForm(m)" class="btn btn-action bg-slate"
@@ -202,169 +209,163 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <template x-if="museums.length === 0">
-                            <div class="text-center py-5">
-                                <div class="mb-3">
-                                    <i class="bi bi-bank2 text-white-50 opacity-25 display-1"></i>
-                                </div>
-                                <h5 class="text-white-50">Nessun museo in archivio</h5>
-                                <p class="small text-muted mb-4">Inizia aggiungendo la tua prima struttura partner.</p>
-                                <button @click="openMuseumForm()" class="btn btn-orange rounded-pill px-4 shadow">
-                                    <i class="bi bi-plus-lg me-2"></i>Aggiungi Museo
-                                </button>
-                            </div>
-                        </template>
                     </div>
-                </div>
-                <div x-show="step === 'museum-form'" class="max-w-550 mx-auto">
-                    <div class="card bg-secondary bg-opacity-10 p-4 rounded-4 border-0 shadow">
-                        <h4 class="fw-bold mb-4" x-text="currentMuseum._id ? 'Modifica Museo' : 'Crea Nuovo Museo'">
-                        </h4>
-
-                        <form @submit.prevent="saveMuseum()">
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Nome del Museo</label>
-                                <input type="text" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentMuseum.museum" required placeholder="Es: Galleria degli Uffizi">
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label text-white-50 small">Città</label>
-                                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                                        x-model="currentMuseum.city" placeholder="Firenze">
-                                </div>
-                                <div class="col-md-3 col-6 mb-3">
-                                    <label class="form-label text-white-50 small">Provincia</label>
-                                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                                        x-model="currentMuseum.provence" maxlength="2" placeholder="FI">
-                                </div>
-                                <div class="col-md-3 col-6 mb-3">
-                                    <label class="form-label text-white-50 small">Regione</label>
-                                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                                        x-model="currentMuseum.region" placeholder="Toscana">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Indirizzo</label>
-                                <input type="text" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentMuseum.address" placeholder="indrizzo museo">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">URL Immagine Copertina</label>
-                                <input type="url" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentMuseum.image" placeholder="https://link-immagine.jpg">
-
-                                <template x-if="currentMuseum.image">
-                                    <div class="mt-2 position-relative">
-                                        <img :src="currentMuseum.image"
-                                            class="rounded-3 w-100 object-fit-cover shadow-sm"
-                                            style="height: 150px; opacity: 0.8; border: 1px solid rgba(255,255,255,0.1);">
-                                        <div class="position-absolute bottom-0 start-0 p-2 w-100 rounded-bottom-3"
-                                            style="background: linear-gradient(transparent, rgba(0,0,0,0.7))">
-                                            <span class="text-white extra-small">Anteprima copertura</span>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Descrizione</label>
-                                <textarea class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentMuseum.description" rows="4"
-                                    placeholder="Racconta brevemente il museo..."></textarea>
-                            </div>
-
-                            <div class="d-flex gap-2 pt-3">
-                                <button type="button" @click="step = 'museum-list'"
-                                    class="btn btn-slate w-100">Annulla</button>
-                                <button type="submit" class="btn btn-orange w-100">
-                                    <i class="bi bi-check-lg me-1"></i> Salva Museo
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div x-show="step === 'artwork-museum-select'" class="max-w-550 mx-auto text-center py-5">
-                    <i class="bi bi-search text-orange icon-5xl mb-4 d-block"></i>
-                    <h3 class="fw-bold">Cerca Opere</h3>
-                    <p class="text-white-50 mb-4">Seleziona un museo per visualizzare e gestire il catalogo opere.</p>
-                    <select class="form-select form-select-lg bg-dark text-white border-secondary"
-                        x-model="selectedMuseumId" @change="fetchArtworks()">
-                        <option value="">Scegli un museo...</option>
-                        <template x-for="m in museums" :key="m._id">
-                            <option :value="m._id" x-text="m.museum"></option>
-                        </template>
-                    </select>
-                </div>
-
-                <div x-show="step === 'artwork-list'">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <button @click="step = 'artwork-museum-select'"
-                            class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                            <i class="bi bi-arrow-left"></i> Cambia Museo
+                </div> <template x-if="museums.length === 0">
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="bi bi-bank2 text-white-50 opacity-25 display-1"></i>
+                        </div>
+                        <h5 class="text-white-50">Nessun museo in archivio</h5>
+                        <p class="small text-muted mb-4">Inizia aggiungendo la tua prima struttura partner.</p>
+                        <button @click="openMuseumForm()" class="btn btn-orange rounded-pill px-4 shadow">
+                            <i class="bi bi-plus-lg me-2"></i>Aggiungi Museo
                         </button>
-                        <span class="text-white-50 small">Stai gestendo le opere di: <strong class="text-white"
-                                x-text="getMuseumName(selectedMuseumId)"></strong></span>
                     </div>
-
-                    <div class="row g-3">
-                        <template x-for="art in artworks" :key="art._id">
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 h-100">
-                                    <img :src="art.image || 'https://via.placeholder.com/400x250?text=No+Image'"
-                                        class="card-img-top thumbnail-160 object-fit-cover rounded-top-4">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold m-0" x-text="art.title"></h6>
-                                        <p class="small text-orange mb-3" x-text="art.artist || 'Artista Sconosciuto'">
-                                        </p>
-                                        <div class="d-flex gap-2">
-                                            <button @click="openArtworkForm(art)"
-                                                class="btn btn-sm bg-slate w-100">Modifica</button>
-                                            <button @click="deleteArtwork(art._id)"
-                                                class="btn btn-sm btn-outline-danger"><i
-                                                    class="bi bi-trash"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div x-show="step === 'artwork-form'" class="max-w-550 mx-auto">
-                    <div class="card bg-secondary bg-opacity-10 p-4 rounded-4 border-0 shadow">
-                        <h4 class="fw-bold mb-4"
-                            x-text="currentArtwork._id ? 'Modifica Opera' : 'Aggiungi Nuova Opera'"></h4>
-                        <form @submit.prevent="saveArtwork()">
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Titolo Opera</label>
-                                <input type="text" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentArtwork.title" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Artista</label>
-                                <input type="text" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentArtwork.artist">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">URL Immagine</label>
-                                <input type="url" class="form-control bg-dark text-white border-secondary"
-                                    x-model="currentArtwork.image">
-                            </div>
-                            <div class="d-flex gap-2 pt-3">
-                                <button type="button" @click="step = 'artwork-list'"
-                                    class="btn btn-slate w-100">Annulla</button>
-                                <button type="submit" class="btn btn-orange w-100">Salva Opera</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
+                </template>
             </div>
-        </main>
+    </div>
+    <div x-show="step === 'museum-form'" class="max-w-550 mx-auto">
+        <div class="card bg-secondary bg-opacity-10 p-4 rounded-4 border-0 shadow">
+            <h4 class="fw-bold mb-4" x-text="currentMuseum._id ? 'Modifica Museo' : 'Crea Nuovo Museo'">
+            </h4>
+
+            <form @submit.prevent="saveMuseum()">
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">Nome del Museo</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentMuseum.museum" required placeholder="Es: Galleria degli Uffizi">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-white-50 small">Città</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                            x-model="currentMuseum.city" placeholder="Firenze">
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <label class="form-label text-white-50 small">Provincia</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                            x-model="currentMuseum.provence" maxlength="2" placeholder="FI">
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <label class="form-label text-white-50 small">Regione</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                            x-model="currentMuseum.region" placeholder="Toscana">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">Indirizzo</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentMuseum.address" placeholder="indrizzo museo">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">URL Immagine Copertina</label>
+                    <input type="url" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentMuseum.image" placeholder="https://link-immagine.jpg">
+
+                    <template x-if="currentMuseum.image">
+                        <div class="mt-2 position-relative">
+                            <img :src="currentMuseum.image" class="rounded-3 w-100 object-fit-cover shadow-sm"
+                                style="height: 150px; opacity: 0.8; border: 1px solid rgba(255,255,255,0.1);">
+                            <div class="position-absolute bottom-0 start-0 p-2 w-100 rounded-bottom-3"
+                                style="background: linear-gradient(transparent, rgba(0,0,0,0.7))">
+                                <span class="text-white extra-small">Anteprima copertura</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">Descrizione</label>
+                    <textarea class="form-control bg-dark text-white border-secondary"
+                        x-model="currentMuseum.description" rows="4"
+                        placeholder="Racconta brevemente il museo..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2 pt-3">
+                    <button type="button" @click="step = 'museum-list'" class="btn btn-slate w-100">Annulla</button>
+                    <button type="submit" class="btn btn-orange w-100">
+                        <i class="bi bi-check-lg me-1"></i> Salva Museo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div x-show="step === 'artwork-museum-select'" class="max-w-550 mx-auto text-center py-5">
+        <i class="bi bi-search text-orange icon-5xl mb-4 d-block"></i>
+        <h3 class="fw-bold">Cerca Opere</h3>
+        <p class="text-white-50 mb-4">Seleziona un museo per visualizzare e gestire il catalogo opere.</p>
+        <select class="form-select form-select-lg bg-dark text-white border-secondary" x-model="selectedMuseumId"
+            @change="fetchArtworks()">
+            <option value="">Scegli un museo...</option>
+            <template x-for="m in museums" :key="m._id">
+                <option :value="m._id" x-text="m.museum"></option>
+            </template>
+        </select>
+    </div>
+
+    <div x-show="step === 'artwork-list'">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <button @click="step = 'artwork-museum-select'" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left"></i> Cambia Museo
+            </button>
+            <span class="text-white-50 small">Stai gestendo le opere di: <strong class="text-white"
+                    x-text="getMuseumName(selectedMuseumId)"></strong></span>
+        </div>
+
+        <div class="row g-3">
+            <template x-for="art in artworks" :key="art._id">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 h-100">
+                        <img :src="art.image || 'https://via.placeholder.com/400x250?text=No+Image'"
+                            class="card-img-top thumbnail-160 object-fit-cover rounded-top-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold m-0" x-text="art.title"></h6>
+                            <p class="small text-orange mb-3" x-text="art.artist || 'Artista Sconosciuto'">
+                            </p>
+                            <div class="d-flex gap-2">
+                                <button @click="openArtworkForm(art)"
+                                    class="btn btn-sm bg-slate w-100">Modifica</button>
+                                <button @click="deleteArtwork(art._id)" class="btn btn-sm btn-outline-danger"><i
+                                        class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <div x-show="step === 'artwork-form'" class="max-w-550 mx-auto">
+        <div class="card bg-secondary bg-opacity-10 p-4 rounded-4 border-0 shadow">
+            <h4 class="fw-bold mb-4" x-text="currentArtwork._id ? 'Modifica Opera' : 'Aggiungi Nuova Opera'"></h4>
+            <form @submit.prevent="saveArtwork()">
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">Titolo Opera</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentArtwork.title" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">Artista</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentArtwork.artist">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small">URL Immagine</label>
+                    <input type="url" class="form-control bg-dark text-white border-secondary"
+                        x-model="currentArtwork.image">
+                </div>
+                <div class="d-flex gap-2 pt-3">
+                    <button type="button" @click="step = 'artwork-list'" class="btn btn-slate w-100">Annulla</button>
+                    <button type="submit" class="btn btn-orange w-100">Salva Opera</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </div>
+    </main>
     </div>
 
     <style>
