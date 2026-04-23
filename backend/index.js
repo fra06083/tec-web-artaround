@@ -44,10 +44,12 @@ if (dbUser && dbPwd && dbHost) {
 // ROUTES 
 const authRoutes = require("./routes/auth.js");
 const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
+const museumRoutes = require("./routes/museums.js");
 const adminRoutes = require("./routes/admin.js");
 app.use("/api", authRoutes);
 app.use("/editor", adminRoutes);
 app.use("/api/visite", visitRoutes);
+app.use("/api/museums", museumRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"
 app.use('/', express.static(path.join(__dirname, '../public')));

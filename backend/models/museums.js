@@ -2,12 +2,13 @@ const mongoose = require('mongoose');
 
 // 1. IL MUSEO (Il contenitore)
 const museumSchema = new mongoose.Schema({
-    museum: { type: String, required: true, unique: true },
-    region: { type: String, required: true },
+    museum: { type: String, required: true },
+    city: { type: String, required: true },
     provence: { type: String, required: true },
-    address: { type: String, required: true }
+    region: { type: String, required: true },
+    description: String,
+    image: String
 });
-
 // 2. L'OPERA (Contenuta nel museo)
 const itemSchema = new mongoose.Schema({
     item: { type: String, required: true, unique: true },

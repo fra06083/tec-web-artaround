@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth.js');
 const visitsCtrl = require('../controllers/visitsController.js');
-
 // ─── MARKETPLACE (public) ────────────────────────────────────────────────────
 
 // GET /api/visite = lista di tutte le visite pubbliche (usata dal marketplace)
