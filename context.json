@@ -49,7 +49,7 @@
             "fields": {
                 "museum": "String (required, unique)",
                 "region": "String",
-                "provence": "String",
+                "province": "String",
                 "address": "String"
             }
         },

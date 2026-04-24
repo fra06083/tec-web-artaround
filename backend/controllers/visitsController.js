@@ -5,7 +5,7 @@ const { visit: Visit, museum: Museum } = require('../models/museums');
 const getAllVisits = async (req, res) => {
     try {
         const visits = await Visit.find()
-            .populate('museum_id', 'museum provence')
+            .populate('museum_id', 'museum province')
             .lean();
         res.json(visits);
     } catch (error) {
@@ -18,7 +18,7 @@ const getAllVisits = async (req, res) => {
 const getVisitById = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id)
-            .populate('museum_id', 'museum provence')
+            .populate('museum_id', 'museum province')
             .populate('items')
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });

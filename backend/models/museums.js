@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const museumSchema = new mongoose.Schema({
     museum: { type: String, required: true },
     city: { type: String, required: true },
-    provence: { type: String, required: true },
+    province: { type: String, required: true },
     region: { type: String, required: true },
     address: { type: String, required: true },
     description: String,

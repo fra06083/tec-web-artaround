@@ -56,11 +56,10 @@
                     <div class="flex-grow-1 border-top border-secondary opacity-25 ms-2"></div>
                 </div>
 
-                <a href="/editor/museum" class="nav-link-admin" :class="step === 'museum-list' ? 'active' : ''">
+                <a href="/editor/museum" class="nav-link-admin">
                     <i class="bi bi-bank"></i> <span>Gestione Musei</span>
                 </a>
-                <a href="#" @click.prevent="setMode('artworks')" class="nav-link-admin"
-                    :class="step.includes('artwork') ? 'active' : ''">
+                <a href="#"  class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
 

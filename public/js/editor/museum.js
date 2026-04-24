@@ -16,7 +16,7 @@ function museumManager() {
         currentMuseum: {
             museum: '',
             city: '',
-            provence: '',
+            province: '',
             region: '',
             address: '',
             description: '',
@@ -98,7 +98,7 @@ function museumManager() {
             if (museum) {
                 this.currentMuseum = { ...museum };
             } else {
-                this.currentMuseum = { museum: '', city: '', provence: '', region: '', description: '', image: '' };
+                this.currentMuseum = { museum: '', city: '', province: '', region: '', description: '', image: '' };
             }
             this.step = 'museum-form';
         },

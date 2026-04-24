@@ -26,7 +26,7 @@ function VisitList() {
                     <div key={v._id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
                         <h3>{v.name}</h3>
                         {v.description && <p>{v.description}</p>}
-                        {v.museum_id && <p><small>{v.museum_id.museum} — {v.museum_id.provence}</small></p>}
+                        {v.museum_id && <p><small>{v.museum_id.museum} — {v.museum_id.province}</small></p>}
                         <Link to={`/visit/${v._id}`}>Inizia visita</Link>
                     </div>
                 ))}
