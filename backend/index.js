@@ -52,8 +52,8 @@ app.use("/api/visite", visitRoutes);
 app.use("/api/museums", museumRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"
+app.use('/navigator', express.static(path.join(__dirname, '../public/navigator/dist')));
 app.use('/', express.static(path.join(__dirname, '../public')));
-app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {
     global.startDate = new Date();

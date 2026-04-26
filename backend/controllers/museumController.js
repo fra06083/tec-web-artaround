@@ -74,8 +74,9 @@ const deleteMuseum = async (req, res) => {
         const deleted = await Museum.findByIdAndDelete(req.params.id);
         if (!deleted) return res.status(404).json({ error: 'Museo non trovato' });
 
-        // Opzionale: Qui potresti voler eliminare anche tutti gli "items" collegati a questo museo
-        // await Item.deleteMany({ museum_id: req.params.id });
+        // visite e item inerenti a quel museo devono essere cancellati
+        await Visit.deleteMany({ museum_id: req.params.id });
+        await Item.deleteMany({ museum_id: req.params.id });
 
         res.json({ message: 'Museo eliminato con successo' });
     } catch (error) {
