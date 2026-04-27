@@ -1,5 +1,4 @@
-const { museum: Museum, item: Item } = require('../models/museums');
-
+const { museum: Museum, item: Item, visit: Visit } = require('../models/museums');
 // GET /api/museums
 // Ritorna tutti i musei
 const getAllMuseums = async (req, res) => {

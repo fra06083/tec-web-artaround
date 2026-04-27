@@ -4,7 +4,7 @@ function museumManager() {
         isLoggedIn: false,
         username: '',
         permissions: '',
-        step: 'choice',
+        step: 'museum-list',
         isReady: false,
 
         // --- DATI ---
@@ -21,13 +21,6 @@ function museumManager() {
             address: '',
             description: '',
             image: ''
-        },
-        currentArtwork: {
-            title: '',
-            artist: '',
-            image: '',
-            description: '',
-            museum_id: ''
         },
         notification: {
             show: false,
@@ -150,72 +143,6 @@ function museumManager() {
                 this.showToast("Errore durante l'eliminazione.", 'error');
             }
         },
-        // --- LOGICA OPERE (ARTWORKS) ---
-        async fetchArtworks() {
-            if (!this.selectedMuseumId) return;
-            try {
-                // Utilizziamo la rotta specifica: /api/museums/:id/artworks
-                const res = await fetch(`/api/museums/${this.selectedMuseumId}/artworks`);
-                if (res.ok) {
-                    this.artworks = await res.json();
-                    this.step = 'artwork-list';
-                }
-            } catch (e) { console.error("Errore fetch opere:", e); }
-        },
-
-        openArtworkForm(artwork = null) {
-            if (artwork) {
-                this.currentArtwork = { ...artwork };
-            } else {
-                this.currentArtwork = {
-                    title: '',
-                    artist: '',
-                    image: '',
-                    description: '',
-                    museum_id: this.selectedMuseumId // Colleghiamo automaticamente al museo selezionato
-                };
-            }
-            this.step = 'artwork-form';
-        },
-
-        async saveArtwork() {
-            const isEdit = !!this.currentArtwork._id;
-            // Se è modifica usiamo la rotta con ID, se è nuovo usiamo la rotta generale /api/artworks
-            const url = isEdit ? `/api/artworks/${this.currentArtwork._id}` : '/api/artworks';
-            const method = isEdit ? 'PUT' : 'POST';
-
-            try {
-                const res = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('artaround_token')
-                    },
-                    body: JSON.stringify(this.currentArtwork)
-                });
-
-                if (res.ok) {
-                    await this.fetchArtworks(); // Ricarica la lista per il museo corrente
-                    this.step = 'artwork-list';
-                } else {
-                    const err = await res.json();
-                    alert("Errore: " + err.error);
-                }
-            } catch (e) { alert("Errore nel salvataggio opera"); }
-        },
-
-        async deleteArtwork(id) {
-            if (!confirm("Eliminare questa opera dal catalogo?")) return;
-            try {
-                const res = await fetch(`/api/artworks/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
-                });
-                if (res.ok) {
-                    await this.fetchArtworks();
-                }
-            } catch (e) { alert("Errore nell'eliminazione"); }
-        },
 
         // --- UTILITY ---
         getMuseumName(id) {
@@ -223,9 +150,6 @@ function museumManager() {
             return m ? m.museum : 'Museo non selezionato';
         },
 
-        setMode(mode) {
-            this.step = (mode === 'museums') ? 'museum-list' : 'artwork-museum-select';
-        },
 
         async checkAuth() {
             try {

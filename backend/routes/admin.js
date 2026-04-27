@@ -13,4 +13,5 @@ router.get('/stats', auth, adminCtrl.getStats);
 router.get('/getTours', auth, adminCtrl.getAllTours);
 router.get('/tours', auth, adminCtrl.serveTours);
 router.get('/museum', auth, adminCtrl.serveMuseums);
+router.get("/artworks", auth, adminCtrl.serveArtworks);
 module.exports = router; // used for exporting the router to app.js
