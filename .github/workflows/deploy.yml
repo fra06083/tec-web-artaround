@@ -22,3 +22,5 @@ jobs:
             cd /home/web/site252632/html/
             git fetch origin main
             git reset --hard origin/main
+            cd /home/web/site252632/public/navigator/
+            /usr/local/node/node-20/bin/npm run build
