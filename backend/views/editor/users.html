@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Utenti e Permessi - ArtAround</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="/js/editor/users.js"></script>
+</head>
+
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="usersManager()" x-cloak>
+
+    <div x-show="!isReady">
+        <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
+            <div class="spinner-border text-orange spinner-lg mb-4" role="status"></div>
+            <h3 class="fw-bold">Verifica autorizzazioni...</h3>
+        </div>
+    </div>
+
+    <div x-show="isReady" class="container-fluid py-4">
+
+        <header class="d-flex justify-content-between align-items-center mb-5 px-3">
+            <div>
+                <h1 class="h3 fw-bold m-0 text-orange">Gestione Permessi</h1>
+                <p class="text-white-50 m-0">Benvenuto, <span x-text="username" class="text-white fw-bold"></span> (Admin)</p>
+            </div>
+            <a href="/editor/dashboard" class="btn btn-outline-light rounded-pill px-4">
+                <i class="bi bi-arrow-left me-2"></i>Dashboard
+            </a>
+        </header>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-3 mb-4 shadow-sm">
+                    <h6 class="text-orange fw-bold mb-3 d-flex align-items-center">
+                        <i class="bi bi-bell-fill me-2"></i> Richieste Utenti
+                        <span class="badge bg-orange ms-auto" x-text="pendingRequests.length"></span>
+                    </h6>
+                    <div class="list-group list-group-flush bg-transparent">
+                        <template x-for="req in pendingRequests" :key="req._id">
+                            <div class="list-group-item bg-transparent border-secondary border-opacity-25 px-0 py-2">
+                                <div class="small fw-bold" x-text="req.user_name"></div>
+                                <div class="text-white-50 smaller">Vorrebbe gestire: <span class="text-white" x-text="req.title"></span></div>
+                            </div>
+                        </template>
+                        <div x-show="pendingRequests.length === 0" class="text-white-50 small py-2">Nessuna richiesta da gestire.</div>
+                    </div>
+                </div>
+
+                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm">
+                    <h5 class="fw-bold mb-3">Cerca Autore</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" x-model="search" @input.debounce.300ms="searchUsers()" 
+                               class="form-control bg-dark border-secondary text-white shadow-none" 
+                               placeholder="Cerca per nome o ID...">
+                        <span class="input-group-text bg-dark border-secondary text-white-50">
+                            <i class="bi bi-search"></i>
+                        </span>
+                    </div>
+
+                    <div class="list-group list-group-flush bg-transparent overflow-auto" style="max-height: 400px;">
+                        <template x-for="user in users" :key="user._id">
+                            <button @click="selectUser(user._id)" 
+                                    class="list-group-item list-group-item-action bg-transparent text-white border-secondary border-opacity-25 py-3 px-2 d-flex justify-content-between align-items-center"
+                                    :class="selectedUser && selectedUser._id === user._id ? 'bg-orange bg-opacity-10' : ''">
+                                <div>
+                                    <div class="fw-bold" x-text="user.name"></div>
+                                    <div class="smaller text-white-50" x-text="user.permissions"></div>
+                                </div>
+                                <i class="bi bi-chevron-right text-orange"></i>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+
+                <template x-if="!selectedUser">
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center text-white-50 opacity-50 border border-secondary border-dashed rounded-4 p-5">
+                        <i class="bi bi-person-gear display-1 mb-3"></i>
+                        <h4 class="fw-bold">Pannello di Controllo</h4>
+                        <p>Seleziona un utente dalla lista a sinistra per gestirne i musei assegnati.</p>
+                    </div>
+                </template>
+
+                <template x-if="selectedUser">
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm">
+
+                        <div class="d-flex justify-content-between align-items-start mb-5 pb-3 border-bottom border-secondary border-opacity-25">
+                            <div>
+                                <h2 class="fw-black m-0 text-white" x-text="selectedUser.name"></h2>
+                                <p class="text-orange small m-0 fw-bold" x-text="'RUOLO: ' + selectedUser.permissions.toUpperCase()"></p>
+                                <code class="smaller text-white-50" x-text="selectedUser._id"></code>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge rounded-pill px-3 py-2" 
+                                      :class="selectedUser.permissions === 'admin' ? 'bg-danger' : 'bg-orange'">
+                                      <i class="bi bi-shield-check me-1"></i> Account Attivo
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                                <i class="bi bi-bank2 me-2 text-orange"></i> Musei sotto la sua gestione
+                            </h5>
+
+                            <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
+                                <table class="table table-dark table-hover m-0 align-middle">
+                                    <thead class="table-light text-dark">
+                                        <tr class="small fw-bold">
+                                            <th class="ps-3 py-3">NOME MUSEO</th>
+                                            <th>REGIONE / CITTÀ</th>
+                                            <th class="text-end pe-3">AZIONI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="m in selectedUser.museums" :key="m._id">
+                                            <tr>
+                                                <td class="ps-3 py-3 fw-bold text-orange" x-text="m.museum"></td>
+                                                <td>
+                                                    <span class="text-white" x-text="m.region"></span>
+                                                    <small class="text-white-50 d-block" x-text="m.provence"></small>
+                                                </td>
+                                                <td class="text-end pe-3">
+                                                    <button @click="revokePermission(m._id)" 
+                                                            class="btn btn-sm btn-outline-danger border-0">
+                                                        <i class="bi bi-x-circle-fill me-1"></i> Revoca Accesso
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <tr x-show="selectedUser.museums && selectedUser.museums.length === 0">
+                                            <td colspan="3" class="text-center py-5 text-white-50">
+                                                L'utente non ha ancora musei assegnati.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-dark rounded-4 border border-orange border-opacity-25">
+                            <h6 class="fw-bold mb-3 text-orange">
+                                <i class="bi bi-plus-circle-fill me-2"></i> Assegna un nuovo museo
+                            </h6>
+                            <p class="small text-white-50 mb-4">L'utente potrà creare tour e modificare opere solo per il museo selezionato.</p>
+
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <select x-model="selectedMuseumId" class="form-select bg-dark border-secondary text-white p-2 shadow-none">
+                                        <option value="">-- Seleziona un museo dalla lista --</option>
+                                        <template x-for="m in allMuseums" :key="m._id">
+                                            <option :value="m._id" x-text="m.museum"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button @click="grantPermission()" 
+                                            class="btn btn-orange w-100 fw-bold p-2"
+                                            :disabled="!selectedMuseumId">
+                                        Conferma Accesso
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -45,6 +45,10 @@ module.exports = {
     serveTours: (req, res) => {
         // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/tours.html'));
+    },
+    serveUsersManagement: (req, res) => {
+        // Nota: adminController è in 'controllers/', quindi serve '../views/...'
+        res.sendFile(path.join(__dirname, '../views/editor/users.html'));
     }
 
 };
