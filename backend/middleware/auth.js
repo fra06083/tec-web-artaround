@@ -19,5 +19,15 @@ const auth = (req, res, next) => {
         res.redirect('/login.html');
     }
 };
+// Middleware per controllare i ruoli di admin e editor
+const authorize = (allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
+            // Se l'utente non ha il ruolo necessario, restituiamo un errore 403 (Forbidden)
+            return res.status(403).send("Accesso negato: permessi insufficienti.");
+        }
+        next(); // L'utente ha il ruolo giusto
+    };
+};
 
-module.exports = auth;
+module.exports = { auth, authorize };

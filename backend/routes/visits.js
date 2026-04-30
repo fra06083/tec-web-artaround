@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth.js');
+const { auth } = require('../middleware/auth.js');
 const visitsCtrl = require('../controllers/visitsController.js');
 // ─── MARKETPLACE (public) ────────────────────────────────────────────────────
 
