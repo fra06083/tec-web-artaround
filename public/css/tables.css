@@ -1,0 +1,114 @@
+/* =========================================================
+   TABLE STYLES
+========================================================= */
+
+.thead-custom {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 100%);
+    border-bottom: 1px solid rgba(253, 126, 20, 0.2) !important;
+}
+
+.thead-custom th {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #fd7e14;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.table-row-custom {
+    transition: all 0.2s ease-in-out;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.table-row-custom:hover {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.08) 0%, rgba(253, 126, 20, 0.04) 100%) !important;
+    transform: scale(1.01);
+}
+
+.table-hover tbody tr:hover {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.08) 0%, rgba(253, 126, 20, 0.04) 100%) !important;
+}
+
+.img-thumbnail-custom {
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.img-thumbnail-custom:hover {
+    transform: scale(1.1);
+}
+
+.badge-province {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.2) 0%, rgba(253, 126, 20, 0.1) 100%);
+    color: #fd7e14;
+    font-weight: 500;
+    font-size: 0.7rem;
+    padding: 0.35em 0.65em;
+    border: 1px solid rgba(253, 126, 20, 0.3);
+}
+
+.btn-action {
+    padding: 0.5rem 0.8rem;
+    font-size: 1rem;
+    transition: all 0.2s;
+    border-radius: 8px;
+}
+
+.btn-action:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* Table Container */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table {
+    margin: 0;
+}
+
+/* Mobile Table Optimization */
+@media (max-width: 768px) {
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    .thead-custom th {
+        font-size: 0.65rem;
+        padding: 0.5rem;
+    }
+
+    .table-row-custom td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    /* Mobile Museum Card Layout */
+    .museum-mobile-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .museum-mobile-card .museum-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .museum-mobile-card .museum-info {
+        flex: 1;
+    }
+
+    .museum-mobile-card .museum-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+}

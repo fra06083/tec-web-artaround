@@ -1,34 +1,34 @@
 function artworkManager() {
     return {
-        // --- STATO DELL'INTERFACCIA ---
+        // UI STATE
         isReady: false,
         isLoggedIn: false,
         permissions: '',
         username: '',
-        step: 'artwork-museum-select', // Stato iniziale: scelta del museo
+        step: 'artwork-museum-select', // initial state: museum selection
 
-        // --- DATI ---
+        // DATA
         museums: [],
         artworks: [],
         selectedMuseumId: '',
 
-        // --- OGGETTO OPERA CORRENTE (Per il Form) ---
+        // CURRENT ARTWORK OBJECT (For Form)
         currentArtwork: {
-            title: '',
-            artist: '',
-            image: '',
-            description: '',
-            museum_id: ''
+            item: '',
+            img_path: '',
+            museum_id: '',
+            author: '',
+            license: ''
         },
 
-        // --- NOTIFICHE ---
+        // NOTIFICATIONS
         notification: {
             show: false,
             message: '',
-            type: 'success' // 'success' o 'error'
+            type: 'success' // 'success' or 'error'
         },
 
-        // --- INIZIALIZZAZIONE ---
+        // INITIALIZATION
         async init() {
             await this.checkAuth();
             if (this.isLoggedIn) {
@@ -39,7 +39,7 @@ function artworkManager() {
             this.isReady = true;
         },
 
-        // --- GESTIONE AUTENTICAZIONE ---
+        // AUTHENTICATION
         async checkAuth() {
             const token = localStorage.getItem('artaround_token');
             const savedUsername = localStorage.getItem('artaround_user');
@@ -72,12 +72,14 @@ function artworkManager() {
         },
 
         logout() {
+            // clear session and redirect to login
             localStorage.removeItem('artaround_token');
             localStorage.removeItem('artaround_user');
             window.location.href = '/login.html';
         },
 
         showToast(msg, type = 'success') {
+            // display notification message
             this.notification.message = msg;
             this.notification.type = type;
             this.notification.show = true;
@@ -86,8 +88,9 @@ function artworkManager() {
             }, 3000);
         },
 
-        // --- LOGICA MUSEI (Per la Select) ---
+        // MUSEUM LOGIC (For Select)
         async fetchMuseums() {
+            // load available museums for dropdown
             try {
                 const res = await fetch('/api/museums', {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
@@ -101,23 +104,24 @@ function artworkManager() {
         },
 
         getMuseumName(id) {
+            // get museum name by ID
             const m = this.museums.find(museo => museo._id === id);
             return m ? m.museum : 'Selezionato';
         },
 
-        // --- LOGICA OPERE (ARTWORKS) ---
+        // ARTWORK LOGIC
         async fetchArtworks() {
+            // load artworks for selected museum
             if (!this.selectedMuseumId) return;
 
             try {
-                // Chiamata alla rotta specifica per le opere di un museo
-                const res = await fetch(`/api/museums/${this.selectedMuseumId}/artworks`, {
+                const res = await fetch(`/api/artworks/museum/${this.selectedMuseumId}`, {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
                 });
 
                 if (res.ok) {
                     this.artworks = await res.json();
-                    this.step = 'artwork-list'; // Una volta caricate, mostra la tabella
+                    this.step = 'artwork-list'; // show table once loaded
                 } else {
                     this.showToast("Impossibile caricare le opere", "error");
                 }
@@ -127,23 +131,39 @@ function artworkManager() {
         },
 
         openArtworkForm(artwork = null) {
+            // open form for new or existing artwork
             if (artwork) {
-                // Modifica: copio i dati dell'opera esistente
-                this.currentArtwork = { ...artwork };
-            } else {
-                // Nuovo: resetto i campi e assegno il museo corrente
+                // copy existing artwork data for editing
                 this.currentArtwork = {
-                    title: '',
-                    artist: '',
-                    image: '',
-                    description: '',
-                    museum_id: this.selectedMuseumId
+                    _id: artwork._id,
+                    item: artwork.item || '',
+                    img_path: artwork.img_path || '',
+                    museum_id: artwork.museum_id || this.selectedMuseumId,
+                    author: artwork.author || '',
+                    license: artwork.license || ''
+                };
+            } else {
+                // reset fields for new artwork
+                this.currentArtwork = {
+                    item: '',
+                    img_path: '',
+                    museum_id: this.selectedMuseumId,
+                    author: '',
+                    license: ''
                 };
             }
             this.step = 'artwork-form';
         },
 
         async saveArtwork() {
+            // create or update artwork
+            // validation
+            if (!this.currentArtwork.item || !this.currentArtwork.img_path ||
+                !this.currentArtwork.museum_id || !this.currentArtwork.author || !this.currentArtwork.license) {
+                this.showToast("Compila tutti i campi obbligatori", "error");
+                return;
+            }
+
             const isEdit = !!this.currentArtwork._id;
             const url = isEdit ? `/api/artworks/${this.currentArtwork._id}` : '/api/artworks';
             const method = isEdit ? 'PUT' : 'POST';
@@ -159,9 +179,9 @@ function artworkManager() {
                 });
 
                 if (res.ok) {
-                    this.showToast(isEdit ? "Opera aggiornata!" : "Nuova opera aggiunta!");
-                    await this.fetchArtworks(); // Ricarica la tabella
-                    this.step = 'artwork-list'; // Torna alla lista
+                    this.showToast(isEdit ? "Opera aggiornata con successo!" : "Nuova opera aggiunta!");
+                    await this.fetchArtworks(); // reload table
+                    this.step = 'artwork-list'; // back to list
                 } else {
                     const err = await res.json();
                     this.showToast(err.error || "Errore nel salvataggio", "error");
@@ -172,6 +192,7 @@ function artworkManager() {
         },
 
         async deleteArtwork(id) {
+            // delete artwork with confirmation
             if (!confirm("Sei sicuro di voler eliminare definitivamente questa opera?")) return;
 
             try {
@@ -182,7 +203,7 @@ function artworkManager() {
 
                 if (res.ok) {
                     this.showToast("Opera eliminata con successo");
-                    await this.fetchArtworks(); // Aggiorna la tabella
+                    await this.fetchArtworks(); // update table
                 } else {
                     this.showToast("Errore nell'eliminazione", "error");
                 }
