@@ -1,9 +1,19 @@
 function homeApp() {
     return {
-        isLoggedIn: false, // Strictly false on start
+        isLoggedIn: false,
         username: '',
+        darkMode: false,
 
         async init() {
+            // Load dark mode preference
+            const savedDarkMode = localStorage.getItem('artaround_darkmode');
+            this.darkMode = savedDarkMode === 'true';
+
+            // Watch for dark mode changes
+            this.$watch('darkMode', (value) => {
+                localStorage.setItem('artaround_darkmode', value);
+            });
+
             const token = localStorage.getItem('artaround_token');
             if (!token) {
                 this.isLoggedIn = false;
@@ -11,7 +21,6 @@ function homeApp() {
             }
 
             try {
-                // Using your specified endpoint: /api/check
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: { 'Authorization': token }
@@ -20,13 +29,12 @@ function homeApp() {
                 if (response.ok) {
                     const data = await response.json();
                     this.username = data.user.name;
-                    this.isLoggedIn = true; // Set to true only after server check
+                    this.isLoggedIn = true;
                 } else {
                     this.logout();
                 }
             } catch (error) {
                 console.error("Auth failed:", error);
-                // If network fails, we don't logout to avoid clearing storage
             }
         },
 

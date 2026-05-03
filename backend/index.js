@@ -43,15 +43,17 @@ if (dbUser && dbPwd && dbHost) {
 
 // ROUTES 
 const authRoutes = require("./routes/auth.js");
-const visitRoutes = require("./routes/visits.js"); // used in the future!!!!!!!!!
+const visitRoutes = require("./routes/visits.js");
 const museumRoutes = require("./routes/museums.js");
 const adminRoutes = require("./routes/admin.js");
 const userManagementRoutes = require("./routes/userManagement.js");
+const artworkRoutes = require("./routes/artworks.js");
 
 app.use("/api", authRoutes);
 app.use("/editor", adminRoutes);
 app.use("/api/visite", visitRoutes);
 app.use("/api/museums", museumRoutes);
+app.use("/api/artworks", artworkRoutes);
 app.use("/editor/user-management", userManagementRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"

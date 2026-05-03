@@ -40,6 +40,15 @@ document.addEventListener('alpine:init', () => {
                 });
                 this.users = await usersRes.json();
 
+                // Close user menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    const menu = document.querySelector('.mobile-user-menu');
+                    const btn = document.querySelector('.mobile-user-btn');
+                    if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+                        this.userMenuOpen = false;
+                    }
+                });
+
             } catch (error) {
                 console.error("Errore inizializzazione:", error);
             } finally {

@@ -17,11 +17,6 @@
     color: #ffffff;
 }
 
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
-    color: #ffffff;
-}
-
 /* Button Styles */
 .btn-outline-orange {
     color: #fd7e14;
@@ -75,10 +70,6 @@
 }
 
 /* Utility Classes */
-.thumbnail-160 {
-    height: 160px;
-}
-
 .icon-5xl {
     font-size: 5rem;
 }
@@ -92,17 +83,9 @@
     max-width: 450px;
 }
 
-.min-vh-50 {
-    min-height: 50vh;
-}
-
 .icon-box-lg {
     width: 70px;
     height: 70px;
-}
-
-.text-opacity-90 {
-    opacity: 0.9 !important;
 }
 
 .hover-bg-light {
@@ -257,4 +240,93 @@
 .icon-btn {
     width: 40px;
     height: 40px;
+}
+
+/* --- Stili Base del Menu (Light Mode di default) --- */
+.auth-dropdown-menu {
+    background-color: #ffffff;
+    min-width: 220px;
+    z-index: 1100;
+}
+
+.dropdown-link-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    color: #212529;
+    /* Testo scuro */
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.dropdown-link-item:hover {
+    background-color: #f8f9fa;
+    color: #fd7e14;
+}
+
+.user-name-text {
+    color: #212529;
+}
+
+.chevron-icon {
+    color: #6c757d;
+}
+
+.dropdown-divider-custom {
+    height: 1px;
+    background-color: #eee;
+    margin: 8px 0;
+}
+
+/* --- Gestione DARK MODE (Automatico) --- */
+.marketplace-dark-mode .auth-dropdown-menu {
+    background-color: #252540;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-dark-mode .dropdown-link-item {
+    color: #ffffff;
+    /* Testo bianco */
+}
+
+.marketplace-dark-mode .dropdown-link-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.marketplace-dark-mode .user-name-text {
+    color: #ffffff;
+}
+
+.marketplace-dark-mode .chevron-icon {
+    color: #ffffff;
+}
+
+.marketplace-dark-mode .dropdown-divider-custom {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Stile speciale Logout */
+.logout-item {
+    color: #ef4444 !important;
+}
+
+.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Mobile Floating Buttons */
+.mobile-floating-buttons {
+    position: fixed !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+    z-index: 1050 !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+
+@media (min-width: 992px) {
+    .mobile-floating-buttons {
+        display: none !important;
+    }
 }

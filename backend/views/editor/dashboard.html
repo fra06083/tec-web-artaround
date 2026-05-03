@@ -11,7 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/mobile-nav.css" />
+    <link rel="stylesheet" href="/css/toasts.css" />
+    <link rel="stylesheet" href="/css/tables.css" />
+    <link rel="stylesheet" href="/css/effects.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -83,22 +88,36 @@
             </div>
         </aside>
         <main class="main-content">
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <i class="bi bi-box"></i>
+                    <span>ArtAround</span>
+                </a>
+            </header>
 
-            <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4">
+            <!-- Desktop Header -->
+            <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
-                    <h5 class="m-0 fw-bold d-none d-md-block">Benvenuto, <span class="text-orange"
-                            x-text="username"></span></h5>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center glow-orange">
+                            <i class="bi bi-person-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <p class="m-0 small text-white-50">Benvenuto</p>
+                            <h5 class="m-0 fw-bold gradient-text" x-text="username"></h5>
+                        </div>
+                    </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="input-group d-none d-lg-flex" style="width: 300px;">
+                        <div class="input-group d-none d-lg-flex search-input">
                             <span class="input-group-text bg-secondary border-0 text-white-50 ps-3">
                                 <i class="bi bi-search"></i>
                             </span>
                             <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
                                 placeholder="Cerca...">
                         </div>
-                        <button class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center"
-                            style="width: 40px; height: 40px;">
+                        <button class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center hover-lift icon-btn">
                             <i class="bi bi-bell"></i>
                         </button>
                     </div>
@@ -176,6 +195,30 @@
             </div>
         </main>
     </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="/editor/dashboard" class="mobile-nav-item active">
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/editor/museum" class="mobile-nav-item">
+            <i class="bi bi-bank"></i>
+            <span>Musei</span>
+        </a>
+        <a href="/editor/artworks" class="mobile-nav-item">
+            <i class="bi bi-palette"></i>
+            <span>Opere</span>
+        </a>
+        <a href="/editor/tours" class="mobile-nav-item">
+            <i class="bi bi-pencil-square"></i>
+            <span>Visite</span>
+        </a>
+        <a href="/editor/user-management" class="mobile-nav-item">
+            <i class="bi bi-people"></i>
+            <span>Utenti</span>
+        </a>
+    </nav>
 
     <div x-show="isReady && (!isLoggedIn || permissions !== 'admin')" x-cloak>
         <div class="vh-100 d-flex align-items-center justify-content-center text-center px-4">

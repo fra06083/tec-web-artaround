@@ -12,19 +12,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/effects.css" />
+    <link rel="stylesheet" href="css/mobile-nav.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="js/index.js"></script>
 </head>
 
-<body class="bg-white text-dark font-sans" x-data="homeApp()">
+<body class="bg-white text-dark font-sans" x-data="homeApp()" :class="{ 'dark-mode': darkMode }">
 
-    <nav class="navbar navbar-expand-lg bg-white sticky-top py-3 shadow-sm">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top py-3 shadow-sm desktop-navbar">
         <div class="container-lg">
-            <a class="navbar-brand fw-bold text-primary fs-4 m-0 d-flex align-items-center gap-2" href="index.html">
-                <i class="bi bi-box"></i> ArtAround
+            <a class="navbar-brand fw-bold fs-4 m-0 d-flex align-items-center gap-2" href="index.html">
+                <i class="bi bi-box-seam text-orange"></i>
+                <span :class="darkMode ? 'text-white' : 'text-primary'">ArtAround</span>
             </a>
 
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
@@ -34,7 +38,7 @@
 
             <div class="collapse navbar-collapse" id="mainNav">
                 <div
-                    class="navbar-nav ms-auto d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0 text-center align-items-center">
+                    class="navbar-nav ms-auto d-flex flex-column flex-lg-row gap-3 mt-3 mt-lg-0 text-center align-items-center">
 
                     <a href="navigator/" class="btn btn-outline-primary rounded-pill px-4 fw-medium btn-with-icon">
                         <i class="bi bi-compass"></i> Naviga
@@ -42,35 +46,63 @@
 
                     <a href="editor-marketplace/"
                         class="btn btn-outline-orange rounded-pill px-4 fw-medium btn-with-icon">
-                        <i class="bi bi-pencil-square"></i> Editor & Marketplace
+                        <i class="bi bi-shop"></i> Marketplace
                     </a>
 
+                    <!-- Dark Mode Toggle Icon -->
+                    <button class="icon-btn rounded-circle d-flex align-items-center justify-content-center"
+                        @click="darkMode = !darkMode">
+                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                    </button>
+
+                    <!-- Auth Section -->
                     <template x-if="!isLoggedIn">
                         <a href="login.html"
                             class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
                             <span>Sign in</span>
-                            <i class="bi bi-cursor reveal-icon"></i>
+                            <i class="bi bi-arrow-right-short reveal-icon"></i>
                         </a>
                     </template>
 
                     <template x-if="isLoggedIn">
-                        <div class="position-relative d-inline-block" x-data="{ open: false }">
-
+                        <div class="position-relative" x-data="{ open: false }">
+                            <!-- Trigger: Avatar -->
                             <button @click="open = !open" @click.outside="open = false"
-                                class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-with-icon m-auto">
-                                <i class="bi bi-person-circle"></i>
-                                <span>Hello, <span x-text="username"></span>!</span>
-                                <i class="bi bi-chevron-down small"></i>
+                                class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
+                                <div
+                                    class="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                                </div>
+                                <i class="bi bi-chevron-down x-small chevron-icon"></i>
                             </button>
 
-                            <div x-show="open" x-transition.opacity x-cloak
-                                class="auth-dropdown-menu shadow border-0 rounded-4 py-2 position-absolute bg-white mt-2"
-                                style="min-width: 150px; right: 0; z-index: 1050; text-align: left;">
+                            <!-- Dropdown Menu Professionale -->
+                            <div x-show="open" x-transition x-cloak
+                                class="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2">
+                                <div class="dropdown-header-info px-4 py-2 border-bottom">
+                                    <div class="fw-bold user-name-text text-dark" x-text="username"></div>
+                                    <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                                </div>
 
-                                <a href="#" @click.prevent="logout()"
-                                    class="d-block px-4 py-2 text-danger text-decoration-none fw-bold hover-bg-light">
-                                    <i class="bi bi-box-arrow-right me-2"></i> Log out
+                                <a href="editor-marketplace/" class="dropdown-link-item">
+                                    <i class="bi bi-grid-1x2 text-orange"></i>
+                                    <span class="text-dark">Dashboard</span>
                                 </a>
+
+                                <template x-if="permissions === 'admin'">
+                                    <a href="/editor/dashboard" class="dropdown-link-item">
+                                        <i class="bi bi-pencil-square text-orange"></i>
+                                        <span class="text-dark">Admin Panel</span>
+                                    </a>
+                                </template>
+
+                                <div class="dropdown-divider-custom"></div>
+
+                                <button @click="logout()"
+                                    class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span class="fw-bold">Log out</span>
+                                </button>
                             </div>
                         </div>
                     </template>
@@ -79,164 +111,285 @@
         </div>
     </nav>
 
-    <header class="bg-primary bg-opacity-10 py-5">
-        <div class="container-lg py-4 text-center text-lg-start">
-            <div class="row align-items-center g-4">
-                <div class="col-12 col-lg-8 mx-auto mx-lg-0">
-                    <h1 class="fw-bold mb-3 text-dark">
-                        <span class="display-6 d-block mb-1">Every visit,</span>
-                        <span class="display-3 fw-bold text-orange">made for you.</span>
+    <!-- HERO SECTION -->
+    <header class="hero-bg py-5">
+        <div class="container-lg py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-12 col-lg-5">
+                    <!-- Stats Card -->
+                    <div class="bg-white rounded-5 p-4 shadow-lg">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div
+                                class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center stat-icon">
+                                <i class="bi bi-building text-primary fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-3 lh-1">500+</div>
+                                <div class="text-secondary small text-uppercase">Museums</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div
+                                class="bg-orange bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center stat-icon">
+                                <i class="bi bi-people text-orange fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-3 lh-1">50K+</div>
+                                <div class="text-secondary small text-uppercase">Visitors</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center stat-icon">
+                                <i class="bi bi-star-fill text-warning fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-3 lh-1">4.9</div>
+                                <div class="text-secondary small text-uppercase">User Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-7 text-center text-lg-start">
+                    <h1 class="fw-bold mb-4 text-dark">
+                        <span class="display-5 d-block mb-2">Every visit,</span>
+                        <span class="display-2 fw-bold gradient-text">made for you.</span>
                     </h1>
-                    <p class="lead text-secondary mb-4">
+                    <p class="lead mb-5 text-secondary">
                         ArtAround adapts language, depth, and pace to your profile.
                         The same museum, a totally different experience.
                     </p>
 
                     <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 mb-5">
-                        <span class="badge bg-primary rounded-pill px-3 py-2 fw-medium"><i class="bi bi-heart me-1"></i>
-                            Interests</span>
-                        <span class="badge bg-orange rounded-pill px-3 py-2 fw-medium"><i class="bi bi-star me-1"></i>
-                            Expertise</span>
-                        <span class="badge bg-primary bg-opacity-75 rounded-pill px-3 py-2 fw-medium"><i
-                                class="bi bi-clock me-1"></i> Time</span>
-                        <span class="badge bg-orange-dark rounded-pill px-3 py-2 fw-medium"><i
-                                class="bi bi-person me-1"></i> Age</span>
+                        <span
+                            class="badge bg-white bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-medium">
+                            <i class="bi bi-heart me-1"></i> Interests
+                        </span>
+                        <span
+                            class="badge bg-white bg-opacity-10 text-orange border border-orange border-opacity-25 rounded-pill px-3 py-2 fw-medium">
+                            <i class="bi bi-lightning-charge me-1"></i> Expertise
+                        </span>
+                        <span
+                            class="badge bg-white bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-medium">
+                            <i class="bi bi-clock me-1"></i> Time
+                        </span>
                     </div>
 
-                    <a href="#roles"
-                        class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm fw-bold w-100 w-md-auto d-md-inline-block">
-                        Start Exploring <i class="bi bi-arrow-down ms-2"></i>
-                    </a>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                        <a href="#roles" class="btn btn-primary btn-lg rounded-pill px-5 shadow fw-bold btn-glow">
+                            Start Exploring <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                        <a href="navigator/" class="btn btn-outline-primary btn-lg rounded-pill px-5 fw-bold">
+                            <i class="bi bi-play-circle me-2"></i> Watch Demo
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- SEZIONE STEPS -->
     <section class="bg-white py-5" id="how-it-works">
-        <div class="container-lg py-4">
-            <h2 class="fs-1 fw-bold text-center text-primary mb-5">Three steps</h2>
+        <div class="container-lg py-5">
+            <div class="text-center mb-5">
+                <span class="badge bg-orange text-white rounded-pill px-4 py-2 mb-3 fw-bold">Simple Process</span>
+                <h2 class="display-5 fw-bold text-primary mb-2">Three steps</h2>
+                <p class="lead text-secondary">Get started in minutes</p>
+            </div>
             <div class="row g-4 text-center">
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                    <div
+                        class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-primary"></div>
                         <div
-                            class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3 mx-auto icon-box-lg">
+                            class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated">
                             <i class="bi bi-geo-alt fs-2"></i>
                         </div>
-                        <h4 class="fw-bold text-dark">Pick a museum</h4>
+                        <h4 class="fw-bold text-dark mb-2">1. Pick a museum</h4>
                         <p class="text-secondary small mb-0">Browse institutions directly from the app.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                    <div
+                        class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-orange"></div>
                         <div
-                            class="d-inline-flex align-items-center justify-content-center bg-orange text-white rounded-circle mb-3 mx-auto icon-box-lg">
+                            class="d-inline-flex align-items-center justify-content-center bg-orange text-white rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated">
                             <i class="bi bi-sliders fs-2"></i>
                         </div>
-                        <h4 class="fw-bold text-dark">Set your vibe</h4>
+                        <h4 class="fw-bold text-dark mb-2">2. Set your vibe</h4>
                         <p class="text-secondary small mb-0">Tell us what you like and how much time you have.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                    <div
+                        class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-primary"></div>
                         <div
-                            class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 mx-auto icon-box-lg">
+                            class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated">
                             <i class="bi bi-headphones fs-2"></i>
                         </div>
-                        <h4 class="fw-bold text-dark">Listen & explore</h4>
+                        <h4 class="fw-bold text-dark mb-2">3. Listen & explore</h4>
                         <p class="text-secondary small mb-0">Enjoy an audio guide tailored completely to you.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
     <section class="container-lg py-5 my-4" id="roles">
         <div class="text-center mb-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-4 py-2 mb-3 fw-bold">Get
+                Started</span>
             <h2 class="display-5 fw-bold mb-3 text-dark">Choose your path</h2>
+
             <p class="lead text-secondary">How do you want to use ArtAround?</p>
+
         </div>
+
 
         <div class="row g-4 justify-content-center">
-            <div class="col-12 col-md-6 col-lg-5 d-flex">
-                <div
-                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-primary text-white text-center text-md-start hover-lift">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
-                        <div
-                            class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle shadow-sm icon-box-lg">
-                            <i class="bi bi-phone fs-2"></i>
-                        </div>
-                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-medium">Visitor</span>
-                    </div>
-                    <h3 class="fw-bold mb-3">Navigator</h3>
-                    <p class="text-white-50 mb-4 flex-grow-1">
-                        In-person guided visits with audio descriptions adapted to your profile. Language, depth, and
-                        pace — all tuned to you.
-                    </p>
-                    <a href="navigator/"
-                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-primary shadow-sm btn-reveal-icon">
-                        <span>Start your visit</span>
-                        <i class="bi bi-arrow-right reveal-icon"></i>
-                    </a>
-                </div>
-            </div>
 
             <div class="col-12 col-md-6 col-lg-5 d-flex">
+
                 <div
-                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-orange text-white text-center text-md-start hover-lift">
+                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-gradient-red text-white text-center text-md-start hover-lift">
+
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+
                         <div
-                            class="d-inline-flex align-items-center justify-content-center bg-white text-orange rounded-circle shadow-sm icon-box-lg">
-                            <i class="bi bi-pencil-square fs-2"></i>
+                            class="d-inline-flex align-items-center justify-content-center bg-white text-danger rounded-circle shadow-sm icon-box-lg icon-box-animated">
+
+                            <i class="bi bi-phone fs-2"></i>
+
                         </div>
-                        <span class="badge bg-white text-orange rounded-pill px-3 py-2 fw-medium">Institution /
-                            Creator</span>
+
+                        <span class="badge bg-white text-danger rounded-pill px-3 py-2 fw-medium">Visitor</span>
+
                     </div>
-                    <h3 class="fw-bold mb-3">Editor &amp; Marketplace</h3>
-                    <p class="text-white mb-4 flex-grow-1 text-opacity-90">
-                        Prepare content, build curated routes, and publish to the marketplace. One simple config file —
-                        any museum.
+
+                    <h3 class="fw-bold mb-3">Navigator</h3>
+
+                    <p class="text-white-75 mb-4 flex-grow-1">
+
+                        In-person guided visits with audio descriptions adapted to your profile. Language, depth, and
+
+                        pace — all tuned to you.
+
                     </p>
-                    <a href="./editor-marketplace/"
-                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-orange shadow-sm btn-reveal-icon">
-                        <span>Create &amp; manage</span>
+
+                    <a href="navigator/"
+                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-danger shadow-sm btn-reveal-icon btn-glow">
+
+                        <span>Start your visit</span>
+
                         <i class="bi bi-arrow-right reveal-icon"></i>
+
                     </a>
+
                 </div>
+
             </div>
+
+
+            <div class="col-12 col-md-6 col-lg-5 d-flex">
+
+                <div
+                    class="card w-100 border-0 shadow rounded-5 p-4 p-md-5 bg-gradient-orange text-white text-center text-md-start hover-lift">
+
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+
+                        <div
+                            class="d-inline-flex align-items-center justify-content-center bg-white text-orange rounded-circle shadow-sm icon-box-lg icon-box-animated">
+
+                            <i class="bi bi-pencil-square fs-2"></i>
+
+                        </div>
+
+                        <span class="badge bg-white text-orange rounded-pill px-3 py-2 fw-medium">Institution</span>
+
+                    </div>
+
+                    <h3 class="fw-bold mb-3">Editor & Marketplace</h3>
+
+                    <p class="text-white-75 mb-4 flex-grow-1">
+
+                        Prepare content, build curated routes, and publish to the marketplace. One simple config file —
+
+                        any museum.
+
+                    </p>
+
+                    <a href="./editor-marketplace/"
+                        class="btn btn-light btn-lg rounded-pill w-100 fw-bold text-orange shadow-sm btn-reveal-icon btn-glow">
+
+                        <span>Create & manage</span>
+
+                        <i class="bi bi-arrow-right reveal-icon"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
+
     </section>
+
 
     <section class="container-lg py-5 mb-5">
+
         <div
             class="card border-0 shadow-sm rounded-5 p-4 p-md-5 overflow-hidden position-relative bg-primary bg-opacity-10">
+
             <i class="bi bi-bank position-absolute text-primary opacity-25 icon-bg-cta"></i>
+
             <div class="row align-items-center position-relative z-1">
+
                 <div class="col-12 col-md-8 text-center text-md-start mb-4 mb-md-0">
+
                     <span class="badge bg-primary text-white rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm">For
+
                         Institutions</span>
+
                     <h2 class="display-6 fw-bold text-dark mb-3">Are you a museum?</h2>
+
                     <p class="lead text-secondary mb-0 mx-auto mx-md-0 max-w-550">
+
                         Deploy ArtAround with <strong>just your content</strong>. <strong>No custom apps</strong>,
+
                         <strong>no messy development</strong>.
+
                     </p>
+
                 </div>
+
                 <div class="col-12 col-md-4 text-center text-md-end">
+
                     <a href="./editor-marketplace"
                         class="btn btn-primary btn-lg rounded-pill px-4 py-3 fw-bold w-100 w-md-auto shadow btn-reveal-icon hover-lift">
-                        <span>Request a Demo</span>
-                        <i class="bi bi-arrow-right reveal-icon text-white"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
 
+                        <span>Request a Demo</span>
+
+                        <i class="bi bi-arrow-right reveal-icon text-white"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+    <!-- FOOTER -->
     <footer class="bg-dark text-white py-4 text-center text-md-start">
         <div class="container-lg">
             <div class="row align-items-center gy-3 text-white-50 small">
                 <div
                     class="col-12 col-md-6 fw-bold text-white fs-5 d-flex justify-content-center justify-content-md-start align-items-center gap-2">
-                    <i class="bi bi-box text-orange"></i> ArtAround
+                    <i class="bi bi-box-seam text-orange"></i> ArtAround
                 </div>
                 <div class="col-12 col-md-6 text-md-end">
                     &copy; 2026 ArtAround. All rights reserved.
