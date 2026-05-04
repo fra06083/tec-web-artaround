@@ -8,23 +8,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/mobile-nav.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/tables.css">
+    <link rel="stylesheet" href="/css/toasts.css">
+    <link rel="stylesheet" href="/css/artworks.css">
+    <link rel="stylesheet" href="/css/effects.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/artworks.js"></script>
 </head>
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="artworkManager()" x-init="init()">
 
-    <div x-show="!isReady">
+    <!-- Loading State -->
+    <div x-show="!isReady" x-cloak>
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
             <div class="spinner-border text-orange spinner-lg mb-4" role="status"></div>
             <h3 class="fw-bold">Accesso in corso...</h3>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div x-show="isReady && isLoggedIn" x-cloak class="d-flex">
 
-
+        <!-- Sidebar Desktop -->
         <aside class="sidebar bg-dark shadow d-flex flex-column">
             <div class="p-4 mb-2">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2"
@@ -62,9 +71,6 @@
                 <a href="/editor/user-management" class="nav-link-admin">
                     <i class="bi bi-people"></i> <span>Gestione Utenti</span>
                 </a>
-                <a href="#" class="nav-link-admin">
-                    <i class="bi bi-bar-chart"></i> <span>Statistiche</span>
-                </a>
             </nav>
 
             <div class="p-3 mt-auto">
@@ -73,22 +79,47 @@
                 </a>
             </div>
         </aside>
-        <main class="main-content flex-grow-1">
-            <header class="navbar bg-dark border-bottom border-secondary py-3 px-4 sticky-top">
-                <h5 class="m-0 fw-bold">Gestione Opere</h5>
-                <button x-show="step === 'artwork-list'" @click="openArtworkForm()"
-                    class="btn btn-orange rounded-pill btn-sm px-3">
-                    <i class="bi bi-plus-lg me-1"></i> Nuova Opera
-                </button>
+
+        <!-- Main Content Area -->
+        <main class="main-content flex-grow-1 pb-5 pb-md-0">
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <i class="bi bi-box"></i>
+                    <span>ArtAround</span>
+                </a>
+            </header>
+
+            <!-- Desktop Header -->
+            <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center glow-orange">
+                            <i class="bi bi-person-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <p class="m-0 small text-white-50">Benvenuto</p>
+                            <h5 class="m-0 fw-bold gradient-text" x-text="username"></h5>
+                        </div>
+                    </div>
+
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                        <button x-show="step === 'artwork-list'" @click="openArtworkForm()"
+                            class="btn btn-orange rounded-pill btn-sm px-3 btn-glow hover-lift">
+                            <i class="bi bi-plus-lg me-1"></i> Nuova Opera
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <div class="p-4 p-lg-5">
 
-                <div x-show="step === 'artwork-museum-select'" class="max-w-550 mx-auto text-center py-5">
-                    <i class="bi bi-search text-orange icon-5xl mb-4 d-block"></i>
-                    <h3 class="fw-bold">Gestione Catalogo</h3>
-                    <p class="text-white-50 mb-4">Seleziona un museo per visualizzare le sue opere.</p>
-                    <select class="form-select form-select-lg bg-dark text-white border-secondary"
+                <!-- Museum Selection -->
+                <div x-show="step === 'artwork-museum-select'" class="museum-select-state fade-in">
+                    <i class="bi bi-search text-orange float"></i>
+                    <h3 class="fw-bold gradient-text">Gestione Catalogo</h3>
+                    <p>Seleziona un museo per visualizzare e gestire le sue opere.</p>
+                    <select class="form-select form-select-lg bg-dark text-white border-secondary hover-glow"
                         x-model="selectedMuseumId" @change="fetchArtworks()">
                         <option value="">Scegli un museo...</option>
                         <template x-for="m in museums" :key="m._id">
@@ -97,24 +128,40 @@
                     </select>
                 </div>
 
+                <!-- Artwork List -->
                 <div x-show="step === 'artwork-list'">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <button @click="step = 'artwork-museum-select'"
-                            class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                            <i class="bi bi-arrow-left"></i> Cambia Museo
-                        </button>
-                        <span class="text-white-50 small">Opere di: <strong class="text-white"
-                                x-text="getMuseumName(selectedMuseumId)"></strong></span>
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
+                        <div class="d-flex align-items-center gap-3">
+                            <button @click="step = 'artwork-museum-select'"
+                                class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                <i class="bi bi-arrow-left"></i> Cambia Museo
+                            </button>
+                            <span class="text-white-50 small d-none d-md-inline">
+                                Opere di: <strong class="text-white" x-text="getMuseumName(selectedMuseumId)"></strong>
+                            </span>
+                        </div>
+                        <span class="badge bg-orange" x-text="artworks.length + ' opere'"></span>
                     </div>
 
-                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg overflow-hidden">
+                    <!-- Empty State -->
+                    <div x-show="artworks.length === 0" class="empty-state fade-in">
+                        <i class="bi bi-palette"></i>
+                        <h4 class="fw-bold mb-2">Nessuna opera presente</h4>
+                        <p>Inizia aggiungendo la prima opera al catalogo.</p>
+                        <button @click="openArtworkForm()" class="btn btn-orange rounded-pill px-4 btn-glow hover-lift">
+                            <i class="bi bi-plus-lg me-2"></i> Aggiungi Opera
+                        </button>
+                    </div>
+
+                    <!-- Desktop Table -->
+                    <div x-show="artworks.length > 0" class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg overflow-hidden d-none d-md-block card-hover">
                         <div class="table-responsive">
                             <table class="table table-dark table-hover align-middle m-0">
                                 <thead class="thead-custom">
                                     <tr>
                                         <th class="ps-4 py-3 fw-bold text-uppercase">Opera</th>
-                                        <th class="py-3 fw-bold text-uppercase">Artista</th>
-                                        <th class="py-3 fw-bold text-uppercase">ID Catalogo</th>
+                                        <th class="py-3 fw-bold text-uppercase">Autore</th>
+                                        <th class="py-3 fw-bold text-uppercase">Licenza</th>
                                         <th class="text-end pe-4 py-3 fw-bold text-uppercase">Azioni</th>
                                     </tr>
                                 </thead>
@@ -123,25 +170,33 @@
                                         <tr class="table-row-custom">
                                             <td class="ps-4 py-3">
                                                 <div class="d-flex align-items-center gap-3">
-                                                    <img :src="art.image || 'https://via.placeholder.com/50'"
-                                                        class="rounded-3 img-thumbnail-custom shadow-sm">
-                                                    <span class="fw-bold text-white" x-text="art.title"></span>
+                                                    <div class="artwork-preview artwork-preview-sm">
+                                                        <template x-if="art.img_path">
+                                                            <img :src="art.img_path"
+                                                                @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'"
+                                                                class="rounded-3">
+                                                        </template>
+                                                        <div class="artwork-placeholder rounded-3"
+                                                            :style="art.img_path ? 'display:none' : 'display:flex'">
+                                                            IMG
+                                                        </div>
+                                                    </div>
+                                                    <span class="fw-bold text-white" x-text="art.item"></span>
                                                 </div>
                                             </td>
                                             <td class="py-3">
-                                                <span class="text-orange fw-medium"
-                                                    x-text="art.artist || 'Artista Ignoto'"></span>
+                                                <span class="text-orange fw-medium" x-text="art.author || 'Autore Ignoto'"></span>
                                             </td>
                                             <td class="py-3">
-                                                <code class="text-white-50 small" x-text="art._id"></code>
+                                                <span class="license-badge" x-text="art.license || 'N/A'"></span>
                                             </td>
                                             <td class="text-end pe-4 py-3">
                                                 <div class="btn-group rounded-3 overflow-hidden shadow-sm">
                                                     <button @click="openArtworkForm(art)"
-                                                        class="btn btn-action bg-slate"><i
+                                                        class="btn btn-action bg-slate hover-lift"><i
                                                             class="bi bi-pencil-square"></i></button>
                                                     <button @click="deleteArtwork(art._id)"
-                                                        class="btn btn-action btn-outline-danger border-0 border-start border-secondary border-opacity-25"><i
+                                                        class="btn btn-action btn-outline-danger border-0 border-start border-secondary border-opacity-25 hover-lift"><i
                                                             class="bi bi-trash3-fill"></i></button>
                                                 </div>
                                             </td>
@@ -151,14 +206,173 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Mobile Cards -->
+                    <div x-show="artworks.length > 0" class="d-md-none">
+                        <template x-for="art in artworks" :key="art._id">
+                            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg artwork-card card-hover">
+                                <div class="card-body p-3">
+                                    <div class="d-flex gap-3">
+                                        <div class="artwork-preview artwork-preview-md">
+                                            <template x-if="art.img_path">
+                                                <img :src="art.img_path"
+                                                    @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'"
+                                                    class="rounded-3">
+                                            </template>
+                                            <div class="artwork-placeholder rounded-3"
+                                                :style="art.img_path ? 'display:none' : 'display:flex'">
+                                                IMG
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-1" x-text="art.item"></h6>
+                                            <p class="text-orange small mb-1" x-text="art.author || 'Autore Ignoto'"></p>
+                                            <span class="license-badge" x-text="art.license || 'N/A'"></span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button @click="openArtworkForm(art)"
+                                            class="btn btn-slate btn-sm flex-grow-1 rounded-pill hover-lift">
+                                            <i class="bi bi-pencil-square me-1"></i> Modifica
+                                        </button>
+                                        <button @click="deleteArtwork(art._id)"
+                                            class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill hover-lift">
+                                            <i class="bi bi-trash3-fill me-1"></i> Elimina
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
-                <div x-show="step === 'artwork-form'" class="max-w-550 mx-auto">
+                <!-- Artwork Form -->
+                <div x-show="step === 'artwork-form'" class="max-w-550 mx-auto fade-in">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <button @click="step = 'artwork-list'"
+                            class="btn btn-outline-secondary btn-sm rounded-pill px-3 hover-lift">
+                            <i class="bi bi-arrow-left"></i> Torna alla lista
+                        </button>
+                        <h5 class="m-0 fw-bold gradient-text" x-text="currentArtwork._id ? 'Modifica Opera' : 'Nuova Opera'"></h5>
+                    </div>
+
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg p-4 card-hover">
+                        <form @submit.prevent="saveArtwork()">
+                            <!-- Museum Selection -->
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Museo</label>
+                                <select class="form-select bg-dark text-white border-secondary hover-glow"
+                                    x-model="currentArtwork.museum_id" required>
+                                    <option value="">Seleziona museo...</option>
+                                    <template x-for="m in museums" :key="m._id">
+                                        <option :value="m._id" x-text="m.museum"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Artwork Name -->
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control bg-dark text-white border-secondary"
+                                    id="artworkName" x-model="currentArtwork.item" placeholder="Nome opera" required>
+                                <label for="artworkName">Nome dell'opera *</label>
+                            </div>
+
+                            <!-- Author -->
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control bg-dark text-white border-secondary"
+                                    id="artworkAuthor" x-model="currentArtwork.author" placeholder="Autore" required>
+                                <label for="artworkAuthor">Autore *</label>
+                            </div>
+
+                            <!-- Image Path -->
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Percorso immagine *</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary hover-glow"
+                                    x-model="currentArtwork.img_path" placeholder="/images/opera.jpg" required>
+                                <div class="mt-2" x-show="currentArtwork.img_path">
+                                    <div class="artwork-preview">
+                                        <template x-if="currentArtwork.img_path">
+                                            <img :src="currentArtwork.img_path"
+                                                @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'">
+                                        </template>
+                                        <div class="artwork-placeholder"
+                                            :style="currentArtwork.img_path ? 'display:none' : 'display:flex'">
+                                            Anteprima
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- License -->
+                            <div class="form-floating mb-4">
+                                <select class="form-select bg-dark text-white border-secondary hover-glow"
+                                    id="artworkLicense" x-model="currentArtwork.license" required>
+                                    <option value="">Seleziona licenza...</option>
+                                    <option value="CC0">CC0 (Public Domain)</option>
+                                    <option value="CC BY">CC BY (Attribuzione)</option>
+                                    <option value="CC BY-SA">CC BY-SA (Attribuzione - Condividi allo stesso modo)</option>
+                                    <option value="CC BY-ND">CC BY-ND (Attribuzione - Non opere derivate)</option>
+                                    <option value="CC BY-NC">CC BY-NC (Attribuzione - Non commerciale)</option>
+                                    <option value="Copyright">Copyright (Tutti i diritti riservati)</option>
+                                </select>
+                                <label for="artworkLicense">Licenza *</label>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-3">
+                                <button type="button" @click="step = 'artwork-list'"
+                                    class="btn btn-outline-secondary flex-grow-1 rounded-pill hover-lift">
+                                    Annulla
+                                </button>
+                                <button type="submit" class="btn btn-orange flex-grow-1 rounded-pill btn-glow hover-lift">
+                                    <i class="bi bi-check-lg me-2"></i>
+                                    <span x-text="currentArtwork._id ? 'Aggiorna' : 'Crea'"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
             </div>
         </main>
     </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="/editor/dashboard" class="mobile-nav-item">
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/editor/museum" class="mobile-nav-item">
+            <i class="bi bi-bank"></i>
+            <span>Musei</span>
+        </a>
+        <a href="/editor/artworks" class="mobile-nav-item active">
+            <i class="bi bi-palette"></i>
+            <span>Opere</span>
+        </a>
+        <a href="/editor/tours" class="mobile-nav-item">
+            <i class="bi bi-pencil-square"></i>
+            <span>Visite</span>
+        </a>
+        <a href="/editor/user-management" class="mobile-nav-item">
+            <i class="bi bi-people"></i>
+            <span>Utenti</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div x-show="notification.show" x-cloak class="toast-container toast-fixed">
+        <div class="custom-toast"
+            :class="notification.type === 'success' ? 'toast-success' : 'toast-error'">
+            <i :class="notification.type === 'success' ? 'bi bi-check-circle-fill text-success' : 'bi bi-exclamation-circle-fill text-danger'"></i>
+            <div class="toast-content">
+                <span class="toast-title" x-text="notification.type === 'success' ? 'Successo' : 'Errore'"></span>
+                <span class="toast-msg" x-text="notification.message"></span>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

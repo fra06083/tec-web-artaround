@@ -1,0 +1,332 @@
+/* =========================================================
+   BASE STYLES - Colors, Utilities, Typography
+========================================================= */
+
+/* Brand Colors */
+.text-orange {
+    color: #fd7e14 !important;
+}
+
+.bg-orange {
+    background-color: #fd7e14 !important;
+    color: #ffffff;
+}
+
+.bg-orange-dark {
+    background-color: #e85d04 !important;
+    color: #ffffff;
+}
+
+/* Button Styles */
+.btn-outline-orange {
+    color: #fd7e14;
+    border: 1px solid #fd7e14;
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-orange:hover,
+.btn-outline-orange:focus {
+    background-color: #fd7e14;
+    color: #ffffff;
+    border-color: #fd7e14;
+}
+
+.bg-slate {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-orange {
+    background-color: #fd7e14 !important;
+    color: #ffffff !important;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-orange:hover {
+    background-color: #e85d04 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+}
+
+.btn-slate {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-slate:hover {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+.bg-slate:hover {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+/* Utility Classes */
+.icon-5xl {
+    font-size: 5rem;
+}
+
+.spinner-lg {
+    width: 3rem;
+    height: 3rem;
+}
+
+.max-w-450 {
+    max-width: 450px;
+}
+
+.icon-box-lg {
+    width: 70px;
+    height: 70px;
+}
+
+.hover-bg-light {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa;
+}
+
+.max-w-550 {
+    max-width: 550px;
+}
+
+.icon-bg-cta {
+    font-size: 15rem;
+    right: -30px;
+    bottom: -60px;
+    transform: rotate(-10deg);
+}
+
+/* Button Micro-interactions */
+.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-reveal-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-reveal-icon .reveal-icon {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-15px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.btn-reveal-icon:hover .reveal-icon {
+    max-width: 24px;
+    opacity: 1;
+    transform: translateX(0);
+    margin-left: 8px;
+}
+
+/* Typography */
+.font-sans {
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.text-11 {
+    font-size: 1.1rem;
+}
+
+.x-small {
+    font-size: 0.65rem;
+    font-family: var(--bs-font-monospace);
+}
+
+/* Alpine.js Utility */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Auth Dropdown */
+.auth-dropdown-menu {
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 160px;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    z-index: 1050;
+    text-align: left;
+    overflow: hidden;
+}
+
+.auth-dropdown-menu i {
+    font-size: 1.1rem;
+}
+
+/* Card Enhancements */
+.card {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card:hover {
+    border-color: rgba(253, 126, 20, 0.2);
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glow Effects */
+.glow-orange {
+    box-shadow: 0 0 20px rgba(253, 126, 20, 0.3);
+}
+
+.glow-orange:hover {
+    box-shadow: 0 0 30px rgba(253, 126, 20, 0.5);
+}
+
+/* Smooth Transitions */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(253, 126, 20, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(253, 126, 20, 0.7);
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 45px;
+    height: 45px;
+}
+
+/* Search Input */
+.search-input {
+    width: 300px;
+}
+
+/* Icon Button */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+}
+
+/* --- Stili Base del Menu (Light Mode di default) --- */
+.auth-dropdown-menu {
+    background-color: #ffffff;
+    min-width: 220px;
+    z-index: 1100;
+}
+
+.dropdown-link-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    color: #212529;
+    /* Testo scuro */
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.dropdown-link-item:hover {
+    background-color: #f8f9fa;
+    color: #fd7e14;
+}
+
+.user-name-text {
+    color: #212529;
+}
+
+.chevron-icon {
+    color: #6c757d;
+}
+
+.dropdown-divider-custom {
+    height: 1px;
+    background-color: #eee;
+    margin: 8px 0;
+}
+
+/* --- Gestione DARK MODE (Automatico) --- */
+.marketplace-dark-mode .auth-dropdown-menu {
+    background-color: #252540;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-dark-mode .dropdown-link-item {
+    color: #ffffff;
+    /* Testo bianco */
+}
+
+.marketplace-dark-mode .dropdown-link-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.marketplace-dark-mode .user-name-text {
+    color: #ffffff;
+}
+
+.marketplace-dark-mode .chevron-icon {
+    color: #ffffff;
+}
+
+.marketplace-dark-mode .dropdown-divider-custom {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Stile speciale Logout */
+.logout-item {
+    color: #ef4444 !important;
+}
+
+.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Mobile Floating Buttons */
+.mobile-floating-buttons {
+    position: fixed !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+    z-index: 1050 !important;
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+
+@media (min-width: 992px) {
+    .mobile-floating-buttons {
+        display: none !important;
+    }
+}

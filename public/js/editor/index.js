@@ -4,9 +4,10 @@ function marketplaceApp() {
         username: '',
         permissions: '',
         items: [],
-        searchQuery: '', // cose che vengono scritte nella barra di ricerca
-        isLoading: true, // true di default così nella console non rompe le balle
+        searchQuery: '',
+        isLoading: true,
         isReady: false,
+        darkMode: false,
         stats: {
             publishedTours: 0,
             totalDownloads: 0,
@@ -14,7 +15,15 @@ function marketplaceApp() {
             serverStatus: 'Offline'
         },
         async init() {
-            // veriFICA del token all'avvio
+            // Load dark mode preference
+            const savedDarkMode = localStorage.getItem('artaround_darkmode');
+            this.darkMode = savedDarkMode === 'true';
+
+            // Watch for dark mode changes
+            this.$watch('darkMode', (value) => {
+                localStorage.setItem('artaround_darkmode', value);
+            });
+
             await this.checkAuth();
             await this.fetchTours();
 

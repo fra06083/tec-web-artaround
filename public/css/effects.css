@@ -1,0 +1,528 @@
+/* =========================================================
+   VISUAL EFFECTS & ANIMATIONS - Minimal & Clean
+========================================================= */
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Button Glow Effect */
+.btn-glow {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glow::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+.btn-glow:hover::after {
+    opacity: 1;
+    left: 100%;
+}
+
+/* Icon Box Animation */
+.icon-box-animated {
+    transition: transform 0.3s ease;
+}
+
+.icon-box-animated:hover {
+    transform: scale(1.05);
+}
+
+/* Hero Section Background */
+.hero-gradient {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.03) 0%, rgba(253, 126, 20, 0.03) 100%);
+    position: relative;
+}
+
+.hero-bg {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+/* Gradient Backgrounds */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
+
+.bg-gradient-orange {
+    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%) !important;
+}
+
+.bg-gradient-red {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%) !important;
+}
+
+/* Text Utilities */
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Stat Icon */
+.stat-icon {
+    width: 60px;
+    height: 60px;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .hover-lift:hover {
+        transform: translateY(-2px);
+    }
+}
+
+/* =========================================================
+   DARK MODE STYLES
+========================================================= */
+
+.dark-mode {
+    background-color: #1a1a2e !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .navbar {
+    background-color: #1a1a2e !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .navbar-brand {
+    color: #ffffff !important;
+}
+
+.dark-mode .navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.dark-mode .navbar-collapse {
+    background-color: #1a1a2e !important;
+}
+
+.dark-mode .hero-bg {
+    background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%) !important;
+}
+
+.dark-mode .hero-bg h1,
+.dark-mode .hero-bg .gradient-text {
+    color: #ffffff !important;
+}
+
+.dark-mode .hero-bg .text-secondary {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark-mode .hero-bg .bg-white {
+    background-color: #252540 !important;
+}
+
+.dark-mode .hero-bg .text-dark {
+    color: #ffffff !important;
+}
+
+.dark-mode .hero-bg .fw-bold {
+    color: #ffffff !important;
+}
+
+.dark-mode #how-it-works {
+    background-color: #1a1a2e !important;
+}
+
+.dark-mode #how-it-works h2,
+.dark-mode #how-it-works h4 {
+    color: #ffffff !important;
+}
+
+.dark-mode #how-it-works .text-secondary {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark-mode #how-it-works .card {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode #how-it-works .text-dark {
+    color: #ffffff !important;
+}
+
+.dark-mode #roles h2 {
+    color: #ffffff !important;
+}
+
+.dark-mode #roles .text-secondary {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark-mode #roles .text-dark {
+    color: #ffffff !important;
+}
+
+.dark-mode .auth-dropdown-menu {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .auth-dropdown-menu a {
+    color: #ffffff !important;
+}
+
+.dark-mode .auth-dropdown-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode .user-name-text {
+    color: #ffffff !important;
+}
+
+.dark-mode .dropdown-link-item {
+    color: #ffffff !important;
+}
+
+.dark-mode .dropdown-link-item span {
+    color: #ffffff !important;
+}
+
+.dark-mode .dropdown-link-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode .dropdown-divider-custom {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-mode .chevron-icon {
+    color: #ffffff !important;
+}
+
+.dark-mode .card.bg-primary {
+    background-color: #252540 !important;
+}
+
+.dark-mode .card.bg-primary h2,
+.dark-mode .card.bg-primary p {
+    color: #ffffff !important;
+}
+
+.dark-mode .card.bg-primary .text-dark {
+    color: #ffffff !important;
+}
+
+.dark-mode .card.bg-primary .text-secondary {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* =========================================================
+   MARKETPLACE DARK MODE
+========================================================= */
+
+.marketplace-dark-mode {
+    background-color: #1a1a2e !important;
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .navbar {
+    background-color: #1a1a2e !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.marketplace-dark-mode .navbar-brand {
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.marketplace-dark-mode .navbar-collapse {
+    background-color: #1a1a2e !important;
+}
+
+.marketplace-dark-mode .hero-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%) !important;
+}
+
+.marketplace-dark-mode .hero-section h1,
+.marketplace-dark-mode .hero-section .display-5 {
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .hero-section .lead {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Marketplace Filters */
+.marketplace-filters .btn-outline-secondary {
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+}
+
+.marketplace-filters .btn-outline-secondary:hover {
+    color: #212529 !important;
+    background-color: rgba(253, 126, 20, 0.1) !important;
+}
+
+.marketplace-filters .btn-outline-secondary.active {
+    color: #212529 !important;
+    background-color: rgba(253, 126, 20, 0.1) !important;
+    border-color: #fd7e14 !important;
+}
+
+/* Marketplace Filters Dark Mode */
+.marketplace-filters-dark .btn-outline-secondary {
+    color: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.marketplace-filters-dark .btn-outline-secondary:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-filters-dark .btn-outline-secondary.active {
+    color: #ffffff !important;
+    background-color: rgba(253, 126, 20, 0.2) !important;
+    border-color: #fd7e14 !important;
+}
+
+/* Marketplace Badge */
+.marketplace-badge {
+    background-color: rgba(253, 126, 20, 0.1) !important;
+    color: #212529 !important;
+}
+
+.marketplace-badge-dark {
+    background-color: rgba(253, 126, 20, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .hero-section .text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.marketplace-dark-mode .card {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .card h5,
+.marketplace-dark-mode .card .text-dark {
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .card .text-secondary {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.marketplace-dark-mode .card .border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-dark-mode .input-group-text {
+    background-color: #252540 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.marketplace-dark-mode .form-control {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-dark-mode .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Marketplace Light Mode */
+.marketplace-light .navbar {
+    background-color: white !important;
+}
+
+.marketplace-light .navbar-brand {
+    color: #0d6efd !important;
+}
+
+.marketplace-light .input-group-text {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+}
+
+.marketplace-light .form-control {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+.marketplace-light .form-control::placeholder {
+    color: #6c757d !important;
+}
+
+/* Marketplace Navbar Dark Mode */
+.marketplace-dark-mode .navbar {
+    background-color: #1a1a2e !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.marketplace-dark-mode .navbar-brand {
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .input-group-text {
+    background-color: #252540 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.marketplace-dark-mode .form-control {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.marketplace-dark-mode .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Marketplace Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
+
+.hero-section h1,
+.hero-section .display-5 {
+    color: #ffffff !important;
+}
+
+.hero-section .lead {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.hero-section .text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Marketplace Card */
+.marketplace-card {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.marketplace-card h5,
+.marketplace-card .text-dark {
+    color: #212529 !important;
+}
+
+.marketplace-card .text-secondary {
+    color: #6c757d !important;
+}
+
+.marketplace-card .border-top {
+    border-color: #dee2e6 !important;
+}
+
+/* Marketplace Card Dark Mode */
+.marketplace-dark-mode .card {
+    background-color: #252540 !important;
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .card h5,
+.marketplace-dark-mode .card .text-dark {
+    color: #ffffff !important;
+}
+
+.marketplace-dark-mode .card .text-secondary {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.marketplace-dark-mode .card .border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* =========================================================
+   DROPDOWN MENU STYLES
+========================================================= */
+
+.auth-dropdown-menu {
+    background-color: white;
+    min-width: 200px;
+    z-index: 1050;
+}
+
+.dropdown-header-info {
+    background-color: rgba(253, 126, 20, 0.05);
+}
+
+.dropdown-link-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-link-item:hover {
+    background-color: rgba(253, 126, 20, 0.1);
+}
+
+.dropdown-link-item i {
+    font-size: 1.1rem;
+}
+
+.dropdown-divider-custom {
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0.5rem 0;
+}
+
+.logout-item:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* =========================================================
+   MOBILE FLOATING CART
+========================================================= */
+
+.mobile-floating-cart {
+    position: fixed;
+    bottom: 2rem;
+    right: 1.5rem;
+    z-index: 1000;
+}
+
+.mobile-floating-cart .btn {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.25rem;
+}
+
+.mobile-floating-cart .badge {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(25%, -25%);
+}

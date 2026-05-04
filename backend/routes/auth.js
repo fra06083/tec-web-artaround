@@ -15,7 +15,7 @@ router.post('/login', async (req, res) => {
         if (!isMatch) return res.status(401).json({ error: 'Credenziali non valide' });
 
         const token = jwt.sign(
-            { id: user._id, name: user.name, permissions: user.permissions },
+            { id: user._id, name: user.name, permissions: user.permissions, museums: user.museums },
             process.env.JWT_SECRET,
             { expiresIn: '4h' }
         );

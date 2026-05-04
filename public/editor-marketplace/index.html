@@ -11,7 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/effects.css" />
+    <link rel="stylesheet" href="/css/mobile-nav.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -19,96 +21,278 @@
 
 </head>
 
-<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
+<body class="bg-white text-dark font-sans marketplace-light" x-data="marketplaceApp()"
+    :class="{ 'marketplace-dark-mode': darkMode }">
 
+    <!-- Schermata di caricamento -->
     <div x-show="!isReady">
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
             <div class="spinner-border text-orange spinner-lg mb-4" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <h3 class="fw-bold">Loading Marketplace...</h3>
+            <h3 class="fw-bold">Caricamento Marketplace...</h3>
         </div>
     </div>
 
     <div x-show="isReady" x-cloak class="d-flex flex-column min-vh-100">
 
-        <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2" href="../index.html">
-                    <i class="bi bi-box text-orange"></i> ArtAround
+        <!-- NAVBAR DESKTOP -->
+        <header class="navbar navbar-expand-lg sticky-top py-3 shadow-sm desktop-navbar">
+            <div class="container-fluid px-lg-5">
+                <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="../index.html">
+                    <i class="bi bi-box-seam text-orange"></i>
+                    <span :class="darkMode ? 'text-white' : 'text-primary'">ArtAround</span>
                 </a>
 
-                <div class="ms-auto d-flex align-items-center gap-3">
-                    <div class="input-group d-none d-lg-flex w-auto">
-                        <span class="input-group-text bg-secondary border-0 text-white-50 ps-3">
+                <!-- Barra di ricerca Desktop (nascosta su mobile) -->
+                <div class="ms-auto d-none d-lg-flex align-items-center gap-3">
+                    <div class="input-group search-input">
+                        <span class="input-group-text border-0">
                             <i class="bi bi-search"></i>
                         </span>
-                        <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
-                            placeholder="Cerca visite o musei..." x-model="searchQuery">
+                        <input type="text" class="form-control border-0" placeholder="Cerca visite..."
+                            x-model="searchQuery">
                     </div>
 
-                    <template x-if="isLoggedIn && permissions === 'admin'">
-                        <a href="/editor/dashboard" class="btn btn-outline-light d-flex align-items-center gap-2">
-                            <i class="bi bi-pencil-square text-orange"></i>
-                            <span class="d-none d-md-inline">Gestisci Visite</span>
-                        </a>
-                    </template>
+                    <!-- Bottoni Azione -->
+                    <button class="btn icon-btn rounded-circle d-flex align-items-center justify-content-center"
+                        @click="darkMode = !darkMode">
+                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                    </button>
 
-                    <div class="d-flex align-items-center gap-2 border-start border-secondary ps-3 ms-1"
-                        x-show="isLoggedIn">
-                        <span class="d-none d-md-block text-white-50 small me-2" x-text="username"></span>
-                        <button class="btn bg-slate rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="bi bi-cart"></i>
+                    <!-- Menu Utente nella Navbar -->
+                    <div class="d-flex align-items-center gap-3" x-show="isLoggedIn">
+                        <div class="position-relative" x-data="{ open: false }">
+
+                            <!-- Trigger -->
+                            <button @click="open = !open" @click.outside="open = false"
+                                class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
+                                <div
+                                    class="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                                </div>
+                                <i class="bi bi-chevron-down x-small chevron-icon"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open" x-transition x-cloak
+                                class="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2 position-absolute end-0 dropdown-menu-width">
+
+                                <!-- Header Profilo -->
+                                <div class="dropdown-header-info px-4 py-2 border-bottom">
+                                    <div class="fw-bold user-name-text" x-text="username"></div>
+                                    <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                                </div>
+
+                                <!-- Link Editor (Solo Admin) -->
+                                <template x-if="permissions === 'admin'">
+                                    <a href="/editor/dashboard" class="dropdown-link-item">
+                                        <i class="bi bi-pencil-square text-orange"></i>
+                                        <span>Editor & Admin</span>
+                                    </a>
+                                </template>
+
+                                <!-- Link Carrello -->
+                                <a href="#" class="dropdown-link-item">
+                                    <i class="bi bi-cart3 text-orange"></i>
+                                    <span>Il mio Carrello</span>
+                                    <span class="badge bg-orange rounded-pill ms-auto" x-show="cartCount > 0"
+                                        x-text="cartCount"></span>
+                                </a>
+
+                                <div class="dropdown-divider-custom"></div>
+
+                                <!-- Logout -->
+                                <button @click="logout()"
+                                    class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span class="fw-bold">Esci</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Actions -->
+                <div class="d-flex d-lg-none align-items-center gap-2 ms-auto">
+                    <!-- Dark Mode Toggle -->
+                    <button class="btn icon-btn rounded-circle d-flex align-items-center justify-content-center"
+                        @click="darkMode = !darkMode">
+                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                    </button>
+
+                    <!-- Account Button -->
+                    <div class="position-relative" x-data="{ open: false }" x-show="isLoggedIn">
+                        <button @click="open = !open" @click.outside="open = false"
+                            class="btn bg-orange rounded-circle d-flex align-items-center justify-content-center">
+                            <span x-text="username.charAt(0).toUpperCase()"></span>
                         </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" x-transition x-cloak
+                            class="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2 position-absolute end-0 dropdown-menu-width">
+
+                            <!-- Header Profilo -->
+                            <div class="dropdown-header-info px-4 py-2 border-bottom">
+                                <div class="fw-bold user-name-text" x-text="username"></div>
+                                <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                            </div>
+
+                            <!-- Link Editor (Solo Admin) -->
+                            <template x-if="permissions === 'admin'">
+                                <a href="/editor/dashboard" class="dropdown-link-item">
+                                    <i class="bi bi-pencil-square text-orange"></i>
+                                    <span>Editor & Admin</span>
+                                </a>
+                            </template>
+
+                            <!-- Link Carrello -->
+                            <a href="#" class="dropdown-link-item">
+                                <i class="bi bi-cart3 text-orange"></i>
+                                <span>Il mio Carrello</span>
+                                <span class="badge bg-orange rounded-pill ms-auto" x-show="cartCount > 0"
+                                    x-text="cartCount"></span>
+                            </a>
+
+                            <div class="dropdown-divider-custom"></div>
+
+                            <!-- Logout -->
+                            <button @click="logout()"
+                                class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="fw-bold">Esci</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <main class="flex-grow-1 p-4 p-lg-5">
+        <!-- MAIN CONTENT -->
+        <main class="flex-grow-1 p-3 p-lg-5">
 
-            <div class="mb-5 text-center text-md-start">
-                <h1 class="fw-bold mb-2">Esplora le Visite</h1>
-                <p class="text-white-50 lead">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
+            <!-- HERO SECTION (usa la classe .hero-section del tuo CSS) -->
+            <div class="mb-5 rounded-5 p-4 p-md-5 hero-section overflow-hidden">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-8 text-center text-md-start">
+                        <h1 class="fw-bold mb-2 text-white display-5">Esplora le Visite</h1>
+                        <p class="text-white-75 lead mb-4">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
+
+                        <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                            <!-- Badge Musei -->
+                            <span
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10">
+                                <i class="bi bi-building me-2 text-orange"></i>
+                                <span><strong class="fw-bold">500+</strong> Musei</span>
+                            </span>
+
+                            <!-- Badge Rating -->
+                            <span
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10">
+                                <i class="bi bi-star-fill me-2 text-warning"></i>
+                                <span><strong class="fw-bold">4.9</strong> Rating</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-none d-md-block text-end">
+                        <i class="bi bi-shop text-white opacity-25 icon-5xl"></i>
+                    </div>
+                </div>
             </div>
 
+            <!-- FILTRI (Gestiti con scroll orizzontale su mobile senza inline style) -->
+            <div class="mb-4 overflow-auto">
+                <div class="d-flex flex-nowrap flex-lg-wrap gap-2 pb-2">
+                    <button class="btn btn-orange rounded-pill px-4 shadow-sm">Tutti</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4">Arte</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4">Storia</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4">Scienza</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4">Audio Guide</button>
+                </div>
+            </div>
+
+            <!-- GRID DEI TOUR -->
             <div class="row g-4">
                 <template x-for="tour in items" :key="tour._id">
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden shadow-sm h-100 d-flex flex-column">
-                            <div class="ratio ratio-16x9 position-relative overflow-hidden bg-slate">
-                                <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25"></div>
-                                <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0">
+                        <!-- Usa .artwork-card e .hover-lift del tuo CSS -->
+                        <div class="card artwork-card h-100 border-0 rounded-4 overflow-hidden d-flex flex-column">
+
+                            <!-- Immagine (usa .artwork-preview del tuo CSS) -->
+                            <div class="artwork-preview position-relative">
+                                <div
+                                    class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <i class="bi bi-palette fs-1"></i>
+                                </div>
+                                <span class="badge bg-white text-orange position-absolute top-0 m-3">
                                     Tour Guidato
                                 </span>
                             </div>
 
                             <div class="card-body p-4 d-flex flex-column">
-                                <h5 class="fw-bold mb-1" x-text="tour.name"></h5>
+                                <h5 class="fw-bold mb-1 text-dark" x-text="tour.name"></h5>
 
-                                <p class="text-white-50 small mb-3">
+                                <div class="d-flex align-items-center gap-1 text-secondary small mb-3">
                                     <i class="bi bi-geo-alt-fill text-orange"></i>
-                                    <span x-text="tour.museum_id.museum + ' (' + tour.museum_id.province + ')'"></span>
-                                </p>
+                                    <span x-text="tour.museum_id.museum"></span>
+                                </div>
 
-                                <!-- flex-grow-1 + line-clamp fissano l'altezza della descrizione -->
-                                <p class="text-white-50 small flex-grow-1 mb-0" x-text="tour.description">
-                                </p>
+                                <p class="text-secondary small flex-grow-1" x-text="tour.description"></p>
 
-                                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
-                                    <span class="text-white-50 small">
-                                        <i class="bi bi-collection"></i>
-                                        <span x-text="tour.items.length + ' opere'"></span>
-                                    </span>
-                                    <button class="btn btn-orange rounded-pill px-4 fw-bold">Seleziona</button>
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-orange fw-bold fs-5">€ 12,00</span>
+                                        <span class="x-small text-secondary"
+                                            x-text="tour.items.length + ' opere'"></span>
+                                    </div>
+                                    <button class="btn btn-orange rounded-pill px-3 fw-bold btn-sm">
+                                        Seleziona
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </template>
             </div>
-
         </main>
+
+        <!-- MOBILE FLOATING CART BUTTON -->
+        <div class="mobile-floating-cart">
+            <button
+                class="btn btn-orange rounded-circle d-flex align-items-center justify-content-center shadow-lg position-relative">
+                <i class="bi bi-cart3"></i>
+                <span class="badge bg-white text-orange position-absolute top-0 end-0 rounded-circle"
+                    x-show="cartCount > 0" x-text="cartCount"></span>
+            </button>
+        </div>
+
+        <!-- FOOTER (Desktop) -->
+        <footer class="bg-dark text-white py-4 d-none d-md-block">
+            <div class="container-fluid px-5">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-white-50 small">
+                        &copy; 2026 ArtAround. All rights reserved.
+                    </div>
+                    <div class="col-md-6 text-end fw-bold">
+                        <i class="bi bi-box text-orange me-2"></i> ArtAround
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- TOAST NOTIFICATIONS (Usa .custom-toast del tuo CSS) -->
+    <div class="toast-container">
+        <template x-if="false"> <!-- Esempio logico per Alpine -->
+            <div class="custom-toast toast-success shadow">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <div class="toast-content">
+                    <span class="toast-title">Successo</span>
+                    <span class="toast-msg">Tour aggiunto al carrello!</span>
+                </div>
+            </div>
+        </template>
     </div>
 
 </body>
