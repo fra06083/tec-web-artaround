@@ -54,24 +54,93 @@
                             x-model="searchQuery">
                     </div>
 
-                    <!-- Bottoni Azione -->
-                    <button class="btn icon-btn rounded-circle d-flex align-items-center justify-content-center"
-                        @click="darkMode = !darkMode">
-                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                    <!-- Dark Mode Toggle Slider -->
+                    <button class="dark-mode-toggle" @click="darkMode = !darkMode"
+                        :class="{ 'active': darkMode }">
+                        <div class="toggle-track">
+                            <i class="bi" :class="darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
+                        </div>
                     </button>
 
                     <!-- Menu Utente nella Navbar -->
-                    <div class="d-flex align-items-center gap-3" x-show="isLoggedIn">
-                        <div class="position-relative" x-data="{ open: false }">
+                    <template x-if="isLoggedIn">
+                        <div class="d-flex align-items-center gap-3" x-data="{ open: false }">
+                            <div class="position-relative">
+                                <!-- Trigger -->
+                                <button @click="open = !open" @click.outside="open = false"
+                                    class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
+                                    <div
+                                        class="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                        <span x-text="username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <i class="bi bi-chevron-down x-small chevron-icon"></i>
+                                </button>
 
-                            <!-- Trigger -->
-                            <button @click="open = !open" @click.outside="open = false"
-                                class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
-                                <div
-                                    class="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
-                                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                                <!-- Dropdown Menu -->
+                                <div x-show="open" x-transition x-cloak
+                                    class="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2 position-absolute end-0 dropdown-menu-width">
+
+                                    <!-- Header Profilo -->
+                                    <div class="dropdown-header-info px-4 py-2 border-bottom">
+                                        <div class="fw-bold user-name-text" x-text="username"></div>
+                                        <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                                    </div>
+
+                                    <!-- Link Editor (Solo Admin) -->
+                                    <template x-if="permissions === 'admin'">
+                                        <a href="/editor/dashboard" class="dropdown-link-item">
+                                            <i class="bi bi-pencil-square text-orange"></i>
+                                            <span>Editor & Admin</span>
+                                        </a>
+                                    </template>
+
+                                    <!-- Link Carrello -->
+                                    <a href="#" class="dropdown-link-item">
+                                        <i class="bi bi-cart3 text-orange"></i>
+                                        <span>Il mio Carrello</span>
+                                        <span class="badge bg-orange rounded-pill ms-auto" x-show="cartCount > 0"
+                                            x-text="cartCount"></span>
+                                    </a>
+
+                                    <div class="dropdown-divider-custom"></div>
+
+                                    <!-- Logout -->
+                                    <button @click="logout()"
+                                        class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        <span class="fw-bold">Esci</span>
+                                    </button>
                                 </div>
-                                <i class="bi bi-chevron-down x-small chevron-icon"></i>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Login Button (quando non loggato) -->
+                    <template x-if="!isLoggedIn">
+                        <a href="../login.html"
+                            class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
+                            <span>Sign in</span>
+                            <i class="bi bi-arrow-right-short reveal-icon"></i>
+                        </a>
+                    </template>
+                </div>
+
+                <!-- Mobile Actions -->
+                <div class="d-flex d-lg-none align-items-center gap-2 ms-auto">
+                    <!-- Dark Mode Toggle Slider Mobile -->
+                    <button class="dark-mode-toggle-mobile" @click="darkMode = !darkMode"
+                        :class="{ 'active': darkMode }">
+                        <div class="toggle-track">
+                            <i class="bi" :class="darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
+                        </div>
+                    </button>
+
+                    <!-- Account Button -->
+                    <template x-if="isLoggedIn">
+                        <div class="position-relative" x-data="{ open: false }">
+                            <button @click="open = !open" @click.outside="open = false"
+                                class="btn bg-orange rounded-circle d-flex align-items-center justify-content-center">
+                                <span x-text="username.charAt(0).toUpperCase()"></span>
                             </button>
 
                             <!-- Dropdown Menu -->
@@ -110,60 +179,15 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </template>
 
-                <!-- Mobile Actions -->
-                <div class="d-flex d-lg-none align-items-center gap-2 ms-auto">
-                    <!-- Dark Mode Toggle -->
-                    <button class="btn icon-btn rounded-circle d-flex align-items-center justify-content-center"
-                        @click="darkMode = !darkMode">
-                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
-                    </button>
-
-                    <!-- Account Button -->
-                    <div class="position-relative" x-data="{ open: false }" x-show="isLoggedIn">
-                        <button @click="open = !open" @click.outside="open = false"
-                            class="btn bg-orange rounded-circle d-flex align-items-center justify-content-center">
-                            <span x-text="username.charAt(0).toUpperCase()"></span>
-                        </button>
-
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" x-transition x-cloak
-                            class="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2 position-absolute end-0 dropdown-menu-width">
-
-                            <!-- Header Profilo -->
-                            <div class="dropdown-header-info px-4 py-2 border-bottom">
-                                <div class="fw-bold user-name-text" x-text="username"></div>
-                                <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
-                            </div>
-
-                            <!-- Link Editor (Solo Admin) -->
-                            <template x-if="permissions === 'admin'">
-                                <a href="/editor/dashboard" class="dropdown-link-item">
-                                    <i class="bi bi-pencil-square text-orange"></i>
-                                    <span>Editor & Admin</span>
-                                </a>
-                            </template>
-
-                            <!-- Link Carrello -->
-                            <a href="#" class="dropdown-link-item">
-                                <i class="bi bi-cart3 text-orange"></i>
-                                <span>Il mio Carrello</span>
-                                <span class="badge bg-orange rounded-pill ms-auto" x-show="cartCount > 0"
-                                    x-text="cartCount"></span>
-                            </a>
-
-                            <div class="dropdown-divider-custom"></div>
-
-                            <!-- Logout -->
-                            <button @click="logout()"
-                                class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span class="fw-bold">Esci</span>
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Login Button Mobile -->
+                    <template x-if="!isLoggedIn">
+                        <a href="../login.html"
+                            class="btn bg-slate text-white rounded-pill px-3 fw-bold shadow-sm">
+                            <i class="bi bi-person"></i>
+                        </a>
+                    </template>
                 </div>
             </div>
         </header>

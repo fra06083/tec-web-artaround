@@ -40,7 +40,7 @@
                 <div
                     class="navbar-nav ms-auto d-flex flex-column flex-lg-row gap-3 mt-3 mt-lg-0 text-center align-items-center">
 
-                    <a href="navigator/" class="btn btn-outline-primary rounded-pill px-4 fw-medium btn-with-icon">
+                    <a href="navigator/" class="btn btn-outline-red rounded-pill px-4 fw-medium btn-with-icon">
                         <i class="bi bi-compass"></i> Naviga
                     </a>
 
@@ -49,10 +49,12 @@
                         <i class="bi bi-shop"></i> Marketplace
                     </a>
 
-                    <!-- Dark Mode Toggle Icon -->
-                    <button class="icon-btn rounded-circle d-flex align-items-center justify-content-center"
-                        @click="darkMode = !darkMode">
-                        <i class="bi" :class="darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+                    <!-- Dark Mode Toggle Slider -->
+                    <button class="dark-mode-toggle" @click="darkMode = !darkMode"
+                        :class="{ 'active': darkMode }">
+                        <div class="toggle-track">
+                            <i class="bi" :class="darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
+                        </div>
                     </button>
 
                     <!-- Auth Section -->
