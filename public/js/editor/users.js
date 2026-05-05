@@ -10,7 +10,7 @@ document.addEventListener('alpine:init', () => {
         pendingRequests: [],
 
         async init() {
-            // 1. Controllo sicurezza (come nel tuo originale)
+            // 1. Controllo sicurezza
             const token = localStorage.getItem('artaround_token');
             if (!token) return window.location.href = '../index.html';
 
@@ -34,7 +34,7 @@ document.addEventListener('alpine:init', () => {
                 await this.loadMuseums();
                 await this.loadPendingRequests();
 
-                // Carica inizialmente tutti gli editor (come facevi tu)
+                // Carica inizialmente tutti gli editor
                 const usersRes = await fetch('/editor/user-management/search?q=', {
                     headers: { 'Authorization': token }
                 });

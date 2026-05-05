@@ -30,7 +30,7 @@ document.addEventListener('alpine:init', () => {
                 this.username = authData.user.name;
 
                 // Load Museums
-                const musRes = await fetch('/admin/museums');
+                const musRes = await fetch('/api/museums');
                 this.museums = await musRes.json();
 
             } catch (e) {
@@ -48,7 +48,7 @@ document.addEventListener('alpine:init', () => {
 
         async onMuseumChange() {
             if (this.mode === 'edit' && this.selectedMuseum) {
-                const res = await fetch(`/admin/tours?museum_id=${this.selectedMuseum}`);
+                const res = await fetch(`/api/visite?museum_id=${this.selectedMuseum}`);
                 this.availableTours = await res.json();
             }
         },
@@ -60,12 +60,37 @@ document.addEventListener('alpine:init', () => {
 
         async goToForm() {
             if (this.mode === 'edit') {
-                const res = await fetch(`/admin/tours/${this.selectedTourId}`);
+                const res = await fetch(`/api/visite/${this.selectedTourId}`);
                 this.tour = await res.json();
             } else {
                 this.tour.museum_id = this.selectedMuseum;
             }
             this.step = 'form';
+        },
+
+        async saveTour() {
+            const token = localStorage.getItem('artaround_token');
+            try {
+                const isEdit = this.mode === 'edit';
+                const url = isEdit ? `/api/visite/${this.tour._id}` : '/api/visite';
+                const method = isEdit ? 'PUT' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.tour)
+                });
+
+                if (!res.ok) throw new Error();
+
+                this.step = 'choice';
+                this.resetForm();
+            } catch (e) {
+                console.error("Salvataggio tour fallito");
+            }
         },
 
         resetForm() {
