@@ -20,58 +20,60 @@ function VisitDetail() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <p>Caricamento visita...</p>;
-    if (error) return <p>Errore: {error}</p>;
-    if (!visita) return <p>Visita non trovata.</p>;
+    if (loading) return <p className="text-center mt-5">Caricamento visita...</p>;
+    if (error) return <p className="text-center mt-5 text-danger">Errore: {error}</p>;
+    if (!visita) return <p className="text-center mt-5">Visita non trovata.</p>;
     if (items.length === 0) return (
-        <div>
+        <div className="container py-5">
             <h1>{visita.name}</h1>
             <p>Nessuna opera in questa visita.</p>
-            <Link to="/visits">← Torna alla lista</Link>
+            <Link to="/visits" className="btn btn-outline-secondary">← Torna alla lista</Link>
         </div>
     );
 
     const currentItem = items[currentIndex];
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <Link to="/visits">← Torna alla lista</Link>
-                <span>{currentIndex + 1} / {items.length}</span>
+        <div className="container py-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <Link to="/visits" className="btn btn-outline-secondary btn-sm">← Torna alla lista</Link>
+                <span className="badge bg-orange">{currentIndex + 1} / {items.length}</span>
             </div>
 
-            <h1>{visita.name}</h1>
+            <h1 className="fw-bold">{visita.name}</h1>
             {visita.museum_id && (
-                <p><small>{visita.museum_id.museum} — {visita.museum_id.province}</small></p>
+                <p className="text-muted">{visita.museum_id.museum} — {visita.museum_id.province}</p>
             )}
 
-            <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1.5rem', marginTop: '1rem' }}>
-                <h2>{currentItem.item}</h2>
+            <div className="card border-0 shadow-sm rounded-4 mt-3">
+                <div className="card-body p-4">
+                    <h2 className="card-title fw-bold">{currentItem.item}</h2>
 
-                {currentItem.img_path && (
-                    <img
-                        src={currentItem.img_path}
-                        alt={currentItem.item}
-                        style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '1rem' }}
-                    />
-                )}
+                    {currentItem.img_path && (
+                        <img
+                            src={currentItem.img_path}
+                            alt={currentItem.item}
+                            className="img-fluid rounded-4 mb-3 w-100"
+                        />
+                    )}
 
-                <p><strong>Autore:</strong> {currentItem.author}</p>
-                <p><strong>Licenza:</strong> {currentItem.license}</p>
+                    <p><strong>Autore:</strong> {currentItem.author}</p>
+                    <p className="mb-0"><strong>Licenza:</strong> {currentItem.license}</p>
+                </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <div className="d-flex gap-3 justify-content-center mt-4">
                 <button
                     onClick={() => setCurrentIndex(i => i - 1)}
                     disabled={currentIndex === 0}
-                    style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+                    className="btn btn-outline-orange rounded-pill px-4"
                 >
                     ← Precedente
                 </button>
                 <button
                     onClick={() => setCurrentIndex(i => i + 1)}
                     disabled={currentIndex === items.length - 1}
-                    style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+                    className="btn btn-orange rounded-pill px-4"
                 >
                     Prossimo →
                 </button>
