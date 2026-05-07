@@ -59,6 +59,11 @@ app.use("/editor/user-management", userManagementRoutes);
 // everything in "public" is accessible via "/"
 app.use('/navigator', express.static(path.join(__dirname, '../public/navigator/dist')));
 app.use('/', express.static(path.join(__dirname, '../public')));
+
+// Catch-all per React Router del navigator
+app.get('/navigator/{*path}', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/navigator/dist/index.html'));
+});
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {
     global.startDate = new Date();
