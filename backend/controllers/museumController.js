@@ -57,6 +57,7 @@ const updateMuseum = async (req, res) => {
         const updated = await Museum.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
+
             { new: true, runValidators: true }
         );
         if (!updated) return res.status(404).json({ error: 'Museo non trovato' });

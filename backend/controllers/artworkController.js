@@ -72,7 +72,7 @@ const updateArtwork = async (req, res) => {
         const updated = await Item.findByIdAndUpdate(
             req.params.id,
             { $set: { item, img_path, museum_id, author, license } },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!updated) return res.status(404).json({ error: 'Opera non trovata' });

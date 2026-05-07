@@ -68,8 +68,11 @@ document.addEventListener('alpine:init', () => {
 
         // Ricerca dinamica
         async searchUsers() {
-            if (this.search.length < 2) return;
-            const res = await fetch(`/editor/user-management/search?q=${encodeURIComponent(this.search)}`);
+            const token = localStorage.getItem('artaround_token');
+            const query = this.search.trim();
+            const res = await fetch(`/editor/user-management/search?q=${encodeURIComponent(query)}`, {
+                headers: { 'Authorization': token }
+            });
             this.users = res.ok ? await res.json() : [];
         },
 

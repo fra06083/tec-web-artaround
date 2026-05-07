@@ -7,7 +7,15 @@ module.exports = {
     searchUsers: async (req, res) => {
         try {
             const q = (req.query.q || '').trim();
-            if (!q) return res.json([]);
+
+            // Se la query è vuota, restituisci tutti gli utenti (limitati a 50)
+            if (!q) {
+                const users = await login.find({})
+                    .select('name permissions museums')
+                    .sort({ name: 1 })
+                    .limit(50);
+                return res.json(users);
+            }
 
             // Cerca nel campo 'name'
             const users = await login.find({
@@ -37,13 +45,24 @@ module.exports = {
         try {
             const { id, museumId } = req.params;
             // $addToSet evita di aggiungere due volte lo stesso museo
-            const user = await login.findByIdAndUpdate(
+            // Aggiorna anche i permessi a 'editor' se l'utente è 'visitatore'
+            const user = await login.findById(id);
+
+            if (!user) return res.status(404).json({ error: "Utente non trovato" });
+
+            // Aggiorna permessi se è visitatore
+            const updateData = { $addToSet: { museums: museumId } };
+            if (user.permissions === 'visitatore') {
+                updateData.$set = { permissions: 'editor' };
+            }
+
+            const updatedUser = await login.findByIdAndUpdate(
                 id,
-                { $addToSet: { museums: museumId } },
+                updateData,
                 { returnDocument: 'after' }
             ).populate('museums', 'museum region provence');
 
-            res.json(user);
+            res.json(updatedUser);
         } catch (error) {
             res.status(500).json({ error: "Errore assegnazione permesso" });
         }

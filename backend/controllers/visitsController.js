@@ -60,7 +60,7 @@ const updateVisit = async (req, res) => {
         const updated = await Visit.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
         if (!updated) return res.status(404).json({ error: 'Visita non trovata' });
         res.json({ message: 'Visita aggiornata', visit: updated });
