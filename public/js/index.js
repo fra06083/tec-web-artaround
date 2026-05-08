@@ -2,14 +2,13 @@ function homeApp() {
     return {
         isLoggedIn: false,
         username: '',
+        permissions: '',
         darkMode: false,
 
         async init() {
-            // Load dark mode preference
             const savedDarkMode = localStorage.getItem('artaround_darkmode');
             this.darkMode = savedDarkMode === 'true';
 
-            // Watch for dark mode changes
             this.$watch('darkMode', (value) => {
                 localStorage.setItem('artaround_darkmode', value);
             });
@@ -29,6 +28,7 @@ function homeApp() {
                 if (response.ok) {
                     const data = await response.json();
                     this.username = data.user.name;
+                    this.permissions = data.user.permissions;
                     this.isLoggedIn = true;
                 } else {
                     this.logout();
@@ -43,8 +43,8 @@ function homeApp() {
             localStorage.removeItem('artaround_user');
             this.isLoggedIn = false;
             this.username = '';
+            this.permissions = '';
             window.location.href = 'index.html';
         }
     }
 }
-
