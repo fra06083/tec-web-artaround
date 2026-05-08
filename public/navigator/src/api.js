@@ -17,3 +17,13 @@ export async function fetchItemsByVisita(id) {
     if (!res.ok) throw new Error('Errore nel caricamento items');
     return res.json();
 }
+export function getUser() {
+    const token = localStorage.getItem('artaround_token');
+    if (!token) return null;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload;
+    } catch {
+        return null;
+    }
+}

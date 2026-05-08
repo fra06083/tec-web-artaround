@@ -149,7 +149,8 @@
                         localStorage.setItem('artaround_user', this.name);
 
                         // Rimanda alla homepage
-                        window.location.href = '/index.html';
+                        const params = new URLSearchParams(window.location.search);
+                        window.location.href = params.get('redirect') || '/index.html';
 
                     } catch (error) {
                         this.errorMessage = error.message;

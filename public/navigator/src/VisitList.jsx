@@ -66,7 +66,7 @@ function VisitList() {
                             </div>
                         </button>
 
-                        <a href="/login.html" className="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
+                        <a href="/login.html?redirect=/navigator/" className="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
                             <span>Sign in</span>
                             <i className="bi bi-arrow-right-short reveal-icon"></i>
                         </a>
