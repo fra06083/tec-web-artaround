@@ -1,19 +1,63 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchVisite } from './api';
+import { fetchVisite, getDarkMode, setDarkMode, getUser, logout } from './api';
 
 function VisitList() {
     const [visite, setVisite] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [darkMode, setDarkMode] = useState(true);
+    const [darkMode, setDarkModeState] = useState(getDarkMode());
+    const [user, setUser] = useState(null);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     useEffect(() => {
+        // Applica la classe dark-mode al body
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+
+        // Sincronizza dark mode con localStorage
+        const handleStorageChange = () => {
+            const newDarkMode = getDarkMode();
+            setDarkModeState(newDarkMode);
+            if (newDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Carica utente
+        const userData = getUser();
+        setUser(userData);
+
         fetchVisite()
             .then(data => setVisite(data))
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
-    }, []);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            document.body.classList.remove('dark-mode');
+        };
+    }, [darkMode]);
+
+    const toggleDarkMode = () => {
+        const newValue = !darkMode;
+        setDarkModeState(newValue);
+        setDarkMode(newValue);
+    };
+
+    const handleLogout = () => {
+        logout();
+        setUser(null);
+        setUserMenuOpen(false);
+        window.location.href = '/index.html';
+    };
 
     const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
     const bgNavbar = darkMode ? 'bg-dark border-bottom border-secondary border-opacity-25' : 'bg-white shadow-sm';
@@ -52,24 +96,72 @@ function VisitList() {
                         <i className="bi bi-box-seam text-red"></i> ArtAround
                     </a>
                     <div className="d-flex align-items-center gap-3">
-                        <a href="/editor-marketplace/" className="btn btn-outline-orange rounded-pill px-3 btn-sm fw-medium btn-with-icon d-none d-md-inline-flex">
+                        <a href="/editor-marketplace/" className="btn btn-outline-orange rounded-pill px-4 fw-medium btn-with-icon d-none d-md-inline-flex">
                             <i className="bi bi-shop"></i> Marketplace
                         </a>
 
-                        {/* DARK MODE TOGGLE */}
+                        {/* Dark Mode Toggle Slider */}
                         <button
                             className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
-                            onClick={() => setDarkMode(!darkMode)}
+                            onClick={toggleDarkMode}
                         >
                             <div className="toggle-track">
                                 <i className={`bi ${darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'}`}></i>
                             </div>
                         </button>
 
-                        <a href="/login.html?redirect=/navigator/" className="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
-                            <span>Sign in</span>
-                            <i className="bi bi-arrow-right-short reveal-icon"></i>
-                        </a>
+                        {/* Auth Section */}
+                        {!user ? (
+                            <a href="/login.html?redirect=/navigator/" className="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
+                                <span>Sign in</span>
+                                <i className="bi bi-arrow-right-short reveal-icon"></i>
+                            </a>
+                        ) : (
+                            <div className="position-relative">
+                                {/* Trigger: Avatar */}
+                                <button
+                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                    className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
+                                >
+                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                        <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                    </div>
+                                    <i className="bi bi-chevron-down x-small chevron-icon"></i>
+                                </button>
+
+                                {/* Dropdown Menu Professionale */}
+                                {userMenuOpen && (
+                                    <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2">
+                                        <div className="dropdown-header-info px-4 py-2 border-bottom">
+                                            <div className="fw-bold user-name-text text-dark">{user.name}</div>
+                                            <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
+                                        </div>
+
+                                        <a href="/editor-marketplace/" className="dropdown-link-item">
+                                            <i className="bi bi-grid-1x2 text-orange"></i>
+                                            <span className="text-dark">Dashboard</span>
+                                        </a>
+
+                                        {user.permissions === 'admin' && (
+                                            <a href="/editor/dashboard" className="dropdown-link-item">
+                                                <i className="bi bi-pencil-square text-orange"></i>
+                                                <span className="text-dark">Admin Panel</span>
+                                            </a>
+                                        )}
+
+                                        <div className="dropdown-divider-custom"></div>
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent"
+                                        >
+                                            <i className="bi bi-box-arrow-right"></i>
+                                            <span className="fw-bold">Log out</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </header>

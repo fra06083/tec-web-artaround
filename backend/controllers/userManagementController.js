@@ -82,5 +82,24 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ error: "Errore rimozione permesso" });
         }
+    },
+
+    // delete user (solo se non è admin)
+    deleteUser: async (req, res) => {
+        try {
+            const user = await login.findById(req.params.id);
+
+            if (!user) return res.status(404).json({ error: "Utente non trovato" });
+
+            // Non permettere di eliminare gli utenti admin
+            if (user.permissions === 'admin') {
+                return res.status(403).json({ error: "Non è possibile eliminare un utente admin" });
+            }
+
+            await login.findByIdAndDelete(req.params.id);
+            res.json({ message: "Utente eliminato con successo" });
+        } catch (error) {
+            res.status(500).json({ error: "Errore eliminazione utente" });
+        }
     }
 };

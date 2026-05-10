@@ -12,5 +12,6 @@ router.get('/search', auth, isAdmin, userCtrl.searchUsers);
 router.get('/:id', auth, isAdmin, userCtrl.getUserById);
 router.post('/:id/museums/:museumId', auth, isAdmin, userCtrl.grantMuseumPermission);
 router.delete('/:id/museums/:museumId', auth, isAdmin, userCtrl.revokeMuseumPermission);
+router.delete('/:id', auth, isAdmin, userCtrl.deleteUser);
 
 module.exports = router;

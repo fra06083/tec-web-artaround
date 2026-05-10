@@ -73,6 +73,9 @@
                 <a href="/editor/artworks" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
+                <a href="/editor/import" class="nav-link-admin">
+                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
+                </a>
 
                 <div class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -230,6 +233,17 @@
                                 </div>
                             </div>
                         </template>
+                    </div>
+
+                    <!-- Mobile Import Prompt -->
+                    <div class="d-md-none mt-4">
+                        <div class="card bg-orange bg-opacity-10 border border-orange border-opacity-25 rounded-4 p-4 text-center">
+                            <i class="bi bi-file-earmark-arrow-up text-orange fs-3 mb-2 d-block"></i>
+                            <p class="mb-3 fw-bold">Vuoi importare un museo tramite file configurazione?</p>
+                            <a href="/editor/import" class="btn btn-orange rounded-pill px-4">
+                                <i class="bi bi-upload me-2"></i>Vai all'Import
+                            </a>
+                        </div>
                     </div>
                 </div>
 

@@ -49,6 +49,11 @@ module.exports = {
     serveUsersManagement: (req, res) => {
         // Nota: adminController è in 'controllers/', quindi serve '../views/...'
         res.sendFile(path.join(__dirname, '../views/editor/users.html'));
+    },
+    serveImporter: (req, res) => {
+        // Nota: adminController è in 'controllers/', quindi serve '../views/...'
+        res.sendFile(path.join(__dirname, '../views/editor/import.html'));
     }
+
 
 };

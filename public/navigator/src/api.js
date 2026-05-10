@@ -17,6 +17,7 @@ export async function fetchItemsByVisita(id) {
     if (!res.ok) throw new Error('Errore nel caricamento items');
     return res.json();
 }
+
 export function getUser() {
     const token = localStorage.getItem('artaround_token');
     if (!token) return null;
@@ -26,4 +27,17 @@ export function getUser() {
     } catch {
         return null;
     }
+}
+
+export function getDarkMode() {
+    return localStorage.getItem('artaround_darkmode') === 'true';
+}
+
+export function setDarkMode(value) {
+    localStorage.setItem('artaround_darkmode', value);
+}
+
+export function logout() {
+    localStorage.removeItem('artaround_token');
+    localStorage.removeItem('artaround_user');
 }

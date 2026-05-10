@@ -16,4 +16,5 @@ router.get('/getTours', auth, isEditor, adminCtrl.getAllTours);
 router.get('/tours', auth, isEditor, adminCtrl.serveTours);
 router.get('/museum', auth, isEditor, adminCtrl.serveMuseums);
 router.get("/artworks", auth, isEditor, adminCtrl.serveArtworks);
+router.get("/import", auth, isAdmin, adminCtrl.serveImporter);
 module.exports = router; // used for exporting the router to app.js

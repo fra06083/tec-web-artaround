@@ -117,6 +117,24 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        // Elimina un utente (solo se non è admin)
+        async deleteUser(userId) {
+            if (!confirm('Sei sicuro di voler eliminare questo utente? Questa azione è irreversibile.')) return;
+
+            const token = localStorage.getItem('artaround_token');
+            const res = await fetch(`/editor/user-management/${userId}`, {
+                method: 'DELETE',
+                headers: {'Authorization': token}
+            });
+
+            if (res.ok) {
+                this.selectedUser = null;
+                await this.searchUsers();
+            } else {
+                alert('Errore durante l\'eliminazione dell\'utente');
+            }
+        },
+
         logout() {
             localStorage.removeItem('artaround_token');
             window.location.href = '../index.html';
