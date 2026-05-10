@@ -74,19 +74,19 @@ function VisitDetail() {
     const footerText = darkMode ? 'text-white-50' : 'text-secondary';
 
     if (loading) return (
-        <div className="vh-100 d-flex flex-column align-items-center justify-content-center">
+        <div className={`vh-100 d-flex flex-column align-items-center justify-content-center ${bgMain}`}>
             <div className="spinner-border text-red spinner-lg mb-4" role="status">
                 <span className="visually-hidden">Caricamento...</span>
             </div>
-            <h5 className="fw-bold">Caricamento visita...</h5>
+            <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Caricamento visita...</h5>
         </div>
     );
 
     if (error) return (
-        <div className="vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
+        <div className={`vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4 ${bgMain}`}>
             <i className="bi bi-exclamation-triangle text-red icon-5xl mb-3"></i>
-            <h3 className="fw-bold">Errore</h3>
-            <p className="text-white-50">{error}</p>
+            <h3 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Errore</h3>
+            <p className={textMuted}>{error}</p>
             <Link to="/" className="btn btn-outline-red rounded-pill px-4">← Torna alla lista</Link>
         </div>
     );
@@ -219,7 +219,7 @@ function VisitDetail() {
                             />
                         )}
                         <div className="card-body p-4">
-                            <h2 className="fw-bold mb-3">{currentItem.item}</h2>
+                            <h2 className={`fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}>{currentItem.item}</h2>
 
                             <div className="d-flex flex-wrap gap-3 mb-3">
                                 <div className="d-flex align-items-center gap-2">

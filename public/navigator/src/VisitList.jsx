@@ -194,7 +194,7 @@ function VisitList() {
                             <div key={v._id} className="col-12 col-md-6 col-lg-4">
                                 <div className={`card h-100 rounded-4 overflow-hidden shadow hover-lift ${bgCard}`}>
                                     <div className="card-body p-4 d-flex flex-column">
-                                        <h5 className="fw-bold mb-1">{v.name}</h5>
+                                        <h5 className={`fw-bold mb-1 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
 
                                         {v.museum_id && (
                                             <div className={`d-flex align-items-center gap-1 ${textMuted} small mb-3`}>
