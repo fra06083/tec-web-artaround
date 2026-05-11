@@ -18,10 +18,12 @@ function artworkManager() {
             img_path: '',
             museum_id: '',
             author: '',
-            license: ''
+            license: '',
+            description: '',
+            desc_type: 'medio' // default
         },
 
-        // NOTIFICATIONS
+        // NOTIFICATION
         notification: {
             show: false,
             message: '',
@@ -140,7 +142,9 @@ function artworkManager() {
                     img_path: artwork.img_path || '',
                     museum_id: artwork.museum_id || this.selectedMuseumId,
                     author: artwork.author || '',
-                    license: artwork.license || ''
+                    license: artwork.license || '',
+                    description: artwork.description || '',
+                    desc_type: artwork.desc_type || 'medio'
                 };
             } else {
                 // reset fields for new artwork
@@ -149,7 +153,9 @@ function artworkManager() {
                     img_path: '',
                     museum_id: this.selectedMuseumId,
                     author: '',
-                    license: ''
+                    license: '',
+                    description: '',
+                    desc_type: 'medio'
                 };
             }
             this.step = 'artwork-form';

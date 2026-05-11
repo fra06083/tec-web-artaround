@@ -1,4 +1,4 @@
-const { item: Item } = require('../models/museums.js');
+const { item: Item, language: Language } = require('../models/museums.js');
 
 // GET /api/artworks
 const getAllArtworks = async (req, res) => {
@@ -37,9 +37,10 @@ const getArtworksByMuseum = async (req, res) => {
 // POST /api/artworks
 const createArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license } = req.body;
+        const { item, img_path, museum_id, author, license, description, desc_type } = req.body;
 
-        if (!item || !img_path || !museum_id || !author || !license) {
+        // for the moment the description is mandatory..
+        if (!item || !img_path || !museum_id || !author || !license || !description) {
             return res.status(400).json({
                 error: 'Campi obbligatori mancanti: item, img_path, museum_id, author, license'
             });
@@ -52,9 +53,19 @@ const createArtwork = async (req, res) => {
             author,
             license
         });
-
         await newArtwork.save();
         res.status(201).json({ message: 'Opera creata con successo', artwork: newArtwork });
+
+        const newLanguage = new Language({
+            // default
+            type: desc_type || 'medio',
+            text: description,
+            // this actually needs to a time selected by the user
+            length: description.length.toString(),
+            item_id: newArtwork._id
+        });
+        await newLanguage.save();
+
     } catch (error) {
         console.error('Errore nella creazione dell\'opera:', error);
         if (error.code === 11000) {
@@ -67,12 +78,22 @@ const createArtwork = async (req, res) => {
 // PUT /api/artworks/:id
 const updateArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license } = req.body;
+        const { item, img_path, museum_id, author, license, description, desc_type } = req.body;
 
         const updated = await Item.findByIdAndUpdate(
             req.params.id,
             { $set: { item, img_path, museum_id, author, license } },
             { returnDocument: 'after', runValidators: true }
+        );
+
+        await Language.findOneAndUpdate(
+            { item_id: req.params.id },
+            { $set: {
+                text: description,
+                length: description.length.toString(),
+                type: desc_type || 'medio'
+            }},
+            { upsert: true }
         );
 
         if (!updated) return res.status(404).json({ error: 'Opera non trovata' });

@@ -308,6 +308,27 @@
                                 </div>
                             </div>
 
+                            <div class="mb-2">
+                                <label class="form-label text-white-50 small">Tipo di Descrizione</label>
+                                <select class="form-select bg-dark text-white border-secondary hover-glow"
+                                    x-model="currentArtwork.desc_type">
+                                    <option value="infantile">Infantile</option>
+                                    <option value="semplice">Semplice</option>
+                                    <option value="medio">Medio</option>
+                                    <option value="dettagliato">Dettagliato</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Descrizione dell'opera</label>
+                                <textarea 
+                                    class="form-control bg-dark text-white border-secondary hover-glow" 
+                                    rows="4" 
+                                    x-model="currentArtwork.description" 
+                                    placeholder="Inserisci una breve descrizione dell'opera...">
+                                </textarea>
+                            </div>
+
                             <!-- License -->
                             <div class="form-floating mb-4">
                                 <select class="form-select bg-dark text-white border-secondary hover-glow"
