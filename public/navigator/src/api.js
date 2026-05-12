@@ -18,6 +18,12 @@ export async function fetchItemsByVisita(id) {
     return res.json();
 }
 
+export async function fetchDescriptionsByItem(id) {
+    const res = await fetch(`${API_BASE}/artworks/${id}/descriptions`);
+    if (!res.ok) throw new Error('Errore nel caricamento descrizioni');
+    return res.json();
+}
+
 export function getUser() {
     const token = localStorage.getItem('artaround_token');
     if (!token) return null;

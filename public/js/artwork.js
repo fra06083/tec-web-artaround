@@ -1,3 +1,6 @@
+// cosa diavolo è questo file? Un refuso i guess 
+// possiamo eliminarlo no?
+
 function artworkManager() {
     return {
         // --- STATO ---

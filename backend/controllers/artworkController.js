@@ -34,6 +34,22 @@ const getArtworksByMuseum = async (req, res) => {
     }
 };
 
+// GET /api/artworks/:id/descriptions
+const getDescriptionsByArtwork = async (req, res) => {
+    try {
+        const artworkId = req.params.id;
+        // search in the collection language for all documents with that specific id
+        const descriptions = await Language.find({ item_id: artworkId }).lean();
+
+        if (!descriptions) return res.status(404).json({ error: 'Nessuna descrizione trovata' });
+
+        res.json(descriptions);
+    } catch (error) {
+        console.error('Errore recupero descrizioni:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+};
+
 // POST /api/artworks
 const createArtwork = async (req, res) => {
     try {
@@ -54,7 +70,6 @@ const createArtwork = async (req, res) => {
             license
         });
         await newArtwork.save();
-        res.status(201).json({ message: 'Opera creata con successo', artwork: newArtwork });
 
         const newLanguage = new Language({
             // default
@@ -65,7 +80,7 @@ const createArtwork = async (req, res) => {
             item_id: newArtwork._id
         });
         await newLanguage.save();
-
+        res.status(201).json({ message: 'Opera creata con successo', artwork: newArtwork });
     } catch (error) {
         console.error('Errore nella creazione dell\'opera:', error);
         if (error.code === 11000) {
@@ -87,7 +102,7 @@ const updateArtwork = async (req, res) => {
         );
 
         await Language.findOneAndUpdate(
-            { item_id: req.params.id },
+            { item_id: req.params.id, type: desc_type },
             { $set: {
                 text: description,
                 length: description.length.toString(),
@@ -123,6 +138,7 @@ module.exports = {
     getAllArtworks,
     getArtworkById,
     getArtworksByMuseum,
+    getDescriptionsByArtwork,
     createArtwork,
     updateArtwork,
     deleteArtwork

@@ -308,24 +308,25 @@
                                 </div>
                             </div>
 
-                            <div class="mb-2">
-                                <label class="form-label text-white-50 small">Tipo di Descrizione</label>
-                                <select class="form-select bg-dark text-white border-secondary hover-glow"
-                                    x-model="currentArtwork.desc_type">
-                                    <option value="infantile">Infantile</option>
-                                    <option value="semplice">Semplice</option>
-                                    <option value="medio">Medio</option>
-                                    <option value="dettagliato">Dettagliato</option>
-                                </select>
-                            </div>
-
+                            <!-- Description Tabs -->
                             <div class="mb-3">
-                                <label class="form-label text-white-50 small">Descrizione dell'opera</label>
-                                <textarea 
-                                    class="form-control bg-dark text-white border-secondary hover-glow" 
-                                    rows="4" 
-                                    x-model="currentArtwork.description" 
-                                    placeholder="Inserisci una breve descrizione dell'opera...">
+                                <label class="form-label text-white-50 small">Descrizioni per tipo</label>
+                                <div class="d-flex gap-2 mb-2 flex-wrap">
+                                    <template x-for="type in ['infantile','semplice','medio','dettagliato']" :key="type">
+                                        <button type="button"
+                                            @click="activeDescType = type"
+                                            :class="activeDescType === type ? 'btn-orange' : 'btn-outline-secondary'"
+                                            class="btn btn-sm rounded-pill px-3 text-capitalize">
+                                            <span x-text="type"></span>
+                                            <i x-show="descriptions[type]" class="bi bi-check-circle-fill ms-1 text-white opacity-75"></i>
+                                        </button>
+                                    </template>
+                                </div>
+                                <textarea
+                                    class="form-control bg-dark text-white border-secondary hover-glow"
+                                    rows="4"
+                                    :placeholder="'Descrizione ' + activeDescType + '...'"
+                                    x-model="descriptions[activeDescType]">
                                 </textarea>
                             </div>
 

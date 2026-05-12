@@ -11,6 +11,8 @@ function artworkManager() {
         museums: [],
         artworks: [],
         selectedMuseumId: '',
+        activeDescType: 'medio',
+        descriptions: { infantile: '', semplice: '', medio: '', dettagliato: '' },
 
         // CURRENT ARTWORK OBJECT (For Form)
         currentArtwork: {
@@ -19,6 +21,8 @@ function artworkManager() {
             museum_id: '',
             author: '',
             license: '',
+
+            // remove maybe
             description: '',
             desc_type: 'medio' // default
         },
@@ -132,7 +136,10 @@ function artworkManager() {
             }
         },
 
-        openArtworkForm(artwork = null) {
+        async openArtworkForm(artwork = null) {
+            this.descriptions = { infantile: '', semplice: '', medio: '', dettagliato: '' };
+            this.activeDescType = 'medio';
+
             // open form for new or existing artwork
             if (artwork) {
                 // copy existing artwork data for editing
@@ -146,6 +153,11 @@ function artworkManager() {
                     description: artwork.description || '',
                     desc_type: artwork.desc_type || 'medio'
                 };
+                try {
+                    const res = await fetch(`/api/artworks/${artwork._id}/descriptions`, { headers: { Authorization: localStorage.getItem('artaround_token') } });
+                    const descs = await res.json();
+                    descs.forEach(d => { this.descriptions[d.type] = d.text; });
+                } catch(e) { console.error(e); }
             } else {
                 // reset fields for new artwork
                 this.currentArtwork = {
@@ -162,6 +174,7 @@ function artworkManager() {
         },
 
         async saveArtwork() {
+
             // create or update artwork
             // validation
             if (!this.currentArtwork.item || !this.currentArtwork.img_path ||
@@ -170,6 +183,15 @@ function artworkManager() {
                 return;
             }
 
+            const filledTypes = Object.entries(this.descriptions).filter(([, text]) => text.trim());
+
+            const [firstType, firstText] = filledTypes[0] || ['medio', ''];
+            const payload = {
+                ...this.currentArtwork,
+                desc_type: firstType,
+                description: firstText
+            };
+
             const isEdit = !!this.currentArtwork._id;
             const url = isEdit ? `/api/artworks/${this.currentArtwork._id}` : '/api/artworks';
             const method = isEdit ? 'PUT' : 'POST';
@@ -177,19 +199,26 @@ function artworkManager() {
             try {
                 const res = await fetch(url, {
                     method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('artaround_token')
-                    },
-                    body: JSON.stringify(this.currentArtwork)
+                    headers: { 'Content-Type': 'application/json', Authorization: localStorage.getItem('artaround_token') },
+                    body: JSON.stringify(payload)
                 });
+                const data = await res.json();
+                const artworkId = isEdit ? this.currentArtwork._id : data.artwork._id;
+
+                // save remaining description types
+                for (const [type, text] of filledTypes.slice(1)) {
+                    await fetch(`/api/artworks/${artworkId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', Authorization: localStorage.getItem('artaround_token') },
+                        body: JSON.stringify({ ...this.currentArtwork, _id: artworkId, desc_type: type, description: text })
+                    });
+                }
 
                 if (res.ok) {
                     this.showToast(isEdit ? "Opera aggiornata con successo!" : "Nuova opera aggiunta!");
                     await this.fetchArtworks(); // reload table
                     this.step = 'artwork-list'; // back to list
                 } else {
-                    const err = await res.json();
                     this.showToast(err.error || "Errore nel salvataggio", "error");
                 }
             } catch (e) {

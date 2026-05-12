@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { fetchVisita, fetchItemsByVisita, getDarkMode, setDarkMode, getUser, logout } from './api';
+import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, logout } from './api';
 
 function VisitDetail() {
     const { id } = useParams();
@@ -12,6 +12,8 @@ function VisitDetail() {
     const [darkMode, setDarkModeState] = useState(getDarkMode());
     const [user, setUser] = useState(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [descriptions, setDescriptions] = useState([]);
+    const [selectedType, setSelectedType] = useState('medio');
 
     useEffect(() => {
         // Applica la classe dark-mode al body
@@ -51,6 +53,17 @@ function VisitDetail() {
             document.body.classList.remove('dark-mode');
         };
     }, [id, darkMode]);
+
+    useEffect(() => {
+        if (items.length > 0) {
+            const currentItemId = items[currentIndex]._id;
+            fetchDescriptionsByItem(currentItemId)
+                .then(data => setDescriptions(data))
+                .catch(err => console.error(err));
+        }
+    }, [currentIndex, items]);
+
+    const currentDescription = descriptions.find(d => d.type === selectedType);
 
     const toggleDarkMode = () => {
         const newValue = !darkMode;
@@ -239,6 +252,41 @@ function VisitDetail() {
                                     I contenuti audio saranno disponibili a breve.
                                 </p>
                             </div>
+
+                            {/* description type selector */}
+                            <div className="mt-2 mb-3 d-flex flex-wrap gap-2 justify-content-center">
+                                {['infantile', 'semplice', 'medio', 'dettagliato'].map(type => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setSelectedType(type)}
+                                        className={`btn btn-sm rounded-pill px-3 transition-all ${
+                                            selectedType === type
+                                            ? 'btn-outline-secondary bg-secondary bg-opacity-25'
+                                            : 'btn-outline-secondary border-opacity-25'
+                                        }`}
+                                    >
+                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* text area */}
+                            <div className={`rounded-4 p-4 mt-3 ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
+                                {currentDescription ? (
+                                    <div className="fade-in">
+                                        <p className={`mb-0 small ${textMuted}`}>
+                                            <i className="bi bi-chat-left-text me-2 text-red"></i>
+                                            {currentDescription.text}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className={`${textMuted} mb-0 text-center small italic`}>
+                                        <i className="bi bi-exclamation-circle me-2 text-red"></i>
+                                        Manca la descrizione per il tipo <strong>{selectedType}</strong>.
+                                    </p>
+                                )}
+                            </div>
+
                         </div>
                     </div>
 

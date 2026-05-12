@@ -16,6 +16,9 @@ router.get('/', auth, isEditor, artworkCtrl.getAllArtworks);
 // GET /api/artworks/:id - Opera specifica
 router.get('/:id', auth, isEditor, artworkCtrl.getArtworkById);
 
+// GET /api/artworks/:id/descriptions
+router.get('/:id/descriptions', artworkCtrl.getDescriptionsByArtwork);
+
 // POST /api/artworks - Crea nuova opera
 router.post('/', auth, isEditor, hasMuseumAccess, artworkCtrl.createArtwork);
 
