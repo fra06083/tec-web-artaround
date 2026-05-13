@@ -14,6 +14,18 @@ function marketplaceApp() {
             activeUsers: 0,
             serverStatus: 'Offline'
         },
+        get filteredItems() {
+            if (!this.searchQuery || this.searchQuery.trim() === '') {
+                return this.items;
+            }
+            const query = this.searchQuery.toLowerCase().trim();
+            return this.items.filter(tour => {
+                const name = tour.name?.toLowerCase() || '';
+                const museum = tour.museum_id?.museum?.toLowerCase() || '';
+                const description = tour.description?.toLowerCase() || '';
+                return name.includes(query) || museum.includes(query) || description.includes(query);
+            });
+        },
         async init() {
             // Load dark mode preference
             const savedDarkMode = localStorage.getItem('artaround_darkmode');

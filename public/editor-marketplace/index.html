@@ -46,12 +46,13 @@
 
                 <!-- Barra di ricerca Desktop (nascosta su mobile) -->
                 <div class="ms-auto d-none d-lg-flex align-items-center gap-3">
-                    <div class="input-group search-input">
-                        <span class="input-group-text border-0">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control border-0" placeholder="Cerca visite..."
-                            x-model="searchQuery">
+                    <div class="search-container position-relative">
+                        <div class="search-input-wrapper">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Cerca visite..."
+                                x-model="searchQuery">
+                        </div>
+                        <div class="search-glow"></div>
                     </div>
 
                     <!-- Dark Mode Toggle Slider -->
@@ -237,7 +238,7 @@
 
             <!-- GRID DEI TOUR -->
             <div class="row g-4">
-                <template x-for="tour in items" :key="tour._id">
+                <template x-for="tour in filteredItems" :key="tour._id">
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                         <!-- Usa .artwork-card e .hover-lift del tuo CSS -->
                         <div class="card artwork-card h-100 border-0 rounded-4 overflow-hidden d-flex flex-column">

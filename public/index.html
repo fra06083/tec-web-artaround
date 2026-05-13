@@ -50,8 +50,7 @@
                     </a>
 
                     <!-- Dark Mode Toggle Slider -->
-                    <button class="dark-mode-toggle" @click="darkMode = !darkMode"
-                        :class="{ 'active': darkMode }">
+                    <button class="dark-mode-toggle" @click="darkMode = !darkMode" :class="{ 'active': darkMode }">
                         <div class="toggle-track">
                             <i class="bi" :class="darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
                         </div>
@@ -59,7 +58,7 @@
 
                     <!-- Auth Section -->
                     <template x-if="!isLoggedIn">
-                        <a href="login.html"
+                        <a :href="login.html"
                             class="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
                             <span>Sign in</span>
                             <i class="bi bi-arrow-right-short reveal-icon"></i>
@@ -133,7 +132,7 @@
                         <div class="d-flex align-items-center gap-3 mb-4">
                             <div
                                 class="bg-orange bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center stat-icon">
-                                <i class="bi bi-people text-orange fs-3"></i>
+                                <i class="bi bi-people text-white fs-3"></i>
                             </div>
                             <div>
                                 <div class="fw-bold text-dark fs-3 lh-1">50K+</div>

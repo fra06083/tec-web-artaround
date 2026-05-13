@@ -160,3 +160,193 @@ body.login-page {
     color: #198754;
     border-left: 4px solid #198754;
 }
+
+/* =========================================================
+   LOGIN ENHANCED STYLES
+========================================================= */
+
+/* Login card with glass effect */
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+}
+
+/* Login input with enhanced styling */
+.login-input {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    color: #212529;
+    padding: 0.875rem 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.login-input:focus {
+    background: white;
+    border-color: #fd7e14;
+    box-shadow: 0 0 0 4px rgba(253, 126, 20, 0.15);
+    transform: translateY(-2px);
+}
+
+.login-input::placeholder {
+    color: #6c757d;
+    transition: opacity 0.3s ease;
+}
+
+.login-input:focus::placeholder {
+    opacity: 0.5;
+}
+
+/* Login button with enhanced effects */
+.login-btn {
+    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%);
+    border: none;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.login-btn:hover::before {
+    left: 100%;
+}
+
+.login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(253, 126, 20, 0.4);
+}
+
+.login-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Floating shapes background */
+.login-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.login-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(13, 110, 253, 0.1) 100%);
+    animation: float 20s infinite ease-in-out;
+}
+
+.login-shape:nth-child(1) {
+    width: 400px;
+    height: 400px;
+    top: -200px;
+    left: -200px;
+    animation-delay: 0s;
+}
+
+.login-shape:nth-child(2) {
+    width: 300px;
+    height: 300px;
+    bottom: -150px;
+    right: -150px;
+    animation-delay: -5s;
+}
+
+.login-shape:nth-child(3) {
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    right: -100px;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(50px, 50px) rotate(90deg);
+    }
+    50% {
+        transform: translate(0, 100px) rotate(180deg);
+    }
+    75% {
+        transform: translate(-50px, 50px) rotate(270deg);
+    }
+}
+
+/* Logo icon with animation */
+.login-page .bi-box {
+    transition: transform 0.3s ease;
+}
+
+.login-page .bi-box:hover {
+    transform: rotate(10deg) scale(1.1);
+}
+
+/* Link hover effects */
+.hover-bg-light {
+    transition: all 0.2s ease;
+}
+
+.hover-bg-light:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* Max width constraint */
+.max-w-450 {
+    max-width: 450px;
+}
+
+/* Z-index for card content */
+.z-1 {
+    z-index: 1;
+}
+
+/* Enhanced alert animations */
+.login-page .alert {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reveal icon animation */
+.btn-reveal-icon .reveal-icon {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.btn-reveal-icon:hover .reveal-icon {
+    transform: translateX(5px);
+}
