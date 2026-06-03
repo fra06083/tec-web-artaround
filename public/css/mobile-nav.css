@@ -112,6 +112,7 @@
 ========================================================= */
 /* Colore di base per Light Mode */
 .desktop-navbar {
+    background-color: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -121,7 +122,7 @@
 /* Colore per Dark Mode (Sia Home che Marketplace) */
 .dark-mode .desktop-navbar,
 .marketplace-dark-mode .desktop-navbar {
-    background: rgba(26, 26, 46, 0.95) !important;
+    background: rgba(26, 26, 46, 0.85) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
