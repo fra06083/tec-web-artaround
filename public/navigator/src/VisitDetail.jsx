@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, logout } from './api';
+
+const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 
 function VisitDetail() {
     const { id } = useParams();
@@ -14,6 +16,36 @@ function VisitDetail() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [descriptions, setDescriptions] = useState([]);
     const [selectedType, setSelectedType] = useState('medio');
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    
+    // Ferma la sintesi vocale
+    const stopSpeaking = useCallback(() => {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+    }, []);
+
+    // Leggi il testo ad alta voce
+    const speak = useCallback((text) => {
+        stopSpeaking();
+        if (!text) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+        utterance.rate = 1;
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+        setIsSpeaking(true);
+    }, [stopSpeaking]);
+
+    // Dimmi di più / dimmi di meno
+    const changeLevelUp = () => {
+        const i = LEVELS.indexOf(selectedType);
+        if (i < LEVELS.length - 1) setSelectedType(LEVELS[i + 1]);
+    };
+    const changeLevelDown = () => {
+        const i = LEVELS.indexOf(selectedType);
+        if (i > 0) setSelectedType(LEVELS[i - 1]);
+    };
 
     useEffect(() => {
         // Applica la classe dark-mode al body
@@ -245,21 +277,13 @@ function VisitDetail() {
                                 </div>
                             </div>
 
-                            {/* PLACEHOLDER PER STEP 3 */}
-                            <div className="rounded-4 p-4 mt-3 bg-secondary bg-opacity-10">
-                                <p className={`${textMuted} mb-0 text-center small`}>
-                                    <i className="bi bi-chat-left-text me-2 text-red"></i>
-                                    I contenuti audio saranno disponibili a breve.
-                                </p>
-                            </div>
-
-                            {/* description type selector */}
+                            {/* SELETTORE LIVELLO */}
                             <div className="mt-2 mb-3 d-flex flex-wrap gap-2 justify-content-center">
-                                {['infantile', 'semplice', 'medio', 'dettagliato'].map(type => (
+                                {LEVELS.map(type => (
                                     <button
                                         key={type}
                                         onClick={() => setSelectedType(type)}
-                                        className={`btn btn-sm rounded-pill px-3 transition-all ${
+                                        className={`btn btn-sm rounded-pill px-3 ${
                                             selectedType === type
                                             ? 'btn-outline-secondary bg-secondary bg-opacity-25'
                                             : 'btn-outline-secondary border-opacity-25'
@@ -270,21 +294,52 @@ function VisitDetail() {
                                 ))}
                             </div>
 
-                            {/* text area */}
+                            {/* AREA TESTO DESCRIZIONE */}
                             <div className={`rounded-4 p-4 mt-3 ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
                                 {currentDescription ? (
-                                    <div className="fade-in">
+                                    <div>
                                         <p className={`mb-0 small ${textMuted}`}>
                                             <i className="bi bi-chat-left-text me-2 text-red"></i>
                                             {currentDescription.text}
                                         </p>
                                     </div>
                                 ) : (
-                                    <p className={`${textMuted} mb-0 text-center small italic`}>
+                                    <p className={`${textMuted} mb-0 text-center small`}>
                                         <i className="bi bi-exclamation-circle me-2 text-red"></i>
                                         Manca la descrizione per il tipo <strong>{selectedType}</strong>.
                                     </p>
                                 )}
+                            </div>
+
+                            {/* CONTROLLI VOCALI */}
+                            <div className="d-flex flex-wrap gap-2 justify-content-center mt-3">
+                                {/* Play / Stop */}
+                                <button
+                                    onClick={() => isSpeaking ? stopSpeaking() : speak(currentDescription?.text)}
+                                    disabled={!currentDescription}
+                                    className={`btn rounded-pill px-4 btn-with-icon ${isSpeaking ? 'btn-outline-red' : 'bg-red text-white'}`}
+                                >
+                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-volume-up-fill'}`}></i>
+                                    {isSpeaking ? 'Stop' : 'Ascolta'}
+                                </button>
+
+                                {/* Dimmi di meno */}
+                                <button
+                                    onClick={changeLevelDown}
+                                    disabled={LEVELS.indexOf(selectedType) === 0}
+                                    className="btn btn-outline-secondary rounded-pill px-3 btn-sm btn-with-icon"
+                                >
+                                    <i className="bi bi-dash-circle"></i> Dimmi di meno
+                                </button>
+                                
+                                {/* Dimmi di più */}
+                                <button
+                                    onClick={changeLevelUp}
+                                    disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1}
+                                    className="btn btn-outline-secondary rounded-pill px-3 btn-sm btn-with-icon"
+                                >
+                                    <i className="bi bi-plus-circle"></i> Dimmi di più
+                                </button>
                             </div>
 
                         </div>
