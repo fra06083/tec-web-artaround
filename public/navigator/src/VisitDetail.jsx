@@ -145,22 +145,22 @@ function VisitDetail() {
     );
 
     if (items.length === 0) return (
-        <div className="min-vh-100 d-flex flex-column">
-            <header className={`navbar sticky-top py-3 shadow-sm ${bgNavbar}`}>
-                <div className="container-lg d-flex justify-content-between align-items-center">
-                    <Link to="/" className="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 text-white">
-                        <i className="bi bi-box-seam text-red"></i> ArtAround
-                    </Link>
-                </div>
-            </header>
-            <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center px-4">
-                <i className="bi bi-inbox text-white-50 icon-5xl mb-3"></i>
-                <h3 className="fw-bold">{visita.name}</h3>
-                <p className="text-white-50">Nessuna opera in questa visita.</p>
-                <Link to="/" className="btn btn-outline-red rounded-pill px-4 mt-2">← Torna alla lista</Link>
+    <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
+        <header className={`navbar sticky-top py-3 shadow-sm ${bgNavbar}`}>
+            <div className="container-lg d-flex justify-content-between align-items-center">
+                <a href="/" className={`navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 ${brandColor}`}>
+                    <i className="bi bi-box-seam text-red"></i> ArtAround
+                </a>
             </div>
+        </header>
+        <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center px-4">
+            <i className={`bi bi-inbox ${textMuted} icon-5xl mb-3`}></i>
+            <h3 className="fw-bold">{visita.name}</h3>
+            <p className={textMuted}>Nessuna opera in questa visita.</p>
+            <Link to="/" className="btn btn-outline-red rounded-pill px-4 mt-2">← Torna alla lista</Link>
         </div>
-    );
+    </div>
+);
 
     const currentItem = items[currentIndex];
 
