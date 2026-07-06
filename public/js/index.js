@@ -11,6 +11,11 @@ function homeApp() {
 
             this.$watch('darkMode', (value) => {
                 localStorage.setItem('artaround_darkmode', value);
+                if (value) {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                }
             });
 
             const token = localStorage.getItem('artaround_token');

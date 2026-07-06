@@ -91,9 +91,19 @@ module.exports = {
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // Non permettere di eliminare gli utenti admin
-            if (user.permissions === 'admin') {
-                return res.status(403).json({ error: "Non è possibile eliminare un utente admin" });
+            // 1. Non permettere di eliminare sé stessi
+            if (user._id.toString() === req.user._id.toString()) {
+                return res.status(403).json({ error: "Non puoi eliminare il tuo stesso account" });
+            }
+
+            // 2. L'utente "admin" è il master e non può mai essere eliminato da nessuno
+            if (user.name === 'admin') {
+                return res.status(403).json({ error: "L'utente master 'admin' non può essere eliminato" });
+            }
+
+            // 3. Solo il master "admin" può eliminare altri admin
+            if (user.permissions === 'admin' && req.user.name !== 'admin') {
+                return res.status(403).json({ error: "Solo l'admin master può eliminare altri amministratori" });
             }
 
             await login.findByIdAndDelete(req.params.id);

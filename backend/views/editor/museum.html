@@ -103,15 +103,15 @@
             </header>
 
             <!-- Desktop Header -->
-            <header class="navbar navbar-expand bg-dark border-bottom border-secondary sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
+            <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center glow-orange">
-                            <i class="bi bi-person-fill fs-5"></i>
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow" style="cursor: pointer;">
+                            <i class="bi bi-person-fill text-white fs-5"></i>
                         </div>
                         <div>
-                            <p class="m-0 small text-white-50">Benvenuto</p>
-                            <h5 class="m-0 fw-bold gradient-text" x-text="username"></h5>
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">Bentornato</p>
+                            <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
                     </div>
 
@@ -128,9 +128,9 @@
 
                 <div x-show="step === 'museum-list'" class="animate__animated animate__fadeIn">
                     <!-- Desktop Table -->
-                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg overflow-hidden d-none d-md-block">
+                    <div class="card bg-gradient-dark-blue border-0 rounded-4 shadow-lg overflow-hidden d-none d-md-block">
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle m-0">
+                            <table class="table table-dark table-hover table-borderless align-middle m-0">
                                 <thead class="thead-custom">
                                     <tr>
                                         <th class="ps-4 py-3 fw-bold text-uppercase">Museo</th>
@@ -199,35 +199,35 @@
                     <!-- Mobile Cards -->
                     <div class="d-md-none">
                         <template x-for="m in museums" :key="m._id">
-                            <div class="museum-mobile-card">
+                            <div class="card bg-gradient-dark-blue border-0 shadow-lg rounded-4 p-4 mb-4">
                                 <div class="d-flex gap-3 mb-3">
                                     <template x-if="m.image">
                                         <img :src="m.image"
-                                            class="museum-image"
+                                            class="rounded-3 object-fit-cover shadow-sm" style="width: 80px; height: 80px;"
                                             alt="Museum">
                                     </template>
                                     <template x-if="!m.image">
-                                        <div class="museum-image d-flex align-items-center justify-content-center bg-orange bg-opacity-10">
-                                            <i class="bi bi-bank text-orange fs-4"></i>
+                                        <div class="d-flex align-items-center justify-content-center bg-orange bg-opacity-10 border border-orange border-opacity-25 rounded-3 shadow-sm" style="width: 80px; height: 80px;">
+                                            <i class="bi bi-bank text-orange fs-2"></i>
                                         </div>
                                     </template>
                                     <div class="museum-info">
-                                        <h6 class="fw-bold mb-1" x-text="m.museum"></h6>
-                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="fw-bold mb-1 text-white" x-text="m.museum"></h5>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
                                             <i class="bi bi-geo-alt-fill text-orange small"></i>
-                                            <span class="text-white" x-text="m.city"></span>
-                                            <span class="badge badge-province" x-show="m.province" x-text="m.province"></span>
+                                            <span class="text-white-50 small fw-medium" x-text="m.city"></span>
+                                            <span class="badge bg-slate border border-secondary shadow-sm" x-show="m.province" x-text="m.province"></span>
                                         </div>
-                                        <p class="text-white-50 small mb-0" x-text="m.address"></p>
+                                        <p class="text-white-50 small mb-0 text-truncate" x-text="m.address"></p>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-2 museum-actions">
+                                <div class="d-flex gap-2">
                                     <button @click="openMuseumForm(m)"
-                                        class="btn btn-slate btn-sm flex-grow-1 rounded-pill">
+                                        class="btn bg-slate text-white btn-sm flex-grow-1 rounded-pill hover-lift shadow-sm">
                                         <i class="bi bi-pencil-square me-1"></i> Modifica
                                     </button>
                                     <button @click="deleteMuseum(m._id)"
-                                        class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill">
+                                        class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill hover-lift shadow-sm">
                                         <i class="bi bi-trash3-fill me-1"></i> Elimina
                                     </button>
                                 </div>

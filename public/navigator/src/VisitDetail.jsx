@@ -111,7 +111,7 @@ function VisitDetail() {
     };
 
     const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
-    const bgNavbar = darkMode ? 'bg-dark border-bottom border-secondary border-opacity-25' : 'bg-white shadow-sm';
+    const bgNavbar = darkMode ? 'glass-header' : 'bg-white shadow-sm';
     const brandColor = darkMode ? 'text-white' : 'text-primary';
     const bgCard = darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border';
     const textMuted = darkMode ? 'text-white-50' : 'text-secondary';
@@ -146,7 +146,7 @@ function VisitDetail() {
 
     if (items.length === 0) return (
     <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
-        <header className={`navbar sticky-top py-3 shadow-sm ${bgNavbar}`}>
+        <header className={`navbar sticky-top py-3 border-0 ${bgNavbar}`}>
             <div className="container-lg d-flex justify-content-between align-items-center">
                 <a href="/" className={`navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 ${brandColor}`}>
                     <i className="bi bi-box-seam text-red"></i> ArtAround
@@ -167,16 +167,16 @@ function VisitDetail() {
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
-            <header className={`navbar sticky-top py-3 shadow-sm ${bgNavbar}`}>
+            <header className={`navbar sticky-top py-3 border-0 ${bgNavbar}`}>
                 <div className="container-lg d-flex justify-content-between align-items-center">
                     <Link to="/" className="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-1">
                         <i className="bi bi-arrow-left"></i> Visite
                     </Link>
-                    <a href="/" className={`fw-bold text-decoration-none d-flex align-items-center gap-2 ${brandColor}`}>
+                    <a href="/" className={`fw-bold text-decoration-none d-flex align-items-center gap-2 ms-3 ${brandColor}`}>
                         <i className="bi bi-box-seam text-red"></i>
                         <span className="d-none d-md-inline">ArtAround</span>
                     </a>
-                    <div className="d-flex align-items-center gap-3">
+                    <div className="d-flex align-items-center ms-auto gap-3">
                         {/* Dark Mode Toggle */}
                         <button
                             className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
@@ -198,14 +198,14 @@ function VisitDetail() {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
                                 >
-                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm" style={{cursor: 'pointer'}}>
                                         <span>{user.name?.charAt(0).toUpperCase()}</span>
                                     </div>
                                     <i className="bi bi-chevron-down x-small chevron-icon"></i>
                                 </button>
 
                                 {userMenuOpen && (
-                                    <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2">
+                                    <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2" style={{right: 0, left: 'auto'}}>
                                         <div className="dropdown-header-info px-4 py-2 border-bottom">
                                             <div className="fw-bold user-name-text">{user.name}</div>
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>

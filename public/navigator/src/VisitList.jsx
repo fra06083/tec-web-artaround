@@ -60,7 +60,7 @@ function VisitList() {
     };
 
     const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
-    const bgNavbar = darkMode ? 'bg-dark border-bottom border-secondary border-opacity-25' : 'bg-white shadow-sm';
+    const bgNavbar = darkMode ? 'glass-header' : 'bg-white shadow-sm';
     const brandColor = darkMode ? 'text-white' : 'text-primary';
     const bgCard = darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border';
     const textMuted = darkMode ? 'text-white-50' : 'text-secondary';
@@ -90,7 +90,7 @@ function VisitList() {
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
-            <header className={`navbar navbar-expand-lg sticky-top py-3 ${bgNavbar}`}>
+            <header className={`navbar navbar-expand-lg sticky-top py-3 border-0 ${bgNavbar}`}>
                 <div className="container-lg d-flex justify-content-between align-items-center">
                     <a href="/" className={`navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 ${brandColor}`}>
                         <i className="bi bi-box-seam text-red"></i> ArtAround
@@ -123,7 +123,7 @@ function VisitList() {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
                                 >
-                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center text-white fw-bold shadow-sm">
+                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm" style={{cursor: 'pointer'}}>
                                         <span>{user.name?.charAt(0).toUpperCase()}</span>
                                     </div>
                                     <i className="bi bi-chevron-down x-small chevron-icon"></i>
@@ -133,19 +133,19 @@ function VisitList() {
                                 {userMenuOpen && (
                                     <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2">
                                         <div className="dropdown-header-info px-4 py-2 border-bottom">
-                                            <div className="fw-bold user-name-text text-dark">{user.name}</div>
+                                            <div className="fw-bold user-name-text">{user.name}</div>
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
                                         </div>
 
                                         <a href="/editor-marketplace/" className="dropdown-link-item">
                                             <i className="bi bi-grid-1x2 text-orange"></i>
-                                            <span className="text-dark">Dashboard</span>
+                                            <span>Dashboard</span>
                                         </a>
 
                                         {user.permissions === 'admin' && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
                                                 <i className="bi bi-pencil-square text-orange"></i>
-                                                <span className="text-dark">Admin Panel</span>
+                                                <span>Admin Panel</span>
                                             </a>
                                         )}
 
@@ -166,18 +166,51 @@ function VisitList() {
                 </div>
             </header>
 
-            {/* HERO */}
+            {/* HERO E CONNECT */}
             <div className="container-lg py-4">
-                <div className="rounded-5 p-4 p-md-5 mb-4 bg-gradient-red overflow-hidden">
-                    <div className="row align-items-center">
+                <div className="rounded-5 p-4 p-md-5 mb-5 navigator-hero-gradient shadow-lg position-relative">
+                    <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
                         <div className="col-12 col-md-8 text-center text-md-start">
-                            <h1 className="fw-bold text-white display-5 mb-2">Esplora le Visite</h1>
-                            <p className="text-white-75 lead mb-0">
-                                Scegli una visita guidata e inizia il tuo percorso nel museo.
+                            <h1 className="fw-black text-white display-4 mb-3" style={{ letterSpacing: '-1px' }}>Esplora le Visite</h1>
+                            <p className="text-white lead mb-0 fw-medium" style={{ opacity: 0.9 }}>
+                                Scegli una visita guidata e inizia il tuo percorso nel museo, oppure connettiti a un tour live.
                             </p>
                         </div>
                         <div className="col-md-4 d-none d-md-block text-end">
-                            <i className="bi bi-compass text-white opacity-25 icon-5xl"></i>
+                            <i className="bi bi-compass text-white opacity-50 hero-icon-animated" style={{ fontSize: '9rem', marginRight: '-10px' }}></i>
+                        </div>
+                    </div>
+                </div>
+
+                {/* CONNECT CON CODICE */}
+                <div className={`card border-0 rounded-4 shadow-sm overflow-hidden mb-5 ${bgCard}`} style={{ transform: 'translateY(-40px)', zIndex: 2, position: 'relative' }}>
+                    <div className="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+                        <div className="text-center text-md-start">
+                            <h3 className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>
+                                <i className="bi bi-broadcast text-red me-2 glow-icon"></i>Visita in Diretta
+                            </h3>
+                            <p className={`${textMuted} mb-0 fw-medium`}>Inserisci il codice fornito dalla tua guida per connetterti al tour in tempo reale.</p>
+                        </div>
+                        <div className="d-flex w-100 rounded-pill glass-search-wrapper" style={{ maxWidth: '450px' }}>
+                            <input 
+                                type="text" 
+                                className={`form-control form-control-lg border-0 rounded-start-pill ps-4 shadow-none bg-transparent ${darkMode ? 'text-white' : 'text-dark'}`} 
+                                placeholder="Es. XYZ-123" 
+                                style={{ outline: 'none' }}
+                            />
+                            <button 
+                                className="btn bg-red text-white rounded-pill px-4 fw-bold shadow-sm" 
+                                style={{ transition: 'all 0.3s' }}
+                                onClick={() => {
+                                    // TODO: Implement the connection logic here.
+                                    // 1. Validate the entered shortcode via backend API.
+                                    // 2. If valid, open a WebSocket or WebRTC connection to the server for real-time state synchronization.
+                                    // 3. Redirect the user to the active live session view (e.g. /live/:code).
+                                    alert('Funzione in arrivo: Connessione in corso...');
+                                }}
+                            >
+                                <i className="bi bi-link-45deg me-1 fs-5"></i> Entra
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -189,10 +222,10 @@ function VisitList() {
                         <p className={textMuted}>Torna più tardi per nuovi contenuti.</p>
                     </div>
                 ) : (
-                    <div className="row g-4">
+                    <div className="row g-4 mt-2">
                         {visite.map(v => (
                             <div key={v._id} className="col-12 col-md-6 col-lg-4">
-                                <div className={`card h-100 rounded-4 overflow-hidden shadow hover-lift ${bgCard}`}>
+                                <div className={`card h-100 rounded-4 overflow-hidden shadow-sm card-hover-premium ${bgCard}`}>
                                     <div className="card-body p-4 d-flex flex-column">
                                         <h5 className={`fw-bold mb-1 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
 

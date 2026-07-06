@@ -196,31 +196,31 @@
         <!-- MAIN CONTENT -->
         <main class="flex-grow-1 p-3 p-lg-5">
 
-            <!-- HERO SECTION (usa la classe .hero-section del tuo CSS) -->
-            <div class="mb-5 rounded-5 p-4 p-md-5 hero-section overflow-hidden">
-                <div class="row align-items-center">
+            <!-- HERO SECTION (usa la classe .navigator-hero-gradient animata) -->
+            <div class="mb-5 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
+                <div class="row align-items-center position-relative" style="z-index: 1;">
                     <div class="col-12 col-md-8 text-center text-md-start">
-                        <h1 class="fw-bold mb-2 text-white display-5">Esplora le Visite</h1>
-                        <p class="text-white-75 lead mb-4">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
+                        <h1 class="fw-black mb-2 text-white display-5" style="letter-spacing: -1px;">Esplora le Visite</h1>
+                        <p class="text-white-75 lead mb-4 fw-medium">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
 
                         <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
                             <!-- Badge Musei -->
                             <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10">
-                                <i class="bi bi-building me-2 text-orange"></i>
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper" style="padding: 10px !important">
+                                <i class="bi bi-building me-2 text-white opacity-75"></i>
                                 <span><strong class="fw-bold">500+</strong> Musei</span>
                             </span>
 
                             <!-- Badge Rating -->
                             <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10">
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper" style="padding: 10px !important">
                                 <i class="bi bi-star-fill me-2 text-warning"></i>
                                 <span><strong class="fw-bold">4.9</strong> Rating</span>
                             </span>
                         </div>
                     </div>
                     <div class="col-md-4 d-none d-md-block text-end">
-                        <i class="bi bi-shop text-white opacity-25 icon-5xl"></i>
+                        <i class="bi bi-shop text-white opacity-50 hero-icon-animated" style="font-size: 8rem; margin-right: -10px;"></i>
                     </div>
                 </div>
             </div>
@@ -228,11 +228,11 @@
             <!-- FILTRI (Gestiti con scroll orizzontale su mobile senza inline style) -->
             <div class="mb-4 overflow-auto">
                 <div class="d-flex flex-nowrap flex-lg-wrap gap-2 pb-2">
-                    <button class="btn btn-orange rounded-pill px-4 shadow-sm">Tutti</button>
-                    <button class="btn btn-outline-secondary rounded-pill px-4">Arte</button>
-                    <button class="btn btn-outline-secondary rounded-pill px-4">Storia</button>
-                    <button class="btn btn-outline-secondary rounded-pill px-4">Scienza</button>
-                    <button class="btn btn-outline-secondary rounded-pill px-4">Audio Guide</button>
+                    <button class="btn btn-orange rounded-pill px-4 shadow-sm hover-lift">Tutti</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4 hover-lift">Arte</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4 hover-lift">Storia</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4 hover-lift">Scienza</button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4 hover-lift">Audio Guide</button>
                 </div>
             </div>
 
@@ -240,8 +240,8 @@
             <div class="row g-4">
                 <template x-for="tour in filteredItems" :key="tour._id">
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <!-- Usa .artwork-card e .hover-lift del tuo CSS -->
-                        <div class="card artwork-card h-100 border-0 rounded-4 overflow-hidden d-flex flex-column">
+                        <!-- Usa .card-hover-premium per animazioni ultra -->
+                        <div class="card artwork-card h-100 border-0 rounded-4 overflow-hidden d-flex flex-column card-hover-premium shadow-sm">
 
                             <!-- Immagine (usa .artwork-preview del tuo CSS) -->
                             <div class="artwork-preview position-relative">
@@ -249,13 +249,13 @@
                                     class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
                                     <i class="bi bi-palette fs-1"></i>
                                 </div>
-                                <span class="badge bg-white text-orange position-absolute top-0 m-3">
+                                <span class="badge bg-white text-orange position-absolute top-0 m-3 shadow-sm">
                                     Tour Guidato
                                 </span>
                             </div>
 
                             <div class="card-body p-4 d-flex flex-column">
-                                <h5 class="fw-bold mb-1 text-dark" x-text="tour.name"></h5>
+                                <h5 class="fw-bold mb-1" x-text="tour.name"></h5>
 
                                 <div class="d-flex align-items-center gap-1 text-secondary small mb-3">
                                     <i class="bi bi-geo-alt-fill text-orange"></i>
@@ -267,10 +267,10 @@
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                                     <div class="d-flex flex-column">
                                         <span class="text-orange fw-bold fs-5">€ 12,00</span>
-                                        <span class="x-small text-secondary"
+                                        <span class="x-small text-secondary fw-bold"
                                             x-text="tour.items.length + ' opere'"></span>
                                     </div>
-                                    <button class="btn btn-orange rounded-pill px-3 fw-bold btn-sm">
+                                    <button class="btn btn-outline-red rounded-pill px-3 fw-bold btn-sm shadow-sm" style="transition: all 0.3s">
                                         Seleziona
                                     </button>
                                 </div>

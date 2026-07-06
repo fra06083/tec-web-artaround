@@ -2,6 +2,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('usersManager', () => ({
         isReady: false,
         username: '',
+        permissions: '',
         search: '',
         users: [],
         allMuseums: [],
@@ -29,6 +30,7 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 this.username = authData.user.name;
+                this.permissions = authData.user.permissions;
 
                 // 2. Caricamento dati iniziali per la gestione
                 await this.loadMuseums();
