@@ -111,7 +111,7 @@ function VisitDetail() {
     };
 
     const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
-    const bgNavbar = darkMode ? 'glass-header' : 'bg-white shadow-sm';
+    const bgNavbar = darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light shadow-sm';
     const brandColor = darkMode ? 'text-white' : 'text-primary';
     const bgCard = darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border';
     const textMuted = darkMode ? 'text-white-50' : 'text-secondary';
@@ -145,12 +145,16 @@ function VisitDetail() {
     );
 
     if (items.length === 0) return (
-    <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
-        <header className={`navbar sticky-top py-3 border-0 ${bgNavbar}`}>
-            <div className="container-lg d-flex justify-content-between align-items-center">
-                <a href="/" className={`navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 ${brandColor}`}>
-                    <i className="bi bi-box-seam text-red"></i> ArtAround
-                </a>
+        <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
+            {/* NAVBAR */}
+            <header className={`navbar sticky-top py-3 desktop-navbar transition-theme border-0 ${bgNavbar}`}>
+                <div className="container-lg d-flex justify-content-between align-items-center">
+                    <a href="/" className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ${brandColor}`}>
+                        <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
+                            <i className="bi bi-box-seam fs-5"></i>
+                        </div>
+                        <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
+                    </a>
             </div>
         </header>
         <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center px-4">
@@ -167,16 +171,21 @@ function VisitDetail() {
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
-            <header className={`navbar sticky-top py-3 border-0 ${bgNavbar}`}>
+            <header className={`navbar sticky-top py-3 desktop-navbar transition-theme border-0 ${bgNavbar}`}>
                 <div className="container-lg d-flex justify-content-between align-items-center">
-                    <Link to="/" className="btn btn-outline-secondary btn-sm rounded-pill px-3 d-flex align-items-center gap-1">
+                    <Link to="/" className={`btn btn-sm rounded-pill px-3 d-flex align-items-center gap-1 nav-hover-premium ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`}>
                         <i className="bi bi-arrow-left"></i> Visite
                     </Link>
-                    <a href="/" className={`fw-bold text-decoration-none d-flex align-items-center gap-2 ms-3 ${brandColor}`}>
-                        <i className="bi bi-box-seam text-red"></i>
-                        <span className="d-none d-md-inline">ArtAround</span>
+                    <a href="/" className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ms-3 ${brandColor}`}>
+                        <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center d-none d-md-flex">
+                            <i className="bi bi-box-seam fs-6"></i>
+                        </div>
+                        <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
                     </a>
-                    <div className="d-flex align-items-center ms-auto gap-3">
+                    <div className="d-flex align-items-center ms-auto gap-2">
+                        
+                        <div className={`vr d-none d-md-block mx-1 ${darkMode ? 'bg-white opacity-25' : 'bg-dark opacity-25'}`}></div>
+
                         {/* Dark Mode Toggle */}
                         <button
                             className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
@@ -260,7 +269,8 @@ function VisitDetail() {
                             <img
                                 src={currentItem.img_path}
                                 alt={currentItem.item}
-                                className="card-img-top"
+                                className="card-img-top object-fit-cover"
+                                style={{ maxHeight: '350px' }}
                             />
                         )}
                         <div className="card-body p-4">
@@ -283,10 +293,8 @@ function VisitDetail() {
                                     <button
                                         key={type}
                                         onClick={() => setSelectedType(type)}
-                                        className={`btn btn-sm rounded-pill px-3 ${
-                                            selectedType === type
-                                            ? 'btn-outline-secondary bg-secondary bg-opacity-25'
-                                            : 'btn-outline-secondary border-opacity-25'
+                                        className={`btn filter-pill rounded-pill px-4 ${
+                                            selectedType === type ? 'active' : ''
                                         }`}
                                     >
                                         {type.charAt(0).toUpperCase() + type.slice(1)}

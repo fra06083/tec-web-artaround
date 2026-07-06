@@ -60,7 +60,7 @@ function VisitList() {
     };
 
     const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
-    const bgNavbar = darkMode ? 'glass-header' : 'bg-white shadow-sm';
+    const bgNavbar = darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light shadow-sm';
     const brandColor = darkMode ? 'text-white' : 'text-primary';
     const bgCard = darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border';
     const textMuted = darkMode ? 'text-white-50' : 'text-secondary';
@@ -90,15 +90,20 @@ function VisitList() {
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
-            <header className={`navbar navbar-expand-lg sticky-top py-3 border-0 ${bgNavbar}`}>
+            <header className={`navbar navbar-expand-lg sticky-top py-3 desktop-navbar transition-theme border-0 ${bgNavbar}`}>
                 <div className="container-lg d-flex justify-content-between align-items-center">
-                    <a href="/" className={`navbar-brand fw-bold fs-4 d-flex align-items-center gap-2 ${brandColor}`}>
-                        <i className="bi bi-box-seam text-red"></i> ArtAround
+                    <a href="/" className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ${brandColor}`}>
+                        <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
+                            <i className="bi bi-box-seam fs-5"></i>
+                        </div>
+                        <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
                     </a>
-                    <div className="d-flex align-items-center gap-3">
-                        <a href="/editor-marketplace/" className="btn btn-outline-orange rounded-pill px-4 fw-medium btn-with-icon d-none d-md-inline-flex">
-                            <i className="bi bi-shop"></i> Marketplace
+                    <div className="d-flex align-items-center gap-2">
+                        <a href="/editor-marketplace/" className={`nav-link fw-bold px-4 py-2 rounded-pill d-none d-md-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-white' : 'text-dark'}`}>
+                            <i className="bi bi-shop text-orange fs-5"></i> Marketplace
                         </a>
+
+                        <div className={`vr d-none d-md-block mx-1 ${darkMode ? 'bg-white opacity-25' : 'bg-dark opacity-25'}`}></div>
 
                         {/* Dark Mode Toggle Slider */}
                         <button
@@ -183,7 +188,7 @@ function VisitList() {
                 </div>
 
                 {/* CONNECT CON CODICE */}
-                <div className={`card border-0 rounded-4 shadow-sm overflow-hidden mb-5 ${bgCard}`} style={{ transform: 'translateY(-40px)', zIndex: 2, position: 'relative' }}>
+                <div className={`card border-0 rounded-4 shadow-sm overflow-hidden mb-5 live-tour-card ${bgCard}`} style={{ transform: 'translateY(-40px)', zIndex: 2, position: 'relative' }}>
                     <div className="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
                         <div className="text-center text-md-start">
                             <h3 className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>
@@ -199,7 +204,7 @@ function VisitList() {
                                 style={{ outline: 'none' }}
                             />
                             <button 
-                                className="btn bg-red text-white rounded-pill px-4 fw-bold shadow-sm" 
+                                className="btn btn-premium-red rounded-pill px-5 fw-bold shadow-sm d-flex align-items-center" 
                                 style={{ transition: 'all 0.3s' }}
                                 onClick={() => {
                                     // TODO: Implement the connection logic here.
@@ -213,6 +218,13 @@ function VisitList() {
                             </button>
                         </div>
                     </div>
+                </div>
+
+                <div className="d-flex align-items-center mb-4 mt-5">
+                    <h4 className={`fw-black mb-0 ${darkMode ? 'text-white' : 'text-dark'}`}>
+                        <i className="bi bi-stars text-orange me-2"></i>Esperienze da Scoprire
+                    </h4>
+                    <div className={`ms-3 flex-grow-1 border-bottom ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`}></div>
                 </div>
 
                 {visite.length === 0 ? (
@@ -245,7 +257,7 @@ function VisitList() {
                                                 <i className="bi bi-collection me-1"></i>
                                                 {v.items?.length || 0} opere
                                             </span>
-                                            <Link to={`/visit/${v._id}`} className="btn btn-outline-red rounded-pill px-3 fw-bold btn-sm">
+                                            <Link to={`/visit/${v._id}`} className="btn btn-premium-red rounded-pill px-3 fw-bold btn-sm">
                                                 Inizia visita
                                             </Link>
                                         </div>

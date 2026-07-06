@@ -14,10 +14,55 @@
 
 /* Gradient Text */
 .gradient-text {
-    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%);
+    background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
+}
+
+.gradient-text-red {
+    background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+.gradient-text-orange {
+    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Animated Underline for Text */
+.animated-underline-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 1; /* Creates stacking context */
+}
+
+.animated-underline-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; /* Lowered */
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(90deg, #fd7e14 0%, #dc3545 100%);
+    border-radius: 6px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: slideUnderline 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: 0.5s;
+    z-index: -1; /* Behind the text, but inside wrapper's z-index */
+}
+
+@keyframes slideUnderline {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
 }
 
 /* Button Glow Effect */
@@ -60,7 +105,18 @@
 }
 
 .hero-bg {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    background-color: #f8f9fa;
+    background-image: 
+        radial-gradient(at 15% 20%, rgba(111, 66, 193, 0.12) 0px, transparent 50%), /* Purple */
+        radial-gradient(at 85% 30%, rgba(214, 51, 132, 0.1) 0px, transparent 50%),  /* Pink/Magenta */
+        radial-gradient(at 20% 90%, rgba(102, 16, 242, 0.1) 0px, transparent 50%),  /* Indigo */
+        radial-gradient(at 90% 90%, rgba(253, 126, 20, 0.06) 0px, transparent 50%); /* Subtle Orange for brand tie-in */
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-orange-soft {
+    background-color: rgba(253, 126, 20, 0.05) !important;
 }
 
 /* Gradient Backgrounds */
@@ -98,14 +154,21 @@
    DARK MODE STYLES
 ========================================================= */
 
+html.dark-mode, html.marketplace-dark-mode {
+    background-color: #0d121d !important; /* Perfect blend for the overscroll area */
+}
+
 .dark-mode {
-    background-color: #1a1a2e !important;
+    background-color: #0b0f19 !important;
     color: #ffffff !important;
 }
 
 .dark-mode .navbar {
-    background-color: #1a1a2e !important;
+    background-color: rgba(11, 15, 25, 0.5) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .dark-mode .navbar-brand {
@@ -116,12 +179,37 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-.dark-mode .navbar-collapse {
-    background-color: #1a1a2e !important;
+@media (max-width: 991.98px) {
+    .dark-mode .navbar-collapse {
+        background-color: #0b0f19 !important;
+    }
 }
 
 .dark-mode .hero-bg {
-    background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%) !important;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent !important;
+    background-image: 
+        radial-gradient(circle at 15% 20%, rgba(111, 66, 193, 0.25) 0%, transparent 50%), /* Deep Purple */
+        radial-gradient(circle at 85% 30%, rgba(214, 51, 132, 0.2) 0%, transparent 50%),  /* Magenta */
+        radial-gradient(circle at 20% 90%, rgba(102, 16, 242, 0.2) 0%, transparent 50%),  /* Indigo */
+        radial-gradient(circle at 90% 90%, rgba(253, 126, 20, 0.12) 0%, transparent 50%) !important; /* Subtle Orange */
+}
+
+/* Rimuovo i ::before e ::after precedenti perché uso background-image mesh */
+.dark-mode .hero-bg::before,
+.dark-mode .hero-bg::after {
+    display: none !important;
+}
+
+.dark-mode .hero-bg h1,
+.dark-mode .hero-bg .gradient-text,
+.dark-mode .hero-bg .text-secondary,
+.dark-mode .hero-bg .text-dark,
+.dark-mode .hero-bg p,
+.dark-mode .hero-bg .container-lg {
+    position: relative;
+    z-index: 1;
 }
 
 .dark-mode .hero-bg h1,
@@ -134,7 +222,9 @@
 }
 
 .dark-mode .hero-bg .bg-white {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .dark-mode .hero-bg .text-dark {
@@ -146,7 +236,8 @@
 }
 
 .dark-mode #how-it-works {
-    background-color: #1a1a2e !important;
+    background-color: transparent !important;
+    background-image: none !important;
 }
 
 .dark-mode #how-it-works h2,
@@ -159,7 +250,9 @@
 }
 
 .dark-mode #how-it-works .card {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
@@ -180,7 +273,9 @@
 }
 
 .dark-mode .auth-dropdown-menu {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
@@ -217,7 +312,9 @@
 }
 
 .dark-mode .card.bg-primary {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .dark-mode .card.bg-primary h2,
@@ -238,12 +335,13 @@
 ========================================================= */
 
 .marketplace-dark-mode {
-    background-color: #1a1a2e !important;
+    background-color: #0b0f19 !important;
     color: #ffffff !important;
 }
 
 .marketplace-dark-mode .navbar {
-    background-color: #1a1a2e !important;
+    background-color: rgba(11, 15, 25, 0.9) !important;
+    backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -255,12 +353,21 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-.marketplace-dark-mode .navbar-collapse {
-    background-color: #1a1a2e !important;
+@media (max-width: 991.98px) {
+    .marketplace-dark-mode .navbar-collapse {
+        background-color: #0b0f19 !important;
+    }
 }
 
 .marketplace-dark-mode .hero-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%) !important;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent !important;
+    background-image: 
+        radial-gradient(circle at 15% 20%, rgba(111, 66, 193, 0.25) 0%, transparent 50%), /* Deep Purple */
+        radial-gradient(circle at 85% 30%, rgba(214, 51, 132, 0.2) 0%, transparent 50%),  /* Magenta */
+        radial-gradient(circle at 20% 90%, rgba(102, 16, 242, 0.2) 0%, transparent 50%),  /* Indigo */
+        radial-gradient(circle at 90% 90%, rgba(253, 126, 20, 0.12) 0%, transparent 50%) !important; /* Subtle Orange */
 }
 
 .marketplace-dark-mode .hero-section h1,
@@ -322,7 +429,9 @@
 }
 
 .marketplace-dark-mode .card {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
@@ -340,12 +449,16 @@
 }
 
 .marketplace-dark-mode .input-group-text {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .marketplace-dark-mode .form-control {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
@@ -379,8 +492,11 @@
 
 /* Marketplace Navbar Dark Mode */
 .marketplace-dark-mode .navbar {
-    background-color: #1a1a2e !important;
+    background-color: rgba(11, 15, 25, 0.5) !important;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .marketplace-dark-mode .navbar-brand {
@@ -388,12 +504,16 @@
 }
 
 .marketplace-dark-mode .input-group-text {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .marketplace-dark-mode .form-control {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
@@ -441,7 +561,9 @@
 
 /* Marketplace Card Dark Mode */
 .marketplace-dark-mode .card {
-    background-color: #252540 !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
@@ -607,11 +729,11 @@
 }
 
 .marketplace-dark-mode .search-input-wrapper:hover {
-    background: #252540;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .marketplace-dark-mode .search-input-wrapper:focus-within {
-    background: #252540;
+    background: rgba(255, 255, 255, 0.05);
     border-color: #fd7e14;
     box-shadow: 0 0 0 4px rgba(253, 126, 20, 0.2);
 }
@@ -637,6 +759,23 @@
     .search-container {
         width: 100%;
     }
+}
+
+/* Premium Nav Hover */
+.nav-hover-premium {
+    transition: all 0.2s ease;
+}
+.nav-hover-premium:hover {
+    background: rgba(128, 128, 128, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Premium Glass Header Light */
+.glass-header-light {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Premium Glass Header */
@@ -671,23 +810,6 @@
   background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
   position: relative;
   overflow: hidden;
-}
-
-.navigator-hero-gradient::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-  animation: rotateGlow 15s linear infinite;
-  z-index: 0;
-}
-
-@keyframes rotateGlow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 .hero-icon-animated {
@@ -760,14 +882,9 @@
 
 .dark-mode .navigator-hero-gradient,
 .marketplace-dark-mode .navigator-hero-gradient {
-  background: linear-gradient(135deg, #9d0208 0%, #dc2f02 100%);
-  box-shadow: 0 15px 35px rgba(220, 47, 2, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.dark-mode .navigator-hero-gradient::before,
-.marketplace-dark-mode .navigator-hero-gradient::before {
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(157, 2, 8, 0.6) 0%, rgba(220, 47, 2, 0.4) 100%) !important;
+  box-shadow: 0 10px 30px rgba(220, 47, 2, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dark-mode .card-hover-premium,
@@ -794,8 +911,71 @@
 
 .dark-mode .glass-search-wrapper:focus-within,
 .marketplace-dark-mode .glass-search-wrapper:focus-within {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(220, 47, 2, 0.6);
-  box-shadow: 0 0 25px rgba(220, 47, 2, 0.25);
+  border-color: rgba(253, 126, 20, 0.5);
+  box-shadow: 0 0 15px rgba(253, 126, 20, 0.2);
 }
 
+/* Premium Live Tour Card */
+.live-tour-card {
+    background: linear-gradient(135deg, rgba(255, 75, 43, 0.05) 0%, rgba(255, 65, 108, 0.05) 100%) !important;
+    border: 1px solid rgba(255, 75, 43, 0.2) !important;
+}
+
+.dark-mode .live-tour-card {
+    background: linear-gradient(135deg, rgba(255, 75, 43, 0.15) 0%, rgba(157, 2, 8, 0.2) 100%) !important;
+    border: 1px solid rgba(255, 75, 43, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(255, 75, 43, 0.1) !important;
+}
+
+/* Premium Filter Pills */
+.filter-pill {
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid rgba(128, 128, 128, 0.15) !important;
+    color: inherit;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.filter-pill:hover {
+    background: rgba(128, 128, 128, 0.15);
+    transform: translateY(-1px);
+}
+.filter-pill.active {
+    background: #fd7e14;
+    border-color: #fd7e14 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(253, 126, 20, 0.3);
+}
+.dark-mode .filter-pill.active,
+.marketplace-dark-mode .filter-pill.active {
+    background: #e85d04;
+    border-color: #e85d04 !important;
+    box-shadow: 0 4px 12px rgba(232, 93, 4, 0.4);
+}
+
+/* Premium Button Red */
+.btn-premium-red {
+    background: linear-gradient(135deg, #dc2f02 0%, #9d0208 100%);
+    color: white !important;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(220, 47, 2, 0.3);
+}
+.btn-premium-red:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 47, 2, 0.4);
+    background: linear-gradient(135deg, #e85d04 0%, #dc2f02 100%);
+}
+
+/* Premium Button Orange */
+.btn-premium-orange {
+    background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%);
+    color: white !important;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
+}
+.btn-premium-orange:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(253, 126, 20, 0.4);
+    background: linear-gradient(135deg, #e85d04 0%, #dc2f02 100%);
+}

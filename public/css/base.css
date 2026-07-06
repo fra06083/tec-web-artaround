@@ -12,6 +12,10 @@
     color: #ffffff;
 }
 
+.bg-orange-subtle {
+    background-color: rgba(253, 126, 20, 0.1) !important;
+}
+
 .bg-orange-dark {
     background-color: #e85d04 !important;
     color: #ffffff;
@@ -450,3 +454,11 @@
         display: none !important;
     }
 }
+
+/* Utility Classes for Inline Styles Replacements */
+.ls-minus-1 { letter-spacing: -0.5px; }
+.anim-delay-200 { animation-delay: 0.2s; }
+.anim-delay-400 { animation-delay: 0.4s; }
+.op-90 { opacity: 0.9; }
+.trans-base { transition: all 0.3s ease; }
+.max-w-550 { max-width: 550px; }
