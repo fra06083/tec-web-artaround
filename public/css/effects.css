@@ -12,31 +12,6 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Gradient Text */
-.gradient-text {
-    background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
-.gradient-text-red {
-    background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
-.gradient-text-orange {
-    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
 /* Animated Underline for Text */
 .animated-underline-wrapper {
     position: relative;
@@ -97,39 +72,70 @@
 .icon-box-animated:hover {
     transform: scale(1.05);
 }
-
-/* Hero Section Background */
-.hero-gradient {
-    background: linear-gradient(135deg, rgba(13, 110, 253, 0.03) 0%, rgba(253, 126, 20, 0.03) 100%);
-    position: relative;
-}
-
 .hero-bg {
-    background-color: #f8f9fa;
-    background-image: 
-        radial-gradient(at 15% 20%, rgba(111, 66, 193, 0.12) 0px, transparent 50%), /* Purple */
-        radial-gradient(at 85% 30%, rgba(214, 51, 132, 0.1) 0px, transparent 50%),  /* Pink/Magenta */
-        radial-gradient(at 20% 90%, rgba(102, 16, 242, 0.1) 0px, transparent 50%),  /* Indigo */
-        radial-gradient(at 90% 90%, rgba(253, 126, 20, 0.06) 0px, transparent 50%); /* Subtle Orange for brand tie-in */
+    background-color: #fdfbf7; /* Cream paper base */
+    background-image: url('../images/bg-light.jpg');
+    background-size: cover;
+    background-position: top center;
     position: relative;
     overflow: hidden;
 }
 
-.bg-orange-soft {
-    background-color: rgba(253, 126, 20, 0.05) !important;
-}
-
 /* Gradient Backgrounds */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
-}
-
 .bg-gradient-orange {
     background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%) !important;
 }
 
-.bg-gradient-red {
-    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%) !important;
+/* Artisanal Palette Utilities */
+.text-teal { color: #1a4341 !important; }
+.text-terracotta { color: #9c4238 !important; }
+.text-cream { color: #fdfbf7 !important; }
+.text-darkgrey { color: #333333 !important; }
+.bg-teal { background-color: #1a4341 !important; }
+.bg-terracotta { background-color: #9c4238 !important; }
+.bg-cream { background-color: #fdfbf7 !important; }
+.border-ochre { border-color: #c89b53 !important; }
+.border-gold { border-color: #d4af37 !important; }
+
+/* Metallic Backgrounds for Stats */
+.bg-bronze-metallic {
+    background: linear-gradient(135deg, #cd7f32 0%, #8b5a2b 100%) !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+.bg-copper-metallic {
+    background: linear-gradient(135deg, #b87333 0%, #a0522d 100%) !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+.bg-gold-metallic {
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%) !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* Brush Underline */
+.brush-underline {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+.brush-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: -5%;
+    width: 110%;
+    height: 12px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 5 Q 25 10, 50 5 T 100 5' fill='none' stroke='%239c4238' stroke-width='3' stroke-linecap='round' /%3E%3C/svg%3E") no-repeat center;
+    background-size: 100% 100%;
+    z-index: -1;
+}
+
+/* Artisanal Section Gradients */
+.section-gradient {
+    background: linear-gradient(180deg, #fdfbf7 0%, rgba(26, 67, 65, 0.05) 50%, #fdfbf7 100%) !important;
+}
+
+.dark-mode .section-gradient, .marketplace-dark-mode .section-gradient {
+    background: linear-gradient(180deg, #111111 0%, rgba(156, 66, 56, 0.05) 50%, #111111 100%) !important;
 }
 
 /* Text Utilities */
@@ -155,12 +161,12 @@
 ========================================================= */
 
 html.dark-mode, html.marketplace-dark-mode {
-    background-color: #0d121d !important; /* Perfect blend for the overscroll area */
+    background-color: #111111 !important; /* Perfect blend for the dark obsidian area */
 }
 
 .dark-mode {
-    background-color: #0b0f19 !important;
-    color: #ffffff !important;
+    background-color: #111111 !important;
+    color: #fdfbf7 !important;
 }
 
 .dark-mode .navbar {
@@ -189,17 +195,9 @@ html.dark-mode, html.marketplace-dark-mode {
     position: relative;
     overflow: hidden;
     background-color: transparent !important;
-    background-image: 
-        radial-gradient(circle at 15% 20%, rgba(111, 66, 193, 0.25) 0%, transparent 50%), /* Deep Purple */
-        radial-gradient(circle at 85% 30%, rgba(214, 51, 132, 0.2) 0%, transparent 50%),  /* Magenta */
-        radial-gradient(circle at 20% 90%, rgba(102, 16, 242, 0.2) 0%, transparent 50%),  /* Indigo */
-        radial-gradient(circle at 90% 90%, rgba(253, 126, 20, 0.12) 0%, transparent 50%) !important; /* Subtle Orange */
-}
-
-/* Rimuovo i ::before e ::after precedenti perché uso background-image mesh */
-.dark-mode .hero-bg::before,
-.dark-mode .hero-bg::after {
-    display: none !important;
+    background-image: url('../images/bg-dark.jpg') !important;
+    background-size: cover !important;
+    background-position: center 15% !important;
 }
 
 .dark-mode .hero-bg h1,
@@ -363,11 +361,9 @@ html.dark-mode, html.marketplace-dark-mode {
     position: relative;
     overflow: hidden;
     background-color: transparent !important;
-    background-image: 
-        radial-gradient(circle at 15% 20%, rgba(111, 66, 193, 0.25) 0%, transparent 50%), /* Deep Purple */
-        radial-gradient(circle at 85% 30%, rgba(214, 51, 132, 0.2) 0%, transparent 50%),  /* Magenta */
-        radial-gradient(circle at 20% 90%, rgba(102, 16, 242, 0.2) 0%, transparent 50%),  /* Indigo */
-        radial-gradient(circle at 90% 90%, rgba(253, 126, 20, 0.12) 0%, transparent 50%) !important; /* Subtle Orange */
+    background-image: url('../images/bg-dark.jpg') !important;
+    background-size: cover !important;
+    background-position: center 15% !important;
 }
 
 .marketplace-dark-mode .hero-section h1,

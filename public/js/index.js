@@ -1,8 +1,15 @@
 function homeApp() {
+    const token = localStorage.getItem('artaround_token');
+    const savedUserStr = localStorage.getItem('artaround_user');
+    let savedUser = null;
+    if (savedUserStr) {
+        try { savedUser = JSON.parse(savedUserStr); } catch(e) {}
+    }
+    
     return {
-        isLoggedIn: false,
-        username: '',
-        permissions: '',
+        isLoggedIn: !!token,
+        username: savedUser ? savedUser.name : '',
+        permissions: savedUser ? savedUser.permissions : '',
         darkMode: false,
 
         async init() {
