@@ -1,8 +1,15 @@
 const API_BASE = '/api';
 
 export async function fetchVisite() {
-    const res = await fetch(`${API_BASE}/visite`);
-    if (!res.ok) throw new Error('Errore nel caricamento visite');
+    const token = localStorage.getItem('artaround_token');
+    if (!token) return []; // Se non è loggato, nessuna visita
+
+    const res = await fetch(`${API_BASE}/my-visits`, {
+        headers: {
+            'Authorization': token
+        }
+    });
+    if (!res.ok) throw new Error('Errore nel caricamento visite (acquistate)');
     return res.json();
 }
 

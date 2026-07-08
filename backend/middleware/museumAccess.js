@@ -1,4 +1,4 @@
-const login = require('../models/admin.js');
+const User = require('../models/user.js');
 const mongoose = require('mongoose');
 
 // Middleware per verificare se l'utente ha accesso a un museo specifico

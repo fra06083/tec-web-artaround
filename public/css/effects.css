@@ -285,9 +285,9 @@ html.dark-mode, html.marketplace-dark-mode {
 }
 
 .dark-mode .auth-dropdown-menu {
-    background-color: rgba(255, 255, 255, 0.03) !important;
-    backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background-color: #1e1e2f !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
     color: #ffffff !important;
 }
 
@@ -988,4 +988,30 @@ html.dark-mode, html.marketplace-dark-mode {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(253, 126, 20, 0.4);
     background: linear-gradient(135deg, #e85d04 0%, #dc2f02 100%);
+}
+
+/* Theme Toggle Mobile Button Animation */
+.theme-btn-mobile i {
+    display: inline-block;
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.theme-btn-mobile:active i {
+    transform: scale(0.9);
+}
+
+/* --- Animazioni per Menu a Tendina React --- */
+@keyframes dropdownFadeScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.dropdown-animate-enter {
+    animation: dropdownFadeScale 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: top right;
 }

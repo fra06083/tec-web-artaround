@@ -9,6 +9,8 @@ function VisitList() {
     const [darkMode, setDarkModeState] = useState(getDarkMode());
     const [user, setUser] = useState(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     useEffect(() => {
         // Applica la classe dark-mode al body
@@ -90,32 +92,53 @@ function VisitList() {
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
-            <header className={`navbar navbar-expand-lg sticky-top py-3 desktop-navbar transition-theme border-0 ${bgNavbar}`}>
-                <div className="container-lg d-flex justify-content-between align-items-center">
-                    <a href="/" className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ${brandColor}`}>
+            <header className={`navbar fixed-top w-100 py-3 desktop-navbar transition-theme border-0 shadow-sm ${bgNavbar}`} style={{ zIndex: 1030 }}>
+                <div className="container-lg d-flex align-items-center justify-content-between">
+                    
+                    {/* 1. LOGO */}
+                    <a className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ${brandColor} me-auto`} href="/">
                         <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
                             <i className="bi bi-box-seam fs-5"></i>
                         </div>
                         <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
                     </a>
-                    <div className="d-flex align-items-center gap-2">
-                        <a href="/editor-marketplace/" className={`nav-link fw-bold px-4 py-2 rounded-pill d-none d-md-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-white' : 'text-dark'}`}>
+
+                    {/* 2. MOBILE CONTROLS */}
+                    <div className="d-flex d-lg-none align-items-center gap-2">
+                        <button 
+                            className={`btn btn-link p-1 shadow-none ${darkMode ? 'text-white' : 'text-dark'}`} 
+                            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                        >
+                            <i className="bi bi-search fs-5"></i>
+                        </button>
+
+                        <button
+                        className={`btn btn-link p-1 shadow-none theme-btn-mobile ${darkMode ? 'text-white' : 'text-dark'}`}
+                        onClick={toggleDarkMode}
+                    >
+                        <i className={`bi fs-5 ${darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'}`}></i>
+                    </button>
+                </div>
+
+                    {/* 3. DESKTOP SEARCH BAR */}
+                    <div className="d-none d-lg-flex position-relative align-items-center flex-grow-1 mx-lg-4 nav-search-container" style={{ maxWidth: '400px' }}>
+                        <i className="bi bi-search position-absolute ms-3 text-secondary nav-search-icon"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Cerca visita..." 
+                            className={`form-control rounded-pill ps-5 w-100 shadow-none nav-search-input ${darkMode ? 'bg-dark text-white border-secondary border-opacity-25' : 'bg-light text-dark border-0'}`} 
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="d-none d-lg-flex align-items-center gap-2 ms-auto">
+                        <a href="/editor-marketplace/" className={`nav-link fw-bold px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-white' : 'text-dark'}`}>
                             <i className="bi bi-shop text-orange fs-5"></i> Marketplace
                         </a>
 
-                        <div className={`vr d-none d-md-block mx-1 ${darkMode ? 'bg-white opacity-25' : 'bg-dark opacity-25'}`}></div>
+                        <div className={`vr mx-2 ${darkMode ? 'bg-white opacity-25' : 'bg-dark opacity-25'}`}></div>
 
-                        {/* Dark Mode Toggle Slider */}
-                        <button
-                            className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
-                            onClick={toggleDarkMode}
-                        >
-                            <div className="toggle-track">
-                                <i className={`bi ${darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'}`}></i>
-                            </div>
-                        </button>
-
-                        {/* Auth Section */}
                         {!user ? (
                             <a href="/login.html?redirect=/navigator/" className="btn bg-slate text-white rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
                                 <span>Sign in</span>
@@ -131,13 +154,13 @@ function VisitList() {
                                     <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm" style={{cursor: 'pointer'}}>
                                         <span>{user.name?.charAt(0).toUpperCase()}</span>
                                     </div>
-                                    <i className="bi bi-chevron-down x-small chevron-icon"></i>
+                                    <i className={`bi bi-chevron-down x-small chevron-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
                                 </button>
 
                                 {/* Dropdown Menu Professionale */}
                                 {userMenuOpen && (
-                                    <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2">
-                                        <div className="dropdown-header-info px-4 py-2 border-bottom">
+                                    <div className="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 dropdown-animate-enter" style={{minWidth: '220px', zIndex: 1050}}>
+                                        <div className={`dropdown-header-info px-4 py-2 border-bottom ${darkMode ? 'border-secondary border-opacity-25' : 'border-light'}`}>
                                             <div className="fw-bold user-name-text">{user.name}</div>
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
                                         </div>
@@ -167,12 +190,33 @@ function VisitList() {
                                 )}
                             </div>
                         )}
+
+                        <button className={`btn btn-link p-1 shadow-none ms-3 ${darkMode ? 'text-white' : 'text-dark'}`} onClick={toggleDarkMode}>
+                            <i className={`bi fs-5 ${darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'}`}></i>
+                        </button>
                     </div>
                 </div>
+
+                {/* 5. MOBILE SEARCH POPUP DROPDOWN */}
+                {mobileSearchOpen && (
+                    <div className={`position-absolute top-100 start-0 w-100 p-3 shadow-lg border-bottom d-lg-none ${darkMode ? 'bg-dark border-secondary border-opacity-25' : 'bg-white border-light'}`} style={{ zIndex: 1040 }}>
+                        <div className="position-relative">
+                            <i className="bi bi-search position-absolute ms-3 top-50 translate-middle-y text-secondary"></i>
+                            <input 
+                                type="text" 
+                                placeholder="Cerca visita..." 
+                                className={`form-control rounded-pill ps-5 w-100 shadow-none ${darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : 'bg-light text-dark border-1'}`} 
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+                )}
             </header>
 
             {/* HERO E CONNECT */}
-            <div className="container-lg py-4">
+            <div className="container-lg py-4 mt-5 pt-5">
                 <div className="rounded-5 p-4 p-md-5 mb-5 navigator-hero-gradient shadow-lg position-relative">
                     <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
                         <div className="col-12 col-md-8 text-center text-md-start">
@@ -227,15 +271,15 @@ function VisitList() {
                     <div className={`ms-3 flex-grow-1 border-bottom ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`}></div>
                 </div>
 
-                {visite.length === 0 ? (
+                {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
                     <div className="text-center py-5">
                         <i className={`bi bi-inbox ${textMuted} icon-5xl mb-3 d-block`}></i>
                         <h4 className="fw-bold">Nessuna visita disponibile</h4>
                         <p className={textMuted}>Torna più tardi per nuovi contenuti.</p>
                     </div>
                 ) : (
-                    <div className="row g-4 mt-2">
-                        {visite.map(v => (
+                    <div className="row g-4 mt-2 mb-5 pb-5">
+                        {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).map(v => (
                             <div key={v._id} className="col-12 col-md-6 col-lg-4">
                                 <div className={`card h-100 rounded-4 overflow-hidden shadow-sm card-hover-premium ${bgCard}`}>
                                     <div className="card-body p-4 d-flex flex-column">
@@ -243,22 +287,23 @@ function VisitList() {
 
                                         {v.museum_id && (
                                             <div className={`d-flex align-items-center gap-1 ${textMuted} small mb-3`}>
-                                                <i className="bi bi-geo-alt-fill text-red"></i>
-                                                <span>{v.museum_id.museum} — {v.museum_id.province}</span>
+                                                <i className="bi bi-geo-alt-fill text-orange"></i>
+                                                <span className="text-truncate">{v.museum_id.name || 'Museo sconosciuto'}</span>
                                             </div>
                                         )}
 
-                                        {v.description && (
-                                            <p className={`${textMuted} small flex-grow-1`}>{v.description}</p>
-                                        )}
-
-                                        <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
-                                            <span className={`${textMuted} small`}>
-                                                <i className="bi bi-collection me-1"></i>
-                                                {v.items?.length || 0} opere
-                                            </span>
-                                            <Link to={`/visit/${v._id}`} className="btn btn-premium-red rounded-pill px-3 fw-bold btn-sm">
-                                                Inizia visita
+                                        <p className={`card-text small mb-4 flex-grow-1 ${textMuted}`}>
+                                            {v.description && v.description.length > 100 ? v.description.substring(0, 100) + '...' : v.description || "Nessuna descrizione disponibile."}
+                                        </p>
+                                        
+                                        <div className={`mt-auto pt-3 border-top d-flex align-items-center justify-content-between ${darkMode ? 'border-secondary border-opacity-50' : 'border-light'}`}>
+                                            <div className="d-flex align-items-center">
+                                                <i className="bi bi-person-walking text-orange me-2"></i>
+                                                <span className={`fw-bold small ${darkMode ? 'text-white' : 'text-dark'}`}>{v.steps ? v.steps.length : 0}</span>
+                                                <span className={`ms-1 small ${textMuted}`}>tappe</span>
+                                            </div>
+                                            <Link to={`/navigator/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-4 fw-bold btn-sm shadow-sm transition-theme">
+                                                Inizia <i className="bi bi-arrow-right ms-1"></i>
                                             </Link>
                                         </div>
                                     </div>
@@ -270,7 +315,7 @@ function VisitList() {
             </div>
 
             {/* FOOTER */}
-            <footer className={`${bgFooter} py-4 mt-auto`}>
+            <footer className={`${bgFooter} py-4 mt-auto pb-5 mb-5 pb-lg-4 mb-lg-0`}>
                 <div className="container-lg">
                     <div className="row align-items-center">
                         <div className={`col-6 ${footerText} small`}>
@@ -282,6 +327,76 @@ function VisitList() {
                     </div>
                 </div>
             </footer>
+
+            {/* MOBILE NAVIGATION (Bottom Bar) */}
+            <nav className={`mobile-nav d-lg-none transition-theme shadow-lg ${darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-white'}`}>
+                <a href="/navigator/" className="mobile-nav-item active">
+                    <i className="bi bi-compass"></i>
+                    <span>Naviga</span>
+                </a>
+                <a href="/editor-marketplace/" className="mobile-nav-item">
+                    <i className="bi bi-shop"></i>
+                    <span>Market</span>
+                </a>
+
+                {!user ? (
+                    <a href="/login.html?redirect=/navigator/" className="mobile-nav-item">
+                        <i className="bi bi-person"></i>
+                        <span>Accedi</span>
+                    </a>
+                ) : (
+                    <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" className="mobile-nav-item" onClick={(e) => e.preventDefault()}>
+                        <div className={`user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`} style={{ fontSize: '0.8rem' }}>
+                            <span>{user.name?.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <span>Profilo</span>
+                    </a>
+                )}
+            </nav>
+
+            {/* OFFCANVAS PROFILO MOBILE */}
+            <div className="offcanvas offcanvas-end border-0 shadow-lg" tabIndex="-1" id="mobileProfileOffcanvas">
+                <div className={`offcanvas-body d-flex flex-column p-0 ${darkMode ? 'bg-dark' : 'bg-light'}`}>
+                    
+                    {/* User Banner */}
+                    <div className={`position-relative p-4 p-md-5 text-center shadow-sm ${darkMode ? 'bg-gradient-dark-blue' : 'bg-gradient-orange'}`}>
+                        <button type="button" className="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        {user && (
+                            <div className="mt-3">
+                                <div className={`user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3 ${darkMode ? 'text-dark' : 'text-orange'}`} style={{ width: '80px', height: '80px', fontSize: '2.5rem', border: '4px solid rgba(255,255,255,0.2)' }}>
+                                    <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                </div>
+                                <h4 className="fw-bold mb-1 text-white">{user.name}</h4>
+                                <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.role}</span>
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Menu Links */}
+                    <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
+                        <a href="/editor-marketplace/" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
+                            <i className="bi bi-grid-1x2-fill fs-5 text-orange"></i>
+                            <span>Dashboard Personale</span>
+                            <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                        </a>
+                        
+                        {user && user.role === 'admin' && (
+                            <a href="/editor/dashboard" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
+                                <i className="bi bi-shield-lock-fill fs-5 text-primary"></i>
+                                <span>Admin Panel</span>
+                                <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                            </a>
+                        )}
+                        
+                        <div className="mt-auto pt-4">
+                            <button onClick={handleLogout} className={`btn py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 w-100 shadow-sm hover-lift ${darkMode ? 'btn-danger' : 'btn-outline-danger bg-white'}`} data-bs-dismiss="offcanvas">
+                                <i className="bi bi-box-arrow-right fs-5"></i>
+                                <span>Disconnetti account</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

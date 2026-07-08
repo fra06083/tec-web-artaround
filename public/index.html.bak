@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArtAround 🚀 La rivoluzione del museo su misura</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/effects.css" />
+    <link rel="stylesheet" href="css/mobile-nav.css" />
+    <script>
+        if (localStorage.getItem('artaround_darkmode') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="js/index.js"></script>
+</head>
+
+<body class="font-sans transition-theme" x-data="homeApp()"
+    :class="darkMode ? 'marketplace-dark-mode' : 'marketplace-light'">
+
+    <!-- NAVBAR -->
+    <nav class="navbar fixed-top w-100 py-3 shadow-sm desktop-navbar transition-theme border-0" style="z-index: 1030;"
+        :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'">
+        <div class="container-lg d-flex flex-wrap align-items-center justify-content-between">
+            
+            <!-- 1. LOGO -->
+            <a class="navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto" href="index.html">
+                <div class="p-2 rounded-3 d-flex align-items-center justify-content-center"
+                    :class="darkMode ? 'bg-cream text-teal' : 'bg-teal text-cream'">
+                    <i class="bi bi-box-seam fs-5"></i>
+                </div>
+                <span :class="darkMode ? 'text-cream' : 'text-teal'" class="ls-minus-1">ArtAround</span>
+            </a>
+
+            <!-- 2. MOBILE CONTROLS -->
+            <div class="d-flex d-lg-none align-items-center gap-2 order-2">
+                <button class="btn btn-link p-1 shadow-none theme-btn-mobile" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
+                    <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
+                </button>
+            </div>
+
+            <!-- 3. DESKTOP THEME TOGGLE -->
+            <button class="btn btn-link p-1 shadow-none order-lg-3 ms-2 d-none d-lg-flex" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
+                <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
+            </button>
+
+            <!-- 3. DESKTOP LINKS -->
+            <div class="d-none d-lg-flex align-items-center gap-3 ms-auto order-3 order-lg-2">
+                <a href="navigator/"
+                    class="nav-link fw-bold px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium"
+                    :class="darkMode ? 'text-cream' : 'text-darkgrey'">
+                    <i class="bi bi-compass fs-5 text-terracotta"></i> Naviga
+                </a>
+
+                <a href="editor-marketplace/"
+                    class="nav-link fw-bold px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium"
+                    :class="darkMode ? 'text-cream' : 'text-darkgrey'">
+                    <i class="bi bi-shop fs-5 text-terracotta"></i> Marketplace
+                </a>
+
+                <div class="vr mx-2"
+                    :class="darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'"></div>
+
+                <!-- Auth Section -->
+                <template x-if="!isLoggedIn">
+                    <a href="login.html" class="btn rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon"
+                        :class="darkMode ? 'bg-teal text-cream' : 'bg-teal text-cream'">
+                        <span>Sign in</span>
+                        <i class="bi bi-arrow-right-short reveal-icon"></i>
+                    </a>
+                </template>
+
+                <template x-if="isLoggedIn">
+                    <div class="position-relative" x-data="{ open: false }">
+                        <!-- Trigger: Avatar -->
+                        <button @click="open = !open" @click.outside="open = false"
+                            class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
+                            <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
+                                :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'">
+                                <span x-text="username.charAt(0).toUpperCase()"></span>
+                            </div>
+                            <i class="bi bi-chevron-down x-small chevron-icon"
+                                :class="darkMode ? 'text-cream' : 'text-teal'"></i>
+                        </button>
+
+                        <!-- Dropdown Menu Professionale -->
+                        <div x-show="open" x-cloak
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 text-start"
+                            style="min-width: 220px;" :class="darkMode ? 'bg-dark' : 'bg-white'">
+                            <div class="dropdown-header-info px-4 py-2 border-bottom" :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
+                                <div class="fw-bold user-name-text" :class="darkMode ? 'text-white' : 'text-dark'"
+                                    x-text="username"></div>
+                                <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                            </div>
+
+                            <a href="editor-marketplace/" class="dropdown-link-item">
+                                <i class="bi bi-grid-1x2 text-orange"></i>
+                                <span>Dashboard</span>
+                            </a>
+
+                            <template x-if="permissions === 'admin'">
+                                <a href="/editor/dashboard" class="dropdown-link-item">
+                                    <i class="bi bi-pencil-square text-orange"></i>
+                                    <span>Admin Panel</span>
+                                </a>
+                            </template>
+
+                            <div class="dropdown-divider-custom"></div>
+
+                            <button @click="logout()"
+                                class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="fw-bold">Log out</span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="py-5 hero-bg pt-5 mt-5">
+        <div class="container-lg py-5 mt-md-4">
+            <div class="row justify-content-center text-center g-5">
+                <div class="col-12 col-lg-10">
+                    <h1 class="fw-black mb-4">
+                        <span class="display-6 display-md-5 d-block mb-2"
+                            :class="darkMode ? 'text-cream' : 'text-teal'">La tua visita,</span>
+                        <span
+                            class="display-4 display-md-2 fw-black text-terracotta position-relative d-inline-block brush-underline">le tue regole.</span>
+                    </h1>
+                    <p class="lead mb-5 fw-medium mx-auto" style="max-width: 600px;"
+                        :class="darkMode ? 'text-white-50' : 'text-darkgrey'">
+                        Basta con le audioguide soporifere! ArtAround ti legge nel pensiero e adatta linguaggio, profondità e ritmo. Stesso museo, vibrazioni completamente diverse.
+                    </p>
+
+                    <!-- Stats Row -->
+                    <div class="d-flex flex-wrap justify-content-center gap-4 gap-md-5 mb-5">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="bg-bronze-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated shadow">
+                                <i class="bi bi-building text-white fs-3"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">500+
+                                </div>
+                                <div class="small text-uppercase fw-bold"
+                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Musei Sbloccati</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="bg-copper-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated anim-delay-200 shadow">
+                                <i class="bi bi-people-fill text-white fs-3"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">50K+
+                                </div>
+                                <div class="small text-uppercase fw-bold"
+                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Avventurieri</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                class="bg-gold-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated anim-delay-400 shadow">
+                                <i class="bi bi-star-fill text-white fs-3"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">4.9</div>
+                                <div class="small text-uppercase fw-bold"
+                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Livello di WOW</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mt-5">
+                        <a href="#roles"
+                            class="btn bg-teal text-cream border border-ochre btn-lg rounded-pill px-5 shadow fw-bold btn-glow hover-lift text-nowrap">
+                            Inizia l'Avventura <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                        <a href="#"
+                            class="btn btn-lg rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 px-4 shadow-sm hover-lift trans-base border"
+                            :class="darkMode ? 'text-cream border-light bg-white bg-opacity-10' : 'text-teal border-teal bg-white'">
+                            <i class="bi bi-play-circle-fill fs-4"
+                                :class="darkMode ? 'text-cream' : 'text-terracotta'"></i> Sbircia la Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEZIONE STEPS -->
+    <section class="py-5 section-gradient" id="how-it-works">
+        <div class="container-lg py-5">
+            <div class="text-center mb-5">
+                <span
+                    class="badge bg-teal text-cream rounded-pill px-4 py-2 mb-3 fw-bold shadow-sm border border-ochre">Easy Peasy</span>
+                <h2 class="display-5 fw-black mb-2" :class="darkMode ? 'text-cream' : 'text-teal'">Tre Mosse Magiche</h2>
+                <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-secondary'">Dal divano al capolavoro in un attimo
+                </p>
+            </div>
+            <div class="row g-4 text-center">
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 card-hover-premium position-relative overflow-hidden"
+                        :class="darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white'">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-orange"></div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated shadow"
+                            :class="darkMode ? 'bg-orange text-white' : 'bg-teal text-cream'">
+                            <i class="bi bi-geo-alt fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">1. Il tuo campo base</h4>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Scorri i musei più cool direttamente dall'app. Niente file, solo vibrazioni positive.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 card-hover-premium position-relative overflow-hidden"
+                        :class="darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white'">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-orange"></div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated shadow anim-delay-200"
+                            :class="darkMode ? 'bg-orange text-white' : 'bg-teal text-cream'">
+                            <i class="bi bi-sliders fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">2. Imposta il Vibe</h4>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Dicci cosa ti esalta e quanto tempo hai. Nerd della storia o vai di fretta? Ci pensiamo noi.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 card-hover-premium position-relative overflow-hidden"
+                        :class="darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white'">
+                        <div class="position-absolute top-0 start-0 w-100 h-1 bg-orange"></div>
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 mx-auto icon-box-lg icon-box-animated shadow anim-delay-400"
+                            :class="darkMode ? 'bg-orange text-white' : 'bg-teal text-cream'">
+                            <i class="bi bi-headphones fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">3. Premi Play</h4>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Goditi una voce che parla la tua lingua. Nessun effetto robot, solo puro storytelling.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container-lg py-5 my-4" id="roles">
+        <div class="text-center mb-5">
+            <span
+                class="badge bg-transparent border border-ochre text-terracotta rounded-pill px-4 py-2 mb-3 fw-bold glass-search-wrapper">Scegli da che parte stare</span>
+            <h2 class="display-5 fw-black mb-3" :class="darkMode ? 'text-cream' : 'text-teal'">Qual è il tuo stile?</h2>
+
+            <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Sei qui per esplorare o per creare la magia?</p>
+
+        </div>
+
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-12 col-md-6 col-lg-5 d-flex">
+
+                <div
+                    class="card w-100 border-0 shadow-lg rounded-5 p-4 p-md-5 navigator-hero-gradient text-white text-center text-md-start card-hover-premium overflow-hidden">
+                    <div class="position-relative z-1">
+                        <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm icon-box-lg hero-icon-animated glass-search-wrapper border-0"
+                                :class="darkMode ? 'bg-terracotta text-cream' : 'bg-white bg-opacity-25 text-white'">
+                                <i class="bi bi-phone fs-2"></i>
+                            </div>
+                            <span
+                                class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-2 fw-bold glass-search-wrapper border-0">Esploratore</span>
+                        </div>
+
+                        <h3 class="fw-black mb-3 text-white">Il Navigator</h3>
+
+                        <p class="text-white mb-4 flex-grow-1 fw-medium op-90">
+                            La tua bussola personale per il museo. Indossa le cuffie e lasciati guidare da storie che si adattano al tuo livello, dal vocabolario al ritmo dei tuoi passi. Esplorare non è mai stato così epico.
+                        </p>
+
+                        <a href="navigator/"
+                            class="btn bg-white btn-lg rounded-pill w-100 fw-bold text-teal shadow-sm btn-reveal-icon hover-lift trans-base">
+                            <span>Inizia a Esplorare</span>
+                            <i class="bi bi-arrow-right reveal-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-5 d-flex">
+
+                <div
+                    class="card w-100 border-0 shadow-lg rounded-5 p-4 p-md-5 bg-gradient-orange text-white text-center text-md-start card-hover-premium overflow-hidden">
+                    <div class="position-relative z-1">
+                        <div
+                            class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm icon-box-lg hero-icon-animated glass-search-wrapper border-0"
+                                :class="darkMode ? 'bg-orange text-white' : 'bg-white bg-opacity-25 text-white'">
+                                <i class="bi bi-pencil-square fs-2"></i>
+                            </div>
+                            <span
+                                class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-2 fw-bold glass-search-wrapper border-0">Creatore di Mondi</span>
+                        </div>
+
+                        <h3 class="fw-black mb-3 text-white">L'Editor & Market</h3>
+
+                        <p class="text-white mb-4 flex-grow-1 fw-medium op-90">
+                            Sei tu il regista! Crea percorsi pazzeschi, carica contenuti e lanciali nel nostro Marketplace. Trasforma qualsiasi museo noioso in un'esperienza virale con zero sbattimenti.
+                        </p>
+
+                        <a href="./editor-marketplace/"
+                            class="btn bg-white btn-lg rounded-pill w-100 fw-bold text-orange shadow-sm btn-reveal-icon hover-lift trans-base">
+                            <span>Crea & Domina</span>
+                            <i class="bi bi-arrow-right reveal-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="container-lg py-5 mb-5">
+
+        <div class="card border-0 shadow-sm rounded-5 p-4 p-md-5 overflow-hidden position-relative"
+            :class="darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-cream'">
+
+            <i class="bi bi-bank position-absolute opacity-25 icon-bg-cta"
+                :class="darkMode ? 'text-white' : 'text-ochre'"></i>
+
+            <div class="row align-items-center position-relative z-1">
+
+                <div class="col-12 col-md-8 text-center text-md-start mb-4 mb-md-0">
+
+                    <span
+                        class="badge rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm glass-search-wrapper bg-transparent border border-ochre"
+                        :class="darkMode ? 'text-terracotta border-opacity-50' : 'text-terracotta border-opacity-25'">Per i Piani Alti</span>
+
+                    <h2 class="display-6 fw-black mb-3" :class="darkMode ? 'text-cream' : 'text-teal'">Gestisci un Museo?
+                    </h2>
+
+                    <p class="lead mb-0 mx-auto mx-md-0 fw-medium max-w-550"
+                        :class="darkMode ? 'text-white-50' : 'text-darkgrey'">
+                        Lancia ArtAround usando <strong :class="darkMode ? 'text-white' : 'text-teal'">solo i tuoi contenuti</strong>. <strong :class="darkMode ? 'text-white' : 'text-teal'">Zero app custom da sviluppare</strong>,
+                        <strong :class="darkMode ? 'text-white' : 'text-teal'">zero mal di testa tecnologici</strong>. Diventa il museo preferito dalla Gen Z.
+                    </p>
+
+                </div>
+
+                <div class="col-12 col-md-4 text-center text-md-end mt-4 mt-md-0 d-grid d-md-block">
+
+                    <a href="./editor-marketplace"
+                        class="btn bg-teal text-cream btn-lg rounded-pill px-4 py-3 fw-bold shadow btn-reveal-icon hover-lift btn-glow">
+                        <span>Pretendi una Demo</span>
+                        <i class="bi bi-arrow-right reveal-icon text-cream"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-4 text-center text-md-start transition-theme pb-5 mb-5 pb-lg-4 mb-lg-0"
+        :class="darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-dark'">
+        <div class="container-lg">
+            <div class="row align-items-center gy-3 text-white-50 small fw-medium">
+                <div
+                    class="col-12 col-md-6 fw-bold text-white fs-5 d-flex justify-content-center justify-content-md-start align-items-center gap-2">
+                    <i class="bi bi-box-seam text-terracotta"></i> ArtAround
+                </div>
+                <div class="col-12 col-md-6 text-md-end">
+                    &copy; 2026 ArtAround. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MOBILE NAVIGATION (Bottom Bar) -->
+    <nav class="mobile-nav d-lg-none transition-theme shadow-lg">
+        <a href="navigator/" class="mobile-nav-item">
+            <i class="bi bi-compass"></i>
+            <span>Naviga</span>
+        </a>
+        <a href="editor-marketplace/" class="mobile-nav-item">
+            <i class="bi bi-shop"></i>
+            <span>Market</span>
+        </a>
+
+        <template x-if="!isLoggedIn">
+            <a href="login.html" class="mobile-nav-item">
+                <i class="bi bi-person"></i>
+                <span>Accedi</span>
+            </a>
+        </template>
+        <template x-if="isLoggedIn">
+            <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" class="mobile-nav-item" @click.prevent="">
+                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
+                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="font-size: 0.8rem;">
+                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                </div>
+                <span>Profilo</span>
+            </a>
+        </template>
+    </nav>
+
+    <!-- OFFCANVAS PROFILO MOBILE -->
+    <div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="mobileProfileOffcanvas">
+        <div class="offcanvas-body d-flex flex-column p-0" :class="darkMode ? 'bg-dark' : 'bg-light'">
+            
+            <!-- User Banner -->
+            <div class="position-relative p-4 p-md-5 text-center shadow-sm" :class="darkMode ? 'bg-gradient-dark-blue' : 'bg-gradient-orange'">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <template x-if="isLoggedIn">
+                    <div class="mt-3">
+                        <div class="user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3" :class="darkMode ? 'text-dark' : 'text-orange'" style="width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2);">
+                            <span x-text="username.charAt(0).toUpperCase()"></span>
+                        </div>
+                        <h4 class="fw-bold mb-1 text-white" x-text="username"></h4>
+                        <span class="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm" x-text="permissions"></span>
+                    </div>
+                </template>
+            </div>
+            
+            <!-- Menu Links -->
+            <div class="p-4 d-flex flex-column gap-3 flex-grow-1">
+                <a href="/editor-marketplace/" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
+                    <i class="bi bi-grid-1x2-fill fs-5 text-orange"></i>
+                    <span>Dashboard Personale</span>
+                    <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                </a>
+                
+                <template x-if="permissions === 'admin'">
+                    <a href="/editor/dashboard" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
+                        <i class="bi bi-shield-lock-fill fs-5 text-primary"></i>
+                        <span>Admin Panel</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                    </a>
+                </template>
+                
+                <div class="mt-auto pt-4">
+                    <button @click="logout()" class="btn py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 w-100 shadow-sm hover-lift" :class="darkMode ? 'btn-danger' : 'btn-outline-danger bg-white'" data-bs-dismiss="offcanvas">
+                        <i class="bi bi-box-arrow-right fs-5"></i>
+                        <span>Disconnetti account</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

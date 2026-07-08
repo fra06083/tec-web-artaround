@@ -24,10 +24,20 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    background: #ffffff; /* Light mode default */
     padding: 12px 10px;
     z-index: 1040;
     justify-content: space-around;
+    border-top: 1px solid #e9ecef;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.dark-mode .mobile-nav,
+.marketplace-dark-mode .mobile-nav,
+.admin-dark-mode .mobile-nav,
+[data-bs-theme="dark"] .mobile-nav {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 }
@@ -36,13 +46,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: rgba(255, 255, 255, 0.6);
+    color: #6c757d; /* Light mode text */
     text-decoration: none;
     font-size: 0.7rem;
     gap: 4px;
     transition: all 0.3s ease;
     padding: 8px 12px;
     border-radius: 12px;
+}
+
+.dark-mode .mobile-nav-item,
+.marketplace-dark-mode .mobile-nav-item,
+.admin-dark-mode .mobile-nav-item,
+[data-bs-theme="dark"] .mobile-nav-item {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .mobile-nav-item.active {
@@ -54,9 +71,20 @@
 .mobile-nav-item i {
     font-size: 1.4rem;
     transition: transform 0.3s ease;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.mobile-nav-item:hover i {
+.mobile-nav-item .user-avatar {
+    height: 28px !important;
+    width: 28px !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
+.mobile-nav-item:hover i, .mobile-nav-item:hover .user-avatar {
     transform: scale(1.1);
 }
 
@@ -292,12 +320,26 @@
     perspective: 1000px;
 }
 
-/* Navbar toggler migliorato */
 .navbar-toggler {
     padding: 0.5rem;
     border: 2px solid #dee2e6 !important;
     border-radius: 8px;
     transition: all 0.3s ease;
+}
+
+/* Utilities per Navigator Navbar */
+.nav-search-container {
+    max-width: 300px;
+}
+.nav-search-icon {
+    font-size: 1rem;
+}
+.nav-search-input {
+    font-size: 1rem;
+    height: 42px;
+}
+.cursor-pointer {
+    cursor: pointer;
 }
 
 .navbar-toggler:hover {

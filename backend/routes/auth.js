@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const login = require('../models/admin'); // admin models
+const User = require('../models/user'); // user models
 
 // Rotta per il login
 router.post('/login', async (req, res) => {
     try {
         const { name, password } = req.body;
-        const user = await login.findOne({ name });
+        const user = await User.findOne({ name });
         if (!user) return res.status(401).json({ error: 'Credenziali non valide' });
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
         }
 
         // CHECK EXISTING USER (NOT OVERWRITE)
-        const existingUser = await login.findOne({ name });
+        const existingUser = await User.findOne({ name });
         if (existingUser) {
             return res.status(400).json({ error: 'Nome utente già in uso' });
         }
@@ -54,7 +54,7 @@ router.post('/register', async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const newUser = new login({
+        const newUser = new User({
             name: name,
             password: hashedPassword,
             permissions: 'visitatore' // always check visitatore, if we let choose the role we might have security problems!
@@ -85,17 +85,63 @@ const authenticateToken = (req, res, next) => {
         res.status(403).json({ error: 'Token non valido o scaduto.' });
     }
 };
-router.post('/check', authenticateToken, (req, res) => {
-    const token = req.headers.authorization; if (!token) {
-        return res.status(401).json({ error: 'Nessun token fornito' });
-    }
-
+router.post('/check', authenticateToken, async (req, res) => {
     try {
-        // Decodifichiamo direttamente la stringa passata
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
-        res.json({ valid: true, user: decoded });
+        const userId = req.user.id;
+        const user = await User.findById(userId).select('purchased_visits');
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato' });
+        }
+        res.json({ valid: true, user: { ...req.user, purchased_visits: user.purchased_visits } });
     } catch (error) {
-        res.status(401).json({ error: 'Token non valido o scaduto' });
+        res.status(500).json({ error: 'Errore interno' });
+    }
+});
+
+router.get('/my-visits', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findById(userId).populate({
+            path: 'purchased_visits',
+            populate: { path: 'museum_id', select: 'museum province' }
+        });
+        
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato' });
+        }
+        
+        res.json(user.purchased_visits || []);
+    } catch (error) {
+        console.error('Errore recupero my-visits:', error);
+        res.status(500).json({ error: 'Errore interno' });
+    }
+});
+
+// Rotta per checkout carrello
+router.post('/buy', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { visits } = req.body; // array of visit IDs
+
+        if (!visits || !Array.isArray(visits)) {
+            return res.status(400).json({ error: 'Nessuna visita fornita' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato' });
+        }
+
+        // Aggiungi le visite al vettore purchased_visits (evitando duplicati se desiderato, o permettendoli)
+        // Usiamo $addToSet per evitare duplicati
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: { purchased_visits: { $each: visits } }
+        });
+
+        res.json({ message: 'Acquisto completato con successo!' });
+    } catch (error) {
+        console.error("Errore durante l'acquisto:", error);
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 

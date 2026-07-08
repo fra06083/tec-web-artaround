@@ -344,7 +344,7 @@
             <div class="p-4 mb-2">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2"
                     href="/editor-marketplace/index.html">
-                    <i class="bi bi-box text-orange"></i>
+                    <i class="bi bi-gear-fill text-orange"></i>
                     <span class="d-none d-lg-inline">ArtAround</span>
                 </a>
             </div>
@@ -390,10 +390,13 @@
         </aside>
         <main class="main-content flex-grow-1">
             <!-- Mobile Header -->
+            <!-- Mobile Header -->
             <header class="mobile-header">
-                <a href="/editor-marketplace/index.html" class="mobile-logo">
-                    <i class="bi bi-box"></i>
-                    <span>ArtAround</span>
+                <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
+                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                        <i class="bi bi-gear-fill fs-5"></i>
+                    </div>
+                    <span style="letter-spacing: -0.5px;" class="fw-bold text-white fs-4 m-0">ArtAround</span>
                 </a>
             </header>
 
@@ -578,27 +581,27 @@
 
                             <div x-show="selectedArtworks.length > 0" class="artworks-list">
                                 <template x-for="(artwork, index) in selectedArtworks" :key="artwork._id">
-                                    <div class="artwork-item d-flex align-items-center gap-3 p-3 mb-2 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
-                                        <div class="artwork-number bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" x-text="index + 1"></div>
+                                    <div class="artwork-item d-flex align-items-center gap-2 gap-sm-3 p-3 mb-2 rounded-4 shadow-sm bg-dark bg-opacity-50 border border-secondary border-opacity-25 transition-all">
+                                        <div class="artwork-number flex-shrink-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" x-text="index + 1" style="width: 28px; height: 28px;"></div>
                                         <img :src="artwork.img_path" :alt="artwork.item"
-                                            class="artwork-thumbnail rounded-2">
-                                        <div class="flex-grow-1">
-                                            <h6 class="fw-bold m-0" x-text="artwork.item"></h6>
-                                            <small class="text-white-50" x-text="artwork.author"></small>
+                                            class="artwork-thumbnail rounded-3 flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+                                        <div class="flex-grow-1" style="min-width: 0;">
+                                            <h6 class="fw-bold m-0 text-truncate text-white" x-text="artwork.item"></h6>
+                                            <small class="text-white-50 text-truncate d-block" x-text="artwork.author"></small>
                                         </div>
-                                        <div class="d-flex gap-1">
+                                        <div class="d-flex gap-1 flex-shrink-0">
                                             <button @click="moveArtworkUp(index)"
-                                                class="btn btn-sm btn-outline-secondary rounded-circle"
+                                                class="btn btn-sm btn-outline-secondary rounded-circle icon-btn"
                                                 :disabled="index === 0">
                                                 <i class="bi bi-chevron-up"></i>
                                             </button>
                                             <button @click="moveArtworkDown(index)"
-                                                class="btn btn-sm btn-outline-secondary rounded-circle"
+                                                class="btn btn-sm btn-outline-secondary rounded-circle icon-btn"
                                                 :disabled="index === selectedArtworks.length - 1">
                                                 <i class="bi bi-chevron-down"></i>
                                             </button>
                                             <button @click="removeArtworkFromTour(artwork._id)"
-                                                class="btn btn-sm btn-outline-danger rounded-circle">
+                                                class="btn btn-sm btn-outline-danger rounded-circle icon-btn">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </div>
@@ -697,6 +700,7 @@
             <i class="bi bi-people"></i>
             <span>Utenti</span>
         </a>
+        
     </nav>
 </body>
 

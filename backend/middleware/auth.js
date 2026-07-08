@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const login = require('../models/admin.js');
+const User = require('../models/user.js');
 
 const auth = async (req, res, next) => {
     const token = req.cookies?.artaround_token || req.query.token;
@@ -12,7 +12,7 @@ const auth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Popola req.user con i dati completi dell'utente dal database
-        const user = await login.findById(decoded.id).select('-password');
+        const user = await User.findById(decoded.id).select('-password');
         if (!user) {
             return res.redirect('/login.html');
         }

@@ -42,6 +42,18 @@ document.addEventListener('alpine:init', () => {
             await this.checkAuth();
             if (this.isLoggedIn) {
                 await this.fetchMuseums();
+                
+                // Verifica se è stato passato un ID da modificare tramite querystring
+                const urlParams = new URLSearchParams(window.location.search);
+                const editId = urlParams.get('id');
+                if (editId) {
+                    this.mode = 'edit';
+                    this.selectedTourId = editId;
+                    await this.loadTour(editId);
+                    this.selectedMuseum = this.tour.museum_id;
+                    await this.fetchAvailableArtworks();
+                    this.step = 'form';
+                }
             } else {
                 this.logout();
             }

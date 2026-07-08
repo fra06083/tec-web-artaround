@@ -1,114 +1,216 @@
 /* =========================================================
-   TABLE STYLES
+   PREMIUM TABLE STYLES
 ========================================================= */
 
-.thead-custom {
-    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 100%);
-    border-bottom: 1px solid rgba(253, 126, 20, 0.2) !important;
+.table-responsive {
+    border-radius: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: rgba(30, 30, 47, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(253, 126, 20, 0.5) rgba(255, 255, 255, 0.02);
 }
 
-.thead-custom th {
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-    color: #fd7e14;
-    text-transform: uppercase;
-    font-weight: 700;
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
 }
 
-.table-row-custom {
-    transition: all 0.2s ease-in-out;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.table-row-custom:hover {
-    background: linear-gradient(135deg, rgba(253, 126, 20, 0.08) 0%, rgba(253, 126, 20, 0.04) 100%) !important;
-    transform: scale(1.01);
-}
-
-.table-hover tbody tr:hover {
-    background: linear-gradient(135deg, rgba(253, 126, 20, 0.08) 0%, rgba(253, 126, 20, 0.04) 100%) !important;
-}
-
-.img-thumbnail-custom {
-    width: 48px;
-    height: 48px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.2s ease;
-}
-
-.img-thumbnail-custom:hover {
-    transform: scale(1.1);
-}
-
-.badge-province {
-    background: linear-gradient(135deg, rgba(253, 126, 20, 0.2) 0%, rgba(253, 126, 20, 0.1) 100%);
-    color: #fd7e14;
-    font-weight: 500;
-    font-size: 0.7rem;
-    padding: 0.35em 0.65em;
-    border: 1px solid rgba(253, 126, 20, 0.3);
-}
-
-.btn-action {
-    padding: 0.5rem 0.8rem;
-    font-size: 1rem;
-    transition: all 0.2s;
+.table-responsive::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
     border-radius: 8px;
 }
 
-.btn-action:hover {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
-}
-
-/* Table Container */
-.table-responsive {
-    border-radius: 12px;
-    overflow: hidden;
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: rgba(253, 126, 20, 0.5);
+    border-radius: 8px;
 }
 
 .table {
     margin: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-/* Mobile Table Optimization */
+.table th, .table td {
+    white-space: nowrap; /* Prevent squishing on mobile */
+}
+
+/* --- Headers --- */
+.thead-custom {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.thead-custom th {
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    color: #fd7e14;
+    text-transform: uppercase;
+    font-weight: 800;
+    border-bottom: 2px solid rgba(253, 126, 20, 0.2) !important;
+    padding: 1.25rem 1rem;
+}
+
+/* --- Rows --- */
+.table-row-custom {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+}
+
+.table-row-custom td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    color: #e5e7eb;
+}
+
+/* Ultima riga senza bordo */
+.table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Hover Effect per le righe */
+.table-row-custom:hover,
+.table-hover tbody tr:hover {
+    background: linear-gradient(90deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.02) 100%) !important;
+}
+
+.table-row-custom:hover td,
+.table-hover tbody tr:hover td {
+    color: #ffffff;
+}
+
+/* --- Utility Immagini --- */
+.img-thumbnail-custom {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.table-row-custom:hover .img-thumbnail-custom {
+    transform: scale(1.1) rotate(2deg);
+    border-color: rgba(253, 126, 20, 0.5);
+    box-shadow: 0 8px 15px rgba(253, 126, 20, 0.2);
+}
+
+/* --- Badges & Actions --- */
+.badge-province {
+    background: rgba(253, 126, 20, 0.15);
+    color: #fd7e14;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 0.4em 0.8em;
+    border: 1px solid rgba(253, 126, 20, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(253, 126, 20, 0.1);
+}
+
+.btn-action {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Mobile Specific Optimizations (Card Layout) --- */
 @media (max-width: 768px) {
     .table-responsive {
-        border-radius: 8px;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        border: none;
+        overflow: visible; /* Togliamo lo scroll orizzontale */
     }
 
-    .thead-custom th {
-        font-size: 0.65rem;
+    /* Trasforma la tabella in un layout a blocchi */
+    .table, .table tbody, .table tr, .table td, .table th {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .table thead {
+        display: none; /* Nascondiamo le intestazioni */
+    }
+
+    .table th, .table td {
+        white-space: normal; /* Permettiamo il wrap del testo su mobile */
+    }
+    
+    /* Ogni riga diventa una bellissima "Scheda" (Card) molto visibile */
+    .table-row-custom {
+        background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%) !important;
+        background-color: #2b2b3d !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         padding: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
     }
-
+    
+    .table-row-custom:active {
+        transform: scale(0.98);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Stile delle celle dentro la scheda */
     .table-row-custom td {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.85rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        padding: 0.8rem 1rem !important;
+        font-size: 1rem;
+        text-align: right;
+        color: #f8f9fa; /* Testo più chiaro e leggibile */
     }
-
-    /* Mobile Museum Card Layout */
-    .museum-mobile-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+    
+    /* La prima cella fa da "Titolo" della scheda */
+    .table-row-custom td:first-child {
+        justify-content: flex-start;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #fd7e14;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 1.2rem 1rem !important;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        background: rgba(0,0,0,0.1);
+        border-radius: 12px 12px 0 0;
+    }
+    
+    /* L'ultima cella (generalmente le Azioni) */
+    .table-row-custom td:last-child {
+        border-bottom: none !important;
+        background: rgba(0, 0, 0, 0.3);
         border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+        margin-top: 0.5rem;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1rem !important;
     }
-
-    .museum-mobile-card .museum-image {
+    
+    /* Se c'è un'immagine, modifichiamo leggermente il layout */
+    .table-row-custom td .img-thumbnail-custom {
         width: 60px;
         height: 60px;
-        border-radius: 8px;
-        object-fit: cover;
-    }
-
-    .museum-mobile-card .museum-info {
-        flex: 1;
-    }
-
-    .museum-mobile-card .museum-actions {
-        display: flex;
-        gap: 0.5rem;
+        border-radius: 10px;
     }
 }

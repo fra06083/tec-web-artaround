@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-// STRUTTURA DI UN ADMIN
-const loginSchema = new mongoose.Schema({
+// STRUTTURA DI UN ADMIN/USER
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -18,7 +18,11 @@ const loginSchema = new mongoose.Schema({
     museums: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'museum'
+    }],
+    purchased_visits: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'visit'
     }]
 });
 
-module.exports = mongoose.model('login', loginSchema);
+module.exports = mongoose.model('user', userSchema, 'logins');

@@ -1,5 +1,5 @@
 const { visit } = require('../models/museums.js'); // used for accessing Visit data
-const login = require('../models/admin.js');       // used for accessing User data
+const User = require('../models/user.js');       // used for accessing User data
 const path = require('path');                      // used for handling file paths
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     getStats: async (req, res) => {
         try {
             const publishedTours = await visit.countDocuments();
-            const totalUsers = await login.countDocuments();
+            const totalUsers = await User.countDocuments();
 
             res.json({
                 publishedTours,
