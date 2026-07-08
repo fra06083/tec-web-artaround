@@ -81,6 +81,13 @@
     overflow: hidden;
 }
 
+@media (max-width: 767.98px) {
+    .hero-bg {
+        background-image: url('../images/bg-light-mobile.jpg') !important;
+        background-position: bottom center !important;
+    }
+}
+
 /* Gradient Backgrounds */
 .bg-gradient-orange {
     background: linear-gradient(135deg, #fd7e14 0%, #e85d04 100%) !important;
@@ -198,6 +205,13 @@ html.dark-mode, html.marketplace-dark-mode {
     background-image: url('../images/bg-dark.jpg') !important;
     background-size: cover !important;
     background-position: center 15% !important;
+}
+
+@media (max-width: 767.98px) {
+    .dark-mode .hero-bg {
+        background-image: url('../images/bg-dark-mobile.jpg') !important;
+        background-position: bottom center !important;
+    }
 }
 
 .dark-mode .hero-bg h1,
