@@ -165,26 +165,22 @@ function VisitList() {
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
                                         </div>
 
-                                        <a href="/editor-marketplace/" className="dropdown-link-item">
-                                            <i className="bi bi-grid-1x2 text-orange"></i>
-                                            <span>Dashboard</span>
-                                        </a>
-
-                                        {user.permissions === 'admin' && (
+                                        {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
-                                                <i className="bi bi-pencil-square text-orange"></i>
-                                                <span>Admin Panel</span>
+                                                <i className="bi bi-grid-1x2 text-orange"></i>
+                                                <span>Dashboard</span>
                                             </a>
                                         )}
+                                        
+                                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Schermata Modifica Profilo'); }} className="dropdown-link-item">
+                                            <i className="bi bi-person-gear text-orange"></i>
+                                            <span>Modifica Profilo</span>
+                                        </a>
 
                                         <div className="dropdown-divider-custom"></div>
 
-                                        <button
-                                            onClick={handleLogout}
-                                            className="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent"
-                                        >
-                                            <i className="bi bi-box-arrow-right"></i>
-                                            <span className="fw-bold">Log out</span>
+                                        <button onClick={handleLogout} className="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">
+                                            Logout
                                         </button>
                                     </div>
                                 )}
@@ -367,31 +363,30 @@ function VisitList() {
                                     <span>{user.name?.charAt(0).toUpperCase()}</span>
                                 </div>
                                 <h4 className="fw-bold mb-1 text-white">{user.name}</h4>
-                                <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.role}</span>
+                                <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.permissions}</span>
                             </div>
                         )}
                     </div>
                     
                     {/* Menu Links */}
                     <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
-                        <a href="/editor-marketplace/" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
-                            <i className="bi bi-grid-1x2-fill fs-5 text-orange"></i>
-                            <span>Dashboard Personale</span>
-                            <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
-                        </a>
-                        
-                        {user && user.role === 'admin' && (
+                        {(user?.permissions === 'admin' || user?.permissions === 'editor' || user?.permissions === 'docente') && (
                             <a href="/editor/dashboard" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
-                                <i className="bi bi-shield-lock-fill fs-5 text-primary"></i>
-                                <span>Admin Panel</span>
+                                <i className="bi bi-grid-1x2-fill fs-5 text-orange"></i>
+                                <span>Dashboard</span>
                                 <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                             </a>
                         )}
                         
+                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Modifica Profilo'); }} className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
+                            <i className="bi bi-person-gear fs-5 text-primary"></i>
+                            <span>Modifica Profilo</span>
+                            <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                        </a>
+
                         <div className="mt-auto pt-4">
-                            <button onClick={handleLogout} className={`btn py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 w-100 shadow-sm hover-lift ${darkMode ? 'btn-danger' : 'btn-outline-danger bg-white'}`} data-bs-dismiss="offcanvas">
-                                <i className="bi bi-box-arrow-right fs-5"></i>
-                                <span>Disconnetti account</span>
+                            <button onClick={handleLogout} className="btn btn-danger py-3 rounded-pill fw-bold text-white w-100 shadow-sm border-0" data-bs-dismiss="offcanvas">
+                                Logout
                             </button>
                         </div>
                     </div>

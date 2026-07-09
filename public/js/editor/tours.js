@@ -150,7 +150,7 @@ document.addEventListener('alpine:init', () => {
             if (!this.selectedMuseum) return;
 
             try {
-                const res = await fetch('/api/visite', {
+                const res = await fetch('/api/visite?manage=true', {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
                 });
                 if (res.ok) {

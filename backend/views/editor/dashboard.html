@@ -36,7 +36,8 @@
         </div>
     </div>
 
-    <div x-show="isReady && isLoggedIn && permissions === 'admin'" x-cloak>
+    <div x-show="isReady && isLoggedIn && (permissions === 'admin' || permissions === 'editor' || permissions === 'docente')"
+        x-cloak>
 
 
         <aside class="sidebar bg-dark shadow d-flex flex-column">
@@ -56,58 +57,61 @@
                     <i class="bi bi-pencil-square"></i> <span>Gestione Visite</span>
                 </a>
 
-                <div class="nav-section-header mt-4 mb-2">
+                <div x-show="permissions !== 'docente'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Catalogo Artistico</span>
                     <div class="flex-grow-1 border-top border-secondary opacity-25 ms-2"></div>
                 </div>
 
-                <a href="/editor/museum" class="nav-link-admin">
+                <a href="/editor/museum" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-bank"></i> <span>Gestione Musei</span>
                 </a>
-                <a href="/editor/artworks" class="nav-link-admin">
+                <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
-                <a href="/editor/import" class="nav-link-admin">
+                <a href="/editor/import" x-show="permissions === 'admin'" class="nav-link-admin">
                     <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
                 </a>
 
-                <div class="nav-section-header mt-4 mb-2">
+                <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
                     <div class="flex-grow-1 border-top border-secondary opacity-25 ms-2"></div>
                 </div>
 
-                <a href="/editor/user-management" class="nav-link-admin">
+                <a href="/editor/user-management" x-show="permissions === 'admin'" class="nav-link-admin">
                     <i class="bi bi-people"></i> <span>Gestione Utenti</span>
                 </a>
             </nav>
 
             <div class="p-3 mt-auto">
-                <a href="#" @click.prevent="logout()" class="nav-link-admin text-danger w-100 rounded-3">
-                    <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
-                </a>
+                <button @click.prevent="logout()"
+                    class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
         <main class="main-content">
             <!-- Mobile Header -->
-            <!-- Mobile Header -->
             <header class="mobile-header">
-                <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <a href="/editor-marketplace/index.html"
+                    class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
+                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center"
+                        style="width: 38px; height: 38px;">
                         <i class="bi bi-gear-fill fs-5"></i>
                     </div>
                     <span style="letter-spacing: -0.5px;" class="fw-bold text-white fs-4 m-0">ArtAround</span>
                 </a>
             </header>
 
+
             <!-- Desktop Header -->
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow" style="cursor: pointer;">
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow"
+                            style="cursor: pointer;">
                             <i class="bi bi-person-fill text-white fs-5"></i>
                         </div>
                         <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">Bentornato</p>
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                Bentornato</p>
                             <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
                     </div>
@@ -120,7 +124,8 @@
                             <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
                                 placeholder="Cerca...">
                         </div>
-                        <button class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center hover-lift icon-btn">
+                        <button
+                            class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center hover-lift icon-btn">
                             <i class="bi bi-bell"></i>
                         </button>
                     </div>
@@ -129,116 +134,325 @@
 
             <div class="p-4 p-lg-5">
 
-                <div class="row g-4 mb-5">
-                    <div class="col-12 col-sm-6 col-xl-4">
-                        <div class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
-                            <div class="d-flex justify-content-between align-items-start mb-3 position-relative" style="z-index: 1;">
-                                <div>
-                                    <p class="text-white-50 small fw-bold text-uppercase mb-1">Tour Pubblicati</p>
-                                    <h2 class="fw-black mb-0 text-white display-6" x-text="stats.publishedTours">0</h2>
-                                </div>
-                                <div class="p-3 rounded-4 glass-search-wrapper" style="background-color: rgba(253, 126, 20, 0.1);">
-                                    <i class="bi bi-map-fill text-orange fs-3"></i>
+                <!-- ADMIN DASHBOARD -->
+                <template x-if="permissions === 'admin'">
+                    <div>
+                        <h4 class="fw-bold mb-4">Panoramica Globale Sistema</h4>
+                        <div class="row g-4 mb-5">
+                            <div class="col-12 col-sm-6 col-xl-4">
+                                <div
+                                    class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
+                                        style="z-index: 1;">
+                                        <div>
+                                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Tour Pubblicati
+                                            </p>
+                                            <h2 class="fw-black mb-0 text-white display-6"
+                                                x-text="stats.publishedTours">0</h2>
+                                        </div>
+                                        <div class="p-3 rounded-4 glass-search-wrapper"
+                                            style="background-color: rgba(253, 126, 20, 0.1);">
+                                            <i class="bi bi-map-fill text-orange fs-3"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-success small fw-medium mt-2 position-relative"
+                                        style="z-index: 1;"><i class="bi bi-arrow-up me-1"></i>Live dal DB</div>
                                 </div>
                             </div>
-                            <div class="text-success small fw-medium mt-2 position-relative" style="z-index: 1;"><i class="bi bi-arrow-up me-1"></i>Live dal DB</div>
-                        </div>
-                    </div>
 
-                    <div class="col-12 col-sm-6 col-xl-4">
-                        <div class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
-                            <div class="d-flex justify-content-between align-items-start mb-3 position-relative" style="z-index: 1;">
-                                <div>
-                                    <p class="text-white-50 small fw-bold text-uppercase mb-1">Utenti Totali</p>
-                                    <h2 class="fw-black mb-0 text-white display-6" x-text="stats.activeUsers">0</h2>
-                                </div>
-                                <div class="p-3 rounded-4 glass-search-wrapper" style="background-color: rgba(13, 110, 253, 0.1);">
-                                    <i class="bi bi-people-fill text-primary fs-3"></i>
+                            <div class="col-12 col-sm-6 col-xl-4">
+                                <div
+                                    class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
+                                        style="z-index: 1;">
+                                        <div>
+                                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Utenti Totali</p>
+                                            <h2 class="fw-black mb-0 text-white display-6" x-text="stats.activeUsers">0
+                                            </h2>
+                                        </div>
+                                        <div class="p-3 rounded-4 glass-search-wrapper"
+                                            style="background-color: rgba(13, 110, 253, 0.1);">
+                                            <i class="bi bi-people-fill text-primary fs-3"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-white-50 small fw-medium mt-2 position-relative"
+                                        style="z-index: 1;">Account creati nel sistema</div>
                                 </div>
                             </div>
-                            <div class="text-white-50 small fw-medium mt-2 position-relative" style="z-index: 1;">Account creati nel sistema</div>
-                        </div>
-                    </div>
 
-                    <div class="col-12 col-sm-6 col-xl-4">
-                        <div class="card bg-gradient-orange border-0 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
-                            <div class="d-flex justify-content-between align-items-start mb-3 position-relative" style="z-index: 1;">
-                                <div>
-                                    <p class="text-white-75 small fw-bold text-uppercase mb-1">Stato Server</p>
-                                    <h2 class="fw-black mb-0 text-white display-6" x-text="stats.serverStatus">Offline</h2>
-                                </div>
-                                <div class="p-3 rounded-4 glass-search-wrapper" style="background-color: rgba(255, 255, 255, 0.2);">
-                                    <i class="bi bi-hdd-network-fill text-white fs-3"></i>
+                            <div class="col-12 col-sm-6 col-xl-4">
+                                <div
+                                    class="card bg-gradient-orange border-0 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
+                                        style="z-index: 1;">
+                                        <div>
+                                            <p class="text-white-75 small fw-bold text-uppercase mb-1">Stato Server</p>
+                                            <h2 class="fw-black mb-0 text-white display-6" x-text="stats.serverStatus">
+                                                Offline</h2>
+                                        </div>
+                                        <div class="p-3 rounded-4 glass-search-wrapper"
+                                            style="background-color: rgba(255, 255, 255, 0.2);">
+                                            <i class="bi bi-hdd-network-fill text-white fs-3"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-white small fw-medium mt-2 position-relative"
+                                        style="z-index: 1; opacity: 0.9;"><i
+                                            class="bi bi-check-circle-fill me-1"></i>Sistema operativo</div>
                                 </div>
                             </div>
-                            <div class="text-white small fw-medium mt-2 position-relative" style="z-index: 1; opacity: 0.9;"><i class="bi bi-check-circle-fill me-1"></i>Sistema operativo</div>
+                        </div>
+                        <div class="card bg-gradient-dark-blue border-0 rounded-4 shadow-lg overflow-hidden mb-5">
+                            <div
+                                class="card-header bg-transparent border-bottom border-secondary border-opacity-25 p-4 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-orange me-2"></i>Ultimi Tour
+                                    Gestiti</h5>
+                                <button class="btn btn-outline-orange btn-sm rounded-pill px-4 fw-medium btn-glow">Vedi
+                                    tutti</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover table-borderless m-0 align-middle">
+                                        <thead class="thead-custom">
+                                            <tr>
+                                                <th class="ps-4 py-3">Titolo Visita</th>
+                                                <th class="py-3">Museo</th>
+                                                <th class="py-3 text-center">N° Opere</th>
+                                                <th class="text-end pe-4 py-3">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template x-for="item in items" :key="item._id">
+                                                <tr class="table-row-custom">
+                                                    <td class="ps-4 py-3 fw-bold" x-text="item.name || 'Senza titolo'">
+                                                    </td>
+                                                    <td class="py-3"><span class="badge bg-slate px-2 py-1 shadow-sm"
+                                                            x-text="(item.museum_id && item.museum_id.museum) ? item.museum_id.museum : 'Sconosciuto'"></span>
+                                                    </td>
+                                                    <td class="py-3 fw-medium text-white-50 text-center"><span
+                                                            class="badge bg-orange text-white rounded-pill px-2"
+                                                            x-text="item.items ? item.items.length : 0"></span></td>
+                                                    <td class="text-end pe-4 py-3">
+                                                        <button @click="editTour(item._id)"
+                                                            class="btn btn-sm btn-action bg-slate shadow-sm hover-lift"><i
+                                                                class="bi bi-pencil-square"></i></button>
+                                                        <button @click="deleteTour(item._id)"
+                                                            class="btn btn-sm btn-action btn-outline-danger border-0 ms-2 hover-lift"><i
+                                                                class="bi bi-trash3-fill"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </template>
+
+                <!-- EDITOR DASHBOARD -->
+                <template x-if="permissions === 'editor'">
+                    <div>
+                        <h4 class="fw-bold mb-2">Il Mio Spazio di Lavoro</h4>
+                        <p class="text-white-50 mb-4">Benvenuto nel tuo pannello di amministrazione museale.</p>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm h-100 border border-orange border-opacity-25"
+                                    style="border-width: 2px !important;">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-orange bg-opacity-10 p-3 rounded-circle text-orange me-3">
+                                            <i class="bi bi-bank fs-3"></i>
+                                        </div>
+                                        <h5 class="fw-bold m-0">I Miei Musei</h5>
+                                    </div>
+                                    <p class="text-white-50 small">Gestisci i musei a te assegnati, inserisci nuove
+                                        opere e organizza le collezioni.</p>
+                                    <div class="mt-auto pt-3">
+                                        <a href="/editor/museum" class="btn btn-orange fw-bold px-4 py-2 w-100">Vai ai
+                                            Musei <i class="bi bi-arrow-right ms-2"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm h-100">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-10 p-3 rounded-circle text-white me-3">
+                                            <i class="bi bi-pencil-square fs-3"></i>
+                                        </div>
+                                        <h5 class="fw-bold m-0">Le Mie Visite</h5>
+                                    </div>
+                                    <p class="text-white-50 small">Crea nuovi tour guidati per i tuoi musei o modifica
+                                        quelli esistenti per migliorare l'esperienza dei visitatori.</p>
+                                    <div class="mt-auto pt-3">
+                                        <a href="/editor/tours"
+                                            class="btn btn-outline-light fw-bold px-4 py-2 w-100 border-secondary">Gestisci
+                                            Visite <i class="bi bi-arrow-right ms-2"></i></a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card bg-gradient-dark-blue border-0 rounded-4 shadow-lg overflow-hidden mb-5">
-                    <div class="card-header bg-transparent border-bottom border-secondary border-opacity-25 p-4 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-orange me-2"></i>Ultimi Tour Gestiti</h5>
-                        <button class="btn btn-outline-orange btn-sm rounded-pill px-4 fw-medium btn-glow">Vedi tutti</button>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover table-borderless m-0 align-middle">
-                                <thead class="thead-custom">
-                                    <tr>
-                                        <th class="ps-4 py-3">Titolo Visita</th>
-                                        <th class="py-3">Museo</th>
-                                        <th class="py-3 text-center">N° Opere</th>
-                                        <th class="text-end pe-4 py-3">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="item in items" :key="item._id">
-                                        <tr class="table-row-custom">
-                                            <td class="ps-4 py-3 fw-bold" x-text="item.name || 'Senza titolo'"></td>
-                                            <td class="py-3"><span class="badge bg-slate px-2 py-1 shadow-sm" x-text="(item.museum_id && item.museum_id.museum) ? item.museum_id.museum : 'Sconosciuto'"></span></td>
-                                            <td class="py-3 fw-medium text-white-50 text-center"><span class="badge bg-orange text-white rounded-pill px-2" x-text="item.items ? item.items.length : 0"></span></td>
-                                            <td class="text-end pe-4 py-3">
-                                                <button @click="editTour(item._id)" class="btn btn-sm btn-action bg-slate shadow-sm hover-lift"><i class="bi bi-pencil-square"></i></button>
-                                                <button @click="deleteTour(item._id)" class="btn btn-sm btn-action btn-outline-danger border-0 ms-2 hover-lift"><i class="bi bi-trash3-fill"></i></button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                </template>
+
+                <!-- DOCENTE DASHBOARD -->
+                <template x-if="permissions === 'docente'">
+                    <div class="d-flex flex-column align-items-center justify-content-center h-100"
+                        style="min-height: 50vh;">
+                        <h2 class="fw-black mb-2 text-center">Ciao <span class="text-orange" x-text="username"></span>,
+                            cosa vuoi fare oggi?</h2>
+                        <p class="text-white-50 text-center mb-5" style="max-width: 500px;">Sei nella tua area protetta.
+                            Usa gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la
+                            tua classe.</p>
+
+                        <div class="row g-4 w-100" style="max-width: 800px;">
+                            <div class="col-md-6">
+                                <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm"
+                                    style="cursor: pointer;"
+                                    @click="alert('TODO: Schermata Selezione Visita per Navigatore (Avvio modalità Navigatore)')">
+                                    <div
+                                        class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
+                                        <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
+                                            style="transform: translate(-50%, -50%) scale(5);">
+                                            <i class="bi bi-play-circle-fill"></i>
+                                        </div>
+                                        <i
+                                            class="bi bi-play-circle-fill display-3 text-white mb-3 position-relative z-1"></i>
+                                        <h3 class="fw-black text-white m-0 position-relative z-1">INIZIA VISITA</h3>
+                                        <p
+                                            class="text-white-50 mt-2 m-0 position-relative z-1 small fw-bold text-uppercase">
+                                            Avvia Tour Interattivo</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/editor/tours" class="text-decoration-none">
+                                    <div
+                                        class="card bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
+                                        <i class="bi bi-pencil-square display-3 text-white-50 mb-3"></i>
+                                        <h4 class="fw-bold text-white m-0">Gestisci Visite</h4>
+                                        <p class="text-white-50 mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
 
             </div>
-        </main>
+            </template>
+
+            <!-- EDITOR DASHBOARD -->
+            <template x-if="permissions === 'editor'">
+                <div class="d-flex flex-column h-100">
+                    <div class="d-flex align-items-center mb-4">
+                        <div>
+                            <h3 class="fw-black text-white m-0" style="letter-spacing: -0.5px;">Spazio Creativo</h3>
+                            <p class="text-white-50 m-0 mt-1">Bentornato nel tuo hub di amministrazione museale.</p>
+                        </div>
+                        <div class="ms-auto d-none d-sm-block">
+                            <span
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 border border-white border-opacity-10 shadow-sm glass-search-wrapper">
+                                <i class="bi bi-star-fill text-warning me-2"></i>Editor Certificato
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 flex-grow-1">
+                        <div class="col-md-6">
+                            <a href="/editor/museum" class="text-decoration-none">
+                                <div
+                                    class="card bg-gradient-dark-blue border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
+                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
+                                        style="transform: translate(-50%, -50%) scale(4);">
+                                        <i class="bi bi-bank"></i>
+                                    </div>
+                                    <div
+                                        class="bg-white bg-opacity-10 p-4 rounded-circle text-white mb-4 position-relative z-1 shadow-sm">
+                                        <i class="bi bi-bank display-5"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-white m-0 position-relative z-1">Gestione Musei</h4>
+                                    <p class="text-white-50 mt-2 mb-0 small position-relative z-1"
+                                        style="max-width: 250px;">Gestisci i musei, inserisci nuove opere e organizza le
+                                        tue collezioni artistiche.</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/editor/tours" class="text-decoration-none">
+                                <div
+                                    class="card bg-gradient-orange border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
+                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
+                                        style="transform: translate(-50%, -50%) scale(4);">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </div>
+                                    <div
+                                        class="bg-white bg-opacity-25 p-4 rounded-circle text-white mb-4 position-relative z-1 shadow-sm border border-white border-opacity-25">
+                                        <i class="bi bi-pencil-square display-5"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-white m-0 position-relative z-1">Le Mie Visite</h4>
+                                    <p class="text-white-75 mt-2 mb-0 small position-relative z-1"
+                                        style="max-width: 250px;">Crea nuovi tour guidati interattivi o modifica i tuoi
+                                        percorsi esistenti.</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- DOCENTE DASHBOARD -->
+            <template x-if="permissions === 'docente'">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100"
+                    style="min-height: 50vh;">
+                    <h2 class="fw-black mb-2 text-center">Ciao <span class="text-orange" x-text="username"></span>, cosa
+                        vuoi fare oggi?</h2>
+                    <p class="text-white-50 text-center mb-5" style="max-width: 500px;">Sei nella tua area protetta. Usa
+                        gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la tua
+                        classe.</p>
+
+                    <div class="row g-4 w-100" style="max-width: 800px;">
+                        <div class="col-md-6">
+                            <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm"
+                                style="cursor: pointer;"
+                                @click="alert('TODO: Schermata Selezione Visita per Navigatore (Avvio modalità Navigatore)')">
+                                <div
+                                    class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
+                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
+                                        style="transform: translate(-50%, -50%) scale(5);">
+                                        <i class="bi bi-play-circle-fill"></i>
+                                    </div>
+                                    <i
+                                        class="bi bi-play-circle-fill display-3 text-white mb-3 position-relative z-1"></i>
+                                    <h3 class="fw-black text-white m-0 position-relative z-1">INIZIA VISITA</h3>
+                                    <p
+                                        class="text-white-50 mt-2 m-0 position-relative z-1 small fw-bold text-uppercase">
+                                        Avvia Tour Interattivo</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/editor/tours" class="text-decoration-none">
+                                <div
+                                    class="card bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
+                                    <i class="bi bi-pencil-square display-3 text-white-50 mb-3"></i>
+                                    <h4 class="fw-bold text-white m-0">Gestisci Visite</h4>
+                                    <p class="text-white-50 mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+    </div>
+    </main>
     </div>
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <a href="/editor/dashboard" class="mobile-nav-item active">
-            <i class="bi bi-grid-fill"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="/editor/museum" class="mobile-nav-item">
-            <i class="bi bi-bank"></i>
-            <span>Musei</span>
-        </a>
-        <a href="/editor/artworks" class="mobile-nav-item">
-            <i class="bi bi-palette"></i>
-            <span>Opere</span>
-        </a>
-        <a href="/editor/tours" class="mobile-nav-item">
-            <i class="bi bi-pencil-square"></i>
-            <span>Visite</span>
-        </a>
-        <a href="/editor/user-management" class="mobile-nav-item">
-            <i class="bi bi-people"></i>
-            <span>Utenti</span>
-        </a>
-        
-    </nav>
 
-    <div x-show="isReady && (!isLoggedIn || permissions !== 'admin')" x-cloak>
+
+    <div x-show="isReady && (!isLoggedIn || (permissions !== 'admin' && permissions !== 'editor' && permissions !== 'docente'))"
+        x-cloak>
         <div class="vh-100 d-flex align-items-center justify-content-center text-center px-4">
             <div class="max-w-450">
                 <i class="bi bi-shield-lock text-orange icon-5xl mb-4 d-block"></i>
@@ -250,6 +464,33 @@
             </div>
         </div>
     </div>
+
+
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="/editor/dashboard" class="mobile-nav-item">
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/editor/museum" x-show="permissions !== 'docente'" class="mobile-nav-item">
+            <i class="bi bi-bank"></i>
+            <span>Musei</span>
+        </a>
+        <a href="/editor/artworks" x-show="permissions !== 'docente'" class="mobile-nav-item">
+            <i class="bi bi-palette"></i>
+            <span>Opere</span>
+        </a>
+        <a href="/editor/tours" class="mobile-nav-item">
+            <i class="bi bi-pencil-square"></i>
+            <span>Visite</span>
+        </a>
+        <a href="/editor/user-management" x-show="permissions === 'admin'" class="mobile-nav-item">
+            <i class="bi bi-people"></i>
+            <span>Utenti</span>
+        </a>
+    </nav>
+
 </body>
 
 </html>

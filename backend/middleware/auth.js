@@ -23,6 +23,25 @@ const auth = async (req, res, next) => {
         res.redirect('/login.html');
     }
 };
+
+const optionalAuth = async (req, res, next) => {
+    const token = req.cookies?.artaround_token || req.query.token || req.headers.authorization;
+
+    if (!token) {
+        return next();
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password');
+        if (user) {
+            req.user = user;
+        }
+    } catch (err) {
+        // Ignora errori di token scaduto in optionalAuth
+    }
+    next();
+};
 // Middleware per controllare i ruoli di admin e editor
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
@@ -33,4 +52,4 @@ const authorize = (allowedRoles) => {
     };
 };
 
-module.exports = { auth, authorize };
+module.exports = { auth, optionalAuth, authorize };

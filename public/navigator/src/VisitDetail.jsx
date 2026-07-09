@@ -220,26 +220,22 @@ function VisitDetail() {
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
                                         </div>
 
-                                        <a href="/editor-marketplace/" className="dropdown-link-item">
-                                            <i className="bi bi-grid-1x2 text-orange"></i>
-                                            <span>Dashboard</span>
-                                        </a>
-
-                                        {user.permissions === 'admin' && (
+                                        {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
-                                                <i className="bi bi-pencil-square text-orange"></i>
-                                                <span>Admin Panel</span>
+                                                <i className="bi bi-grid-1x2 text-orange"></i>
+                                                <span>Dashboard</span>
                                             </a>
                                         )}
+                                        
+                                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Schermata Modifica Profilo'); }} className="dropdown-link-item">
+                                            <i className="bi bi-person-gear text-orange"></i>
+                                            <span>Modifica Profilo</span>
+                                        </a>
 
                                         <div className="dropdown-divider-custom"></div>
 
-                                        <button
-                                            onClick={handleLogout}
-                                            className="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent"
-                                        >
-                                            <i className="bi bi-box-arrow-right"></i>
-                                            <span className="fw-bold">Log out</span>
+                                        <button onClick={handleLogout} className="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">
+                                            Logout
                                         </button>
                                     </div>
                                 )}

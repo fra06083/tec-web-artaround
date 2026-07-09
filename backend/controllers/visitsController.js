@@ -1,10 +1,15 @@
 const { visit: Visit, museum: Museum } = require('../models/museums');
 
 // GET /api/visite
-// Ritorna tutte le visite, con museo popolato
+// Ritorna le visite. Se l'utente loggato è un docente, ritorna solo le sue.
 const getAllVisits = async (req, res) => {
     try {
-        const visits = await Visit.find()
+        let query = {};
+        if (req.user && req.user.permissions === 'docente' && req.query.manage === 'true') {
+            query = { createdBy: req.user._id };
+        }
+
+        const visits = await Visit.find(query)
             .populate('museum_id', 'museum province')
             .lean();
         res.json(visits);
@@ -32,7 +37,7 @@ const getVisitById = async (req, res) => {
 // POST /api/visite
 const createVisit = async (req, res) => {
     try {
-        const { name, description, museum_id, logistic_info, items } = req.body;
+        const { name, description, museum_id, logistic_info, items, createdBy } = req.body;
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
@@ -43,7 +48,8 @@ const createVisit = async (req, res) => {
             description,
             museum_id,
             logistic_info: logistic_info || [],
-            items: items || []
+            items: items || [],
+            createdBy: req.user._id // Salva l'id dell'utente che crea la visita
         });
 
         await newVisit.save();
@@ -57,12 +63,21 @@ const createVisit = async (req, res) => {
 // PUT /api/visite/:id
 const updateVisit = async (req, res) => {
     try {
+        const visitToUpdate = await Visit.findById(req.params.id);
+        if (!visitToUpdate) return res.status(404).json({ error: 'Visita non trovata' });
+
+        // Controllo permessi docente
+        if (req.user.permissions === 'docente') {
+            if (!visitToUpdate.createdBy || visitToUpdate.createdBy.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
         const updated = await Visit.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
             { returnDocument: 'after', runValidators: true }
         );
-        if (!updated) return res.status(404).json({ error: 'Visita non trovata' });
         res.json({ message: 'Visita aggiornata', visit: updated });
     } catch (error) {
         console.error('Errore nell\'aggiornamento della visita:', error);
@@ -73,8 +88,17 @@ const updateVisit = async (req, res) => {
 // DELETE /api/visite/:id
 const deleteVisit = async (req, res) => {
     try {
-        const deleted = await Visit.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ error: 'Visita non trovata' });
+        const visitToDelete = await Visit.findById(req.params.id);
+        if (!visitToDelete) return res.status(404).json({ error: 'Visita non trovata' });
+
+        // Controllo permessi docente
+        if (req.user.permissions === 'docente') {
+            if (!visitToDelete.createdBy || visitToDelete.createdBy.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: 'Non sei autorizzato a eliminare questa visita' });
+            }
+        }
+
+        await Visit.findByIdAndDelete(req.params.id);
         res.json({ message: 'Visita eliminata con successo' });
     } catch (error) {
         console.error('Errore nell\'eliminazione della visita:', error);

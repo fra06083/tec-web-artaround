@@ -103,6 +103,11 @@ document.addEventListener('alpine:init', () => {
             if (res.ok) {
                 this.selectedUser = await res.json(); // Backend deve restituire l'utente aggiornato con .populate('museums')
                 this.selectedMuseumId = '';
+                
+                // Avviso se non ha i permessi corretti
+                if (this.selectedUser.permissions !== 'admin' && this.selectedUser.permissions !== 'editor') {
+                    alert("Attenzione: l'utente non avrà accesso all'amministrazione di questo museo se non gli assegni un ruolo appropriato (es. Editor). Usa la tendina per cambiarlo.");
+                }
             }
         },
 
@@ -134,6 +139,28 @@ document.addEventListener('alpine:init', () => {
                 await this.searchUsers();
             } else {
                 alert('Errore durante l\'eliminazione dell\'utente');
+            }
+        },
+
+        // Cambia ruolo utente
+        async updateRole(newRole) {
+            if (!this.selectedUser) return;
+            const token = localStorage.getItem('artaround_token');
+            const res = await fetch(`/editor/user-management/${this.selectedUser._id}/role`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ permissions: newRole })
+            });
+
+            if (res.ok) {
+                this.selectedUser = await res.json();
+                await this.searchUsers(); // Aggiorna anche la lista a sinistra
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Errore durante l\'aggiornamento del ruolo');
             }
         },
 

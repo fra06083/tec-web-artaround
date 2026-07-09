@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     },
     permissions: {
         type: String,
-        enum: ["visitatore", 'autore', "admin"],
+        enum: ["visitatore", "editor", "docente", "admin"],
         required: true
     },
     museums: [{

@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth.js');
+const { auth, optionalAuth } = require('../middleware/auth.js');
 const visitsCtrl = require('../controllers/visitsController.js');
 // ─── MARKETPLACE (public) ────────────────────────────────────────────────────
 
 // GET /api/visite = lista di tutte le visite pubbliche (usata dal marketplace)
-router.get('/', visitsCtrl.getAllVisits);
+router.get('/', optionalAuth, visitsCtrl.getAllVisits);
 
 // GET /api/visite/:id = dettaglio di una singola visita
-router.get('/:id', visitsCtrl.getVisitById);
+router.get('/:id', optionalAuth, visitsCtrl.getVisitById);
 
 // ─── EDITOR (protected) ──────────────────────────────────────────────────────
 

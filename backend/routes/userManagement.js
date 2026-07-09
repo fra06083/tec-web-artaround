@@ -10,6 +10,7 @@ router.get('/', auth, isAdmin, adminCtrl.serveUsersManagement);
 // API per il frontend (Alpine.js)
 router.get('/search', auth, isAdmin, userCtrl.searchUsers);
 router.get('/:id', auth, isAdmin, userCtrl.getUserById);
+router.put('/:id/role', auth, isAdmin, userCtrl.updateUserRole);
 router.post('/:id/museums/:museumId', auth, isAdmin, userCtrl.grantMuseumPermission);
 router.delete('/:id/museums/:museumId', auth, isAdmin, userCtrl.revokeMuseumPermission);
 router.delete('/:id', auth, isAdmin, userCtrl.deleteUser);

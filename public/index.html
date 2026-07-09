@@ -109,25 +109,21 @@
                                 <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
                             </div>
 
-                            <a href="editor-marketplace/" class="dropdown-link-item">
-                                <i class="bi bi-grid-1x2 text-orange"></i>
-                                <span>Dashboard</span>
-                            </a>
-
-                            <template x-if="permissions === 'admin'">
+                            <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
                                 <a href="/editor/dashboard" class="dropdown-link-item">
-                                    <i class="bi bi-pencil-square text-orange"></i>
-                                    <span>Admin Panel</span>
+                                    <i class="bi bi-grid-1x2 text-orange"></i>
+                                    <span>Dashboard</span>
                                 </a>
                             </template>
+                            
+                            <a href="#" onclick="alert('TODO: Schermata Modifica Profilo'); return false;" class="dropdown-link-item">
+                                <i class="bi bi-person-gear text-orange"></i>
+                                <span>Modifica Profilo</span>
+                            </a>
 
                             <div class="dropdown-divider-custom"></div>
 
-                            <button @click="logout()"
-                                class="btn w-100 text-start dropdown-link-item logout-item border-0 bg-transparent">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span class="fw-bold">Log out</span>
-                            </button>
+                                                        <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
                         </div>
                     </div>
                 </template>
@@ -443,25 +439,22 @@
             
             <!-- Menu Links -->
             <div class="p-4 d-flex flex-column gap-3 flex-grow-1">
-                <a href="/editor-marketplace/" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
-                    <i class="bi bi-grid-1x2-fill fs-5 text-orange"></i>
-                    <span>Dashboard Personale</span>
-                    <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
-                </a>
-                
-                <template x-if="permissions === 'admin'">
+                <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
                     <a href="/editor/dashboard" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
-                        <i class="bi bi-shield-lock-fill fs-5 text-primary"></i>
-                        <span>Admin Panel</span>
+                        <i class="bi bi-grid-1x2-fill fs-5 text-orange"></i>
+                        <span>Dashboard</span>
                         <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                     </a>
                 </template>
                 
+                <a href="#" onclick="alert('TODO: Schermata Modifica Profilo (Es. cambio avatar, password, etc)'); return false;" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
+                    <i class="bi bi-person-gear fs-5 text-primary"></i>
+                    <span>Modifica Profilo</span>
+                    <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
+                </a>
+                
                 <div class="mt-auto pt-4">
-                    <button @click="logout()" class="btn py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 w-100 shadow-sm hover-lift" :class="darkMode ? 'btn-danger' : 'btn-outline-danger bg-white'" data-bs-dismiss="offcanvas">
-                        <i class="bi bi-box-arrow-right fs-5"></i>
-                        <span>Disconnetti account</span>
-                    </button>
+                                        <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white py-3 rounded-pill border-0 shadow-sm" data-bs-dismiss="offcanvas">Logout</button>
                 </div>
             </div>
         </div>

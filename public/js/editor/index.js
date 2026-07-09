@@ -40,12 +40,27 @@ function marketplaceApp() {
             this.$watch('darkMode', (value) => {
                 localStorage.setItem('artaround_darkmode', value);
             });
+            
+            // Set active sidebar link
+            setTimeout(() => {
+                const path = window.location.pathname;
+                document.querySelectorAll('.nav-link-admin, .mobile-nav-item').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === path || (path === '/editor/' && href === '/editor/dashboard')) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }, 100);
 
             await this.checkAuth();
             await this.fetchTours();
 
             this.isLoading = false;
-            this.refreshStats();
+            if (this.permissions === 'admin') {
+                this.refreshStats();
+            }
             this.isReady = true;
         },
 
@@ -105,7 +120,9 @@ function marketplaceApp() {
         },
         async fetchTours() {
             try {
-                const response = await fetch('/api/visite');
+                const response = await fetch('/api/visite?manage=true', {
+                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                });
                 if (response.ok) {
                     this.items = await response.json();
                 }

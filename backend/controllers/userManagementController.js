@@ -50,11 +50,8 @@ module.exports = {
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // Aggiorna permessi se è visitatore
+            // Aggiungi solo il museo
             const updateData = { $addToSet: { museums: museumId } };
-            if (user.permissions === 'visitatore') {
-                updateData.$set = { permissions: 'editor' };
-            }
 
             const updatedUser = await User.findByIdAndUpdate(
                 id,
@@ -110,6 +107,38 @@ module.exports = {
             res.json({ message: "Utente eliminato con successo" });
         } catch (error) {
             res.status(500).json({ error: "Errore eliminazione utente" });
+        }
+    },
+
+    // update user role
+    updateUserRole: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { permissions } = req.body;
+            
+            // Check if valid role
+            const validRoles = ["visitatore", "editor", "docente", "admin"];
+            if (!validRoles.includes(permissions)) {
+                return res.status(400).json({ error: "Ruolo non valido" });
+            }
+
+            const user = await User.findById(id);
+            if (!user) return res.status(404).json({ error: "Utente non trovato" });
+
+            // Impedisci di cambiare il ruolo dell'admin master
+            if (user.name === 'admin' && permissions !== 'admin') {
+                return res.status(403).json({ error: "Non puoi modificare il ruolo dell'amministratore master" });
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                { $set: { permissions: permissions } },
+                { returnDocument: 'after', runValidators: true }
+            ).populate('museums', 'museum region provence');
+
+            res.json(updatedUser);
+        } catch (error) {
+            res.status(500).json({ error: "Errore aggiornamento ruolo utente" });
         }
     }
 };
