@@ -493,6 +493,11 @@
                                             <small class="text-white-50" x-text="(t.items?.length || 0) + ' opere'"></small>
                                         </div>
                                         <div class="d-flex gap-2">
+                                            <template x-if="permissions === 'docente'">
+                                                <button @click="createRoom(t._id)" class="btn btn-sm bg-orange text-white rounded-pill shadow-sm" title="Crea Stanza per Navigatore">
+                                                    <i class="bi bi-play-circle-fill me-1"></i> Avvia
+                                                </button>
+                                            </template>
                                             <button @click="selectedTourId = t._id; goToForm()"
                                                 class="btn btn-sm btn-outline-orange rounded-pill">
                                                 <i class="bi bi-pencil-square"></i>
@@ -676,9 +681,35 @@
         </div>
     </div>
 
-    
+    <!-- Modale Lobby -->
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isLobbyModalOpen" x-transition>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg text-center bg-dark text-white">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close btn-close-white" @click="closeLobby()"></button>
+                </div>
+                <div class="modal-body py-5">
+                    <h3 class="fw-bold mb-4">La tua Stanza è Pronta!</h3>
+                    <p class="lead mb-4 text-white-50">Comunica questo PIN agli studenti per farli unire:</p>
+                    <div class="display-1 fw-black text-orange mb-5" style="letter-spacing: 5px;" x-text="roomState.pin"></div>
+                    
+                    <h5 class="fw-bold mb-3">Studenti Connessi (<span x-text="roomState.students.length"></span>)</h5>
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                        <template x-for="s in roomState.students">
+                            <span class="badge bg-secondary px-3 py-2 rounded-pill fs-6" x-text="s"></span>
+                        </template>
+                        <template x-if="roomState.students.length === 0">
+                            <p class="text-white-50 fst-italic">In attesa degli studenti...</p>
+                        </template>
+                    </div>
 
-    
+                    <button @click="startVisit()" class="btn btn-lg bg-orange text-white rounded-pill px-5 py-3 fw-bold shadow-sm" :disabled="roomState.students.length === 0">
+                        <i class="bi bi-play-circle me-2"></i> Avvia Visita Guidata
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Mobile Navigation -->
     <nav class="mobile-nav">

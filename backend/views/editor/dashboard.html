@@ -295,53 +295,7 @@
                         </div>
                     </div>
                 </template>
-
-                <!-- DOCENTE DASHBOARD -->
-                <template x-if="permissions === 'docente'">
-                    <div class="d-flex flex-column align-items-center justify-content-center h-100"
-                        style="min-height: 50vh;">
-                        <h2 class="fw-black mb-2 text-center">Ciao <span class="text-orange" x-text="username"></span>,
-                            cosa vuoi fare oggi?</h2>
-                        <p class="text-white-50 text-center mb-5" style="max-width: 500px;">Sei nella tua area protetta.
-                            Usa gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la
-                            tua classe.</p>
-
-                        <div class="row g-4 w-100" style="max-width: 800px;">
-                            <div class="col-md-6">
-                                <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm"
-                                    style="cursor: pointer;"
-                                    @click="alert('TODO: Schermata Selezione Visita per Navigatore (Avvio modalità Navigatore)')">
-                                    <div
-                                        class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
-                                        <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
-                                            style="transform: translate(-50%, -50%) scale(5);">
-                                            <i class="bi bi-play-circle-fill"></i>
-                                        </div>
-                                        <i
-                                            class="bi bi-play-circle-fill display-3 text-white mb-3 position-relative z-1"></i>
-                                        <h3 class="fw-black text-white m-0 position-relative z-1">INIZIA VISITA</h3>
-                                        <p
-                                            class="text-white-50 mt-2 m-0 position-relative z-1 small fw-bold text-uppercase">
-                                            Avvia Tour Interattivo</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="/editor/tours" class="text-decoration-none">
-                                    <div
-                                        class="card bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
-                                        <i class="bi bi-pencil-square display-3 text-white-50 mb-3"></i>
-                                        <h4 class="fw-bold text-white m-0">Gestisci Visite</h4>
-                                        <p class="text-white-50 mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
             </div>
-            </template>
 
             <!-- EDITOR DASHBOARD -->
             <template x-if="permissions === 'editor'">
@@ -416,13 +370,9 @@
                         <div class="col-md-6">
                             <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm"
                                 style="cursor: pointer;"
-                                @click="alert('TODO: Schermata Selezione Visita per Navigatore (Avvio modalità Navigatore)')">
+                                @click="openVisitSelection()">
                                 <div
                                     class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
-                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
-                                        style="transform: translate(-50%, -50%) scale(5);">
-                                        <i class="bi bi-play-circle-fill"></i>
-                                    </div>
                                     <i
                                         class="bi bi-play-circle-fill display-3 text-white mb-3 position-relative z-1"></i>
                                     <h3 class="fw-black text-white m-0 position-relative z-1">INIZIA VISITA</h3>
@@ -490,6 +440,69 @@
             <span>Utenti</span>
         </a>
     </nav>
+
+    <!-- Modale Selezione Visita -->
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isVisitSelectionModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isVisitSelectionModalOpen" x-transition>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg bg-dark text-white">
+                <div class="modal-header border-0 pb-0">
+                    <h4 class="fw-bold m-0">Seleziona una Visita da Avviare</h4>
+                    <button type="button" class="btn-close btn-close-white" @click="closeVisitSelection()"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div x-show="items.length === 0" class="text-center py-5 text-white-50">
+                        <i class="bi bi-inbox fs-1 mb-3"></i>
+                        <p>Nessuna visita disponibile. Vai su "Gestisci Visite" per crearne una.</p>
+                        <a href="/editor/tours" class="btn btn-outline-orange mt-3">Vai a Gestione Visite</a>
+                    </div>
+                    
+                    <div x-show="items.length > 0" class="list-group list-group-flush bg-transparent">
+                        <template x-for="tour in items" :key="tour._id">
+                            <div class="list-group-item bg-transparent border-secondary border-opacity-25 d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <h5 class="fw-bold m-0 text-white" x-text="tour.name || 'Visita senza titolo'"></h5>
+                                    <small class="text-white-50" x-text="(tour.items ? tour.items.length : 0) + ' opere'"></small>
+                                </div>
+                                <button @click="createRoom(tour._id)" class="btn btn-orange rounded-pill px-4 fw-bold">
+                                    <i class="bi bi-play-circle-fill me-2"></i> Avvia
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Lobby -->
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isLobbyModalOpen" x-transition>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg text-center bg-dark text-white">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close btn-close-white" @click="closeLobby()"></button>
+                </div>
+                <div class="modal-body py-5">
+                    <h3 class="fw-bold mb-4">La tua Stanza è Pronta!</h3>
+                    <p class="lead mb-4 text-white-50">Comunica questo PIN agli studenti per farli unire:</p>
+                    <div class="display-1 fw-black text-orange mb-5" style="letter-spacing: 5px;" x-text="roomState.pin"></div>
+                    
+                    <h5 class="fw-bold mb-3">Studenti Connessi (<span x-text="roomState.students.length"></span>)</h5>
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                        <template x-for="s in roomState.students">
+                            <span class="badge bg-secondary px-3 py-2 rounded-pill fs-6" x-text="s"></span>
+                        </template>
+                        <template x-if="roomState.students.length === 0">
+                            <p class="text-white-50 fst-italic">In attesa degli studenti...</p>
+                        </template>
+                    </div>
+
+                    <button @click="startVisit()" class="btn btn-lg bg-orange text-white rounded-pill px-5 py-3 fw-bold shadow-sm" :disabled="roomState.students.length === 0">
+                        <i class="bi bi-play-circle me-2"></i> Avvia Visita Guidata
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 

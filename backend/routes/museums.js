@@ -19,5 +19,5 @@ router.put('/:id', auth, isEditor, museumCtrl.updateMuseum);
 
 
 // GET MUSEUM (PROTECTED)
-router.get("/", auth, isEditor, museumCtrl.getAllMuseums);
+router.get("/", auth, authorize(['admin', 'editor', 'docente']), museumCtrl.getAllMuseums);
 module.exports = router;

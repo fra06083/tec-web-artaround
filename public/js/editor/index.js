@@ -3,6 +3,12 @@ function marketplaceApp() {
         isLoggedIn: false,
         username: '',
         permissions: '',
+        propic: '',
+        isProfileModalOpen: false,
+        profileForm: { name: '', propic: '' },
+        isVisitSelectionModalOpen: false,
+        roomState: { pin: null, students: [], eventSource: null },
+        isLobbyModalOpen: false,
         items: [],
         cart: [],
         purchasedVisits: [],
@@ -93,6 +99,7 @@ function marketplaceApp() {
                     // Se il backend restituisce il nome, usiamo quello, altrimenti teniamo quello del localStorage
                     this.username = data.user?.name || savedUsername;
                     this.permissions = data.user?.permissions;
+                    this.propic = data.user?.propic || '';
                     this.purchasedVisits = data.user?.purchased_visits || [];
                     this.isLoggedIn = true;
                 } else {
@@ -223,10 +230,114 @@ function marketplaceApp() {
             }
         },
 
+        openProfileModal() {
+            this.profileForm.name = this.username;
+            this.profileForm.propic = this.propic;
+            this.isProfileModalOpen = true;
+        },
+
+        async updateProfile() {
+            try {
+                const token = localStorage.getItem('artaround_token');
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(this.profileForm)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    this.username = data.user.name;
+                    this.propic = data.user.propic;
+                    localStorage.setItem('artaround_user', this.username);
+                    this.isProfileModalOpen = false;
+                    this.showToast('Profilo aggiornato con successo', 'success');
+                } else {
+                    const err = await response.json();
+                    this.showToast(err.error || 'Errore aggiornamento profilo', 'error');
+                }
+            } catch (error) {
+                console.error("Errore aggiornamento profilo:", error);
+                this.showToast('Errore di connessione', 'error');
+            }
+        },
+
         showToast(message, type) {
             // Emette un custom event che sarà catturato da un eventuale componente toast globale,
             // oppure gestisce il toast localmente se lo implementiamo in index.html
             window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }));
+        },
+
+        openVisitSelection() {
+            this.isVisitSelectionModalOpen = true;
+        },
+
+        closeVisitSelection() {
+            this.isVisitSelectionModalOpen = false;
+        },
+
+        async createRoom(visitId) {
+            try {
+                const response = await fetch('/api/rooms/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ visitId, teacherId: this.username })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.roomState.pin = data.pin;
+                    this.roomState.students = [];
+                    this.isVisitSelectionModalOpen = false;
+                    this.isLobbyModalOpen = true;
+
+                    if (this.roomState.eventSource) {
+                        this.roomState.eventSource.close();
+                    }
+                    this.roomState.eventSource = new EventSource(`/api/rooms/events/${data.pin}`);
+                    
+                    this.roomState.eventSource.addEventListener('student-joined', (e) => {
+                        const eventData = JSON.parse(e.data);
+                        this.roomState.students = eventData.students;
+                    });
+                } else {
+                    this.showToast('Errore creazione stanza', 'error');
+                }
+            } catch (error) {
+                console.error("Errore creazione stanza:", error);
+                this.showToast('Errore di connessione', 'error');
+            }
+        },
+
+        async startVisit() {
+            if (!this.roomState.pin) return;
+            try {
+                const response = await fetch('/api/rooms/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin: this.roomState.pin })
+                });
+
+                if (response.ok) {
+                    this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
+                    const teacherLink = `/navigator/?role=teacher&pin=${this.roomState.pin}`;
+                    window.open(teacherLink, '_blank');
+                }
+            } catch (error) {
+                console.error("Errore avvio visita:", error);
+            }
+        },
+
+        closeLobby() {
+            this.isLobbyModalOpen = false;
+            if (this.roomState.eventSource) {
+                this.roomState.eventSource.close();
+                this.roomState.eventSource = null;
+            }
+            this.roomState.pin = null;
         }
     };
 }

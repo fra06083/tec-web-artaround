@@ -8,6 +8,10 @@ document.addEventListener('alpine:init', () => {
         step: 'choice', // choice, selection, form
         mode: 'create', // create, edit
 
+        // ROOM STATE
+        roomState: { pin: null, students: [], eventSource: null },
+        isLobbyModalOpen: false,
+
         // DATA
         museums: [],
         availableTours: [],
@@ -415,6 +419,69 @@ document.addEventListener('alpine:init', () => {
             } catch (e) {
                 this.showToast("Errore di connessione", "error");
             }
+        },
+
+        // --- ROOMS MANAGEMENT ---
+        async createRoom(visitId) {
+            try {
+                const response = await fetch('/api/rooms/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ visitId, teacherId: this.username }) // o l'ID se presente
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.roomState.pin = data.pin;
+                    this.roomState.students = [];
+                    this.isLobbyModalOpen = true;
+
+                    // Collegamento SSE
+                    if (this.roomState.eventSource) {
+                        this.roomState.eventSource.close();
+                    }
+                    this.roomState.eventSource = new EventSource(`/api/rooms/events/${data.pin}`);
+                    
+                    this.roomState.eventSource.addEventListener('student-joined', (e) => {
+                        const eventData = JSON.parse(e.data);
+                        this.roomState.students = eventData.students;
+                    });
+                } else {
+                    this.showToast('Errore creazione stanza', 'error');
+                }
+            } catch (error) {
+                console.error("Errore creazione stanza:", error);
+                this.showToast('Errore di connessione', 'error');
+            }
+        },
+
+        async startVisit() {
+            if (!this.roomState.pin) return;
+            try {
+                const response = await fetch('/api/rooms/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin: this.roomState.pin })
+                });
+
+                if (response.ok) {
+                    this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
+                    // Potremmo aprire in un'altra tab il navigator con il PIN, o generare il link
+                    const teacherLink = `/navigator/?role=teacher&pin=${this.roomState.pin}`;
+                    window.open(teacherLink, '_blank');
+                }
+            } catch (error) {
+                console.error("Errore avvio visita:", error);
+            }
+        },
+
+        closeLobby() {
+            this.isLobbyModalOpen = false;
+            if (this.roomState.eventSource) {
+                this.roomState.eventSource.close();
+                this.roomState.eventSource = null;
+            }
+            this.roomState.pin = null;
         }
     }));
 });

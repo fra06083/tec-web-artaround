@@ -1,9 +1,15 @@
 const { museum: Museum, item: Item, visit: Visit } = require('../models/museums');
 // GET /api/museums
-// Ritorna tutti i musei
+// Ritorna tutti i musei o solo quelli assegnati al docente
 const getAllMuseums = async (req, res) => {
     try {
-        const museums = await Museum.find().lean();
+        let museums;
+        if (req.user.permissions === 'docente') {
+            const userWithMuseums = await require('../models/user.js').findById(req.user._id).populate('museums').lean();
+            museums = userWithMuseums.museums || [];
+        } else {
+            museums = await Museum.find().lean();
+        }
         res.json(museums);
     } catch (error) {
         console.error('Errore nel recupero dei musei:', error);

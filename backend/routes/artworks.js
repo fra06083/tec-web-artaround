@@ -6,9 +6,10 @@ const { item: Item } = require('../models/museums.js');
 const artworkCtrl = require('../controllers/artworkController.js');
 
 const isEditor = authorize(['admin', 'editor']);
+const canManageTours = authorize(['admin', 'editor', 'docente']);
 
 // GET /api/artworks/museum/:museumId - Opere di un museo (deve venire prima di :id)
-router.get('/museum/:museumId', auth, isEditor, hasMuseumAccess, artworkCtrl.getArtworksByMuseum);
+router.get('/museum/:museumId', auth, canManageTours, hasMuseumAccess, artworkCtrl.getArtworksByMuseum);
 
 // GET /api/artworks - Tutte le opere (solo editor)
 router.get('/', auth, isEditor, artworkCtrl.getAllArtworks);

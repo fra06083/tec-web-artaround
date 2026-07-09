@@ -88,12 +88,54 @@ const authenticateToken = (req, res, next) => {
 router.post('/check', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const user = await User.findById(userId).select('purchased_visits');
+        const user = await User.findById(userId).select('name permissions propic purchased_visits museums');
         if (!user) {
             return res.status(404).json({ error: 'Utente non trovato' });
         }
-        res.json({ valid: true, user: { ...req.user, purchased_visits: user.purchased_visits } });
+        res.json({ valid: true, user: { 
+            id: user._id, 
+            name: user.name, 
+            permissions: user.permissions, 
+            propic: user.propic,
+            museums: user.museums,
+            purchased_visits: user.purchased_visits 
+        } });
     } catch (error) {
+        res.status(500).json({ error: 'Errore interno' });
+    }
+});
+
+// Modifica Profilo Utente
+router.put('/profile', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, propic } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ error: 'Il nome è obbligatorio' });
+        }
+
+        // Verifica che il nome non sia usato da altri (se è cambiato)
+        if (name !== req.user.name) {
+            const existingUser = await User.findOne({ name });
+            if (existingUser && existingUser._id.toString() !== userId) {
+                return res.status(400).json({ error: 'Nome utente già in uso' });
+            }
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { name, propic: propic || "" },
+            { new: true }
+        );
+
+        res.json({ message: 'Profilo aggiornato con successo', user: {
+            id: user._id,
+            name: user.name,
+            propic: user.propic
+        }});
+    } catch (error) {
+        console.error("Errore aggiornamento profilo:", error);
         res.status(500).json({ error: 'Errore interno' });
     }
 });

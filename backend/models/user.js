@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    propic: {
+        type: String,
+        default: ""
+    },
     permissions: {
         type: String,
         enum: ["visitatore", "editor", "docente", "admin"],

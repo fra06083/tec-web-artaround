@@ -391,3 +391,30 @@
 .op-90 { opacity: 0.9; }
 .trans-base { transition: all 0.3s ease; }
 .max-w-550 { max-width: 550px; }
+
+/* Profile Modal Utilities */
+.profile-modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.profile-modal-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+}
+
+body.dark-mode .form-control {
+    background-color: #212529;
+    color: #f8f9fa;
+    border-color: #495057;
+}
+
+body.dark-mode .form-control:focus {
+    background-color: #212529;
+    color: #f8f9fa;
+    border-color: #fd7e14;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #adb5bd;
+}

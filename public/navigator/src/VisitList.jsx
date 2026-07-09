@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchVisite, getDarkMode, setDarkMode, getUser, logout } from './api';
+import ProfileModal from './Profile';
 
 function VisitList() {
     const [visite, setVisite] = useState([]);
@@ -11,6 +12,7 @@ function VisitList() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     useEffect(() => {
         // Applica la classe dark-mode al body
@@ -172,9 +174,9 @@ function VisitList() {
                                             </a>
                                         )}
                                         
-                                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Schermata Modifica Profilo'); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-gear text-orange"></i>
-                                            <span>Modifica Profilo</span>
+                                        <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
+                                            <i className="bi bi-person-circle text-orange"></i>
+                                            <span>Profilo</span>
                                         </a>
 
                                         <div className="dropdown-divider-custom"></div>
@@ -378,9 +380,9 @@ function VisitList() {
                             </a>
                         )}
                         
-                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Modifica Profilo'); }} className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
-                            <i className="bi bi-person-gear fs-5 text-primary"></i>
-                            <span>Modifica Profilo</span>
+                        <a href="#" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`} onClick={(e) => { e.preventDefault(); const offcanvas = document.getElementById('mobileProfileOffcanvas'); if(offcanvas) window.bootstrap.Offcanvas.getInstance(offcanvas)?.hide(); setIsProfileModalOpen(true); }}>
+                            <i className="bi bi-person-circle fs-5 text-primary"></i>
+                            <span>Profilo</span>
                             <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                         </a>
 
@@ -392,6 +394,12 @@ function VisitList() {
                     </div>
                 </div>
             </div>
+            <ProfileModal 
+                isOpen={isProfileModalOpen} 
+                onClose={() => setIsProfileModalOpen(false)} 
+                user={user} 
+                onUpdate={(updatedUser) => setUser(updatedUser)} 
+            />
         </div>
     );
 }

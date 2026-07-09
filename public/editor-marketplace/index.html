@@ -99,9 +99,14 @@
                         <div class="position-relative" x-data="{ open: false }">
                             <button @click="open = !open" @click.outside="open = false"
                                 class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
-                                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
+                                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
                                     :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="width: 40px; height: 40px;">
-                                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                                    <template x-if="propic">
+                                        <img :src="propic" alt="Profile" class="w-100 h-100 object-fit-cover">
+                                    </template>
+                                    <template x-if="!propic">
+                                        <span x-text="username.charAt(0).toUpperCase()"></span>
+                                    </template>
                                 </div>
                                 <i class="bi bi-chevron-down x-small chevron-icon" :class="darkMode ? 'text-cream' : 'text-teal'"></i>
                             </button>
@@ -123,14 +128,19 @@
 
                                 <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
                                     <a href="/editor/dashboard" class="dropdown-link-item">
-                                        <i class="bi bi-pencil-square text-orange"></i>
-                                        <span>Area Gestione</span>
+                                        <i class="bi bi-grid-1x2 text-orange"></i>
+                                        <span>Dashboard</span>
                                     </a>
                                 </template>
 
+                                <button @click="openProfileModal(); open = false" class="btn w-100 text-start dropdown-link-item border-0 bg-transparent">
+                                    <i class="bi bi-person-circle text-orange"></i>
+                                    <span class="fw-bold">Profilo</span>
+                                </button>
+
                                 <div class="dropdown-divider-custom"></div>
 
-                                                            <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
+                                    <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
                             </div>
                         </div>
                     </template>
@@ -309,11 +319,12 @@
         </template>
         <template x-if="isLoggedIn">
             <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" class="mobile-nav-item" @click.prevent="">
-                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
-                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="font-size: 0.8rem;">
-                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
+                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="font-size: 0.8rem; width:25px; height:25px;">
+                    <template x-if="propic"><img :src="propic" alt="P" class="w-100 h-100 object-fit-cover"></template>
+                    <template x-if="!propic"><span x-text="username.charAt(0).toUpperCase()"></span></template>
                 </div>
-                <span>Profilo</span>
+                <span>Menu</span>
             </a>
         </template>
     </nav>
@@ -422,6 +433,52 @@
             </template>
         </div>
     </div>
+
+    <!-- Offcanvas Mobile Profile -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileProfileOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <button @click="openProfileModal()" data-bs-dismiss="offcanvas" class="btn btn-outline-orange w-100 mb-3">Modifica Profilo</button>
+            <button @click="logout()" class="btn btn-danger w-100">Esci</button>
+        </div>
+    </div>
+
+    <!-- Modale Profilo Utente -->
+    <div class="modal fade profile-modal-backdrop" tabindex="-1" :class="{ 'show d-block': isProfileModalOpen }" x-show="isProfileModalOpen" x-transition>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" :class="darkMode ? 'bg-dark text-white' : 'bg-white'">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Modifica Profilo</h5>
+                    <button type="button" class="btn-close" @click="isProfileModalOpen = false" :class="darkMode ? 'btn-close-white' : ''"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <div class="mx-auto rounded-circle bg-secondary overflow-hidden mb-3 profile-modal-avatar">
+                            <template x-if="profileForm.propic">
+                                <img :src="profileForm.propic" class="w-100 h-100 object-fit-cover">
+                            </template>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome Visualizzato</label>
+                        <input type="text" class="form-control" x-model="profileForm.name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL Immagine Profilo (Base64 o HTTP)</label>
+                        <input type="text" class="form-control" x-model="profileForm.propic" placeholder="https://... o data:image/...">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" @click="isProfileModalOpen = false">Annulla</button>
+                    <button type="button" class="btn bg-orange text-white" @click="updateProfile()">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </body>
 

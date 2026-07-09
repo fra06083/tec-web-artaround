@@ -48,12 +48,14 @@ const museumRoutes = require("./routes/museums.js");
 const adminRoutes = require("./routes/admin.js");
 const userManagementRoutes = require("./routes/userManagement.js");
 const artworkRoutes = require("./routes/artworks.js");
+const roomRoutes = require("./routes/rooms.js");
 
 app.use("/api", authRoutes);
 app.use("/editor", adminRoutes);
 app.use("/api/visite", visitRoutes);
 app.use("/api/museums", museumRoutes);
 app.use("/api/artworks", artworkRoutes);
+app.use("/api/rooms", roomRoutes);
 app.use("/editor/user-management", userManagementRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"

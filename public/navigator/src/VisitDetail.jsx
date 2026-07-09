@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, logout } from './api';
+import ProfileModal from './Profile';
 
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 
@@ -14,9 +15,15 @@ function VisitDetail() {
     const [darkMode, setDarkModeState] = useState(getDarkMode());
     const [user, setUser] = useState(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [descriptions, setDescriptions] = useState([]);
     const [selectedType, setSelectedType] = useState('medio');
     const [isSpeaking, setIsSpeaking] = useState(false);
+
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const pin = query.get('pin');
+    const role = query.get('role'); // 'teacher' o null/studente
     
     // Ferma la sintesi vocale
     const stopSpeaking = useCallback(() => {
@@ -88,12 +95,52 @@ function VisitDetail() {
 
     useEffect(() => {
         if (items.length > 0) {
-            const currentItemId = items[currentIndex]._id;
-            fetchDescriptionsByItem(currentItemId)
-                .then(data => setDescriptions(data))
-                .catch(err => console.error(err));
+            const currentItemId = items[currentIndex]?._id;
+            if (currentItemId) {
+                fetchDescriptionsByItem(currentItemId)
+                    .then(data => setDescriptions(data))
+                    .catch(err => console.error(err));
+            }
         }
     }, [currentIndex, items]);
+
+    // SSE Effect per gli studenti
+    useEffect(() => {
+        if (pin && role !== 'teacher') {
+            const eventSource = new EventSource(`/api/rooms/events/${pin}`);
+            
+            eventSource.addEventListener('artwork-changed', (e) => {
+                const data = JSON.parse(e.data);
+                if (data.artworkIndex !== undefined) {
+                    setCurrentIndex(data.artworkIndex);
+                    // Ferma l'audio precedente se stava parlando
+                    stopSpeaking();
+                }
+            });
+
+            return () => {
+                eventSource.close();
+            };
+        }
+    }, [pin, role, stopSpeaking]);
+
+    const handleIndexChange = async (newIndex) => {
+        if (newIndex < 0 || newIndex >= items.length) return;
+        
+        setCurrentIndex(newIndex);
+        
+        if (pin && role === 'teacher') {
+            try {
+                await fetch('/api/rooms/change-artwork', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin, artworkIndex: newIndex })
+                });
+            } catch (err) {
+                console.error("Errore nel cambio opera remoto:", err);
+            }
+        }
+    };
 
     const currentDescription = descriptions.find(d => d.type === selectedType);
 
@@ -207,8 +254,12 @@ function VisitDetail() {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
                                 >
-                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm" style={{cursor: 'pointer'}}>
-                                        <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm overflow-hidden" style={{cursor: 'pointer'}}>
+                                        {user.propic ? (
+                                            <img src={user.propic} alt="Profile" className="w-100 h-100 object-fit-cover" />
+                                        ) : (
+                                            <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                        )}
                                     </div>
                                     <i className="bi bi-chevron-down x-small chevron-icon"></i>
                                 </button>
@@ -220,17 +271,22 @@ function VisitDetail() {
                                             <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
                                         </div>
 
+                                        <a href="/editor-marketplace/" className="dropdown-link-item">
+                                            <i className="bi bi-shop text-orange"></i>
+                                            <span>Marketplace</span>
+                                        </a>
+
+                                        <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
+                                            <i className="bi bi-person-circle text-orange"></i>
+                                            <span>Profilo</span>
+                                        </a>
+
                                         {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
                                                 <i className="bi bi-grid-1x2 text-orange"></i>
                                                 <span>Dashboard</span>
                                             </a>
                                         )}
-                                        
-                                        <a href="#" onClick={(e) => { e.preventDefault(); alert('TODO: Schermata Modifica Profilo'); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-gear text-orange"></i>
-                                            <span>Modifica Profilo</span>
-                                        </a>
 
                                         <div className="dropdown-divider-custom"></div>
 
@@ -350,34 +406,38 @@ function VisitDetail() {
                     </div>
 
                     {/* NAVIGAZIONE */}
-                    <div className="d-flex gap-3 justify-content-center mt-4">
-                        <button
-                            onClick={() => setCurrentIndex(i => i - 1)}
-                            disabled={currentIndex === 0}
-                            className="btn btn-outline-red rounded-pill px-4 btn-with-icon"
-                        >
-                            <i className="bi bi-arrow-left"></i> Precedente
-                        </button>
-                        <button
-                            onClick={() => setCurrentIndex(i => i + 1)}
-                            disabled={currentIndex === items.length - 1}
-                            className="btn bg-red text-white rounded-pill px-4 btn-with-icon"
-                        >
-                            Prossimo <i className="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
+                    {(!pin || role === 'teacher') && (
+                        <div className="d-flex gap-3 justify-content-center mt-4">
+                            <button
+                                onClick={() => handleIndexChange(currentIndex - 1)}
+                                disabled={currentIndex === 0}
+                                className="btn btn-outline-red rounded-pill px-4 btn-with-icon"
+                            >
+                                <i className="bi bi-arrow-left"></i> Precedente
+                            </button>
+                            <button
+                                onClick={() => handleIndexChange(currentIndex + 1)}
+                                disabled={currentIndex === items.length - 1}
+                                className="btn bg-red text-white rounded-pill px-4 btn-with-icon"
+                            >
+                                Prossimo <i className="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    )}
 
                     {/* PROGRESS DOTS */}
-                    <div className="d-flex justify-content-center gap-2 mt-4">
-                        {items.map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setCurrentIndex(i)}
-                                className={`btn p-0 border-0 rounded-circle ${i === currentIndex ? 'bg-red' : 'bg-secondary'}`}
-                                style={{ width: '10px', height: '10px' }}
-                            ></button>
-                        ))}
-                    </div>
+                    {(!pin || role === 'teacher') && (
+                        <div className="d-flex justify-content-center gap-2 mt-4">
+                            {items.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleIndexChange(i)}
+                                    className={`btn p-0 border-0 rounded-circle ${i === currentIndex ? 'bg-red' : 'bg-secondary'}`}
+                                    style={{ width: '10px', height: '10px' }}
+                                ></button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </main>
 
@@ -394,6 +454,12 @@ function VisitDetail() {
                     </div>
                 </div>
             </footer>
+            <ProfileModal 
+                isOpen={isProfileModalOpen} 
+                onClose={() => setIsProfileModalOpen(false)} 
+                user={user} 
+                onUpdate={(updatedUser) => setUser(updatedUser)} 
+            />
         </div>
     );
 }

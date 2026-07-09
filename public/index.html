@@ -116,9 +116,9 @@
                                 </a>
                             </template>
                             
-                            <a href="#" onclick="alert('TODO: Schermata Modifica Profilo'); return false;" class="dropdown-link-item">
-                                <i class="bi bi-person-gear text-orange"></i>
-                                <span>Modifica Profilo</span>
+                            <a @click="openProfileModal()" class="dropdown-link-item cursor-pointer">
+                                <i class="bi bi-person-circle text-orange"></i>
+                                <span>Profilo</span>
                             </a>
 
                             <div class="dropdown-divider-custom"></div>
@@ -459,6 +459,39 @@
             </div>
         </div>
     </div>
+    <!-- Modale Profilo Utente -->
+    <div class="modal fade profile-modal-backdrop" tabindex="-1" :class="{ 'show d-block': isProfileModalOpen }" x-show="isProfileModalOpen" x-transition>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" :class="darkMode ? 'bg-dark text-white' : 'bg-white'">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Modifica Profilo</h5>
+                    <button type="button" class="btn-close" @click="isProfileModalOpen = false" :class="darkMode ? 'btn-close-white' : ''"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <div class="mx-auto rounded-circle bg-secondary overflow-hidden mb-3 profile-modal-avatar">
+                            <template x-if="profileForm.propic">
+                                <img :src="profileForm.propic" class="w-100 h-100 object-fit-cover">
+                            </template>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome Visualizzato</label>
+                        <input type="text" class="form-control" x-model="profileForm.name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL Immagine Profilo (Base64 o HTTP)</label>
+                        <input type="text" class="form-control" x-model="profileForm.propic" placeholder="https://... o data:image/...">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" @click="isProfileModalOpen = false">Annulla</button>
+                    <button type="button" class="btn bg-orange text-white" @click="updateProfile()">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
