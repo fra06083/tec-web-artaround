@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ArtAround 🚀 Il museo che si adatta a te</title>
+    <title>ArtAround: Il museo che si adatta a te</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/effects.css" />
     <link rel="stylesheet" href="css/mobile-nav.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <script>
         if (localStorage.getItem('artaround_darkmode') === 'true') {
             document.documentElement.classList.add('dark-mode');
@@ -32,7 +33,7 @@
     <nav class="navbar fixed-top w-100 py-3 shadow-sm desktop-navbar transition-theme border-0" style="z-index: 1030;"
         :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'">
         <div class="container-lg d-flex flex-wrap align-items-center justify-content-between">
-            
+
             <!-- 1. LOGO -->
             <a class="navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto" href="index.html">
                 <div class="p-2 rounded-3 d-flex align-items-center justify-content-center"
@@ -44,13 +45,15 @@
 
             <!-- 2. MOBILE CONTROLS -->
             <div class="d-flex d-lg-none align-items-center gap-2 order-2">
-                <button class="btn btn-link p-1 shadow-none theme-btn-mobile" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
+                <button class="btn btn-link p-1 shadow-none theme-btn-mobile"
+                    :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
                     <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
                 </button>
             </div>
 
             <!-- 3. DESKTOP THEME TOGGLE -->
-            <button class="btn btn-link p-1 shadow-none order-lg-3 ms-2 d-none d-lg-flex" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
+            <button class="btn btn-link p-1 shadow-none order-lg-3 ms-2 d-none d-lg-flex"
+                :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
                 <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
             </button>
 
@@ -68,8 +71,7 @@
                     <i class="bi bi-shop fs-5 text-terracotta"></i> Marketplace
                 </a>
 
-                <div class="vr mx-2"
-                    :class="darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'"></div>
+                <div class="vr mx-2" :class="darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'"></div>
 
                 <!-- Auth Section -->
                 <template x-if="!isLoggedIn">
@@ -85,37 +87,41 @@
                         <!-- Trigger: Avatar -->
                         <button @click="open = !open" @click.outside="open = false"
                             class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
-                            <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
+                            <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
                                 :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'">
-                                <span x-text="username.charAt(0).toUpperCase()"></span>
+                                <template x-if="propic">
+                                    <img :src="propic" alt="Profile" class="w-100 h-100 object-fit-cover">
+                                </template>
+                                <template x-if="!propic">
+                                    <span x-text="username.charAt(0).toUpperCase()"></span>
+                                </template>
                             </div>
                             <i class="bi bi-chevron-down x-small chevron-icon"
                                 :class="darkMode ? 'text-cream' : 'text-teal'"></i>
                         </button>
 
                         <!-- Dropdown Menu Professionale -->
-                        <div x-show="open" x-cloak
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
+                        <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                             x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
+                            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 text-start"
                             style="min-width: 220px;" :class="darkMode ? 'bg-dark' : 'bg-white'">
-                            <div class="dropdown-header-info px-4 py-2 border-bottom" :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
+                            <div class="dropdown-header-info px-4 py-2 border-bottom"
+                                :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
                                 <div class="fw-bold user-name-text" :class="darkMode ? 'text-white' : 'text-dark'"
                                     x-text="username"></div>
                                 <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
                             </div>
 
-                            <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
+                            <template
+                                x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
                                 <a href="/editor/dashboard" class="dropdown-link-item">
                                     <i class="bi bi-grid-1x2 text-orange"></i>
                                     <span>Dashboard</span>
                                 </a>
                             </template>
-                            
+
                             <a @click="openProfileModal()" class="dropdown-link-item cursor-pointer">
                                 <i class="bi bi-person-circle text-orange"></i>
                                 <span>Profilo</span>
@@ -123,7 +129,8 @@
 
                             <div class="dropdown-divider-custom"></div>
 
-                                                        <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
+                            <button @click="logout()"
+                                class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
                         </div>
                     </div>
                 </template>
@@ -140,11 +147,13 @@
                         <span class="display-6 display-md-5 d-block mb-2"
                             :class="darkMode ? 'text-cream' : 'text-teal'">La tua visita,</span>
                         <span
-                            class="display-4 display-md-2 fw-black text-terracotta position-relative d-inline-block brush-underline">le tue regole.</span>
+                            class="display-4 display-md-2 fw-black text-terracotta position-relative d-inline-block brush-underline">le
+                            tue regole.</span>
                     </h1>
                     <p class="lead mb-5 fw-medium mx-auto" style="max-width: 600px;"
                         :class="darkMode ? 'text-white-50' : 'text-darkgrey'">
-                        Scopri un nuovo modo per vivere l'arte.<br> ArtAround adatta dinamicamente il linguaggio, il livello di approfondimento e il ritmo di ogni audioguida. Vivi la cultura senza compromessi.
+                        Scopri un nuovo modo per vivere l'arte.<br> ArtAround adatta dinamicamente il linguaggio, il
+                        livello di approfondimento e il ritmo di ogni audioguida. Vivi la cultura senza compromessi.
                     </p>
 
                     <!-- Stats Row -->
@@ -208,9 +217,12 @@
         <div class="container-lg py-5">
             <div class="text-center mb-5">
                 <span
-                    class="badge bg-teal text-cream rounded-pill px-4 py-2 mb-3 fw-bold shadow-sm border border-ochre">Intuitivo e Veloce</span>
-                <h2 class="display-5 fw-black mb-2" :class="darkMode ? 'text-cream' : 'text-teal'">Tre semplici passaggi</h2>
-                <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-secondary'">Dal divano al museo in pochi istanti
+                    class="badge bg-teal text-cream rounded-pill px-4 py-2 mb-3 fw-bold shadow-sm border border-ochre">Intuitivo
+                    e Veloce</span>
+                <h2 class="display-5 fw-black mb-2" :class="darkMode ? 'text-cream' : 'text-teal'">Tre semplici passaggi
+                </h2>
+                <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-secondary'">Dal divano al museo in
+                    pochi istanti
                 </p>
             </div>
             <div class="row g-4 text-center">
@@ -222,8 +234,10 @@
                             :class="darkMode ? 'bg-orange text-white' : 'bg-teal text-cream'">
                             <i class="bi bi-geo-alt fs-2"></i>
                         </div>
-                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">1. Trova la tua meta</h4>
-                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Esplora e seleziona i musei direttamente dall'app, ovunque ti trovi.</p>
+                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">1. Trova la tua meta
+                        </h4>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Esplora e seleziona
+                            i musei direttamente dall'app, ovunque ti trovi.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
@@ -234,8 +248,10 @@
                             :class="darkMode ? 'bg-orange text-white' : 'bg-teal text-cream'">
                             <i class="bi bi-sliders fs-2"></i>
                         </div>
-                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">2. Personalizza l'esperienza</h4>
-                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Scegli il tuo livello di competenza, il tempo a disposizione e le tue preferenze.</p>
+                        <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">2. Personalizza
+                            l'esperienza</h4>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Scegli il tuo
+                            livello di competenza, il tempo a disposizione e le tue preferenze.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
@@ -247,7 +263,8 @@
                             <i class="bi bi-headphones fs-2"></i>
                         </div>
                         <h4 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">3. Ascolta e scopri</h4>
-                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Goditi un'audioguida dinamica che parla il tuo linguaggio e ti guida senza distrazioni.</p>
+                        <p class="small mb-0" :class="darkMode ? 'text-white-50' : 'text-secondary'">Goditi
+                            un'audioguida dinamica che parla il tuo linguaggio e ti guida senza distrazioni.</p>
                     </div>
                 </div>
             </div>
@@ -257,10 +274,12 @@
     <section class="container-lg py-5 my-4" id="roles">
         <div class="text-center mb-5">
             <span
-                class="badge bg-transparent border border-ochre text-terracotta rounded-pill px-4 py-2 mb-3 fw-bold glass-search-wrapper">Scopri le funzionalità</span>
+                class="badge bg-transparent border border-ochre text-terracotta rounded-pill px-4 py-2 mb-3 fw-bold glass-search-wrapper">Scopri
+                le funzionalità</span>
             <h2 class="display-5 fw-black mb-3" :class="darkMode ? 'text-cream' : 'text-teal'">Qual è il tuo ruolo?</h2>
 
-            <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-darkgrey'">La piattaforma perfetta per esploratori e curatori.</p>
+            <p class="lead fw-medium" :class="darkMode ? 'text-white-50' : 'text-darkgrey'">La piattaforma perfetta per
+                esploratori e curatori.</p>
 
         </div>
 
@@ -284,7 +303,9 @@
                         <h3 class="fw-black mb-3 text-white">Navigatore</h3>
 
                         <p class="text-white mb-4 flex-grow-1 fw-medium op-90">
-                            La tua guida personale. Indossa le cuffie e lasciati condurre attraverso il museo con spiegazioni dinamiche che si adattano al tuo livello, dal vocabolario al ritmo dei tuoi passi. Mai più tour standardizzati.
+                            La tua guida personale. Indossa le cuffie e lasciati condurre attraverso il museo con
+                            spiegazioni dinamiche che si adattano al tuo livello, dal vocabolario al ritmo dei tuoi
+                            passi. Mai più tour standardizzati.
                         </p>
 
                         <a href="navigator/"
@@ -315,7 +336,9 @@
                         <h3 class="fw-black mb-3 text-white">L'Editor & Marketplace</h3>
 
                         <p class="text-white mb-4 flex-grow-1 fw-medium op-90">
-                            Costruisci percorsi museali, organizza i contenuti e pubblicali nel Marketplace. Uno strumento potente che trasforma qualsiasi esposizione in un'esperienza interattiva di altissimo livello.
+                            Costruisci percorsi museali, organizza i contenuti e pubblicali nel Marketplace. Uno
+                            strumento potente che trasforma qualsiasi esposizione in un'esperienza interattiva di
+                            altissimo livello.
                         </p>
 
                         <a href="./editor-marketplace/"
@@ -346,15 +369,21 @@
 
                     <span
                         class="badge rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm glass-search-wrapper bg-transparent border border-ochre"
-                        :class="darkMode ? 'text-terracotta border-opacity-50' : 'text-terracotta border-opacity-25'">Per le Istituzioni</span>
+                        :class="darkMode ? 'text-terracotta border-opacity-50' : 'text-terracotta border-opacity-25'">Per
+                        le Istituzioni</span>
 
-                    <h2 class="display-6 fw-black mb-3" :class="darkMode ? 'text-cream' : 'text-teal'">Sei la direzione di un museo?
+                    <h2 class="display-6 fw-black mb-3" :class="darkMode ? 'text-cream' : 'text-teal'">Sei la direzione
+                        di un museo?
                     </h2>
 
                     <p class="lead mb-0 mx-auto mx-md-0 fw-medium max-w-550"
                         :class="darkMode ? 'text-white-50' : 'text-darkgrey'">
-                        Porta il tuo museo su ArtAround utilizzando <strong :class="darkMode ? 'text-white' : 'text-teal'">solo i tuoi contenuti</strong>. <strong :class="darkMode ? 'text-white' : 'text-teal'">Nessuna app proprietaria</strong> da sviluppare,
-                        <strong :class="darkMode ? 'text-white' : 'text-teal'">nessun costo di manutenzione</strong>. Un'infrastruttura già pronta per accogliere migliaia di visitatori.
+                        Porta il tuo museo su ArtAround utilizzando <strong
+                            :class="darkMode ? 'text-white' : 'text-teal'">solo i tuoi contenuti</strong>. <strong
+                            :class="darkMode ? 'text-white' : 'text-teal'">Nessuna app proprietaria</strong> da
+                        sviluppare,
+                        <strong :class="darkMode ? 'text-white' : 'text-teal'">nessun costo di manutenzione</strong>.
+                        Un'infrastruttura già pronta per accogliere migliaia di visitatori.
                     </p>
 
                 </div>
@@ -422,50 +451,65 @@
     <!-- OFFCANVAS PROFILO MOBILE -->
     <div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="mobileProfileOffcanvas">
         <div class="offcanvas-body d-flex flex-column p-0" :class="darkMode ? 'bg-dark' : 'bg-light'">
-            
+
             <!-- User Banner -->
-            <div class="position-relative p-4 p-md-5 text-center shadow-sm" :class="darkMode ? 'bg-gradient-dark-blue' : 'bg-gradient-orange'">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <div class="position-relative p-4 p-md-5 text-center shadow-sm"
+                :class="darkMode ? 'bg-gradient-dark-blue' : 'bg-gradient-orange'">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4"
+                    data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 <template x-if="isLoggedIn">
                     <div class="mt-3">
-                        <div class="user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3" :class="darkMode ? 'text-dark' : 'text-orange'" style="width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2);">
+                        <div class="user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3"
+                            :class="darkMode ? 'text-dark' : 'text-orange'"
+                            style="width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2);">
                             <span x-text="username.charAt(0).toUpperCase()"></span>
                         </div>
                         <h4 class="fw-bold mb-1 text-white" x-text="username"></h4>
-                        <span class="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm" x-text="permissions"></span>
+                        <span
+                            class="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm"
+                            x-text="permissions"></span>
                     </div>
                 </template>
             </div>
-            
+
             <!-- Menu Links -->
             <div class="p-4 d-flex flex-column gap-3 flex-grow-1">
                 <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
-                    <a href="/editor/dashboard" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
+                    <a href="/editor/dashboard"
+                        class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift"
+                        :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
                         <i class="bi bi-grid-1x2-fill fs-5 text-orange"></i>
                         <span>Dashboard</span>
                         <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                     </a>
                 </template>
-                
-                <a href="#" onclick="alert('TODO: Schermata Modifica Profilo (Es. cambio avatar, password, etc)'); return false;" class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
+
+                <a href="#"
+                    onclick="alert('TODO: Schermata Modifica Profilo (Es. cambio avatar, password, etc)'); return false;"
+                    class="btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift"
+                    :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'">
                     <i class="bi bi-person-gear fs-5 text-primary"></i>
                     <span>Modifica Profilo</span>
                     <i class="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                 </a>
-                
+
                 <div class="mt-auto pt-4">
-                                        <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white py-3 rounded-pill border-0 shadow-sm" data-bs-dismiss="offcanvas">Logout</button>
+                    <button @click="logout()"
+                        class="btn btn-danger w-100 fw-bold text-white py-3 rounded-pill border-0 shadow-sm"
+                        data-bs-dismiss="offcanvas">Logout</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- Modale Profilo Utente -->
-    <div class="modal fade profile-modal-backdrop" tabindex="-1" :class="{ 'show d-block': isProfileModalOpen }" x-show="isProfileModalOpen" x-transition>
+    <div class="modal fade profile-modal-backdrop" tabindex="-1" :class="{ 'show d-block': isProfileModalOpen }"
+        x-show="isProfileModalOpen" x-transition>
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="darkMode ? 'bg-dark text-white' : 'bg-white'">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold">Modifica Profilo</h5>
-                    <button type="button" class="btn-close" @click="isProfileModalOpen = false" :class="darkMode ? 'btn-close-white' : ''"></button>
+                    <button type="button" class="btn-close" @click="isProfileModalOpen = false"
+                        :class="darkMode ? 'btn-close-white' : ''"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 text-center">
@@ -481,7 +525,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">URL Immagine Profilo (Base64 o HTTP)</label>
-                        <input type="text" class="form-control" x-model="profileForm.propic" placeholder="https://... o data:image/...">
+                        <input type="text" class="form-control" x-model="profileForm.propic"
+                            placeholder="https://... o data:image/...">
                     </div>
                 </div>
                 <div class="modal-footer border-0">
