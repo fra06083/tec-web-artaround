@@ -418,3 +418,13 @@ body.dark-mode .form-control:focus {
 body.dark-mode .form-control::placeholder {
     color: #adb5bd;
 }
+
+/* Editor HTML Utilities */
+.avatar-sm { width: 38px; height: 38px; }
+.ls-5 { letter-spacing: 5px; }
+.bg-white-20 { background-color: rgba(255, 255, 255, 0.2); }
+.max-w-250 { max-width: 250px; }
+.max-w-500 { max-width: 500px; }
+.max-w-800 { max-width: 800px; }
+.modal-backdrop-dark { background: rgba(0,0,0,0.8); }
+.scale-4-origin { transform: translate(-50%, -50%) scale(4); }
