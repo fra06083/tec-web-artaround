@@ -372,7 +372,7 @@ function VisitDetail() {
                         <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
                             <i className="bi bi-box-seam fs-5"></i>
                         </div>
-                        <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
+                        <span className="tracking-tight-sm">ArtAround</span>
                     </a>
             </div>
         </header>
@@ -415,27 +415,27 @@ function VisitDetail() {
             
             {/* BACKGROUND DINAMICO (Prende tutto lo schermo) */}
             {currentItem.img_path && (
-                <div className="position-absolute w-100 h-100" style={{ backgroundImage: `url(${currentItem.img_path})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(30px) brightness(0.4)', opacity: 0.8, zIndex: 0 }}></div>
+                <div className="position-absolute w-100 h-100 dynamic-bg-blur" style={{ backgroundImage: `url(${currentItem.img_path})` }}></div>
             )}
             
             {/* NAVBAR (Semplice, non a pillola intera, icone separate) */}
-            <header className="w-100 px-3 py-3 position-relative" style={{ zIndex: 1030 }}>
+            <header className="w-100 px-3 py-3 position-relative z-1030">
                 <div className="d-flex align-items-center justify-content-between">
                     
                     {/* SINISTRA: Back + Logo */}
                     <div className="d-flex align-items-center gap-3">
-                        <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${darkMode ? 'bg-dark text-white border border-secondary' : 'bg-light text-dark border'}`} style={{ width: '40px', height: '40px' }} title="Torna alla Home">
+                        <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-icon-40 ${darkMode ? 'bg-dark text-white border border-secondary' : 'bg-light text-dark border'}`} title="Torna alla Home">
                             <i className="bi bi-arrow-left fs-5"></i>
                         </Link>
-                        <div className="d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary" style={{ backdropFilter: 'blur(5px)'}}>
+                        <div className="d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary glass-blur-5">
                             <i className="bi bi-box-seam text-orange fs-5"></i>
-                            <span className="fw-black fs-6 text-white" style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
+                            <span className="fw-black fs-6 text-white tracking-tight-sm">ArtAround</span>
                         </div>
                     </div>
 
                     {/* CENTRO: Titolo dell'opera (nascosto se lo schermo è piccolo) */}
                     <div className="text-center px-2 d-none d-md-block text-truncate">
-                        <h6 className="m-0 fw-bold text-white shadow-sm px-4 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary text-truncate" style={{ maxWidth: '400px', backdropFilter: 'blur(5px)' }}>
+                        <h6 className="m-0 fw-bold text-white shadow-sm px-4 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary text-truncate max-w-400 glass-blur-5">
                             {currentItem.item.replace(/\s*\d{10,}$/, '')}
                         </h6>
                     </div>
@@ -457,26 +457,26 @@ function VisitDetail() {
                                                 const action = studentActions[student];
                                                 return (
                                                     <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
-                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-dark ${action ? 'border-orange' : ''}`} style={{ width: '32px', height: '32px', fontSize: '0.75rem' }}>
+                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-dark avatar-sm-075 ${action ? 'border-orange' : ''}`}>
                                                             {student.charAt(0).toUpperCase()}
                                                         </div>
                                                         {action && (
-                                                            <span className="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-orange border border-1 border-white shadow-sm" style={{ width: '10px', height: '10px' }}></span>
+                                                            <span className="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-orange border border-1 border-white shadow-sm indicator-dot"></span>
                                                         )}
                                                     </div>
                                                 );
                                             })}
                                             {hiddenCount > 0 && (
-                                                <div className="user-avatar rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-secondary" style={{ width: '32px', height: '32px', fontSize: '0.65rem', zIndex: 0, marginLeft: '-12px' }}>
+                                                <div className="user-avatar rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-secondary avatar-sm-065 overlap-avatar-left">
                                                     +{hiddenCount}
                                                 </div>
                                             )}
                                         </div>
-                                        <i className="bi bi-chevron-down text-white-50 ms-1 me-1" style={{ fontSize: '0.7rem' }}></i>
+                                        <i className="bi bi-chevron-down text-white-50 ms-1 me-1 fs-07"></i>
                                     </button>
 
                                     {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}
-                                    <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 ${darkMode ? 'dropdown-menu-dark' : ''}`} style={{ minWidth: '260px' }}>
+                                    <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 min-w-260 ${darkMode ? 'dropdown-menu-dark' : ''}`}>
                                         <li className="px-3 pb-2 mb-2 border-bottom border-secondary border-opacity-25">
                                             <h6 className="m-0 fw-bold">Stato Studenti ({connectedStudents.length})</h6>
                                         </li>
@@ -491,14 +491,14 @@ function VisitDetail() {
                                             else if (action === 'audio') { icon = 'bi-mic-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
                                             
                                             return (
-                                                <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1" style={{cursor: 'default'}}>
-                                                    <span className="fw-bold small text-truncate" style={{maxWidth: '120px'}}>{student}</span>
+                                                <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1 cursor-default">
+                                                    <span className="fw-bold small text-truncate max-w-120">{student}</span>
                                                     {actionText ? (
-                                                        <span className={`badge bg-opacity-10 d-flex align-items-center gap-1 ${iconColor.replace('text-', 'bg-')} ${iconColor}`} style={{fontSize: '0.65rem'}}>
+                                                        <span className={`badge bg-opacity-10 d-flex align-items-center gap-1 fs-065 ${iconColor.replace('text-', 'bg-')} ${iconColor}`}>
                                                             <i className={`bi ${icon}`}></i> {actionText}
                                                         </span>
                                                     ) : (
-                                                        <small className="text-muted fst-italic" style={{fontSize: '0.65rem'}}>
+                                                        <small className="text-muted fst-italic fs-065">
                                                             <i className="bi bi-eye"></i> Online
                                                         </small>
                                                     )}
@@ -528,7 +528,7 @@ function VisitDetail() {
                             >
                                 <i className={`bi bi-chat-dots-fill fs-4 ${darkMode ? 'text-info' : 'text-primary'}`}></i>
                                 {unreadCount > 0 && (
-                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark" style={{ fontSize: '0.65rem' }}>
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark fs-065">
                                         {unreadCount > 9 ? '9+' : unreadCount}
                                     </span>
                                 )}
@@ -540,31 +540,30 @@ function VisitDetail() {
             </header>
 
             {/* CONTENUTO FULL SCREEN IMMERSIVO */}
-            <main className="flex-grow-1 w-100 d-flex flex-column" style={{ overflowY: 'auto', overflowX: 'hidden', zIndex: 10 }}>
+            <main className="flex-grow-1 w-100 d-flex flex-column scroll-y-hidden-x z-10">
                 
                 {/* MAIN IMAGE */}
-                <div className="flex-grow-1 w-100 d-flex justify-content-center align-items-center p-3" style={{ minHeight: '250px' }}>
+                <div className="flex-grow-1 w-100 d-flex justify-content-center align-items-center p-3 min-h-250">
                     {currentItem.img_path && (
                         <img
                             src={currentItem.img_path}
                             alt={currentItem.item.replace(/\s*\d{10,}$/, '')}
-                            className="img-fluid position-relative shadow-lg rounded-4"
-                            style={{ maxHeight: '100%', maxWidth: '95%', objectFit: 'contain', cursor: 'zoom-in' }}
+                            className="img-fluid rounded-4 shadow-lg zoom-image-contain"
                             onClick={() => setLightboxImage(currentItem.img_path)}
                         />
                     )}
                 </div>
 
                 {/* BOTTOM TEXT & ACTION CARD */}
-                <div className="w-100 p-2 p-md-4 flex-shrink-0" style={{ zIndex: 20, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+                <div className="w-100 p-2 p-md-4 flex-shrink-0 z-20 pb-safe">
                     <div className="container-lg px-0">
                         <div className="row justify-content-center">
                             <div className="col-12 col-md-10 col-lg-8">
-                                <div className={`card border-0 rounded-4 shadow-lg ${darkMode ? 'bg-dark bg-opacity-75 text-white' : 'bg-white bg-opacity-90 text-dark'}`} style={{ backdropFilter: 'blur(15px)' }}>
+                                <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 ${darkMode ? 'bg-dark bg-opacity-75 text-white' : 'bg-white bg-opacity-90 text-dark'}`}>
                                     <div className="card-body p-3 p-md-4">
                                         <div className="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
-                                            <div style={{minWidth: 0, flex: 1}}>
-                                                <h3 className="fw-black mb-1" style={{ letterSpacing: '-0.5px' }}>{currentItem.item.replace(/\s*\d{10,}$/, '')}</h3>
+                                            <div className="flex-1-min-w-0">
+                                                <h3 className="fw-black mb-1 tracking-tight-sm">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h3>
                                                 {visita.museum_id && <small className="d-block mb-2 opacity-75"><i className="bi bi-geo-alt-fill text-orange me-1"></i>{visita.museum_id.museum}</small>}
                                                 <span className="badge bg-orange text-white rounded-pill px-3 py-2 shadow-sm"><i className="bi bi-person-fill me-1"></i>{currentItem.author}</span>
                                             </div>
@@ -575,7 +574,7 @@ function VisitDetail() {
                                                     <i className="bi bi-dash-lg"></i> Dettagli
                                                 </button>
                                                 
-                                                <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} style={{ width: '36px', height: '36px' }} title="Ascolta descrizione">
+                                                <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-36 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
                                                     <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
                                                 </button>
                                                 
@@ -586,9 +585,9 @@ function VisitDetail() {
                                         </div>
 
                                         {/* SCROLLABLE TESTO */}
-                                        <div className="overflow-auto mt-2 pe-2" style={{ maxHeight: '20vh', scrollbarWidth: 'thin' }}>
+                                        <div className="overflow-auto mt-2 pe-2 max-h-20vh scrollbar-thin">
                                             {currentDescription ? (
-                                                <p className="mb-0 lh-lg" style={{ fontSize: '1rem', fontWeight: '500' }}>
+                                                <p className="mb-0 lh-lg fs-1-fw-500">
                                                     {currentDescription.text}
                                                 </p>
                                             ) : (
@@ -603,22 +602,22 @@ function VisitDetail() {
                                 {/* PREV NEXT BUTTONS FOR TEACHER */}
                                 {(!pin || role === 'teacher') && (
                                     <div className="d-flex justify-content-center align-items-center mt-3 gap-2 gap-md-4">
-                                        <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className={`btn btn-lg rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 ${darkMode ? 'bg-dark bg-opacity-75 border border-secondary text-white' : 'bg-white bg-opacity-90 border text-dark'}`} style={{ backdropFilter: 'blur(10px)' }}>
+                                        <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className={`btn btn-lg rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10 ${darkMode ? 'bg-dark bg-opacity-75 border border-secondary text-white' : 'bg-white bg-opacity-90 border text-dark'}`}>
                                             <i className="bi bi-arrow-left"></i> <span className="d-none d-sm-inline">Precedente</span>
                                         </button>
                                         
-                                        <div className="d-flex flex-wrap justify-content-center gap-1 bg-dark bg-opacity-50 px-3 py-2 rounded-pill shadow-lg" style={{ backdropFilter: 'blur(5px)'}}>
+                                        <div className="d-flex flex-wrap justify-content-center gap-1 bg-dark bg-opacity-50 px-3 py-2 rounded-pill shadow-lg glass-blur-5">
                                             {items.map((_, i) => (
-                                                <button key={i} onClick={() => handleIndexChange(i)} className={`btn p-0 border-0 rounded-circle shadow ${i === currentIndex ? 'bg-orange' : 'bg-secondary'}`} style={{ width: '12px', height: '12px', transition: 'all 0.3s' }}></button>
+                                                <button key={i} onClick={() => handleIndexChange(i)} className={`btn p-0 border-0 rounded-circle shadow indicator-dot-lg transition-all-300 ${i === currentIndex ? 'bg-orange' : 'bg-secondary'}`}></button>
                                             ))}
                                         </div>
                                         
                                         {currentIndex === items.length - 1 ? (
-                                            <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2" style={{ backdropFilter: 'blur(10px)' }}>
+                                            <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
                                                 <span className="d-none d-sm-inline">Termina Visita</span> <i className="bi bi-stop-circle"></i>
                                             </button>
                                         ) : (
-                                            <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2" style={{ backdropFilter: 'blur(10px)' }}>
+                                            <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
                                                 <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-arrow-right"></i>
                                             </button>
                                         )}
@@ -632,17 +631,17 @@ function VisitDetail() {
 
             {/* LIGHTBOX MODAL */}
             {lightboxImage && (
-                <div className="modal-backdrop fade show" style={{ zIndex: 1050, backgroundColor: 'rgba(0,0,0,0.9)' }} onClick={() => setLightboxImage(null)}></div>
+                <div className="modal-backdrop fade show lightbox-backdrop" onClick={() => setLightboxImage(null)}></div>
             )}
             {lightboxImage && (
-                <div className="modal fade show d-block" tabIndex="-1" style={{ zIndex: 1060 }} onClick={() => setLightboxImage(null)}>
+                <div className="modal fade show d-block z-1060" tabIndex="-1" onClick={() => setLightboxImage(null)}>
                     <div className="modal-dialog modal-dialog-centered modal-xl" onClick={e => e.stopPropagation()}>
                         <div className="modal-content bg-transparent border-0">
                             <div className="modal-header border-0 pb-0 justify-content-end">
-                                <button type="button" className="btn-close btn-close-white shadow-none bg-dark rounded-circle p-2" style={{opacity: 0.8}} onClick={() => setLightboxImage(null)}></button>
+                                <button type="button" className="btn-close btn-close-white shadow-none bg-dark rounded-circle p-2 opacity-80" onClick={() => setLightboxImage(null)}></button>
                             </div>
                             <div className="modal-body text-center p-0">
-                                <img src={lightboxImage} alt="Ingrandita" className="img-fluid rounded-4 shadow-lg" style={{maxHeight: '85vh', objectFit: 'contain'}} />
+                                <img src={lightboxImage} alt="Ingrandita" className="img-fluid rounded-4 shadow-lg lightbox-img" />
                             </div>
                         </div>
                     </div>
@@ -657,7 +656,7 @@ function VisitDetail() {
 
             {/* OFFCANVAS CHAT */}
             {pin && (
-                <div className={`offcanvas offcanvas-end ${isChatOpen ? 'show d-flex' : ''} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} style={{ visibility: isChatOpen ? 'visible' : 'hidden', zIndex: 1050 }} tabIndex="-1">
+                <div className={`offcanvas offcanvas-end z-1050 ${isChatOpen ? 'show d-flex visible' : 'invisible'} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} tabIndex="-1">
                     <div className={`offcanvas-header border-bottom ${darkMode ? 'border-secondary' : ''}`}>
                         <h5 className="offcanvas-title fw-bold"><i className="bi bi-chat-dots-fill text-orange me-2"></i> Chat Stanza</h5>
                         <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} onClick={() => setIsChatOpen(false)}></button>
@@ -671,7 +670,7 @@ function VisitDetail() {
                             </select>
                         </div>
                     )}
-                    <div className="offcanvas-body flex-grow-1" style={{ overflowY: 'auto', minHeight: 0, backgroundColor: darkMode ? '#121212' : '#efeae2' }}>
+                    <div className={`offcanvas-body flex-grow-1 chat-body-scroll ${darkMode ? 'bg-chat-dark' : 'bg-chat-light'}`}>
                         {chatMessages.length === 0 && (
                             <div className="d-flex justify-content-center mt-5">
                                 <div className={`px-4 py-2 rounded-pill shadow-sm small ${darkMode ? 'bg-dark text-white' : 'bg-white text-muted'}`}>
@@ -693,13 +692,13 @@ function VisitDetail() {
                             if (isSystem) {
                                 return (
                                     <div key={msg.id} className="mb-3 d-flex flex-column align-items-center">
-                                        <div className={`p-2 px-3 rounded-pill text-center shadow-sm ${darkMode ? 'bg-black bg-opacity-50 text-white-50' : 'bg-white text-muted border'} border-0`} style={{ fontSize: '0.7rem', maxWidth: '90%' }}>
+                                        <div className={`p-2 px-3 rounded-pill text-center shadow-sm fs-07 max-w-90 ${darkMode ? 'bg-black bg-opacity-50 text-white-50' : 'bg-white text-muted border'} border-0`}>
                                             <i className="bi bi-info-circle-fill me-1 text-orange"></i>
                                             {msg.message}
                                             {msg.type === 'system-action' && role === 'teacher' && (
                                                 <div className="d-flex justify-content-center gap-2 mt-2">
-                                                    <button className="btn btn-sm btn-success py-0 px-2 rounded-pill fw-bold shadow-sm" style={{fontSize: '0.7rem'}} onClick={() => respondToJoin(msg.reqId, true)}>Accetta</button>
-                                                    <button className="btn btn-sm btn-outline-danger py-0 px-2 rounded-pill fw-bold shadow-sm" style={{fontSize: '0.7rem'}} onClick={() => respondToJoin(msg.reqId, false)}>Rifiuta</button>
+                                                    <button className="btn btn-sm btn-success py-0 px-2 rounded-pill fw-bold shadow-sm fs-07" onClick={() => respondToJoin(msg.reqId, true)}>Accetta</button>
+                                                    <button className="btn btn-sm btn-outline-danger py-0 px-2 rounded-pill fw-bold shadow-sm fs-07" onClick={() => respondToJoin(msg.reqId, false)}>Rifiuta</button>
                                                 </div>
                                             )}
                                         </div>
@@ -709,11 +708,11 @@ function VisitDetail() {
 
                             return (
                                 <div key={msg.id} className={`mb-2 d-flex flex-column ${isMe ? 'align-items-end' : 'align-items-start'}`}>
-                                    <div className={`p-2 px-3 shadow-sm ${isMe ? 'bg-orange text-white' : (darkMode ? 'bg-dark text-white border border-secondary' : 'bg-white text-dark border-0')}`} style={{ maxWidth: '85%', borderTopRightRadius: isMe ? '0' : '1rem', borderTopLeftRadius: isMe ? '1rem' : '0', borderBottomRightRadius: '1rem', borderBottomLeftRadius: '1rem' }}>
-                                        {!isMe && <small className="fw-bold text-orange d-block mb-1 lh-1" style={{fontSize: '0.75rem'}}>{msg.sender}</small>}
+                                    <div className={`p-2 px-3 shadow-sm chat-bubble ${isMe ? 'bg-orange text-white chat-bubble-me' : (darkMode ? 'bg-dark text-white border border-secondary chat-bubble-other' : 'bg-white text-dark border-0 chat-bubble-other')}`}>
+                                        {!isMe && <small className="fw-bold text-orange d-block mb-1 lh-1 fs-075">{msg.sender}</small>}
                                         <div className="d-flex align-items-end gap-2">
-                                            <p className="mb-0 lh-sm flex-grow-1" style={{ fontSize: '0.95rem', wordBreak: 'break-word' }}>{msg.message}</p>
-                                            <small className={isMe ? 'text-white-50' : 'text-muted'} style={{fontSize: '0.65rem', whiteSpace: 'nowrap'}}>
+                                            <p className="mb-0 lh-sm flex-grow-1 fs-095 break-word">{msg.message}</p>
+                                            <small className={`fs-065 text-nowrap ${isMe ? 'text-white-50' : 'text-muted'}`}>
                                                 {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                             </small>
                                         </div>
@@ -725,16 +724,15 @@ function VisitDetail() {
                     </div>
                     
                     {/* INPUT MESSAGGI - FISSO IN BASSO */}
-                    <div className={`p-2 flex-shrink-0 mt-auto ${darkMode ? 'bg-dark' : 'bg-light'}`} style={{ zIndex: 10 }}>
+                    <div className={`p-2 flex-shrink-0 mt-auto z-10 ${darkMode ? 'bg-dark' : 'bg-light'}`}>
                         <form onSubmit={sendChatMessage} className="d-flex gap-2 align-items-end">
                             <div className={`d-flex align-items-end flex-grow-1 rounded-4 px-3 py-1 shadow-sm ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
                                 <textarea 
-                                    className={`form-control border-0 bg-transparent shadow-none px-0 py-2 ${darkMode ? 'text-white' : ''}`}
+                                    className={`form-control border-0 bg-transparent shadow-none px-0 py-2 chat-input-textarea ${darkMode ? 'text-white' : ''}`}
                                     placeholder="Scrivi un messaggio..." 
                                     value={chatInput} 
                                     onChange={e => setChatInput(e.target.value)}
                                     rows="1"
-                                    style={{resize: 'none', maxHeight: '100px', overflowY: 'auto'}}
                                     onKeyDown={e => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();
@@ -743,7 +741,7 @@ function VisitDetail() {
                                     }}
                                 ></textarea>
                             </div>
-                            <button type="submit" disabled={!chatInput.trim()} className={`btn rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm mb-1 ${chatInput.trim() ? 'bg-orange text-white' : (darkMode ? 'bg-secondary text-white-50' : 'bg-secondary text-white')}`} style={{width: '46px', height: '46px'}}>
+                            <button type="submit" disabled={!chatInput.trim()} className={`btn rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm mb-1 btn-icon-46 ${chatInput.trim() ? 'bg-orange text-white' : (darkMode ? 'bg-secondary text-white-50' : 'bg-secondary text-white')}`}>
                                 <i className="bi bi-send-fill fs-5"></i>
                             </button>
                         </form>
@@ -753,7 +751,7 @@ function VisitDetail() {
             
             {/* Overlay semi-trasparente per Offcanvas senza bootstrap.js */}
             {isChatOpen && (
-                <div className="offcanvas-backdrop fade show" onClick={() => setIsChatOpen(false)} style={{ zIndex: 1040 }}></div>
+                <div className="offcanvas-backdrop fade show z-1040" onClick={() => setIsChatOpen(false)}></div>
             )}
         </div>
     );

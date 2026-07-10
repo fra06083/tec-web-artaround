@@ -405,11 +405,12 @@
 
     <!-- FOOTER -->
     <footer class="py-4 text-center text-md-start transition-theme pb-5 mb-5 pb-lg-4 mb-lg-0"
-        :class="darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-dark'">
+        :class="darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-light border-top'">
         <div class="container-lg">
-            <div class="row align-items-center gy-3 text-white-50 small fw-medium">
+            <div class="row align-items-center gy-3 small fw-medium" :class="darkMode ? 'text-white-50' : 'text-muted'">
                 <div
-                    class="col-12 col-md-6 fw-bold text-white fs-5 d-flex justify-content-center justify-content-md-start align-items-center gap-2">
+                    class="col-12 col-md-6 fw-bold fs-5 d-flex justify-content-center justify-content-md-start align-items-center gap-2"
+                    :class="darkMode ? 'text-white' : 'text-dark'">
                     <i class="bi bi-box-seam text-terracotta"></i> ArtAround
                 </div>
                 <div class="col-12 col-md-6 text-md-end">

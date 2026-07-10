@@ -379,7 +379,7 @@ function VisitList() {
             </footer>
 
             {/* MOBILE NAVIGATION (Bottom Bar) */}
-            <nav className={`mobile-nav d-lg-none transition-theme shadow-lg ${darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-white'}`}>
+            <nav className="mobile-nav d-lg-none transition-theme shadow-lg">
                 <a href="/navigator/" className="mobile-nav-item active">
                     <i className="bi bi-compass"></i>
                     <span>Naviga</span>

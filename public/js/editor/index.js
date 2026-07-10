@@ -52,7 +52,15 @@ function marketplaceApp() {
                 const path = window.location.pathname;
                 document.querySelectorAll('.nav-link-admin, .mobile-nav-item').forEach(link => {
                     const href = link.getAttribute('href');
-                    if (href === path || (path === '/editor/' && href === '/editor/dashboard')) {
+                    if (!href || href.startsWith('#')) return; // ignore offcanvas toggles
+
+                    let isActive = href === path || (path === '/editor/' && href === '/editor/dashboard');
+                    
+                    if (path.startsWith('/editor-marketplace/') && (href === 'index.html' || href === './' || href === '/editor-marketplace/')) {
+                        isActive = true;
+                    }
+
+                    if (isActive) {
                         link.classList.add('active');
                     } else {
                         link.classList.remove('active');

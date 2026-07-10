@@ -63,9 +63,16 @@
 }
 
 .mobile-nav-item.active {
-    color: #fd7e14;
-    background: rgba(253, 126, 20, 0.15);
+    color: #fd7e14 !important;
+    background: rgba(253, 126, 20, 0.15) !important;
     transform: translateY(-2px);
+}
+
+.dark-mode .mobile-nav-item.active,
+.marketplace-dark-mode .mobile-nav-item.active,
+.admin-dark-mode .mobile-nav-item.active,
+[data-bs-theme="dark"] .mobile-nav-item.active {
+    color: #fd7e14 !important;
 }
 
 .mobile-nav-item i {
@@ -90,6 +97,8 @@
 
 .mobile-nav-item:active {
     transform: scale(0.95);
+    color: #fd7e14 !important;
+    background: rgba(253, 126, 20, 0.15) !important;
 }
 
 /* Mobile Header */
