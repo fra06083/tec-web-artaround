@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchVisite, getDarkMode, setDarkMode, getUser, logout } from './api';
 import ProfileModal from './Profile';
 
@@ -13,6 +13,39 @@ function VisitList() {
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [roomPin, setRoomPin] = useState('');
+    const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+    const navigate = useNavigate();
+
+    const showToast = (message, type = 'success') => {
+        setNotification({ show: true, message, type });
+        setTimeout(() => setNotification(prev => ({ ...prev, show: false })), 3000);
+    };
+
+    const handleJoinLiveTour = async () => {
+        if (!roomPin.trim()) {
+            showToast('Inserisci un codice valido', 'error');
+            return;
+        }
+        try {
+            const studentName = user ? user.name : 'Studente Anonimo';
+            const res = await fetch('/api/rooms/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin: roomPin.trim(), studentName })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}`);
+            } else {
+                const data = await res.json();
+                showToast(data.error || 'Stanza non trovata o non disponibile', 'error');
+            }
+        } catch (err) {
+            showToast('Errore di connessione al server', 'error');
+        }
+    };
 
     useEffect(() => {
         // Applica la classe dark-mode al body
@@ -243,18 +276,13 @@ function VisitList() {
                                 type="text" 
                                 className={`form-control form-control-lg border-0 rounded-start-pill ps-4 shadow-none bg-transparent ${darkMode ? 'text-white' : 'text-dark'}`} 
                                 placeholder="Es. XYZ-123" 
-                                style={{ outline: 'none' }}
+                                value={roomPin}
+                                onChange={(e) => setRoomPin(e.target.value)}
                             />
                             <button 
                                 className="btn btn-premium-red rounded-pill px-5 fw-bold shadow-sm d-flex align-items-center" 
                                 style={{ transition: 'all 0.3s' }}
-                                onClick={() => {
-                                    // TODO: Implement the connection logic here.
-                                    // 1. Validate the entered shortcode via backend API.
-                                    // 2. If valid, open a WebSocket or WebRTC connection to the server for real-time state synchronization.
-                                    // 3. Redirect the user to the active live session view (e.g. /live/:code).
-                                    alert('Funzione in arrivo: Connessione in corso...');
-                                }}
+                                onClick={handleJoinLiveTour}
                             >
                                 <i className="bi bi-link-45deg me-1 fs-5"></i> Entra
                             </button>
@@ -400,6 +428,19 @@ function VisitList() {
                 user={user} 
                 onUpdate={(updatedUser) => setUser(updatedUser)} 
             />
+
+            {/* Toast Notification */}
+            <div className={`toast-container toast-fixed ${notification.show ? 'd-block' : 'd-none'}`} style={{ zIndex: 9999 }}>
+                <div className={`custom-toast ${notification.type === 'success' ? 'toast-success' : 'toast-error'}`}>
+                    <div className="toast-icon">
+                        <i className={`bi ${notification.type === 'success' ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'} fs-3`}></i>
+                    </div>
+                    <div className="toast-content">
+                        <span className="toast-title d-block fw-bold">{notification.type === 'success' ? 'Successo' : 'Errore'}</span>
+                        <span className="toast-msg d-block">{notification.message}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

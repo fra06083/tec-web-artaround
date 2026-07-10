@@ -217,87 +217,16 @@ function VisitDetail() {
 
     return (
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
-            {/* NAVBAR */}
-            <header className={`navbar sticky-top py-3 desktop-navbar transition-theme border-0 ${bgNavbar}`}>
-                <div className="container-lg d-flex justify-content-between align-items-center">
-                    <Link to="/" className={`btn btn-sm rounded-pill px-3 d-flex align-items-center gap-1 nav-hover-premium ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`}>
-                        <i className="bi bi-arrow-left"></i> Visite
+            {/* HEADER CON TITOLO OPERA AL POSTO DELLA NAVBAR */}
+            <header className={`sticky-top py-3 border-0 shadow-sm ${bgNavbar}`}>
+                <div className="container-lg d-flex align-items-center justify-content-between px-3">
+                    <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`} style={{ width: '45px', height: '45px' }}>
+                        <i className="bi bi-arrow-left fs-5"></i>
                     </Link>
-                    <a href="/" className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 ms-3 ${brandColor}`}>
-                        <div className="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center d-none d-md-flex">
-                            <i className="bi bi-box-seam fs-6"></i>
-                        </div>
-                        <span style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
-                    </a>
-                    <div className="d-flex align-items-center ms-auto gap-2">
-                        
-                        <div className={`vr d-none d-md-block mx-1 ${darkMode ? 'bg-white opacity-25' : 'bg-dark opacity-25'}`}></div>
-
-                        {/* Dark Mode Toggle */}
-                        <button
-                            className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
-                            onClick={toggleDarkMode}
-                        >
-                            <div className="toggle-track">
-                                <i className={`bi ${darkMode ? 'bi-sun-fill' : 'bi-moon-stars-fill'}`}></i>
-                            </div>
-                        </button>
-
-                        {/* Auth Section */}
-                        {!user ? (
-                            <a href="/login.html?redirect=/navigator/" className="btn bg-slate text-white rounded-pill px-3 btn-sm fw-bold shadow-sm">
-                                Sign in
-                            </a>
-                        ) : (
-                            <div className="position-relative">
-                                <button
-                                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
-                                >
-                                    <div className="user-avatar rounded-circle bg-orange d-flex align-items-center justify-content-center avatar-hover-glow text-white fw-bold shadow-sm overflow-hidden" style={{cursor: 'pointer'}}>
-                                        {user.propic ? (
-                                            <img src={user.propic} alt="Profile" className="w-100 h-100 object-fit-cover" />
-                                        ) : (
-                                            <span>{user.name?.charAt(0).toUpperCase()}</span>
-                                        )}
-                                    </div>
-                                    <i className="bi bi-chevron-down x-small chevron-icon"></i>
-                                </button>
-
-                                {userMenuOpen && (
-                                    <div className="auth-dropdown-menu shadow-lg rounded-4 border-0 py-2 mt-2" style={{right: 0, left: 'auto'}}>
-                                        <div className="dropdown-header-info px-4 py-2 border-bottom">
-                                            <div className="fw-bold user-name-text">{user.name}</div>
-                                            <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
-                                        </div>
-
-                                        <a href="/editor-marketplace/" className="dropdown-link-item">
-                                            <i className="bi bi-shop text-orange"></i>
-                                            <span>Marketplace</span>
-                                        </a>
-
-                                        <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-circle text-orange"></i>
-                                            <span>Profilo</span>
-                                        </a>
-
-                                        {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
-                                            <a href="/editor/dashboard" className="dropdown-link-item">
-                                                <i className="bi bi-grid-1x2 text-orange"></i>
-                                                <span>Dashboard</span>
-                                            </a>
-                                        )}
-
-                                        <div className="dropdown-divider-custom"></div>
-
-                                        <button onClick={handleLogout} className="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">
-                                            Logout
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    <h3 className={`m-0 fw-black text-center text-truncate px-3 ${darkMode ? 'text-white' : 'text-dark'}`} style={{ letterSpacing: '-0.5px' }}>
+                        {currentItem.item}
+                    </h3>
+                    <div style={{ width: '45px', height: '45px' }} className="flex-shrink-0"></div>
                 </div>
             </header>
 
@@ -317,91 +246,103 @@ function VisitDetail() {
 
                     {/* CARD OPERA */}
                     <div className={`card border-0 rounded-4 shadow-sm overflow-hidden ${bgCard}`}>
+                        {/* 1. INFO SOPRA L'IMMAGINE */}
+                        <div className="card-header border-0 bg-transparent p-4 pb-3">
+                            <div className="d-flex flex-wrap gap-3">
+                                <div className="d-flex align-items-center gap-2">
+                                    <i className="bi bi-person-fill text-orange"></i>
+                                    <span className={`fw-medium ${textMuted}`}>{currentItem.author}</span>
+                                </div>
+                                <div className="d-flex align-items-center gap-2">
+                                    <i className="bi bi-file-earmark-text-fill text-orange"></i>
+                                    <span className={`fw-medium ${textMuted}`}>{currentItem.license}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. IMMAGINE PRINCIPALE */}
                         {currentItem.img_path && (
-                            <img
-                                src={currentItem.img_path}
-                                alt={currentItem.item}
-                                className="card-img-top object-fit-cover"
-                                style={{ maxHeight: '350px' }}
-                            />
+                            <div className="px-4 pb-3">
+                                <img
+                                    src={currentItem.img_path}
+                                    alt={currentItem.item}
+                                    className="img-fluid rounded-4 w-100 object-fit-cover shadow-sm"
+                                    style={{ maxHeight: '650px' }}
+                                />
+                            </div>
                         )}
-                        <div className="card-body p-4">
-                            <h2 className={`fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}>{currentItem.item}</h2>
 
-                            <div className="d-flex flex-wrap gap-3 mb-3">
-                                <div className="d-flex align-items-center gap-2">
-                                    <i className="bi bi-person text-red"></i>
-                                    <span className={`small ${textMuted}`}>{currentItem.author}</span>
-                                </div>
-                                <div className="d-flex align-items-center gap-2">
-                                    <i className="bi bi-file-earmark-text text-red"></i>
-                                    <span className={`small ${textMuted}`}>{currentItem.license}</span>
-                                </div>
-                            </div>
-
-                            {/* SELETTORE LIVELLO */}
-                            <div className="mt-2 mb-3 d-flex flex-wrap gap-2 justify-content-center">
-                                {LEVELS.map(type => (
-                                    <button
-                                        key={type}
-                                        onClick={() => setSelectedType(type)}
-                                        className={`btn filter-pill rounded-pill px-4 ${
-                                            selectedType === type ? 'active' : ''
-                                        }`}
-                                    >
-                                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* AREA TESTO DESCRIZIONE */}
-                            <div className={`rounded-4 p-4 mt-3 ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
+                        {/* 3. TESTO DESCRIZIONE */}
+                        <div className="card-body p-4 pt-0">
+                            <div className={`rounded-4 p-4 mb-4 shadow-sm ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
                                 {currentDescription ? (
-                                    <div>
-                                        <p className={`mb-0 small ${textMuted}`}>
-                                            <i className="bi bi-chat-left-text me-2 text-red"></i>
-                                            {currentDescription.text}
-                                        </p>
-                                    </div>
+                                    <p className={`mb-0 fs-5 lh-lg fw-medium ${darkMode ? 'text-light' : 'text-dark'}`}>
+                                        {currentDescription.text}
+                                    </p>
                                 ) : (
-                                    <p className={`${textMuted} mb-0 text-center small`}>
-                                        <i className="bi bi-exclamation-circle me-2 text-red"></i>
-                                        Manca la descrizione per il tipo <strong>{selectedType}</strong>.
+                                    <p className={`${textMuted} mb-0 text-center`}>
+                                        <i className="bi bi-exclamation-circle me-2 text-orange"></i>
+                                        Manca la descrizione per il livello <strong>{selectedType}</strong>.
                                     </p>
                                 )}
                             </div>
 
-                            {/* CONTROLLI VOCALI */}
-                            <div className="d-flex flex-wrap gap-2 justify-content-center mt-3">
-                                {/* Play / Stop */}
-                                <button
-                                    onClick={() => isSpeaking ? stopSpeaking() : speak(currentDescription?.text)}
-                                    disabled={!currentDescription}
-                                    className={`btn rounded-pill px-4 btn-with-icon ${isSpeaking ? 'btn-outline-red' : 'bg-red text-white'}`}
-                                >
-                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-volume-up-fill'}`}></i>
-                                    {isSpeaking ? 'Stop' : 'Ascolta'}
-                                </button>
-
-                                {/* Dimmi di meno */}
-                                <button
-                                    onClick={changeLevelDown}
-                                    disabled={LEVELS.indexOf(selectedType) === 0}
-                                    className="btn btn-outline-secondary rounded-pill px-3 btn-sm btn-with-icon"
-                                >
-                                    <i className="bi bi-dash-circle"></i> Dimmi di meno
-                                </button>
+                            {/* 4. CASELLA DETTAGLI CON BOTTONI */}
+                            <div className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between p-3 rounded-4 shadow-sm ${darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border'}`}>
+                                <div className={`fw-bold fs-5 mb-3 mb-md-0 d-flex align-items-center gap-2 ${darkMode ? 'text-white' : 'text-dark'}`}>
+                                    <div className="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                                        <i className="bi bi-info-lg"></i>
+                                    </div>
+                                    Dettagli
+                                </div>
                                 
-                                {/* Dimmi di più */}
-                                <button
-                                    onClick={changeLevelUp}
-                                    disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1}
-                                    className="btn btn-outline-secondary rounded-pill px-3 btn-sm btn-with-icon"
-                                >
-                                    <i className="bi bi-plus-circle"></i> Dimmi di più
-                                </button>
-                            </div>
+                                <div className="d-flex flex-wrap align-items-center gap-2">
+                                    {/* Più (+) */}
+                                    <button
+                                        onClick={changeLevelUp}
+                                        disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1}
+                                        className="btn btn-success rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                        style={{ width: '45px', height: '45px' }}
+                                        title="Più dettagli"
+                                    >
+                                        <i className="bi bi-plus-lg fs-5"></i>
+                                    </button>
 
+                                    {/* Meno (-) */}
+                                    <button
+                                        onClick={changeLevelDown}
+                                        disabled={LEVELS.indexOf(selectedType) === 0}
+                                        className="btn btn-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                        style={{ width: '45px', height: '45px' }}
+                                        title="Meno dettagli"
+                                    >
+                                        <i className="bi bi-dash-lg fs-5"></i>
+                                    </button>
+
+                                    <div className="vr mx-1 d-none d-md-block opacity-25"></div>
+
+                                    {/* TTS */}
+                                    <button
+                                        onClick={() => isSpeaking ? stopSpeaking() : speak(currentDescription?.text)}
+                                        disabled={!currentDescription}
+                                        className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm ${isSpeaking ? 'btn-warning' : 'btn-info text-white'}`}
+                                        style={{ width: '45px', height: '45px' }}
+                                        title="Ascolta descrizione"
+                                    >
+                                        <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-5`}></i>
+                                    </button>
+
+                                    {/* Mic */}
+                                    <button 
+                                        className="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                                        style={{ width: '45px', height: '45px' }}
+                                        onClick={() => alert("Funzionalità microfono in arrivo per i comandi vocali!")}
+                                        title="Usa comandi vocali"
+                                    >
+                                        <i className="bi bi-mic-fill fs-5"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

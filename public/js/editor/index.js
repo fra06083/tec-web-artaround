@@ -290,6 +290,7 @@ function marketplaceApp() {
                 if (response.ok) {
                     const data = await response.json();
                     this.roomState.pin = data.pin;
+                    this.roomState.visitId = visitId;
                     this.roomState.students = [];
                     this.isVisitSelectionModalOpen = false;
                     this.isLobbyModalOpen = true;
@@ -323,7 +324,7 @@ function marketplaceApp() {
 
                 if (response.ok) {
                     this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
-                    const teacherLink = `/navigator/?role=teacher&pin=${this.roomState.pin}`;
+                    const teacherLink = `/navigator/visit/${this.roomState.visitId}?role=teacher&pin=${this.roomState.pin}`;
                     window.open(teacherLink, '_blank');
                 }
             } catch (error) {

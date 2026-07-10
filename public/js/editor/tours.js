@@ -433,6 +433,7 @@ document.addEventListener('alpine:init', () => {
                 if (response.ok) {
                     const data = await response.json();
                     this.roomState.pin = data.pin;
+                    this.roomState.visitId = visitId;
                     this.roomState.students = [];
                     this.isLobbyModalOpen = true;
 
@@ -467,7 +468,7 @@ document.addEventListener('alpine:init', () => {
                 if (response.ok) {
                     this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
                     // Potremmo aprire in un'altra tab il navigator con il PIN, o generare il link
-                    const teacherLink = `/navigator/?role=teacher&pin=${this.roomState.pin}`;
+                    const teacherLink = `/navigator/visit/${this.roomState.visitId}?role=teacher&pin=${this.roomState.pin}`;
                     window.open(teacherLink, '_blank');
                 }
             } catch (error) {
