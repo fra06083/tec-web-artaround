@@ -11,6 +11,7 @@ document.addEventListener('alpine:init', () => {
         // ROOM STATE
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
+        allowLateJoins: true,
 
         // DATA
         museums: [],
@@ -427,7 +428,7 @@ document.addEventListener('alpine:init', () => {
                 const response = await fetch('/api/rooms/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ visitId, teacherId: this.username }) // o l'ID se presente
+                    body: JSON.stringify({ visitId, teacherId: this.username, allowLateJoins: this.allowLateJoins }) // o l'ID se presente
                 });
 
                 if (response.ok) {

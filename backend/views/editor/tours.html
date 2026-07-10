@@ -472,6 +472,10 @@
 
                         <div x-show="mode === 'edit' && selectedMuseum" class="mb-4">
                             <label class="form-label small fw-bold text-white-50">Visite disponibili</label>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="lateJoinsSwitch" x-model="allowLateJoins">
+                                <label class="form-check-label text-white-50 small" for="lateJoinsSwitch">Consenti l'ingresso agli studenti anche a visita già avviata</label>
+                            </div>
                             <div class="mb-3">
                                 <div class="input-group">
                                     <span class="input-group-text bg-dark border-secondary text-white-50">
@@ -493,11 +497,9 @@
                                             <small class="text-white-50" x-text="(t.items?.length || 0) + ' opere'"></small>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <template x-if="permissions === 'docente'">
-                                                <button @click="createRoom(t._id)" class="btn btn-sm bg-orange text-white rounded-pill shadow-sm" title="Crea Stanza per Navigatore">
-                                                    <i class="bi bi-play-circle-fill me-1"></i> Avvia
-                                                </button>
-                                            </template>
+                                            <button @click="createRoom(t._id)" class="btn btn-sm bg-orange text-white rounded-pill shadow-sm" title="Crea Stanza per Navigatore">
+                                                <i class="bi bi-play-circle-fill me-1"></i> Avvia
+                                            </button>
                                             <button @click="selectedTourId = t._id; goToForm()"
                                                 class="btn btn-sm btn-outline-orange rounded-pill">
                                                 <i class="bi bi-pencil-square"></i>

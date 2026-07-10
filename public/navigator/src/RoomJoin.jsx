@@ -21,12 +21,14 @@ export default function RoomJoin() {
                 body: JSON.stringify({ pin, studentName })
             });
 
+            const data = await res.json();
             if (res.ok) {
-                const data = await res.json();
-                // Se la stanza esiste, andiamo nella lobby
-                navigate(`/lobby?pin=${pin}&visitId=${data.visitId}`);
+                if (data.requiresApproval) {
+                    navigate(`/lobby?pin=${pin}&visitId=${data.visitId}&reqId=${data.reqId}&pending=true`);
+                } else {
+                    navigate(`/lobby?pin=${pin}&visitId=${data.visitId}`);
+                }
             } else {
-                const data = await res.json();
                 setError(data.error || 'Errore durante l\'ingresso nella stanza');
             }
         } catch (err) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, logout } from './api';
 import ProfileModal from './Profile';
@@ -7,9 +7,15 @@ const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 
 function VisitDetail() {
     const { id } = useParams();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const pin = query.get('pin');
+    const role = query.get('role'); // 'teacher' o null/studente
+    const initialIndex = parseInt(query.get('index')) || 0;
+
     const [visita, setVisita] = useState(null);
     const [items, setItems] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(initialIndex);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [darkMode, setDarkModeState] = useState(getDarkMode());
@@ -20,10 +26,26 @@ function VisitDetail() {
     const [selectedType, setSelectedType] = useState('medio');
     const [isSpeaking, setIsSpeaking] = useState(false);
 
-    const location = useLocation();
-    const query = new URLSearchParams(location.search);
-    const pin = query.get('pin');
-    const role = query.get('role'); // 'teacher' o null/studente
+    // Nuovi stati per Chat e Azioni
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatFilter, setChatFilter] = useState('all');
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [chatInput, setChatInput] = useState('');
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [connectedStudents, setConnectedStudents] = useState([]);
+    const [studentActions, setStudentActions] = useState({});
+    const [lightboxImage, setLightboxImage] = useState(null);
+    const messagesEndRef = useRef(null);
+
+    // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
+    useEffect(() => {
+        if (isChatOpen) {
+            setUnreadCount(0);
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+    }, [isChatOpen, chatMessages]);
     
     // Ferma la sintesi vocale
     const stopSpeaking = useCallback(() => {
@@ -54,6 +76,54 @@ function VisitDetail() {
         if (i > 0) setSelectedType(LEVELS[i - 1]);
     };
 
+    const handleStudentAction = async (actionType) => {
+        const studentName = user?.name || localStorage.getItem('studentName');
+        if (!pin || role === 'teacher' || !studentName) return;
+        try {
+            await fetch('/api/rooms/student-action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin, studentName, action: actionType })
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const sendChatMessage = async (e) => {
+        e.preventDefault();
+        if (!chatInput.trim() || !pin) return;
+        
+        const msg = chatInput.trim();
+        setChatInput('');
+        
+        try {
+            const senderName = user?.name || localStorage.getItem('studentName') || 'Studente';
+            await fetch('/api/rooms/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin, sender: senderName, message: msg, type: 'user' })
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const respondToJoin = async (reqId, isAccepted) => {
+        if (!pin) return;
+        try {
+            await fetch(`/api/rooms/${isAccepted ? 'accept-join' : 'reject-join'}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin, reqId })
+            });
+            // Rimuovi la richiesta dalla chat
+            setChatMessages(prev => prev.filter(m => m.reqId !== reqId));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
         // Applica la classe dark-mode al body
         if (darkMode) {
@@ -79,13 +149,27 @@ function VisitDetail() {
         const userData = getUser();
         setUser(userData);
 
-        Promise.all([fetchVisita(id), fetchItemsByVisita(id)])
-            .then(([visitaData, itemsData]) => {
+        const fetchAllData = async () => {
+            try {
+                if (pin) {
+                    const roomRes = await fetch(`/api/rooms/check/${pin}`);
+                    if (!roomRes.ok) throw new Error("Errore durante la verifica della stanza.");
+                    const roomData = await roomRes.json();
+                    if (!roomData.exists) {
+                        throw new Error("Stanza non disponibile o codice errato.");
+                    }
+                }
+                const [visitaData, itemsData] = await Promise.all([fetchVisita(id), fetchItemsByVisita(id)]);
                 setVisita(visitaData);
                 setItems(itemsData);
-            })
-            .catch(err => setError(err.message))
-            .finally(() => setLoading(false));
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchAllData();
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
@@ -104,11 +188,13 @@ function VisitDetail() {
         }
     }, [currentIndex, items]);
 
-    // SSE Effect per gli studenti
+    // SSE Effect per stanza (studenti e docente)
     useEffect(() => {
-        if (pin && role !== 'teacher') {
-            const eventSource = new EventSource(`/api/rooms/events/${pin}`);
-            
+        if (!pin) return;
+        
+        const eventSource = new EventSource(`/api/rooms/events/${pin}`);
+        
+        if (role !== 'teacher') {
             eventSource.addEventListener('artwork-changed', (e) => {
                 const data = JSON.parse(e.data);
                 if (data.artworkIndex !== undefined) {
@@ -117,16 +203,88 @@ function VisitDetail() {
                     stopSpeaking();
                 }
             });
-
-            return () => {
-                eventSource.close();
-            };
         }
+        
+        // Logica comune / Docente
+        eventSource.addEventListener('connected', (e) => {
+            const data = JSON.parse(e.data);
+            setConnectedStudents(data.students || []);
+            if (data.currentArtworkIndex !== undefined) {
+                setCurrentIndex(data.currentArtworkIndex);
+            }
+        });
+
+        eventSource.addEventListener('student-joined', (e) => {
+            const data = JSON.parse(e.data);
+            setConnectedStudents(data.students || []);
+        });
+
+        eventSource.addEventListener('student-action', (e) => {
+            if (role !== 'teacher') return;
+            const data = JSON.parse(e.data);
+            setStudentActions(prev => ({
+                ...prev,
+                [data.studentName]: data.action
+            }));
+
+            // Rimuovi l'icona dopo 5 secondi
+            setTimeout(() => {
+                setStudentActions(prev => {
+                    const next = { ...prev };
+                    if (next[data.studentName] === data.action) {
+                        delete next[data.studentName];
+                    }
+                    return next;
+                });
+            }, 5000);
+        });
+
+        eventSource.addEventListener('join-request', (e) => {
+            if (role === 'teacher') {
+                const data = JSON.parse(e.data);
+                setChatMessages(prev => [...prev, {
+                    id: Date.now(),
+                    type: 'system-action',
+                    reqId: data.reqId,
+                    message: `${data.studentName} ha richiesto di entrare.`,
+                    timestamp: new Date().toISOString()
+                }]);
+                setUnreadCount(prev => prev + 1);
+            }
+        });
+
+        eventSource.addEventListener('chat-message', (e) => {
+            const data = JSON.parse(e.data);
+            if (data.type === 'system' && role !== 'teacher') return;
+            
+            setChatMessages(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: data.type,
+                sender: data.sender,
+                message: data.message,
+                timestamp: data.timestamp
+            }]);
+            setUnreadCount(prev => prev + 1);
+        });
+
+        eventSource.addEventListener('room-ended', (e) => {
+            alert("La visita è stata terminata dall'insegnante.");
+            window.location.href = '/index.html';
+        });
+
+        return () => {
+            eventSource.close();
+        };
     }, [pin, role, stopSpeaking]);
 
     const handleIndexChange = async (newIndex) => {
         if (newIndex < 0 || newIndex >= items.length) return;
         
+        if (pin && role === 'teacher' && Object.keys(studentActions).length > 0) {
+            const proceed = window.confirm("Attenzione: alcuni studenti hanno appena fatto delle richieste. Sei sicuro di voler cambiare opera comunque?");
+            if (!proceed) return;
+        }
+
         setCurrentIndex(newIndex);
         
         if (pin && role === 'teacher') {
@@ -139,6 +297,20 @@ function VisitDetail() {
             } catch (err) {
                 console.error("Errore nel cambio opera remoto:", err);
             }
+        }
+    };
+
+    const handleEndVisit = async () => {
+        if (!window.confirm("Sei sicuro di voler terminare la visita per tutti? La stanza verrà chiusa.")) return;
+        
+        try {
+            await fetch('/api/rooms/end', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin })
+            });
+        } catch (err) {
+            console.error("Errore nella chiusura della stanza:", err);
         }
     };
 
@@ -215,192 +387,374 @@ function VisitDetail() {
 
     const currentItem = items[currentIndex];
 
+    // Avatar Logic
+    const maxVisibleAvatars = 4;
+    const activeRequesters = connectedStudents.filter(s => studentActions[s]);
+    const idleStudents = connectedStudents.filter(s => !studentActions[s]);
+    const sortedStudents = [...activeRequesters, ...idleStudents];
+    
+    let visibleStudents = sortedStudents;
+    let hiddenCount = 0;
+    if (sortedStudents.length > 4) {
+        visibleStudents = sortedStudents.slice(0, 3);
+        hiddenCount = sortedStudents.length - 3;
+    }
+
     return (
-        <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
-            {/* HEADER CON TITOLO OPERA AL POSTO DELLA NAVBAR */}
-            <header className={`sticky-top py-3 border-0 shadow-sm ${bgNavbar}`}>
-                <div className="container-lg d-flex align-items-center justify-content-between px-3">
-                    <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm ${darkMode ? 'btn-outline-light' : 'btn-outline-secondary'}`} style={{ width: '45px', height: '45px' }}>
-                        <i className="bi bi-arrow-left fs-5"></i>
-                    </Link>
-                    <h3 className={`m-0 fw-black text-center text-truncate px-3 ${darkMode ? 'text-white' : 'text-dark'}`} style={{ letterSpacing: '-0.5px' }}>
-                        {currentItem.item}
-                    </h3>
-                    <div style={{ width: '45px', height: '45px' }} className="flex-shrink-0"></div>
+        <div className={`vh-100 d-flex flex-column overflow-hidden position-relative ${darkMode ? 'bg-black text-white' : 'bg-dark text-white'}`}>
+            <style>{`
+                @keyframes slideDownFade {
+                    0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+                    100% { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                .animated-dropdown.show {
+                    animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    transform-origin: top right;
+                }
+            `}</style>
+            
+            {/* BACKGROUND DINAMICO (Prende tutto lo schermo) */}
+            {currentItem.img_path && (
+                <div className="position-absolute w-100 h-100" style={{ backgroundImage: `url(${currentItem.img_path})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(30px) brightness(0.4)', opacity: 0.8, zIndex: 0 }}></div>
+            )}
+            
+            {/* NAVBAR (Semplice, non a pillola intera, icone separate) */}
+            <header className="w-100 px-3 py-3 position-relative" style={{ zIndex: 1030 }}>
+                <div className="d-flex align-items-center justify-content-between">
+                    
+                    {/* SINISTRA: Back + Logo */}
+                    <div className="d-flex align-items-center gap-3">
+                        <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm ${darkMode ? 'bg-dark text-white border border-secondary' : 'bg-light text-dark border'}`} style={{ width: '40px', height: '40px' }} title="Torna alla Home">
+                            <i className="bi bi-arrow-left fs-5"></i>
+                        </Link>
+                        <div className="d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary" style={{ backdropFilter: 'blur(5px)'}}>
+                            <i className="bi bi-box-seam text-orange fs-5"></i>
+                            <span className="fw-black fs-6 text-white" style={{ letterSpacing: '-0.5px' }}>ArtAround</span>
+                        </div>
+                    </div>
+
+                    {/* CENTRO: Titolo dell'opera (nascosto se lo schermo è piccolo) */}
+                    <div className="text-center px-2 d-none d-md-block text-truncate">
+                        <h6 className="m-0 fw-bold text-white shadow-sm px-4 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary text-truncate" style={{ maxWidth: '400px', backdropFilter: 'blur(5px)' }}>
+                            {currentItem.item.replace(/\s*\d{10,}$/, '')}
+                        </h6>
+                    </div>
+
+                    {/* DESTRA: Icone separate */}
+                    <div className="d-flex align-items-center">
+                        {/* AVATAR BAR DOCENTE - PILLOLA UNICA */}
+                        {role === 'teacher' && pin && (
+                            <div className="d-flex align-items-center pe-3 border-end border-secondary border-opacity-50 d-none d-sm-flex me-3">
+                                <div className="dropdown">
+                                    <button 
+                                        className="btn btn-sm px-2 py-1 rounded-pill bg-dark bg-opacity-50 border border-secondary shadow-sm d-flex align-items-center gap-2" 
+                                        data-bs-toggle="dropdown" 
+                                        title="Gestione Studenti"
+                                        type="button"
+                                    >
+                                        <div className="d-flex align-items-center">
+                                            {visibleStudents.map((student, idx) => {
+                                                const action = studentActions[student];
+                                                return (
+                                                    <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
+                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-dark ${action ? 'border-orange' : ''}`} style={{ width: '32px', height: '32px', fontSize: '0.75rem' }}>
+                                                            {student.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        {action && (
+                                                            <span className="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-orange border border-1 border-white shadow-sm" style={{ width: '10px', height: '10px' }}></span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                            {hiddenCount > 0 && (
+                                                <div className="user-avatar rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-secondary" style={{ width: '32px', height: '32px', fontSize: '0.65rem', zIndex: 0, marginLeft: '-12px' }}>
+                                                    +{hiddenCount}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <i className="bi bi-chevron-down text-white-50 ms-1 me-1" style={{ fontSize: '0.7rem' }}></i>
+                                    </button>
+
+                                    {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}
+                                    <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 ${darkMode ? 'dropdown-menu-dark' : ''}`} style={{ minWidth: '260px' }}>
+                                        <li className="px-3 pb-2 mb-2 border-bottom border-secondary border-opacity-25">
+                                            <h6 className="m-0 fw-bold">Stato Studenti ({connectedStudents.length})</h6>
+                                        </li>
+                                        {connectedStudents.length === 0 && (
+                                            <li className="dropdown-item text-muted small disabled">Nessuno studente connesso</li>
+                                        )}
+                                        {connectedStudents.map(student => {
+                                            const action = studentActions[student];
+                                            let icon = ''; let iconColor = ''; let actionText = '';
+                                            if (action === 'plus') { icon = 'bi-plus-circle-fill'; iconColor = 'text-success'; actionText = 'Più dettagli'; }
+                                            else if (action === 'minus') { icon = 'bi-dash-circle-fill'; iconColor = 'text-danger'; actionText = 'Meno dettagli'; }
+                                            else if (action === 'audio') { icon = 'bi-mic-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
+                                            
+                                            return (
+                                                <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1" style={{cursor: 'default'}}>
+                                                    <span className="fw-bold small text-truncate" style={{maxWidth: '120px'}}>{student}</span>
+                                                    {actionText ? (
+                                                        <span className={`badge bg-opacity-10 d-flex align-items-center gap-1 ${iconColor.replace('text-', 'bg-')} ${iconColor}`} style={{fontSize: '0.65rem'}}>
+                                                            <i className={`bi ${icon}`}></i> {actionText}
+                                                        </span>
+                                                    ) : (
+                                                        <small className="text-muted fst-italic" style={{fontSize: '0.65rem'}}>
+                                                            <i className="bi bi-eye"></i> Online
+                                                        </small>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* THEME TOGGLE (Solo Icona) */}
+                        <button 
+                            className="btn btn-sm border-0 shadow-none p-1 d-flex align-items-center justify-content-center"
+                            onClick={() => toggleDarkMode()}
+                            title="Cambia tema"
+                        >
+                            <i className={`bi ${darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'} fs-4`}></i>
+                        </button>
+
+                        {/* CHAT TOGGLE (Solo Icona) */}
+                        {pin && (
+                            <button 
+                                className="btn btn-sm border-0 shadow-none p-1 position-relative d-flex align-items-center justify-content-center"
+                                onClick={() => { setIsChatOpen(true); setUnreadCount(0); }}
+                                title="Chat Stanza"
+                            >
+                                <i className={`bi bi-chat-dots-fill fs-4 ${darkMode ? 'text-info' : 'text-primary'}`}></i>
+                                {unreadCount > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark" style={{ fontSize: '0.65rem' }}>
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
+
+                    </div>
                 </div>
             </header>
 
-            {/* CONTENUTO */}
-            <main className="flex-grow-1">
-                <div className="container-lg py-4">
-                    {/* INFO VISITA */}
-                    <div className="mb-4">
-                        <h4 className="fw-bold mb-1">{visita.name}</h4>
-                        {visita.museum_id && (
-                            <div className={`d-flex align-items-center gap-1 ${textMuted} small`}>
-                                <i className="bi bi-geo-alt-fill text-red"></i>
-                                <span>{visita.museum_id.museum} — {visita.museum_id.province}</span>
-                            </div>
-                        )}
-                    </div>
+            {/* CONTENUTO FULL SCREEN IMMERSIVO */}
+            <main className="flex-grow-1 w-100 d-flex flex-column" style={{ overflowY: 'auto', overflowX: 'hidden', zIndex: 10 }}>
+                
+                {/* MAIN IMAGE */}
+                <div className="flex-grow-1 w-100 d-flex justify-content-center align-items-center p-3" style={{ minHeight: '250px' }}>
+                    {currentItem.img_path && (
+                        <img
+                            src={currentItem.img_path}
+                            alt={currentItem.item.replace(/\s*\d{10,}$/, '')}
+                            className="img-fluid position-relative shadow-lg rounded-4"
+                            style={{ maxHeight: '100%', maxWidth: '95%', objectFit: 'contain', cursor: 'zoom-in' }}
+                            onClick={() => setLightboxImage(currentItem.img_path)}
+                        />
+                    )}
+                </div>
 
-                    {/* CARD OPERA */}
-                    <div className={`card border-0 rounded-4 shadow-sm overflow-hidden ${bgCard}`}>
-                        {/* 1. INFO SOPRA L'IMMAGINE */}
-                        <div className="card-header border-0 bg-transparent p-4 pb-3">
-                            <div className="d-flex flex-wrap gap-3">
-                                <div className="d-flex align-items-center gap-2">
-                                    <i className="bi bi-person-fill text-orange"></i>
-                                    <span className={`fw-medium ${textMuted}`}>{currentItem.author}</span>
+                {/* BOTTOM TEXT & ACTION CARD */}
+                <div className="w-100 p-2 p-md-4 flex-shrink-0" style={{ zIndex: 20, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+                    <div className="container-lg px-0">
+                        <div className="row justify-content-center">
+                            <div className="col-12 col-md-10 col-lg-8">
+                                <div className={`card border-0 rounded-4 shadow-lg ${darkMode ? 'bg-dark bg-opacity-75 text-white' : 'bg-white bg-opacity-90 text-dark'}`} style={{ backdropFilter: 'blur(15px)' }}>
+                                    <div className="card-body p-3 p-md-4">
+                                        <div className="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
+                                            <div style={{minWidth: 0, flex: 1}}>
+                                                <h3 className="fw-black mb-1" style={{ letterSpacing: '-0.5px' }}>{currentItem.item.replace(/\s*\d{10,}$/, '')}</h3>
+                                                {visita.museum_id && <small className="d-block mb-2 opacity-75"><i className="bi bi-geo-alt-fill text-orange me-1"></i>{visita.museum_id.museum}</small>}
+                                                <span className="badge bg-orange text-white rounded-pill px-3 py-2 shadow-sm"><i className="bi bi-person-fill me-1"></i>{currentItem.author}</span>
+                                            </div>
+                                            
+                                            {/* ACTION BUTTONS */}
+                                            <div className={`d-flex flex-wrap flex-shrink-0 align-items-center justify-content-center rounded-pill p-1 shadow-sm mt-2 mt-sm-0 border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
+                                                <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-sm btn-danger rounded-pill d-flex align-items-center gap-2 px-3 fw-bold" title="Meno dettagli">
+                                                    <i className="bi bi-dash-lg"></i> Dettagli
+                                                </button>
+                                                
+                                                <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} style={{ width: '36px', height: '36px' }} title="Ascolta descrizione">
+                                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
+                                                </button>
+                                                
+                                                <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-sm btn-success rounded-pill d-flex align-items-center gap-2 px-3 fw-bold" title="Più dettagli">
+                                                    Dettagli <i className="bi bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* SCROLLABLE TESTO */}
+                                        <div className="overflow-auto mt-2 pe-2" style={{ maxHeight: '20vh', scrollbarWidth: 'thin' }}>
+                                            {currentDescription ? (
+                                                <p className="mb-0 lh-lg" style={{ fontSize: '1rem', fontWeight: '500' }}>
+                                                    {currentDescription.text}
+                                                </p>
+                                            ) : (
+                                                <p className="mb-0 text-center mt-3 text-muted">
+                                                    Manca la descrizione per il livello <strong>{selectedType}</strong>.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2">
-                                    <i className="bi bi-file-earmark-text-fill text-orange"></i>
-                                    <span className={`fw-medium ${textMuted}`}>{currentItem.license}</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* 2. IMMAGINE PRINCIPALE */}
-                        {currentItem.img_path && (
-                            <div className="px-4 pb-3">
-                                <img
-                                    src={currentItem.img_path}
-                                    alt={currentItem.item}
-                                    className="img-fluid rounded-4 w-100 object-fit-cover shadow-sm"
-                                    style={{ maxHeight: '650px' }}
-                                />
-                            </div>
-                        )}
-
-                        {/* 3. TESTO DESCRIZIONE */}
-                        <div className="card-body p-4 pt-0">
-                            <div className={`rounded-4 p-4 mb-4 shadow-sm ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
-                                {currentDescription ? (
-                                    <p className={`mb-0 fs-5 lh-lg fw-medium ${darkMode ? 'text-light' : 'text-dark'}`}>
-                                        {currentDescription.text}
-                                    </p>
-                                ) : (
-                                    <p className={`${textMuted} mb-0 text-center`}>
-                                        <i className="bi bi-exclamation-circle me-2 text-orange"></i>
-                                        Manca la descrizione per il livello <strong>{selectedType}</strong>.
-                                    </p>
+                                {/* PREV NEXT BUTTONS FOR TEACHER */}
+                                {(!pin || role === 'teacher') && (
+                                    <div className="d-flex justify-content-center align-items-center mt-3 gap-2 gap-md-4">
+                                        <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className={`btn btn-lg rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 ${darkMode ? 'bg-dark bg-opacity-75 border border-secondary text-white' : 'bg-white bg-opacity-90 border text-dark'}`} style={{ backdropFilter: 'blur(10px)' }}>
+                                            <i className="bi bi-arrow-left"></i> <span className="d-none d-sm-inline">Precedente</span>
+                                        </button>
+                                        
+                                        <div className="d-flex flex-wrap justify-content-center gap-1 bg-dark bg-opacity-50 px-3 py-2 rounded-pill shadow-lg" style={{ backdropFilter: 'blur(5px)'}}>
+                                            {items.map((_, i) => (
+                                                <button key={i} onClick={() => handleIndexChange(i)} className={`btn p-0 border-0 rounded-circle shadow ${i === currentIndex ? 'bg-orange' : 'bg-secondary'}`} style={{ width: '12px', height: '12px', transition: 'all 0.3s' }}></button>
+                                            ))}
+                                        </div>
+                                        
+                                        {currentIndex === items.length - 1 ? (
+                                            <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2" style={{ backdropFilter: 'blur(10px)' }}>
+                                                <span className="d-none d-sm-inline">Termina Visita</span> <i className="bi bi-stop-circle"></i>
+                                            </button>
+                                        ) : (
+                                            <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2" style={{ backdropFilter: 'blur(10px)' }}>
+                                                <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-arrow-right"></i>
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-
-                            {/* 4. CASELLA DETTAGLI CON BOTTONI */}
-                            <div className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between p-3 rounded-4 shadow-sm ${darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border'}`}>
-                                <div className={`fw-bold fs-5 mb-3 mb-md-0 d-flex align-items-center gap-2 ${darkMode ? 'text-white' : 'text-dark'}`}>
-                                    <div className="bg-orange text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
-                                        <i className="bi bi-info-lg"></i>
-                                    </div>
-                                    Dettagli
-                                </div>
-                                
-                                <div className="d-flex flex-wrap align-items-center gap-2">
-                                    {/* Più (+) */}
-                                    <button
-                                        onClick={changeLevelUp}
-                                        disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1}
-                                        className="btn btn-success rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                                        style={{ width: '45px', height: '45px' }}
-                                        title="Più dettagli"
-                                    >
-                                        <i className="bi bi-plus-lg fs-5"></i>
-                                    </button>
-
-                                    {/* Meno (-) */}
-                                    <button
-                                        onClick={changeLevelDown}
-                                        disabled={LEVELS.indexOf(selectedType) === 0}
-                                        className="btn btn-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                                        style={{ width: '45px', height: '45px' }}
-                                        title="Meno dettagli"
-                                    >
-                                        <i className="bi bi-dash-lg fs-5"></i>
-                                    </button>
-
-                                    <div className="vr mx-1 d-none d-md-block opacity-25"></div>
-
-                                    {/* TTS */}
-                                    <button
-                                        onClick={() => isSpeaking ? stopSpeaking() : speak(currentDescription?.text)}
-                                        disabled={!currentDescription}
-                                        className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm ${isSpeaking ? 'btn-warning' : 'btn-info text-white'}`}
-                                        style={{ width: '45px', height: '45px' }}
-                                        title="Ascolta descrizione"
-                                    >
-                                        <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-5`}></i>
-                                    </button>
-
-                                    {/* Mic */}
-                                    <button 
-                                        className="btn btn-secondary rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
-                                        style={{ width: '45px', height: '45px' }}
-                                        onClick={() => alert("Funzionalità microfono in arrivo per i comandi vocali!")}
-                                        title="Usa comandi vocali"
-                                    >
-                                        <i className="bi bi-mic-fill fs-5"></i>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
-
-                    {/* NAVIGAZIONE */}
-                    {(!pin || role === 'teacher') && (
-                        <div className="d-flex gap-3 justify-content-center mt-4">
-                            <button
-                                onClick={() => handleIndexChange(currentIndex - 1)}
-                                disabled={currentIndex === 0}
-                                className="btn btn-outline-red rounded-pill px-4 btn-with-icon"
-                            >
-                                <i className="bi bi-arrow-left"></i> Precedente
-                            </button>
-                            <button
-                                onClick={() => handleIndexChange(currentIndex + 1)}
-                                disabled={currentIndex === items.length - 1}
-                                className="btn bg-red text-white rounded-pill px-4 btn-with-icon"
-                            >
-                                Prossimo <i className="bi bi-arrow-right"></i>
-                            </button>
-                        </div>
-                    )}
-
-                    {/* PROGRESS DOTS */}
-                    {(!pin || role === 'teacher') && (
-                        <div className="d-flex justify-content-center gap-2 mt-4">
-                            {items.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => handleIndexChange(i)}
-                                    className={`btn p-0 border-0 rounded-circle ${i === currentIndex ? 'bg-red' : 'bg-secondary'}`}
-                                    style={{ width: '10px', height: '10px' }}
-                                ></button>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </main>
 
-            {/* FOOTER */}
-            <footer className={`${bgFooter} py-4 mt-auto`}>
-                <div className="container-lg">
-                    <div className="row align-items-center">
-                        <div className={`col-6 ${footerText} small`}>
-                            &copy; 2026 ArtAround. All rights reserved.
-                        </div>
-                        <div className="col-6 text-end fw-bold">
-                            <i className="bi bi-box-seam text-red me-2"></i> ArtAround
+            {/* LIGHTBOX MODAL */}
+            {lightboxImage && (
+                <div className="modal-backdrop fade show" style={{ zIndex: 1050, backgroundColor: 'rgba(0,0,0,0.9)' }} onClick={() => setLightboxImage(null)}></div>
+            )}
+            {lightboxImage && (
+                <div className="modal fade show d-block" tabIndex="-1" style={{ zIndex: 1060 }} onClick={() => setLightboxImage(null)}>
+                    <div className="modal-dialog modal-dialog-centered modal-xl" onClick={e => e.stopPropagation()}>
+                        <div className="modal-content bg-transparent border-0">
+                            <div className="modal-header border-0 pb-0 justify-content-end">
+                                <button type="button" className="btn-close btn-close-white shadow-none bg-dark rounded-circle p-2" style={{opacity: 0.8}} onClick={() => setLightboxImage(null)}></button>
+                            </div>
+                            <div className="modal-body text-center p-0">
+                                <img src={lightboxImage} alt="Ingrandita" className="img-fluid rounded-4 shadow-lg" style={{maxHeight: '85vh', objectFit: 'contain'}} />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </footer>
+            )}
             <ProfileModal 
                 isOpen={isProfileModalOpen} 
                 onClose={() => setIsProfileModalOpen(false)} 
                 user={user} 
                 onUpdate={(updatedUser) => setUser(updatedUser)} 
             />
+
+            {/* OFFCANVAS CHAT */}
+            {pin && (
+                <div className={`offcanvas offcanvas-end ${isChatOpen ? 'show d-flex' : ''} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} style={{ visibility: isChatOpen ? 'visible' : 'hidden', zIndex: 1050 }} tabIndex="-1">
+                    <div className={`offcanvas-header border-bottom ${darkMode ? 'border-secondary' : ''}`}>
+                        <h5 className="offcanvas-title fw-bold"><i className="bi bi-chat-dots-fill text-orange me-2"></i> Chat Stanza</h5>
+                        <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} onClick={() => setIsChatOpen(false)}></button>
+                    </div>
+                    {role === 'teacher' && (
+                        <div className={`p-2 border-bottom ${darkMode ? 'border-secondary' : ''}`}>
+                            <select className={`form-select form-select-sm ${darkMode ? 'bg-secondary text-white border-secondary' : ''}`} value={chatFilter} onChange={(e) => setChatFilter(e.target.value)}>
+                                <option value="all">Tutti i messaggi</option>
+                                <option value="user">Solo messaggi degli utenti</option>
+                                <option value="system">Solo messaggi di sistema</option>
+                            </select>
+                        </div>
+                    )}
+                    <div className="offcanvas-body flex-grow-1" style={{ overflowY: 'auto', minHeight: 0, backgroundColor: darkMode ? '#121212' : '#efeae2' }}>
+                        {chatMessages.length === 0 && (
+                            <div className="d-flex justify-content-center mt-5">
+                                <div className={`px-4 py-2 rounded-pill shadow-sm small ${darkMode ? 'bg-dark text-white' : 'bg-white text-muted'}`}>
+                                    <i className="bi bi-shield-lock-fill me-2"></i>I messaggi sono crittografati end-to-end.
+                                </div>
+                            </div>
+                        )}
+                        {chatMessages.filter(m => {
+                            if (role !== 'teacher') return true;
+                            if (chatFilter === 'all') return true;
+                            if (chatFilter === 'user') return m.type === 'user';
+                            if (chatFilter === 'system') return m.type !== 'user';
+                            return true;
+                        }).map(msg => {
+                            const currentUserName = user?.name || localStorage.getItem('studentName');
+                            const isMe = msg.type === 'user' && msg.sender === currentUserName;
+                            const isSystem = msg.type === 'system-action' || msg.type === 'system';
+
+                            if (isSystem) {
+                                return (
+                                    <div key={msg.id} className="mb-3 d-flex flex-column align-items-center">
+                                        <div className={`p-2 px-3 rounded-pill text-center shadow-sm ${darkMode ? 'bg-black bg-opacity-50 text-white-50' : 'bg-white text-muted border'} border-0`} style={{ fontSize: '0.7rem', maxWidth: '90%' }}>
+                                            <i className="bi bi-info-circle-fill me-1 text-orange"></i>
+                                            {msg.message}
+                                            {msg.type === 'system-action' && role === 'teacher' && (
+                                                <div className="d-flex justify-content-center gap-2 mt-2">
+                                                    <button className="btn btn-sm btn-success py-0 px-2 rounded-pill fw-bold shadow-sm" style={{fontSize: '0.7rem'}} onClick={() => respondToJoin(msg.reqId, true)}>Accetta</button>
+                                                    <button className="btn btn-sm btn-outline-danger py-0 px-2 rounded-pill fw-bold shadow-sm" style={{fontSize: '0.7rem'}} onClick={() => respondToJoin(msg.reqId, false)}>Rifiuta</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <div key={msg.id} className={`mb-2 d-flex flex-column ${isMe ? 'align-items-end' : 'align-items-start'}`}>
+                                    <div className={`p-2 px-3 shadow-sm ${isMe ? 'bg-orange text-white' : (darkMode ? 'bg-dark text-white border border-secondary' : 'bg-white text-dark border-0')}`} style={{ maxWidth: '85%', borderTopRightRadius: isMe ? '0' : '1rem', borderTopLeftRadius: isMe ? '1rem' : '0', borderBottomRightRadius: '1rem', borderBottomLeftRadius: '1rem' }}>
+                                        {!isMe && <small className="fw-bold text-orange d-block mb-1 lh-1" style={{fontSize: '0.75rem'}}>{msg.sender}</small>}
+                                        <div className="d-flex align-items-end gap-2">
+                                            <p className="mb-0 lh-sm flex-grow-1" style={{ fontSize: '0.95rem', wordBreak: 'break-word' }}>{msg.message}</p>
+                                            <small className={isMe ? 'text-white-50' : 'text-muted'} style={{fontSize: '0.65rem', whiteSpace: 'nowrap'}}>
+                                                {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    
+                    {/* INPUT MESSAGGI - FISSO IN BASSO */}
+                    <div className={`p-2 flex-shrink-0 mt-auto ${darkMode ? 'bg-dark' : 'bg-light'}`} style={{ zIndex: 10 }}>
+                        <form onSubmit={sendChatMessage} className="d-flex gap-2 align-items-end">
+                            <div className={`d-flex align-items-end flex-grow-1 rounded-4 px-3 py-1 shadow-sm ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
+                                <textarea 
+                                    className={`form-control border-0 bg-transparent shadow-none px-0 py-2 ${darkMode ? 'text-white' : ''}`}
+                                    placeholder="Scrivi un messaggio..." 
+                                    value={chatInput} 
+                                    onChange={e => setChatInput(e.target.value)}
+                                    rows="1"
+                                    style={{resize: 'none', maxHeight: '100px', overflowY: 'auto'}}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            if (chatInput.trim()) sendChatMessage(e);
+                                        }
+                                    }}
+                                ></textarea>
+                            </div>
+                            <button type="submit" disabled={!chatInput.trim()} className={`btn rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm mb-1 ${chatInput.trim() ? 'bg-orange text-white' : (darkMode ? 'bg-secondary text-white-50' : 'bg-secondary text-white')}`} style={{width: '46px', height: '46px'}}>
+                                <i className="bi bi-send-fill fs-5"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+            
+            {/* Overlay semi-trasparente per Offcanvas senza bootstrap.js */}
+            {isChatOpen && (
+                <div className="offcanvas-backdrop fade show" onClick={() => setIsChatOpen(false)} style={{ zIndex: 1040 }}></div>
+            )}
         </div>
     );
 }

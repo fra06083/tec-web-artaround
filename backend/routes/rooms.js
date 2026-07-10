@@ -35,7 +35,10 @@ router.post('/create', (req, res) => {
         teacherId: teacherId || null,
         currentArtworkIndex: 0,
         clients: [], // conterranno gli oggetti response per SSE
-        students: [] // contiene i nomi degli studenti per mostrarli nella lobby
+        students: [], // contiene i nomi degli studenti per mostrarli nella lobby
+        isStarted: false,
+        allowLateJoins: req.body.allowLateJoins !== false, // default true
+        pendingRequests: new Map() // reqId -> studentName
     });
 
     console.log(`Stanza creata: ${pin} per visita ${visitId}`);
@@ -52,14 +55,37 @@ router.post('/join', (req, res) => {
 
     const room = activeRooms.get(pin);
     
+    if (room.isStarted) {
+        if (!room.allowLateJoins) {
+            return res.status(403).json({ error: "La visita è già iniziata e non sono ammessi nuovi ingressi." });
+        }
+        
+        const reqId = crypto.randomUUID();
+        room.pendingRequests.set(reqId, studentName);
+        
+        broadcastToRoom(pin, 'join-request', { reqId, studentName });
+        
+        return res.json({ requiresApproval: true, reqId, visitId: room.visitId });
+    }
+
     // Aggiungi nome studente alla lista
     if (studentName && !room.students.includes(studentName)) {
         room.students.push(studentName);
         // Avvisa la lobby (docente)
         broadcastToRoom(pin, 'student-joined', { students: room.students });
+        broadcastToRoom(pin, 'chat-message', { sender: 'Sistema', message: `${studentName} si è unito alla stanza.`, type: 'system', timestamp: new Date().toISOString() });
     }
 
     res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex });
+});
+
+// Verifica esistenza stanza
+router.get('/check/:pin', (req, res) => {
+    if (activeRooms.has(req.params.pin)) {
+        res.json({ exists: true });
+    } else {
+        res.json({ exists: false });
+    }
 });
 
 // Connessione SSE per ascoltare gli eventi della stanza
@@ -119,7 +145,84 @@ router.post('/start', (req, res) => {
         return res.status(404).json({ error: "Stanza non trovata" });
     }
 
+    const room = activeRooms.get(pin);
+    room.isStarted = true;
+
     broadcastToRoom(pin, 'visit-started', { message: "La visita è iniziata" });
+    broadcastToRoom(pin, 'chat-message', { sender: 'Sistema', message: `La visita è iniziata.`, type: 'system', timestamp: new Date().toISOString() });
+    res.json({ success: true });
+});
+
+// Accetta richiesta di join
+router.post('/accept-join', (req, res) => {
+    const { pin, reqId } = req.body;
+    const room = activeRooms.get(pin);
+    
+    if (!room || !room.pendingRequests.has(reqId)) {
+        return res.status(404).json({ error: "Richiesta non trovata" });
+    }
+    
+    const studentName = room.pendingRequests.get(reqId);
+    room.pendingRequests.delete(reqId);
+    
+    if (!room.students.includes(studentName)) {
+        room.students.push(studentName);
+    }
+    
+    broadcastToRoom(pin, 'join-accepted', { reqId, studentName, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex });
+    res.json({ success: true });
+});
+
+// Rifiuta richiesta di join
+router.post('/reject-join', (req, res) => {
+    const { pin, reqId } = req.body;
+    const room = activeRooms.get(pin);
+    
+    if (!room || !room.pendingRequests.has(reqId)) {
+        return res.status(404).json({ error: "Richiesta non trovata" });
+    }
+    
+    room.pendingRequests.delete(reqId);
+    
+    broadcastToRoom(pin, 'join-rejected', { reqId });
+    res.json({ success: true });
+});
+
+// Invia messaggio in chat
+router.post('/chat', (req, res) => {
+    const { pin, sender, message, type } = req.body;
+    
+    if (!activeRooms.has(pin)) {
+        return res.status(404).json({ error: "Stanza non trovata" });
+    }
+    
+    broadcastToRoom(pin, 'chat-message', { sender, message, type: type || 'user', timestamp: new Date().toISOString() });
+    res.json({ success: true });
+});
+
+// Notifica azione studente (+, -, audio)
+router.post('/student-action', (req, res) => {
+    const { pin, studentName, action } = req.body;
+    if (!activeRooms.has(pin)) {
+        return res.status(404).json({ error: "Stanza non trovata" });
+    }
+    broadcastToRoom(pin, 'student-action', { studentName, action });
+    res.json({ success: true });
+});
+
+// Termina la visita e chiude la stanza
+router.post('/end', (req, res) => {
+    const { pin } = req.body;
+    if (!activeRooms.has(pin)) {
+        return res.status(404).json({ error: "Stanza non trovata" });
+    }
+    
+    // Avvisa tutti i client che la stanza è chiusa
+    broadcastToRoom(pin, 'room-ended', { message: "La visita è terminata." });
+    
+    // Elimina la stanza dalla memoria
+    activeRooms.delete(pin);
+    
     res.json({ success: true });
 });
 

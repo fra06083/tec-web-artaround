@@ -37,7 +37,11 @@ function VisitList() {
 
             if (res.ok) {
                 const data = await res.json();
-                navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}`);
+                if (data.requiresApproval) {
+                    navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}&reqId=${data.reqId}&pending=true`);
+                } else {
+                    navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}`);
+                }
             } else {
                 const data = await res.json();
                 showToast(data.error || 'Stanza non trovata o non disponibile', 'error');
