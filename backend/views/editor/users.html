@@ -23,7 +23,7 @@
     <script src="/js/editor/users.js"></script>
 </head>
 
-<body class="min-h-400 max-h-400 text-xxs ls-1 ls-1 cursor-pointer ls-minus-1 avatar-sm bg-dark text-white font-sans" data-bs-theme="dark" x-data="usersManager()" x-cloak>
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="usersManager()" x-cloak>
 
     <div x-show="!isReady">
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
@@ -90,10 +90,10 @@
             <!-- Mobile Header -->
             <header class="mobile-header">
                 <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
+                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
                         <i class="bi bi-gear-fill fs-5"></i>
                     </div>
-                    <span class="fw-bold text-white fs-4 m-0">ArtAround</span>
+                    <span style="letter-spacing: -0.5px;" class="fw-bold text-white fs-4 m-0">ArtAround</span>
                 </a>
             </header>
 
@@ -102,18 +102,18 @@
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow">
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow" style="cursor: pointer;">
                             <i class="bi bi-person-fill text-white fs-5"></i>
                         </div>
                         <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold">Bentornato</p>
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">Bentornato</p>
                             <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
                     </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <div class="text-end me-2">
-                            <span class="d-block text-white-50 text-uppercase fw-bold">Ruolo</span>
+                            <span class="d-block text-white-50 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Ruolo</span>
                             <span class="text-orange fw-bold" x-text="permissions"></span>
                         </div>
                     </div>
@@ -155,7 +155,7 @@
                                 </span>
                             </div>
 
-                            <div class="list-group list-group-flush bg-transparent overflow-auto">
+                            <div class="list-group list-group-flush bg-transparent overflow-auto" style="max-height: 400px;">
                                 <template x-for="user in users" :key="user._id">
                                     <button @click="selectUser(user._id)"
                                             class="list-group-item list-group-item-action bg-transparent text-white border-secondary border-opacity-25 py-3 px-2 d-flex justify-content-between align-items-center"
@@ -175,7 +175,7 @@
                     <div class="col-md-8">
 
                         <template x-if="!selectedUser">
-                            <div class="h-100 d-flex flex-column align-items-center justify-content-center text-white-50 opacity-50 border border-secondary border-dashed rounded-4 p-5">
+                            <div class="h-100 d-flex flex-column align-items-center justify-content-center text-white-50 opacity-50 border border-secondary border-dashed rounded-4 p-5" style="min-height: 400px;">
                                 <i class="bi bi-person-gear display-1 mb-3"></i>
                                 <h4 class="fw-bold">Pannello di Controllo</h4>
                                 <p>Seleziona un utente dalla lista a sinistra per gestirne i musei assegnati.</p>

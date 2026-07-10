@@ -24,7 +24,7 @@
 
 </head>
 
-<body class="ls-5 modal-backdrop-dark max-w-800 max-w-500 min-vh-50 max-w-250 scale-4-origin border-2 z-1 op-90 bg-white-20 bg-primary-subtle bg-orange-subtle z-1 ls-1 cursor-pointer ls-minus-1 avatar-sm bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
 
     <div x-show="!isReady">
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
@@ -93,10 +93,10 @@
                 <a href="/editor-marketplace/index.html"
                     class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
                     <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center"
-                       >
+                        style="width: 38px; height: 38px;">
                         <i class="bi bi-gear-fill fs-5"></i>
                     </div>
-                    <span class="fw-bold text-white fs-4 m-0">ArtAround</span>
+                    <span style="letter-spacing: -0.5px;" class="fw-bold text-white fs-4 m-0">ArtAround</span>
                 </a>
             </header>
 
@@ -106,11 +106,11 @@
                 <div class="container-fluid">
                     <div class="d-flex align-items-center gap-3">
                         <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow"
-                           >
+                            style="cursor: pointer;">
                             <i class="bi bi-person-fill text-white fs-5"></i>
                         </div>
                         <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold">
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">
                                 Bentornato</p>
                             <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
@@ -143,7 +143,7 @@
                                 <div
                                     class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
-                                       >
+                                        style="z-index: 1;">
                                         <div>
                                             <p class="text-white-50 small fw-bold text-uppercase mb-1">Tour Pubblicati
                                             </p>
@@ -151,12 +151,12 @@
                                                 x-text="stats.publishedTours">0</h2>
                                         </div>
                                         <div class="p-3 rounded-4 glass-search-wrapper"
-                                           >
+                                            style="background-color: rgba(253, 126, 20, 0.1);">
                                             <i class="bi bi-map-fill text-orange fs-3"></i>
                                         </div>
                                     </div>
                                     <div class="text-success small fw-medium mt-2 position-relative"
-                                       ><i class="bi bi-arrow-up me-1"></i>Live dal DB</div>
+                                        style="z-index: 1;"><i class="bi bi-arrow-up me-1"></i>Live dal DB</div>
                                 </div>
                             </div>
 
@@ -164,19 +164,19 @@
                                 <div
                                     class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
-                                       >
+                                        style="z-index: 1;">
                                         <div>
                                             <p class="text-white-50 small fw-bold text-uppercase mb-1">Utenti Totali</p>
                                             <h2 class="fw-black mb-0 text-white display-6" x-text="stats.activeUsers">0
                                             </h2>
                                         </div>
                                         <div class="p-3 rounded-4 glass-search-wrapper"
-                                           >
+                                            style="background-color: rgba(13, 110, 253, 0.1);">
                                             <i class="bi bi-people-fill text-primary fs-3"></i>
                                         </div>
                                     </div>
                                     <div class="text-white-50 small fw-medium mt-2 position-relative"
-                                       >Account creati nel sistema</div>
+                                        style="z-index: 1;">Account creati nel sistema</div>
                                 </div>
                             </div>
 
@@ -184,19 +184,19 @@
                                 <div
                                     class="card bg-gradient-orange border-0 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative"
-                                       >
+                                        style="z-index: 1;">
                                         <div>
                                             <p class="text-white-75 small fw-bold text-uppercase mb-1">Stato Server</p>
                                             <h2 class="fw-black mb-0 text-white display-6" x-text="stats.serverStatus">
                                                 Offline</h2>
                                         </div>
                                         <div class="p-3 rounded-4 glass-search-wrapper"
-                                           >
+                                            style="background-color: rgba(255, 255, 255, 0.2);">
                                             <i class="bi bi-hdd-network-fill text-white fs-3"></i>
                                         </div>
                                     </div>
                                     <div class="text-white small fw-medium mt-2 position-relative"
-                                       ><i
+                                        style="z-index: 1; opacity: 0.9;"><i
                                             class="bi bi-check-circle-fill me-1"></i>Sistema operativo</div>
                                 </div>
                             </div>
@@ -260,7 +260,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm h-100 border border-orange border-opacity-25"
-                                   >
+                                    style="border-width: 2px !important;">
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="bg-orange bg-opacity-10 p-3 rounded-circle text-orange me-3">
                                             <i class="bi bi-bank fs-3"></i>
@@ -302,7 +302,7 @@
                 <div class="d-flex flex-column h-100">
                     <div class="d-flex align-items-center mb-4">
                         <div>
-                            <h3 class="fw-black text-white m-0">Spazio Creativo</h3>
+                            <h3 class="fw-black text-white m-0" style="letter-spacing: -0.5px;">Spazio Creativo</h3>
                             <p class="text-white-50 m-0 mt-1">Bentornato nel tuo hub di amministrazione museale.</p>
                         </div>
                         <div class="ms-auto d-none d-sm-block">
@@ -319,7 +319,7 @@
                                 <div
                                     class="card bg-gradient-dark-blue border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
                                     <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
-                                       >
+                                        style="transform: translate(-50%, -50%) scale(4);">
                                         <i class="bi bi-bank"></i>
                                     </div>
                                     <div
@@ -328,7 +328,7 @@
                                     </div>
                                     <h4 class="fw-bold text-white m-0 position-relative z-1">Gestione Musei</h4>
                                     <p class="text-white-50 mt-2 mb-0 small position-relative z-1"
-                                       >Gestisci i musei, inserisci nuove opere e organizza le
+                                        style="max-width: 250px;">Gestisci i musei, inserisci nuove opere e organizza le
                                         tue collezioni artistiche.</p>
                                 </div>
                             </a>
@@ -338,7 +338,7 @@
                                 <div
                                     class="card bg-gradient-orange border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
                                     <div class="position-absolute opacity-10 top-50 start-50 translate-middle"
-                                       >
+                                        style="transform: translate(-50%, -50%) scale(4);">
                                         <i class="bi bi-pencil-square"></i>
                                     </div>
                                     <div
@@ -347,7 +347,7 @@
                                     </div>
                                     <h4 class="fw-bold text-white m-0 position-relative z-1">Le Mie Visite</h4>
                                     <p class="text-white-75 mt-2 mb-0 small position-relative z-1"
-                                       >Crea nuovi tour guidati interattivi o modifica i tuoi
+                                        style="max-width: 250px;">Crea nuovi tour guidati interattivi o modifica i tuoi
                                         percorsi esistenti.</p>
                                 </div>
                             </a>
@@ -359,17 +359,17 @@
             <!-- DOCENTE DASHBOARD -->
             <template x-if="permissions === 'docente'">
                 <div class="d-flex flex-column align-items-center justify-content-center h-100"
-                   >
+                    style="min-height: 50vh;">
                     <h2 class="fw-black mb-2 text-center">Ciao <span class="text-orange" x-text="username"></span>, cosa
                         vuoi fare oggi?</h2>
-                    <p class="text-white-50 text-center mb-5">Sei nella tua area protetta. Usa
+                    <p class="text-white-50 text-center mb-5" style="max-width: 500px;">Sei nella tua area protetta. Usa
                         gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la tua
                         classe.</p>
 
-                    <div class="row g-4 w-100">
+                    <div class="row g-4 w-100" style="max-width: 800px;">
                         <div class="col-md-6">
                             <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm"
-                               
+                                style="cursor: pointer;"
                                 @click="openVisitSelection()">
                                 <div
                                     class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
@@ -442,7 +442,7 @@
     </nav>
 
     <!-- Modale Selezione Visita -->
-    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isVisitSelectionModalOpen }" x-show="isVisitSelectionModalOpen" x-transition>
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isVisitSelectionModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isVisitSelectionModalOpen" x-transition>
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 shadow-lg bg-dark text-white">
                 <div class="modal-header border-0 pb-0">
@@ -475,7 +475,7 @@
     </div>
 
     <!-- Modale Lobby -->
-    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" x-show="isLobbyModalOpen" x-transition>
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isLobbyModalOpen" x-transition>
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 shadow-lg text-center bg-dark text-white">
                 <div class="modal-header border-0 pb-0">
@@ -484,7 +484,7 @@
                 <div class="modal-body py-5">
                     <h3 class="fw-bold mb-4">La tua Stanza è Pronta!</h3>
                     <p class="lead mb-4 text-white-50">Comunica questo PIN agli studenti per farli unire:</p>
-                    <div class="display-1 fw-black text-orange mb-5" x-text="roomState.pin"></div>
+                    <div class="display-1 fw-black text-orange mb-5" style="letter-spacing: 5px;" x-text="roomState.pin"></div>
                     
                     <h5 class="fw-bold mb-3">Studenti Connessi (<span x-text="roomState.students.length"></span>)</h5>
                     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">

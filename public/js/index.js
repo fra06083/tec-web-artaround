@@ -1,7 +1,3 @@
-if (localStorage.getItem('artaround_darkmode') === 'true') {
-    document.documentElement.classList.add('dark-mode');
-}
-
 function homeApp() {
     const token = localStorage.getItem('artaround_token');
     const savedUserStr = localStorage.getItem('artaround_user');

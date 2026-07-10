@@ -330,7 +330,7 @@
     </style>
 </head>
 
-<body class="z-1100 thumb-120 min-w-0 thumb-48 avatar-sm ls-5 modal-backdrop-dark text-xxs ls-1 ls-1 cursor-pointer ls-minus-1 avatar-sm bg-dark text-white font-sans" data-bs-theme="dark" x-data="toursManager()" x-cloak>
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="toursManager()" x-cloak>
 
     <div x-show="!isReady">
         <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
@@ -390,10 +390,10 @@
             <!-- Mobile Header -->
             <header class="mobile-header">
                 <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center">
+                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
                         <i class="bi bi-gear-fill fs-5"></i>
                     </div>
-                    <span class="fw-bold text-white fs-4 m-0">ArtAround</span>
+                    <span style="letter-spacing: -0.5px;" class="fw-bold text-white fs-4 m-0">ArtAround</span>
                 </a>
             </header>
 
@@ -402,18 +402,18 @@
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow">
+                        <div class="user-avatar bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow" style="cursor: pointer;">
                             <i class="bi bi-person-fill text-white fs-5"></i>
                         </div>
                         <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold">Bentornato</p>
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold" style="letter-spacing: 1px;">Bentornato</p>
                             <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
                     </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <div class="text-end me-2">
-                            <span class="d-block text-white-50 text-uppercase fw-bold">Ruolo</span>
+                            <span class="d-block text-white-50 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 1px;">Ruolo</span>
                             <span class="text-orange fw-bold" x-text="permissions"></span>
                         </div>
                     </div>
@@ -587,10 +587,10 @@
                             <div x-show="selectedArtworks.length > 0" class="artworks-list">
                                 <template x-for="(artwork, index) in selectedArtworks" :key="artwork._id">
                                     <div class="artwork-item d-flex align-items-center gap-2 gap-sm-3 p-3 mb-2 rounded-4 shadow-sm bg-dark bg-opacity-50 border border-secondary border-opacity-25 transition-all">
-                                        <div class="artwork-number flex-shrink-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" x-text="index + 1"></div>
+                                        <div class="artwork-number flex-shrink-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" x-text="index + 1" style="width: 28px; height: 28px;"></div>
                                         <img :src="artwork.img_path" :alt="artwork.item"
-                                            class="artwork-thumbnail rounded-3 flex-shrink-0 shadow-sm">
-                                        <div class="flex-grow-1">
+                                            class="artwork-thumbnail rounded-3 flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+                                        <div class="flex-grow-1" style="min-width: 0;">
                                             <h6 class="fw-bold m-0 text-truncate text-white" x-text="artwork.item"></h6>
                                             <small class="text-white-50 text-truncate d-block" x-text="artwork.author"></small>
                                         </div>
@@ -647,7 +647,7 @@
                                     <div class="artwork-card p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
                                         <img :src="artwork.img_path" :alt="artwork.item"
                                             class="artwork-image rounded-2 mb-2 w-100"
-                                           >
+                                            style="height: 120px; object-fit: cover;">
                                         <h6 class="fw-bold m-0 text-truncate" x-text="artwork.item"></h6>
                                         <small class="text-white-50 text-truncate d-block" x-text="artwork.author"></small>
                                         <button @click="addArtworkToTour(artwork)"
@@ -673,7 +673,7 @@
         x-transition:leave="transform ease-in duration-200 transition"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="translate-y-full opacity-0"
-        class="position-fixed bottom-0 end-0 p-3">
+        class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
         <div class="toast show align-items-center border-0"
             :class="notification.type === 'success' ? 'bg-success' : 'bg-danger'">
             <div class="d-flex">
@@ -684,7 +684,7 @@
     </div>
 
     <!-- Modale Lobby -->
-    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" x-show="isLobbyModalOpen" x-transition>
+    <div class="modal fade" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" style="background: rgba(0,0,0,0.8);" x-show="isLobbyModalOpen" x-transition>
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 shadow-lg text-center bg-dark text-white">
                 <div class="modal-header border-0 pb-0">
@@ -693,7 +693,7 @@
                 <div class="modal-body py-5">
                     <h3 class="fw-bold mb-4">La tua Stanza è Pronta!</h3>
                     <p class="lead mb-4 text-white-50">Comunica questo PIN agli studenti per farli unire:</p>
-                    <div class="display-1 fw-black text-orange mb-5" x-text="roomState.pin"></div>
+                    <div class="display-1 fw-black text-orange mb-5" style="letter-spacing: 5px;" x-text="roomState.pin"></div>
                     
                     <h5 class="fw-bold mb-3">Studenti Connessi (<span x-text="roomState.students.length"></span>)</h5>
                     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
