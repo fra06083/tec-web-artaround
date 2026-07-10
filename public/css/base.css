@@ -390,7 +390,11 @@
 .anim-delay-400 { animation-delay: 0.4s; }
 .op-90 { opacity: 0.9; }
 .trans-base { transition: all 0.3s ease; }
-.max-w-550 { max-width: 550px; }
+.max-w-600 { max-width: 600px; }
+.min-w-220 { min-width: 220px; }
+.z-master { z-index: 1030; }
+.text-xs { font-size: 0.8rem; }
+.avatar-xl { width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2); }
 
 /* Profile Modal Utilities */
 .profile-modal-backdrop {
@@ -418,3 +422,22 @@ body.dark-mode .form-control:focus {
 body.dark-mode .form-control::placeholder {
     color: #adb5bd;
 }
+
+/* Auto-generated utility classes */
+.avatar-sm { width: 38px; height: 38px; }
+.cursor-pointer { cursor: pointer; }
+.ls-1 { letter-spacing: 1px; }
+.ls-5 { letter-spacing: 5px; }
+.text-xxs { font-size: 0.65rem; }
+.max-h-400 { max-height: 400px; }
+.min-h-400 { min-height: 400px; }
+.bg-white-20 { background-color: rgba(255, 255, 255, 0.2); }
+.max-w-250 { max-width: 250px; }
+.max-w-500 { max-width: 500px; }
+.max-w-800 { max-width: 800px; }
+.modal-backdrop-dark { background: rgba(0,0,0,0.8); }
+.thumb-48 { width: 48px; height: 48px; object-fit: cover; }
+.thumb-120 { height: 120px; object-fit: cover; }
+.min-w-0 { min-width: 0; }
+.z-1100 { z-index: 1100; }
+.scale-4-origin { transform: translate(-50%, -50%) scale(4); }
