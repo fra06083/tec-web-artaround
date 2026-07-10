@@ -41,7 +41,7 @@ export default function RoomJoin() {
             <h1 className="fw-black mb-4">Unisciti a una Visita Guidata</h1>
             <p className="lead mb-5">Inserisci il PIN fornito dal tuo docente.</p>
             
-            <form onSubmit={handleJoin} className="d-inline-block w-100 mx-auto" style={{ maxWidth: '400px' }}>
+            <form onSubmit={handleJoin} className="d-inline-block w-100 mx-auto max-w-400">
                 <div className="mb-4">
                     <input 
                         type="text" 

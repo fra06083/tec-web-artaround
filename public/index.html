@@ -30,7 +30,7 @@
     :class="darkMode ? 'marketplace-dark-mode' : 'marketplace-light'">
 
     <!-- NAVBAR -->
-    <nav class="navbar fixed-top w-100 py-3 shadow-sm desktop-navbar transition-theme border-0" style="z-index: 1030;"
+    <nav class="navbar fixed-top w-100 py-3 shadow-sm desktop-navbar transition-theme border-0"
         :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'">
         <div class="container-lg d-flex flex-wrap align-items-center justify-content-between">
 
@@ -87,8 +87,7 @@
                         <!-- Trigger: Avatar -->
                         <button @click="open = !open" @click.outside="open = false"
                             class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
-                            <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
-                                :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'">
+                            <div class="user-avatar rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden">
                                 <template x-if="propic">
                                     <img :src="propic" alt="Profile" class="w-100 h-100 object-fit-cover">
                                 </template>
@@ -106,7 +105,7 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 text-start"
-                            style="min-width: 220px;" :class="darkMode ? 'bg-dark' : 'bg-white'">
+                            :class="darkMode ? 'bg-dark' : 'bg-white'">
                             <div class="dropdown-header-info px-4 py-2 border-bottom"
                                 :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
                                 <div class="fw-bold user-name-text" :class="darkMode ? 'text-white' : 'text-dark'"
@@ -150,7 +149,7 @@
                             class="display-4 display-md-2 fw-black text-terracotta position-relative d-inline-block brush-underline">le
                             tue regole.</span>
                     </h1>
-                    <p class="lead mb-5 fw-medium mx-auto" style="max-width: 600px;"
+                    <p class="lead mb-5 fw-medium mx-auto hero-lead"
                         :class="darkMode ? 'text-white-50' : 'text-darkgrey'">
                         Scopri un nuovo modo per vivere l'arte.<br> ArtAround adatta dinamicamente il linguaggio, il
                         livello di approfondimento e il ritmo di ogni audioguida. Vivi la cultura senza compromessi.
@@ -439,8 +438,8 @@
         </template>
         <template x-if="isLoggedIn">
             <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" class="mobile-nav-item" @click.prevent="">
-                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold"
-                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="font-size: 0.8rem;">
+                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 fs-6"
+                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'">
                     <span x-text="username.charAt(0).toUpperCase()"></span>
                 </div>
                 <span>Profilo</span>
@@ -459,9 +458,8 @@
                     data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 <template x-if="isLoggedIn">
                     <div class="mt-3">
-                        <div class="user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3"
-                            :class="darkMode ? 'text-dark' : 'text-orange'"
-                            style="width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2);">
+                        <div class="user-avatar auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3"
+                            :class="darkMode ? 'text-dark' : 'text-orange'">
                             <span x-text="username.charAt(0).toUpperCase()"></span>
                         </div>
                         <h4 class="fw-bold mb-1 text-white" x-text="username"></h4>

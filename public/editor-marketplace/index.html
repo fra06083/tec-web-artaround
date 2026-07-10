@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/base.css" />
     <link rel="stylesheet" href="/css/effects.css" />
     <link rel="stylesheet" href="/css/mobile-nav.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -37,7 +38,7 @@
     <div x-show="isReady" x-cloak class="d-flex flex-column min-vh-100">
 
         <!-- NAVBAR DESKTOP & MOBILE -->
-        <header class="navbar fixed-top w-100 py-3 desktop-navbar transition-theme shadow-sm border-0" style="z-index: 1030;" :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'" x-data="{ mobileSearchOpen: false }">
+        <header class="navbar fixed-top w-100 py-3 desktop-navbar transition-theme shadow-sm border-0" :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'" x-data="{ mobileSearchOpen: false }">
             <div class="container-lg d-flex flex-wrap align-items-center justify-content-between">
                 
                 <!-- 1. LOGO -->
@@ -46,7 +47,10 @@
                         :class="darkMode ? 'bg-cream text-teal' : 'bg-teal text-cream'">
                         <i class="bi bi-box-seam fs-5"></i>
                     </div>
-                    <span :class="darkMode ? 'text-cream' : 'text-teal'" class="ls-minus-1">ArtAround</span>
+                    <div class="d-flex align-items-center">
+                        <span :class="darkMode ? 'text-cream' : 'text-teal'" class="ls-minus-1">ArtAround</span>
+                        <span class="fs-5 text-secondary fw-medium ms-2 opacity-50">| Marketplace</span>
+                    </div>
                 </a>
 
                 <!-- 2. MOBILE CONTROLS -->
@@ -57,7 +61,7 @@
                 </div>
 
                 <!-- 3. DESKTOP SEARCH BAR -->
-                <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4 nav-search-container order-lg-2" style="max-width: 400px;">
+                <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4 nav-search-container order-lg-2">
                     <div class="search-input-wrapper w-100">
                         <i class="bi bi-search search-icon"></i>
                         <input type="text" class="search-input w-100" placeholder="Cerca visite..." x-model="searchQuery">
@@ -99,8 +103,7 @@
                         <div class="position-relative" x-data="{ open: false }">
                             <button @click="open = !open" @click.outside="open = false"
                                 class="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none">
-                                <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
-                                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="width: 40px; height: 40px;">
+                                <div class="user-avatar rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden">
                                     <template x-if="propic">
                                         <img :src="propic" alt="Profile" class="w-100 h-100 object-fit-cover">
                                     </template>
@@ -120,7 +123,7 @@
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95"
                                 class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0"
-                                style="min-width: 220px;" :class="darkMode ? 'bg-dark' : 'bg-white'">
+                                :class="darkMode ? 'bg-dark' : 'bg-white'">
                                 <div class="dropdown-header-info px-4 py-2 border-bottom" :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
                                     <div class="fw-bold user-name-text" :class="darkMode ? 'text-white' : 'text-dark'" x-text="username"></div>
                                     <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
@@ -148,7 +151,7 @@
             </div>
 
             <!-- 5. MOBILE SEARCH POPUP DROPDOWN -->
-            <div x-show="mobileSearchOpen" x-transition.opacity.duration.200ms class="position-absolute top-100 start-0 w-100 p-3 shadow-lg border-bottom d-lg-none" :class="darkMode ? 'bg-dark border-secondary border-opacity-25' : 'bg-white border-light'" style="z-index: 1040;" x-cloak>
+            <div x-show="mobileSearchOpen" x-transition.opacity.duration.200ms class="position-absolute top-100 start-0 w-100 p-3 shadow-lg border-bottom d-lg-none mobile-search-dropdown" :class="darkMode ? 'bg-dark border-secondary border-opacity-25' : 'bg-white border-light'" x-cloak>
                 <div class="search-input-wrapper w-100">
                     <i class="bi bi-search search-icon"></i>
                     <input type="text" class="search-input w-100" placeholder="Cerca visite..." x-model="searchQuery">
@@ -160,33 +163,33 @@
         <main class="flex-grow-1 p-3 p-lg-5 pt-5 mt-5">
 
             <!-- MARKETPLACE HERO & CARDS -->
-            <div class="container-lg flex-grow-1 py-4 mt-5 pt-5">
+            <div class="container-lg flex-grow-1 py-2 py-lg-4">
 
             <!-- HERO SECTION (usa la classe .navigator-hero-gradient animata) -->
             <div class="mb-5 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
-                <div class="row align-items-center position-relative" style="z-index: 1;">
+                <div class="row align-items-center position-relative z-1">
                     <div class="col-12 col-md-8 text-center text-md-start">
-                        <h1 class="fw-black mb-2 text-white display-5" style="letter-spacing: -1px;">Esplora i Pacchetti Tour</h1>
+                        <h1 class="fw-black mb-2 text-white display-5 tracking-tight">Esplora i Pacchetti Tour</h1>
                         <p class="text-white-75 lead mb-4 fw-medium">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
 
                         <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
                             <!-- Badge Musei -->
                             <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper" style="padding: 10px !important">
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill p-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper">
                                 <i class="bi bi-building me-2 text-white opacity-75"></i>
                                 <span><strong class="fw-bold">500+</strong> Musei</span>
                             </span>
 
                             <!-- Badge Rating -->
                             <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper" style="padding: 10px !important">
+                                class="badge bg-white bg-opacity-10 text-white rounded-pill p-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper">
                                 <i class="bi bi-star-fill me-2 text-warning"></i>
                                 <span><strong class="fw-bold">4.9</strong> Rating</span>
                             </span>
                         </div>
                     </div>
                     <div class="col-md-4 d-none d-md-block text-end">
-                        <i class="bi bi-shop text-white opacity-50 hero-icon-animated" style="font-size: 8rem; margin-right: -10px;"></i>
+                        <i class="bi bi-shop text-white opacity-50 hero-icon-animated hero-icon-large"></i>
                     </div>
                 </div>
             </div>
@@ -244,7 +247,7 @@
                                         </button>
                                     </template>
                                     <template x-if="!isPurchased(tour._id) && !isInCart(tour._id)">
-                                        <button @click="addToCart(tour)" class="btn btn-outline-red rounded-pill px-3 fw-bold btn-sm shadow-sm" style="transition: all 0.3s">
+                                        <button @click="addToCart(tour)" class="btn btn-outline-red rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
                                             Aggiungi
                                         </button>
                                     </template>
@@ -262,9 +265,9 @@
         </main>
 
         <!-- MOBILE FLOATING CART BUTTON -->
-        <div class="mobile-floating-cart">
+        <div class="mobile-floating-cart d-lg-none" x-data="{ isCartOpen: false }" @cart-opened.window="isCartOpen = true" @cart-closed.window="isCartOpen = false" x-show="!isCartOpen" x-transition.opacity>
             <button @click="if(isLoggedIn) { var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show(); } else { alert('Devi essere loggato per poter acquistare! Vai su ' + (window.innerWidth >= 992 ? 'Sign in' : 'ACCEDI')); }"
-                class="btn btn-premium-orange rounded-circle d-flex align-items-center justify-content-center shadow-lg position-relative" style="z-index: 1040;">
+                class="btn btn-premium-orange rounded-circle d-flex align-items-center justify-content-center shadow-lg position-relative cart-fab">
                 <i class="bi bi-cart3"></i>
                 <span class="badge bg-white text-orange position-absolute top-0 end-0 rounded-circle shadow-sm"
                     x-show="cartCount > 0" x-text="cartCount"></span>
@@ -320,7 +323,7 @@
         <template x-if="isLoggedIn">
             <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" class="mobile-nav-item" @click.prevent="">
                 <div class="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden"
-                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" style="font-size: 0.8rem; width:25px; height:25px;">
+                    :class="darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'" class="avatar-xs">
                     <template x-if="propic"><img :src="propic" alt="P" class="w-100 h-100 object-fit-cover"></template>
                     <template x-if="!propic"><span x-text="username.charAt(0).toUpperCase()"></span></template>
                 </div>
@@ -338,7 +341,7 @@
                 <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 <template x-if="isLoggedIn">
                     <div class="mt-3">
-                        <div class="user-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3" :class="darkMode ? 'text-dark' : 'text-orange'" style="width: 80px; height: 80px; font-size: 2.5rem; border: 4px solid rgba(255,255,255,0.2);">
+                        <div class="user-avatar auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3" :class="darkMode ? 'text-dark' : 'text-orange'">
                             <span x-text="username.charAt(0).toUpperCase()"></span>
                         </div>
                         <h4 class="fw-bold mb-1 text-white" x-text="username"></h4>
@@ -371,7 +374,8 @@
     </div>
 
     <!-- OFFCANVAS CARRELLO -->
-    <div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="cartOffcanvas">
+    <div class="offcanvas offcanvas-end border-0 shadow-lg" tabindex="-1" id="cartOffcanvas"
+         x-init="$el.addEventListener('show.bs.offcanvas', () => $dispatch('cart-opened')); $el.addEventListener('hide.bs.offcanvas', () => $dispatch('cart-closed'));">
         <div class="offcanvas-body d-flex flex-column p-0" :class="darkMode ? 'bg-dark' : 'bg-light'">
             
             <!-- Cart Header -->
@@ -386,8 +390,8 @@
             <div class="p-4 flex-grow-1 overflow-auto">
                 <template x-if="cartCount === 0">
                     <div class="text-center py-5">
-                        <i class="bi bi-cart-x text-muted opacity-50" style="font-size: 4rem;"></i>
-                        <p class="mt-3 text-muted fw-medium">Il tuo carrello è vuoto.</p>
+                        <i class="bi bi-cart-x text-muted opacity-50 empty-state-icon"></i>
+                        <p class="mt-3 fw-medium" :class="darkMode ? 'text-white-50' : 'text-muted'">I tuoi prodotti verranno visualizzati qui.</p>
                         <button class="btn bg-orange text-white rounded-pill px-4 fw-bold shadow-sm mt-2" data-bs-dismiss="offcanvas">Esplora il Marketplace</button>
                     </div>
                 </template>
@@ -398,13 +402,13 @@
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden" :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white'">
                                 <div class="row g-0 align-items-center p-2">
                                     <div class="col-3">
-                                        <div class="rounded-3 bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center text-orange" style="height: 60px;">
+                                        <div class="rounded-3 bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center text-orange cart-item-img-placeholder">
                                             <i class="bi bi-ticket-perforated fs-4"></i>
                                         </div>
                                     </div>
                                     <div class="col-7 ps-3">
                                         <h6 class="fw-bold mb-1 text-truncate" :class="darkMode ? 'text-white' : 'text-dark'" x-text="item.name"></h6>
-                                        <p class="text-muted small mb-0 fw-bold">Gratuito</p>
+                                        <p class="small mb-0 fw-bold" :class="darkMode ? 'text-white-50' : 'text-muted'">Gratuito</p>
                                     </div>
                                     <div class="col-2 text-end pe-2">
                                         <button @click="removeFromCart(item._id)" class="btn btn-link text-danger p-1 shadow-none">

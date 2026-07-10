@@ -105,7 +105,7 @@ export default function Lobby() {
             )}
 
             {!pending && (
-                <div className="card shadow-sm border-0 rounded-4 mx-auto" style={{ maxWidth: '400px' }}>
+                <div className="card shadow-sm border-0 rounded-4 mx-auto max-w-400">
                     <div className="card-body">
                         <h5 className="fw-bold mb-3">Studenti Connessi ({students.length})</h5>
                         <div className="d-flex flex-wrap justify-content-center gap-2">
