@@ -1,107 +1,37 @@
-# ArtAround Backend Architecture
+# ArtAround Project
 
-This project follows the **MVC (Model-View-Controller)** pattern to ensure a clean separation between data, logic, and presentation.
-
----
+This is a web application built with a Node.js backend and a mixed frontend (vanilla HTML/JS for the editor and a React app for the navigator). It uses the MVC (Model-View-Controller) structure to keep everything organized.
 
 ## Project Structure
 
+```text
+public/                 # files sent directly to the browser
+├── css/                # stylesheets
+├── js/                 # frontend javascript files
+├── images/             # pictures and user uploads (profile pics)
+├── editor-marketplace/ # the marketplace frontend pages
+└── navigator/          # the React frontend build folder
+
+backend/                # server-side code
+├── models/             # Mongoose database schemas
+├── middleware/         # functions that check if a user is logged in
+├── controllers/        # handles the logic of the app
+├── routes/             # connects URLs to the right controller
+├── views/              # protected HTML pages for the admin dashboard
+├── index.js            # starts the server and connects to the database
+└── .env                # passwords and secrets (never uploaded to github)
 ```
-public/             # used for: public static files (CSS, client-side JS, images)
-├── css/            # used for: global styles
-├── js/             # used for: frontend logic (Alpine.js, fetch calls)
-└── marketplace/    # used for: public pages (index, login, signup)
-backend/
-├── models/      # used for: defining Mongoose schemas and database structure
-├── middleware/  # used for: protecting routes and verifying JWT tokens (The Guard)
-├── controllers/ # used for: business logic, data processing, and responses (The Brain)
-├── routes/      # used for: mapping URLs to specific controller functions (The Map)
-├── views/       # used for: storing protected HTML files for the editor (The Vault)
-├── index.js     # used for: server configuration and database connection
-└── .env         # used for: storing environment variables and secrets
-```
 
----
+## Application Flow
 
-## Components Detail
+### The Backend
+- **Models:** Define what a user, tour, or museum looks like in the MongoDB database.
+- **Middleware:** The `auth.js` middleware checks the JWT token on incoming requests. If the user doesn't have the right permissions, the request is blocked.
+- **Controllers:** This is where the code connects the database to the routes. It processes data and decides what to send back.
+- **Routes:** Connect URLs to the controllers. For example, the `upload.js` route uses `multer` to save uploaded images to the public folder.
+- **Views:** The HTML files for the editor dashboard are kept here instead of the public folder. Express only sends these files to the browser if the middleware confirms the user is an admin or editor.
 
-### 1. Models (`models/`)
+### Authentication
+When a user logs in, the server creates a JWT token that contains their ID, name, and permissions. This token is stored in a cookie that expires after 7 days. 
 
-**Used for:** defining the structure of MongoDB documents.
-
-Example:  
-`museums.js` handles schemas for visits and items.
-
----
-
-### 2. Middleware (`middleware/`)
-
-**Used for:** intercepting requests before they reach the controller.
-
-File:  
-`auth.js` checks for a valid JWT in cookies or URL parameters.
-
----
-
-### 3. Controllers (`controllers/`)
-
-**Used for:** the actual "intelligence" of the application.
-
-Logic:
-
-- Fetches data from **Models**
-- Processes business logic
-- Chooses which **View (HTML)** or **JSON** data to return
-
----
-
-### 4. Routes (`routes/`)
-
-**Used for:** defining the API and View endpoints.
-
-Example:  
-`admin.js` connects `/admin/stats` to the `getStats` function in the controller.
-
----
-
-### 5. Views (`views/`)
-
-**Used for:** keeping admin-only HTML files safe and hidden from the public.
-
-Security:
-These files are only served via `res.sendFile()` after a successful authentication check.
-
----
-
-## Core Files
-
-### `index.js`
-
-Used for:
-
-- Main entry point of the Node.js application
-- Connecting to MongoDB
-- Initializing Express middleware (CORS, JSON parsing, Cookies)
-- Serving the `/public` folder for static assets
-
----
-
-### `.env`
-
-Used for storing sensitive credentials such as:
-
-- `MONGO_PWD`
-- `JWT_SECRET`
-
-Note:  
-This file is ignored by Git for security reasons.
-
----
-
-## Workflow Example
-
-1. User clicks a link to `/editor/tours`.
-2. **Middleware (`auth.js`)** verifies the identity.
-3. **Route (`admin.js`)** triggers the correct controller function.
-4. **Controller (`adminController.js`)** sends the protected HTML from the `views/` folder.
-5. The browser receives the HTML and fetches CSS/JS from the `/public` directory.
+When the user opens a protected page, the server checks the cookie. If the token is valid, the server sends the HTML file. Once the page loads, the frontend Javascript reads the user data from local storage or from the token to show the correct profile picture and dashboard menus.
