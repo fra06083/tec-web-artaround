@@ -16,11 +16,33 @@
     <link rel="stylesheet" href="/css/effects.css" />
     <link rel="stylesheet" href="/css/mobile-nav.css" />
     <link rel="stylesheet" href="/css/toasts.css" />
+    <script>
+        if (localStorage.getItem('artaround_darkmode') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body class="font-sans">
+    <div class="artaround-loader" id="mainLoader">
+        <div class="artaround-brand-text">ArtAround</div>
+    </div>
+    
     <div id="root"></div>
+    <script>
+        const loaderStartTime = Date.now();
+        window.hideMainLoader = function() {
+            const elapsed = Date.now() - loaderStartTime;
+            const delay = Math.max(0, 800 - elapsed);
+            setTimeout(() => {
+                const loader = document.getElementById('mainLoader');
+                if (loader && !loader.classList.contains('fade-out')) {
+                    loader.classList.add('fade-out');
+                }
+            }, delay);
+        };
+    </script>
     <script type="module" src="src/main.jsx"></script>
 </body>
 

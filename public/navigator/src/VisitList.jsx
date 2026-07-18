@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fetchVisite, getDarkMode, setDarkMode, getUser, logout } from './api';
+import { fetchVisite, getDarkMode, setDarkMode, getUser, fetchUser, logout } from './api';
 import ProfileModal from './Profile';
 
 function VisitList() {
@@ -73,13 +73,19 @@ function VisitList() {
         window.addEventListener('storage', handleStorageChange);
 
         // Carica utente
-        const userData = getUser();
-        setUser(userData);
+        const initUser = async () => {
+            const userData = await fetchUser();
+            setUser(userData);
+        };
+        initUser();
 
         fetchVisite()
             .then(data => setVisite(data))
             .catch(err => setError(err.message))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                if (window.hideMainLoader) window.hideMainLoader();
+            });
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
@@ -108,14 +114,7 @@ function VisitList() {
     const bgFooter = darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-light border-top';
     const footerText = darkMode ? 'text-white-50' : 'text-secondary';
 
-    if (loading) return (
-        <div className={`vh-100 d-flex flex-column align-items-center justify-content-center ${bgMain}`}>
-            <div className="spinner-border text-red spinner-lg mb-4" role="status">
-                <span className="visually-hidden">Caricamento...</span>
-            </div>
-            <h5 className="fw-bold">Caricamento visite...</h5>
-        </div>
-    );
+    if (loading) return null; // Lascia visibile il mainLoader HTML
 
     if (error) return (
         <div className={`vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4 ${bgMain}`}>
@@ -212,7 +211,7 @@ function VisitList() {
                                     <div className="user-avatar position-relative rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden cursor-pointer avatar-font-sm">
                                         <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
                                         {user.propic && (
-                                            <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
+                                            <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
                                         )}
                                     </div>
                                     <i className={`bi bi-chevron-down x-small chevron-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
@@ -353,7 +352,7 @@ function VisitList() {
                                         <div className={`mt-auto pt-3 border-top d-flex align-items-center justify-content-between ${darkMode ? 'border-secondary border-opacity-50' : 'border-light'}`}>
                                             <div className="d-flex align-items-center">
                                                 <i className="bi bi-person-walking text-orange me-2"></i>
-                                                <span className={`fw-bold small ${darkMode ? 'text-white' : 'text-dark'}`}>{v.steps ? v.steps.length : 0}</span>
+                                                <span className={`fw-bold small ${darkMode ? 'text-white' : 'text-dark'}`}>{v.items ? v.items.length : 0}</span>
                                                 <span className={`ms-1 small ${textMuted}`}>tappe</span>
                                             </div>
                                             <Link to={`/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-4 fw-bold btn-sm shadow-sm transition-theme">
@@ -403,7 +402,7 @@ function VisitList() {
                         <div className={`user-avatar position-relative rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`} style={{ fontSize: '0.8rem' }}>
                             <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
                             {user.propic && (
-                                <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
+                                <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
                             )}
                         </div>
                         <span>Profilo</span>
@@ -423,7 +422,7 @@ function VisitList() {
                                 <div className={`user-avatar position-relative auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3 overflow-hidden ${darkMode ? 'text-dark' : 'text-orange'}`}>
                                     <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
                                     {user.propic && (
-                                        <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
+                                        <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
                                     )}
                                 </div>
                                 <h4 className="fw-bold mb-1 text-white">{user.name}</h4>

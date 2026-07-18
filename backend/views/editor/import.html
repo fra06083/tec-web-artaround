@@ -22,18 +22,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/import.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 
-<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="importManager()" x-init="init()">
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="importManager()">
 
-    <div x-show="!isReady">
-        <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
-            <div class="spinner-border text-orange spinner-lg mb-4" role="status"></div>
+    <div x-show="!isReady" x-transition.opacity class="position-fixed top-0 start-0 w-100 h-100 bg-dark" style="z-index: 9999;">
+        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
+            <div class="artaround-brand-text mb-4">ArtAround</div>
             <h3 class="fw-bold">Verifica autorizzazioni...</h3>
         </div>
     </div>
 
-    <div x-show="isReady && isLoggedIn" x-cloak class="d-flex">
+    <div x-show="isReady && isLoggedIn && permissions === 'admin'" class="d-flex" x-transition.opacity x-cloak>
 
         <div class="toast-container">
             <template x-if="notification.show">

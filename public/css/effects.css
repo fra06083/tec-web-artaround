@@ -1022,3 +1022,109 @@ html.dark-mode, html.marketplace-dark-mode {
     animation: dropdownFadeScale 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     transform-origin: top right;
 }
+
+/* =========================================================
+   ARTAROUND BRAND LOADER
+========================================================= */
+
+.artaround-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.85); /* Match glass-header-light */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s cubic-bezier(0.87, 0, 0.13, 1), visibility 0.6s;
+}
+
+.marketplace-dark-mode .artaround-loader,
+.dark-mode .artaround-loader,
+.bg-dark .artaround-loader,
+[data-bs-theme="dark"] .artaround-loader {
+    background: rgba(26, 26, 46, 0.85); /* Match desktop-navbar dark mode */
+}
+
+
+
+.artaround-loader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.artaround-brand-text {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: #1f2937; /* Dark text for light mode */
+    opacity: 0;
+    transform: scale(0.85) translateY(15px);
+    animation: brandEnter 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards, textColorChangeLight 1s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+    animation-delay: 0s, 0.4s;
+    position: relative;
+    display: inline-block;
+}
+
+.artaround-brand-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: #fd7e14;
+    border-radius: 4px;
+    animation: loadingUnderline 1s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+    animation-delay: 0.4s;
+}
+
+.marketplace-dark-mode .artaround-brand-text,
+.dark-mode .artaround-brand-text,
+.bg-dark .artaround-brand-text,
+[data-bs-theme="dark"] .artaround-brand-text {
+    color: #ffffff; /* White text for dark mode */
+    background: none;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+    animation: brandEnter 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards, textColorChangeDark 1s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+    animation-delay: 0s, 0.4s;
+}
+
+@keyframes textColorChangeLight {
+    0% { color: #1f2937; }
+    100% { color: #fd7e14; }
+}
+
+@keyframes textColorChangeDark {
+    0% { color: #ffffff; }
+    100% { color: #fd7e14; }
+}
+
+@keyframes brandEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(15px);
+        filter: blur(10px);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.02) translateY(0);
+        filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0px);
+    }
+}
+
+@keyframes loadingUnderline {
+    0% { width: 0%; opacity: 0; }
+    100% { width: 100%; opacity: 1; }
+}

@@ -39,6 +39,11 @@ const createMuseum = async (req, res) => {
             return res.status(400).json({ error: 'Il nome del museo è obbligatorio' });
         }
 
+        const existingMuseum = await Museum.findOne({ museum });
+        if (existingMuseum) {
+            return res.status(409).json({ error: 'Un museo con questo nome è già presente' });
+        }
+
         const newMuseum = new Museum({
             museum,
             city,
@@ -52,6 +57,12 @@ const createMuseum = async (req, res) => {
         await newMuseum.save();
         res.status(201).json({ message: 'Museo creato con successo', museum: newMuseum });
     } catch (error) {
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: 'Dati incompleti o non validi' });
+        }
+        if (error.code === 11000) {
+            return res.status(409).json({ error: 'Elemento già presente (duplicato)' });
+        }
         console.error('Errore nella creazione del museo:', error);
         res.status(500).json({ error: 'Errore interno del server' });
     }
@@ -60,10 +71,18 @@ const createMuseum = async (req, res) => {
 // PUT /api/museums/:id
 const updateMuseum = async (req, res) => {
     try {
+        const { museum, city, province, region, address, description, image } = req.body;
+
+        if (museum) {
+            const existingMuseum = await Museum.findOne({ museum, _id: { $ne: req.params.id } });
+            if (existingMuseum) {
+                return res.status(409).json({ error: 'Un museo con questo nome è già presente' });
+            }
+        }
+
         const updated = await Museum.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
-
+            { $set: { museum, city, province, region, address, description, image } },
             { new: true, runValidators: true }
         );
         if (!updated) return res.status(404).json({ error: 'Museo non trovato' });

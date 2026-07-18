@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
-import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, logout } from './api';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
+import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, fetchUser, logout } from './api';
 import ProfileModal from './Profile';
 
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
@@ -12,6 +12,7 @@ function VisitDetail() {
     const pin = query.get('pin');
     const role = query.get('role'); // 'teacher' o null/studente
     const initialIndex = parseInt(query.get('index')) || 0;
+    const navigate = useNavigate();
 
     const [visita, setVisita] = useState(null);
     const [items, setItems] = useState([]);
@@ -146,8 +147,11 @@ function VisitDetail() {
         window.addEventListener('storage', handleStorageChange);
 
         // Carica utente
-        const userData = getUser();
-        setUser(userData);
+        const initUser = async () => {
+            const userData = await fetchUser();
+            setUser(userData);
+        };
+        initUser();
 
         const fetchAllData = async () => {
             try {
@@ -166,6 +170,7 @@ function VisitDetail() {
                 setError(err.message);
             } finally {
                 setLoading(false);
+                if (window.hideMainLoader) window.hideMainLoader();
             }
         };
         
@@ -303,6 +308,12 @@ function VisitDetail() {
     };
 
     const handleEndVisit = async () => {
+        if (!pin) {
+            if (!window.confirm("Vuoi uscire dalla visita?")) return;
+            navigate('/');
+            return;
+        }
+
         if (!window.confirm("Sei sicuro di voler terminare la visita per tutti? La stanza verrà chiusa.")) return;
         
         try {
@@ -314,6 +325,7 @@ function VisitDetail() {
             navigate('/');
         } catch (err) {
             console.error("Errore nella chiusura della stanza:", err);
+            navigate('/');
         }
     };
 
@@ -340,14 +352,7 @@ function VisitDetail() {
     const bgFooter = darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-light border-top';
     const footerText = darkMode ? 'text-white-50' : 'text-secondary';
 
-    if (loading) return (
-        <div className={`vh-100 d-flex flex-column align-items-center justify-content-center ${bgMain}`}>
-            <div className="spinner-border text-red spinner-lg mb-4" role="status">
-                <span className="visually-hidden">Caricamento...</span>
-            </div>
-            <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Caricamento visita...</h5>
-        </div>
-    );
+    if (loading) return null; // Lascia visibile il mainLoader HTML
 
     if (error) return (
         <div className={`vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4 ${bgMain}`}>

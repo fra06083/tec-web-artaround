@@ -9,6 +9,8 @@ document.addEventListener('alpine:init', () => {
         selectedUser: null,
         selectedMuseumId: '',
         pendingRequests: [],
+        isEditingName: false,
+        editNameValue: '',
 
         async init() {
             // 1. Controllo sicurezza
@@ -40,7 +42,8 @@ document.addEventListener('alpine:init', () => {
                 const usersRes = await fetch('/editor/user-management/search?q=', {
                     headers: { 'Authorization': token }
                 });
-                this.users = await usersRes.json();
+                const fetchedUsersInit = await usersRes.json();
+                this.users = fetchedUsersInit.filter(u => u.name !== this.username);
 
                 // Close user menu when clicking outside
                 document.addEventListener('click', (e) => {
@@ -75,7 +78,8 @@ document.addEventListener('alpine:init', () => {
             const res = await fetch(`/editor/user-management/search?q=${encodeURIComponent(query)}`, {
                 headers: { 'Authorization': token }
             });
-            this.users = res.ok ? await res.json() : [];
+            const fetchedUsersSearch = res.ok ? await res.json() : [];
+            this.users = fetchedUsersSearch.filter(u => u.name !== this.username);
         },
 
         // Seleziona un utente specifico per vederne i dettagli
@@ -116,7 +120,7 @@ document.addEventListener('alpine:init', () => {
             const token = localStorage.getItem('artaround_token');
             const res = await fetch(`/editor/user-management/${this.selectedUser._id}/museums/${museumId}`, {
                 method: 'DELETE',
-                headers: {'Authorizazion': token}
+                headers: {'Authorization': token}
             });
 
             if (res.ok) {
@@ -124,7 +128,36 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // Elimina un utente (solo se non è admin)
+        // Cambia nome utente
+        async updateUsername() {
+            if (!this.selectedUser || !this.editNameValue.trim()) return;
+            const newName = this.editNameValue.trim();
+            if (newName === this.selectedUser.name) {
+                this.isEditingName = false;
+                return;
+            }
+
+            const token = localStorage.getItem('artaround_token');
+            const res = await fetch(`/editor/user-management/${this.selectedUser._id}/name`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: newName })
+            });
+
+            if (res.ok) {
+                this.selectedUser = await res.json();
+                this.isEditingName = false;
+                await this.searchUsers();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Errore durante l\'aggiornamento del nome');
+            }
+        },
+
+        // Elimina un utente
         async deleteUser(userId) {
             if (!confirm('Sei sicuro di voler eliminare questo utente? Questa azione è irreversibile.')) return;
 

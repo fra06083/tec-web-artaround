@@ -91,8 +91,8 @@ export default function Lobby() {
             <p className="lead mb-4">Stanza: <span className="fw-bold text-orange">{pin}</span></p>
             
             {!rejected && (
-                <div className="spinner-grow text-orange mb-4" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                <div className="artaround-loader">
+                    <div className="artaround-brand-text">ArtAround</div>
                 </div>
             )}
             

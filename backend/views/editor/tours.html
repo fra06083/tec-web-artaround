@@ -21,6 +21,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/tours.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 
     <style>
         /* Custom styles for improved UI */
@@ -332,14 +335,14 @@
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="toursManager()" x-cloak>
 
-    <div x-show="!isReady">
-        <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center">
-            <div class="spinner-border text-orange spinner-lg mb-4" role="status"></div>
+    <div x-show="!isReady" x-transition.opacity class="position-fixed top-0 start-0 w-100 h-100 bg-dark" style="z-index: 9999;">
+        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
+            <div class="artaround-brand-text mb-4">ArtAround</div>
             <h3 class="fw-bold">Caricamento in corso...</h3>
         </div>
     </div>
-
-    <div x-show="isReady" class="d-flex">
+    
+    <div x-show="isReady && isLoggedIn" class="d-flex" x-transition.opacity x-cloak>
         <aside class="sidebar bg-dark shadow d-flex flex-column">
             <div class="p-4 mb-2">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2"

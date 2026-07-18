@@ -27,13 +27,8 @@
     :class="{ 'marketplace-dark-mode': darkMode }">
 
     <!-- Schermata di caricamento -->
-    <div x-show="!isReady">
-        <div class="vh-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
-            <div class="spinner-border text-orange spinner-lg mb-4" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <h3 class="fw-bold">Caricamento Marketplace...</h3>
-        </div>
+    <div x-show="!isReady" x-transition.opacity class="artaround-loader">
+        <div class="artaround-brand-text">ArtAround</div>
     </div>
 
     <div x-show="isReady" x-cloak class="d-flex flex-column min-vh-100">
@@ -90,16 +85,7 @@
                     </a>
 
                     <div class="vr mx-2" :class="darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'"></div>
-                    
-                    <!-- Desktop Cart Icon -->
-                    <button class="btn btn-link nav-link position-relative d-flex align-items-center justify-content-center p-2 me-2"
-                        @click="if(isLoggedIn) { var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show(); } else { showToast('Devi essere loggato per poter acquistare! Vai su Sign in', 'error'); }"
-                        :class="darkMode ? 'text-cream' : 'text-darkgrey'">
-                        <i class="bi bi-cart3 fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-orange text-white"
-                            x-show="cartCount > 0" x-text="cartCount" style="font-size: 0.65rem;" x-cloak></span>
-                    </button>
-
+                    <!-- Cart moved to Floating Action Button -->
                     <!-- Auth Section -->
                     <template x-if="!isLoggedIn">
                         <a href="../login.html" class="btn rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon"
@@ -502,7 +488,13 @@
             </div>
         </div>
     </div>
-
+    <!-- CART FLOATING ACTION BUTTON (FAB) -->
+    <button class="cart-fab"
+        @click="if(isLoggedIn) { var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show(); } else { showToast('Devi essere loggato per poter acquistare! Vai su Sign in', 'error'); }">
+        <i class="bi bi-cart3 fs-3"></i>
+        <span class="badge bg-danger rounded-pill"
+            x-show="cartCount > 0" x-text="cartCount" x-cloak></span>
+    </button>
 
 </body>
 

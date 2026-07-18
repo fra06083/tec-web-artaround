@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUser } from './api';
+import { fetchUser } from './api';
 
 export default function RoomJoin() {
     const [pin, setPin] = useState('');
     const [error, setError] = useState('');
+    const [studentName, setStudentName] = useState('Studente Anonimo');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const initUser = async () => {
+            if (window.hideMainLoader) window.hideMainLoader();
+            const user = await fetchUser();
+            if (user) setStudentName(user.name);
+        };
+        initUser();
+    }, []);
 
     const handleJoin = async (e) => {
         e.preventDefault();
         setError('');
         
         try {
-            const user = getUser();
-            const studentName = user ? user.name : 'Studente Anonimo';
-            
             const res = await fetch('/api/rooms/join', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

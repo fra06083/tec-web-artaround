@@ -18,6 +18,55 @@
     }
 }
 
+/* =========================================================
+   CART FLOATING ACTION BUTTON
+========================================================= */
+.cart-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    z-index: 1050;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #fd7e14;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 10px 20px rgba(253, 126, 20, 0.4);
+}
+
+.cart-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 25px rgba(253, 126, 20, 0.5);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .cart-fab {
+        bottom: 85px; /* Above the mobile nav */
+        right: 1.5rem;
+        width: 55px;
+        height: 55px;
+    }
+}
+
+.cart-fab .badge {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    font-size: 0.8rem;
+    border: 2px solid white;
+}
+
+.dark-mode .cart-fab .badge,
+.marketplace-dark-mode .cart-fab .badge {
+    border-color: #1a1a2e;
+}
+
 .mobile-nav {
     display: none;
     position: fixed;

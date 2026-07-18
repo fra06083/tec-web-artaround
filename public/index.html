@@ -29,6 +29,23 @@
 <body class="font-sans transition-theme" x-data="homeApp()"
     :class="darkMode ? 'marketplace-dark-mode' : 'marketplace-light'">
 
+    <!-- Super Cool Loader -->
+    <div class="artaround-loader" id="mainLoader">
+        <div class="artaround-brand-text">ArtAround</div>
+    </div>
+    <script>
+        // Rimuove il loader solo quando la pagina e tutte le risorse (font, immagini) sono pronte
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('mainLoader');
+                if (loader) {
+                    loader.classList.add('fade-out');
+                }
+            }, 400); // 400ms per dare il tempo all'animazione di entrata di essere apprezzata
+        });
+    </script>
+    <!-- End Loader -->
+
     <!-- NAVBAR -->
     <nav class="navbar fixed-top w-100 py-3 shadow-sm desktop-navbar transition-theme border-0"
         :class="darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light'">

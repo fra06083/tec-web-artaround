@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Dal file del prof, utile per leggere i body delle richieste
 
 // 3. FILE STATICI, dato che il percorso non cambia mai
-app.use(express.static(path.join(__dirname, '../')));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use('/marketplace', express.static(path.join(__dirname, '../editor-marketplace')));
 app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
 

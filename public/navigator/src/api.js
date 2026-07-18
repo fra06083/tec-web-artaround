@@ -65,6 +65,32 @@ export function getUser() {
     return userObj;
 }
 
+export async function fetchUser() {
+    const token = localStorage.getItem('artaround_token');
+    if (!token) return null;
+    
+    try {
+        const res = await fetch('/api/check', {
+            method: 'POST',
+            headers: { 'Authorization': token }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            // Restituisce l'oggetto utente completo con propic
+            return {
+                id: data.user.id,
+                name: data.user.name,
+                permissions: data.user.permissions,
+                propic: data.user.propic
+            };
+        }
+    } catch (e) {
+        console.error("Errore fetch user", e);
+    }
+    // Fallback al token locale
+    return getUser();
+}
+
 export function getDarkMode() {
     return localStorage.getItem('artaround_darkmode') === 'true';
 }

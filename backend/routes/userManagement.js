@@ -11,6 +11,7 @@ router.get('/', auth, isAdmin, adminCtrl.serveUsersManagement);
 router.get('/search', auth, isAdmin, userCtrl.searchUsers);
 router.get('/:id', auth, isAdmin, userCtrl.getUserById);
 router.put('/:id/role', auth, isAdmin, userCtrl.updateUserRole);
+router.put('/:id/name', auth, isAdmin, userCtrl.updateUserName);
 router.post('/:id/museums/:museumId', auth, isAdmin, userCtrl.grantMuseumPermission);
 router.delete('/:id/museums/:museumId', auth, isAdmin, userCtrl.revokeMuseumPermission);
 router.delete('/:id', auth, isAdmin, userCtrl.deleteUser);
