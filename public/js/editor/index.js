@@ -273,9 +273,66 @@ function marketplaceApp() {
             }
         },
 
+        async uploadProfileImage(event) {
+            // grab the first file selected by the user
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // basic validation: we only accept images
+            if (!file.type.startsWith('image/')) {
+                this.showToast('Per favore seleziona un\'immagine', 'error');
+                return;
+            }
+
+            // check file size: max 2MB (2 * 1024 * 1024 bytes)
+            if (file.size > 2 * 1024 * 1024) {
+                this.showToast('L\'immagine non deve superare i 2MB', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                // send the file to our backend upload route
+                const token = localStorage.getItem('artaround_token');
+                const response = await fetch('/api/upload/user', {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.profileForm.propic = data.url;
+                } else {
+                    const err = await response.json();
+                    this.showToast(err.error || 'Errore durante il caricamento', 'error');
+                }
+            } catch (error) {
+                console.error("Errore upload:", error);
+                this.showToast('Errore durante il caricamento', 'error');
+            }
+        },
+
+        toasts: [],
+        handleToastEvent(e) {
+            // we use the current timestamp as a unique id for each toast
+            const id = Date.now();
+            this.toasts.push({ id, message: e.detail.message, type: e.detail.type });
+            
+            // keep maximum 3 toasts on screen so it doesn't get spammy
+            // shift() removes the oldest one from the start of the array
+            if (this.toasts.length > 3) {
+                this.toasts.shift();
+            }
+            
+            // auto-remove the toast after 4 seconds
+            setTimeout(() => {
+                this.toasts = this.toasts.filter(t => t.id !== id);
+            }, 4000);
+        },
         showToast(message, type) {
-            // Emette un custom event che sarà catturato da un eventuale componente toast globale,
-            // oppure gestisce il toast localmente se lo implementiamo in index.html
             window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }));
         },
 

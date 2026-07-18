@@ -144,6 +144,34 @@ function museumManager() {
             }
         },
 
+        async uploadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const token = localStorage.getItem('artaround_token');
+                const res = await fetch('/api/upload/museum', {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    this.currentMuseum.image = data.url;
+                    this.showToast('Immagine caricata con successo!', 'success');
+                } else {
+                    const err = await res.json();
+                    this.showToast(err.error || 'Errore caricamento immagine', 'error');
+                }
+            } catch (error) {
+                this.showToast('Errore di connessione durante l\'upload', 'error');
+            }
+        },
+
         // --- UTILITY ---
         getMuseumName(id) {
             const m = this.museums.find(museo => museo._id === id);

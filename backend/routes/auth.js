@@ -14,16 +14,18 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ error: 'Credenziali non valide' });
 
+        // create a JSON Web Token (JWT) so the user doesn't have to log in on every request
+        // we embed the roles and museums inside the payload so the frontend can read them instantly
         const token = jwt.sign(
             { id: user._id, name: user.name, permissions: user.permissions, museums: user.museums },
             process.env.JWT_SECRET,
-            { expiresIn: '4h' }
+            { expiresIn: '7d' } // keep the user logged in for 7 days
         );
         res.cookie('artaround_token', token, {
             httpOnly: true,
             secure: false,  // Metti true solo se hai HTTPS
             sameSite: 'lax',
-            maxAge: 4 * 60 * 60 * 1000 // Scade tra 4 ore
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
         });
 
         res.json({ message: "Login ok", token });

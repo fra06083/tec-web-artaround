@@ -16,6 +16,7 @@
     z-index: 9999;
 }
 
+
 .custom-toast {
     min-width: 320px;
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
@@ -71,4 +72,17 @@
 .toast-msg {
     font-size: 0.85rem;
     opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .toast-container, .toast-fixed {
+        left: 10px;
+        right: 10px;
+        width: auto;
+    }
+    .custom-toast {
+        min-width: 0 !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }

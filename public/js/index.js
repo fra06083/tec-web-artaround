@@ -93,6 +93,38 @@ function homeApp() {
             } catch (error) {
                 console.error("Errore aggiornamento profilo", error);
             }
+        },
+
+        async uploadProfileImage(event) {
+            // grab the first file selected by the user
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // wrap the file in FormData so we can send it as multipart/form-data
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                // send the file to our backend upload route
+                const token = localStorage.getItem('artaround_token');
+                const response = await fetch('/api/upload/user', {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // update the form state with the new URL so the UI updates instantly
+                    this.profileForm.propic = data.url;
+                } else {
+                    const err = await response.json();
+                    alert(err.error || 'Errore durante il caricamento');
+                }
+            } catch (error) {
+                console.error("Errore upload:", error);
+                alert('Errore durante il caricamento');
+            }
         }
     }
 }

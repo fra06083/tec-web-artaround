@@ -207,7 +207,9 @@ function importManager() {
                                 img_path: artwork.img_path,
                                 museum_id: museum._id,
                                 author: artwork.author,
-                                license: artwork.license
+                                license: artwork.license,
+                                description: artwork.description || 'Nessuna descrizione fornita.',
+                                desc_type: artwork.desc_type || 'medio'
                             };
 
                             const res = await fetch('/api/artworks', {
@@ -275,7 +277,9 @@ function importManager() {
                         "img_path": "https://example.com/artwork.jpg",
                         "museum_name": "Museo di Arte Moderna",
                         "author": "Mario Rossi",
-                        "license": "CC BY 4.0"
+                        "license": "CC BY 4.0",
+                        "description": "Una bellissima opera d'arte moderna.",
+                        "desc_type": "medio"
                     }
                 ]
             };

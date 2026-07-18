@@ -32,14 +32,37 @@ export async function fetchDescriptionsByItem(id) {
 }
 
 export function getUser() {
+    // grab the jwt token to check if we are logged in
     const token = localStorage.getItem('artaround_token');
     if (!token) return null;
+
+    let userObj = null;
+    
+    // decode the base64 jwt payload
+    // we do this first because the token always has the correct user roles/permissions!
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload;
+        userObj = JSON.parse(atob(token.split('.')[1]));
     } catch {
         return null;
     }
+
+    // grab any updated user data from local storage
+    // (e.g. if the user just updated their profile picture)
+    const savedStr = localStorage.getItem('artaround_user');
+    if (savedStr) {
+        try {
+            const parsed = JSON.parse(savedStr);
+            // merge the local storage data ON TOP of the jwt payload
+            // this way we get fresh propics without accidentally deleting permissions
+            if (typeof parsed === 'object' && parsed !== null) {
+                userObj = { ...userObj, ...parsed };
+            }
+        } catch (e) {
+            // ignore errors if savedStr is just a raw string like "admin"
+        }
+    }
+
+    return userObj;
 }
 
 export function getDarkMode() {

@@ -57,6 +57,9 @@ app.use("/api/museums", museumRoutes);
 app.use("/api/artworks", artworkRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/editor/user-management", userManagementRoutes);
+
+const uploadRoutes = require("./routes/upload.js");
+app.use("/api/upload", uploadRoutes);
 // used for serving public files (CSS, JS, Images)
 // everything in "public" is accessible via "/"
 app.use('/navigator', express.static(path.join(__dirname, '../public/navigator/dist')));

@@ -268,8 +268,10 @@ function VisitDetail() {
         });
 
         eventSource.addEventListener('room-ended', (e) => {
-            alert("La visita è stata terminata dall'insegnante.");
-            window.location.href = '/index.html';
+            if (role !== 'teacher') {
+                alert("La visita è stata terminata dall'insegnante.");
+                window.location.href = '/navigator/';
+            }
         });
 
         return () => {
@@ -309,6 +311,7 @@ function VisitDetail() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ pin })
             });
+            navigate('/');
         } catch (err) {
             console.error("Errore nella chiusura della stanza:", err);
         }

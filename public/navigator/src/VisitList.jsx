@@ -209,11 +209,10 @@ function VisitList() {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
                                 >
-                                    <div className="user-avatar rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden cursor-pointer avatar-font-sm">
-                                        {user.propic ? (
-                                            <img src={user.propic} alt="Profile" className="w-100 h-100 object-fit-cover" />
-                                        ) : (
-                                            <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                    <div className="user-avatar position-relative rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden cursor-pointer avatar-font-sm">
+                                        <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                                        {user.propic && (
+                                            <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
                                         )}
                                     </div>
                                     <i className={`bi bi-chevron-down x-small chevron-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
@@ -230,7 +229,7 @@ function VisitList() {
                                         {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
                                                 <i className="bi bi-grid-1x2 text-orange"></i>
-                                                <span>Dashboard</span>
+                                                <span>Dashboard Personale</span>
                                             </a>
                                         )}
                                         
@@ -323,9 +322,14 @@ function VisitList() {
 
                 {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
                     <div className="text-center py-5">
-                        <i className={`bi bi-inbox ${textMuted} icon-5xl mb-3 d-block`}></i>
-                        <h4 className="fw-bold">Nessuna visita disponibile</h4>
-                        <p className={textMuted}>Torna più tardi per nuovi contenuti.</p>
+                        <i className={`bi ${!user ? 'bi-person-x' : 'bi-inbox'} ${textMuted} icon-5xl mb-3 d-block`}></i>
+                        <h4 className="fw-bold">{!user ? "Non sei loggato" : "Nessuna visita disponibile"}</h4>
+                        <p className={textMuted}>{!user ? "Effettua l'accesso per visualizzare le visite acquistate." : "Torna più tardi per nuovi contenuti."}</p>
+                        {!user && (
+                            <a href="../login.html" className="btn bg-orange text-white rounded-pill px-4 fw-bold mt-2 shadow-sm hover-lift">
+                                Vai al Login
+                            </a>
+                        )}
                     </div>
                 ) : (
                     <div className="row g-4 mt-2 mb-5 pb-5">
@@ -352,7 +356,7 @@ function VisitList() {
                                                 <span className={`fw-bold small ${darkMode ? 'text-white' : 'text-dark'}`}>{v.steps ? v.steps.length : 0}</span>
                                                 <span className={`ms-1 small ${textMuted}`}>tappe</span>
                                             </div>
-                                            <Link to={`/navigator/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-4 fw-bold btn-sm shadow-sm transition-theme">
+                                            <Link to={`/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-4 fw-bold btn-sm shadow-sm transition-theme">
                                                 Inizia <i className="bi bi-arrow-right ms-1"></i>
                                             </Link>
                                         </div>
@@ -396,8 +400,11 @@ function VisitList() {
                     </a>
                 ) : (
                     <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" className="mobile-nav-item" onClick={(e) => e.preventDefault()}>
-                        <div className={`user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`} style={{ fontSize: '0.8rem' }}>
-                            <span>{user.name?.charAt(0).toUpperCase()}</span>
+                        <div className={`user-avatar position-relative rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`} style={{ fontSize: '0.8rem' }}>
+                            <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                            {user.propic && (
+                                <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
+                            )}
                         </div>
                         <span>Profilo</span>
                     </a>
@@ -413,8 +420,11 @@ function VisitList() {
                         <button type="button" className="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         {user && (
                             <div className="mt-3">
-                                <div className={`user-avatar auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3 ${darkMode ? 'text-dark' : 'text-orange'}`}>
-                                    <span>{user.name?.charAt(0).toUpperCase()}</span>
+                                <div className={`user-avatar position-relative auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3 overflow-hidden ${darkMode ? 'text-dark' : 'text-orange'}`}>
+                                    <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                                    {user.propic && (
+                                        <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = 1} onError={(e) => e.target.style.opacity = 0} />
+                                    )}
                                 </div>
                                 <h4 className="fw-bold mb-1 text-white">{user.name}</h4>
                                 <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.permissions}</span>
@@ -427,7 +437,7 @@ function VisitList() {
                         {(user?.permissions === 'admin' || user?.permissions === 'editor' || user?.permissions === 'docente') && (
                             <a href="/editor/dashboard" className={`btn d-flex align-items-center gap-3 py-3 px-3 rounded-4 fw-bold shadow-sm hover-lift ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'bg-white text-dark border-0'}`}>
                                 <i className="bi bi-grid-1x2-fill fs-5 text-orange"></i>
-                                <span>Dashboard</span>
+                                <span>Dashboard Personale</span>
                                 <i className="bi bi-chevron-right ms-auto text-muted opacity-50"></i>
                             </a>
                         )}
