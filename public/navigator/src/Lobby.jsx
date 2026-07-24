@@ -15,6 +15,8 @@ export default function Lobby() {
     const [rejected, setRejected] = useState(false);
 
     useEffect(() => {
+        if (window.hideMainLoader) window.hideMainLoader();
+        
         if (!pin || !visitId) {
             navigate('/');
             return;

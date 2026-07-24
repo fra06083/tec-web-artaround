@@ -20,10 +20,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Dal file del prof, utile per leggere i body delle richieste
 
-// 3. FILE STATICI, dato che il percorso non cambia mai
-app.use(express.static(path.join(__dirname, '../public')));
+// 3. FILE STATICI
 app.use('/marketplace', express.static(path.join(__dirname, '../editor-marketplace')));
-app.use('/navigator', express.static(path.join(__dirname, '../navigator/dist')));
+app.use('/navigator', express.static(path.join(__dirname, '../public/navigator/dist')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 4. CONNESSIONE MONGODB
 const dbUser = process.env.MONGO_USER;
@@ -60,15 +60,12 @@ app.use("/editor/user-management", userManagementRoutes);
 
 const uploadRoutes = require("./routes/upload.js");
 app.use("/api/upload", uploadRoutes);
-// used for serving public files (CSS, JS, Images)
-// everything in "public" is accessible via "/"
-app.use('/navigator', express.static(path.join(__dirname, '../public/navigator/dist')));
-app.use('/', express.static(path.join(__dirname, '../public')));
-
 // Catch-all per React Router del navigator
 app.get('/navigator/{*path}', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/navigator/dist/index.html'));
 });
+// Catch-all fallbacks per marketplace se necessari...
+
 // 6. AVVIO DEL SERVER (Correzione cruciale per il 502)
 app.listen(8000, () => {
     global.startDate = new Date();

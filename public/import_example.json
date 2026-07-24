@@ -1,33 +1,33 @@
 {
-  "museums": [
-    {
-      "museum": "Galleria degli Uffizi",
-      "city": "Firenze",
-      "province": "FI",
-      "region": "Toscana",
-      "address": "Piazzale degli Uffizi, 6",
-      "description": "Uno dei musei più famosi al mondo per le sue straordinarie collezioni di sculture antiche e di pitture.",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Uffizi_Firenze.jpg/1200px-Uffizi_Firenze.jpg"
-    }
-  ],
-  "artworks": [
-    {
-      "item": "La Nascita di Venere",
-      "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1200px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
-      "museum_name": "Galleria degli Uffizi",
-      "author": "Sandro Botticelli",
-      "license": "Pubblico Dominio",
-      "description": "Dipinto a tempera su tela di lino realizzato da Sandro Botticelli. Celebra l'ideale rinascimentale di bellezza e amore puro.",
-      "desc_type": "medio"
-    },
-    {
-      "item": "La Primavera",
-      "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Botticelli-primavera.jpg/1200px-Botticelli-primavera.jpg",
-      "museum_name": "Galleria degli Uffizi",
-      "author": "Sandro Botticelli",
-      "license": "Pubblico Dominio",
-      "description": "Un'opera chiave del Rinascimento italiano, allegoria dell'amore e della natura. Rappresenta Venere al centro, attorniata da divinità mitologiche in un giardino rigoglioso.",
-      "desc_type": "dettagliato"
-    }
-  ]
+    "museums": [
+        {
+            "museum": "Galleria degli Uffizi",
+            "city": "Firenze",
+            "province": "FI",
+            "region": "Toscana",
+            "address": "Piazzale degli Uffizi, 6",
+            "description": "Uno dei musei più famosi al mondo per le sue straordinarie collezioni di sculture antiche e di pitture.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Uffizi_Firenze.jpg/1200px-Uffizi_Firenze.jpg"
+        }
+    ],
+    "artworks": [
+        {
+            "item": "La Nascita di Venere",
+            "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1200px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+            "museum_name": "Galleria degli Uffizi",
+            "author": "Sandro Botticelli",
+            "license": "Pubblico Dominio",
+            "description": "Dipinto a tempera su tela di lino realizzato da Sandro Botticelli. Celebra l'ideale rinascimentale di bellezza e amore puro.",
+            "desc_type": "medio"
+        },
+        {
+            "item": "La Primavera",
+            "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Botticelli-primavera.jpg/1200px-Botticelli-primavera.jpg",
+            "museum_name": "Galleria degli Uffizi",
+            "author": "Sandro Botticelli",
+            "license": "Pubblico Dominio",
+            "description": "Un'opera chiave del Rinascimento italiano, allegoria dell'amore e della natura. Rappresenta Venere al centro, attorniata da divinità mitologiche in un giardino rigoglioso.",
+            "desc_type": "dettagliato"
+        }
+    ]
 }
