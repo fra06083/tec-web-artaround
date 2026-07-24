@@ -3,7 +3,7 @@ name: Deploy Automatico su Rosina
 on:
   push:
     branches:
-      - main  # Si attiva ogni volta che pushi su main
+      - main  # Si attiva ogni volta che pushi su main, inutile farlo per roba di test....
 
 jobs:
   deploy:
@@ -15,12 +15,9 @@ jobs:
           host: rosina.cs.unibo.it
           username: francesco.biglieri
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Se il tuo utente è diverso da quello della cartella, 
-          # potresti dover aggiungere una porta o opzioni specifiche, 
-          # ma proviamo prima così:
           script: |
             cd /home/web/site252632/html/
             git fetch origin main
             git reset --hard origin/main
             cd /home/web/site252632/html/public/navigator/
-          #  /usr/local/node/node-20/bin/npm run build
+            /usr/local/node/node-20/bin/npm run build
