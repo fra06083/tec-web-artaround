@@ -28,13 +28,6 @@
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="usersManager()" x-cloak>
 
-    <div x-show="!isReady" x-transition.opacity class="position-fixed top-0 start-0 w-100 h-100 bg-dark" style="z-index: 9999;">
-        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center px-4">
-            <div class="artaround-brand-text mb-4">ArtAround</div>
-            <h3 class="fw-bold">Verifica autorizzazioni...</h3>
-        </div>
-    </div>
-
     <div x-show="isReady" class="d-flex" x-transition.opacity x-cloak>
 
         <!-- Sidebar -->

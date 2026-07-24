@@ -91,13 +91,6 @@ export default function Lobby() {
         <div className="container mt-5 text-center">
             <h1 className="fw-black mb-4">Sei nella Lobby</h1>
             <p className="lead mb-4">Stanza: <span className="fw-bold text-orange">{pin}</span></p>
-            
-            {!rejected && (
-                <div className="artaround-loader">
-                    <div className="artaround-brand-text">ArtAround</div>
-                </div>
-            )}
-            
             <h4 className="fw-bold text-secondary mb-5">{status}</h4>
 
             {rejected && (
