@@ -1,4 +1,4 @@
-const { visit: Visit, museum: Museum } = require('../models/museums');
+const { visit: Visit, museum: Museum, quizQuestion: QuizQuestion } = require('../models/museums');
 
 // GET /api/visite
 // Ritorna le visite. Se l'utente loggato è un docente, ritorna solo le sue.
@@ -160,6 +160,109 @@ const removeItemFromVisit = async (req, res) => {
     }
 };
 
+// GET /api/visite/:id/quiz
+const getQuizByVisit = async (req, res) => {
+    try {
+        const questions = await QuizQuestion.find({ visit_id: req.params.id })
+            .sort({ order: 1 })
+            .lean();
+        res.json(questions);
+    } catch (error) {
+        console.error('Errore nel recupero del quiz:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+};
+
+// POST /api/visite/:id/quiz
+const addQuizQuestion = async (req, res) => {
+    try {
+        const { question, options, correctIndex, order } = req.body;
+
+        if (!question || !Array.isArray(options) || options.length < 2 || correctIndex === undefined) {
+            return res.status(400).json({ error: 'question, options (min 2) e correctIndex sono obbligatori' });
+        }
+        if (correctIndex < 0 || correctIndex >= options.length) {
+            return res.status(400).json({ error: 'correctIndex non valido' });
+        }
+
+        const visit = await Visit.findById(req.params.id);
+        if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
+
+        // Controllo permessi docente (stesso pattern di updateVisit)
+        if (req.user.permissions === 'docente') {
+            if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        const newQuestion = new QuizQuestion({
+            visit_id: req.params.id,
+            question,
+            options,
+            correctIndex,
+            order: order || 0
+        });
+        await newQuestion.save();
+
+        res.status(201).json({ message: 'Domanda aggiunta', question: newQuestion });
+    } catch (error) {
+        console.error('Errore nell\'aggiunta della domanda:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+};
+
+// PUT /api/visite/:id/quiz/:questionId
+const updateQuizQuestion = async (req, res) => {
+    try {
+        const { question, options, correctIndex, order } = req.body;
+
+        const existing = await QuizQuestion.findById(req.params.questionId);
+        if (!existing) return res.status(404).json({ error: 'Domanda non trovata' });
+
+        const visit = await Visit.findById(req.params.id);
+        if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
+
+        if (req.user.permissions === 'docente') {
+            if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        const updated = await QuizQuestion.findByIdAndUpdate(
+            req.params.questionId,
+            { $set: { question, options, correctIndex, order } },
+            { returnDocument: 'after', runValidators: true }
+        );
+
+        res.json({ message: 'Domanda aggiornata', question: updated });
+    } catch (error) {
+        console.error('Errore nell\'aggiornamento della domanda:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+};
+
+// DELETE /api/visite/:id/quiz/:questionId
+const removeQuizQuestion = async (req, res) => {
+    try {
+        const visit = await Visit.findById(req.params.id);
+        if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
+
+        if (req.user.permissions === 'docente') {
+            if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        const deleted = await QuizQuestion.findByIdAndDelete(req.params.questionId);
+        if (!deleted) return res.status(404).json({ error: 'Domanda non trovata' });
+
+        res.json({ message: 'Domanda rimossa' });
+    } catch (error) {
+        console.error('Errore nella rimozione della domanda:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+};
+
 module.exports = {
     getAllVisits,
     getVisitById,
@@ -168,5 +271,9 @@ module.exports = {
     deleteVisit,
     getItemsByVisit,
     addItemToVisit,
-    removeItemFromVisit
+    removeItemFromVisit,
+    getQuizByVisit,
+    addQuizQuestion,
+    updateQuizQuestion,
+    removeQuizQuestion
 };

@@ -32,4 +32,18 @@ router.post('/:id/items', auth, visitsCtrl.addItemToVisit);
 // DELETE /api/visite/:id/items/:itemId = rimuove un item da una visita
 router.delete('/:id/items/:itemId', auth, visitsCtrl.removeItemFromVisit);
 
+// ─── QUIZ (domande a scelta multipla legate a una visita) ───────────────────
+
+// GET /api/visite/:id/quiz = lista domande della visita (pubblica: serve al Navigator per erogare il quiz)
+router.get('/:id/quiz', visitsCtrl.getQuizByVisit);
+
+// POST /api/visite/:id/quiz = aggiunge una domanda alla visita (solo docente/editor autenticato)
+router.post('/:id/quiz', auth, visitsCtrl.addQuizQuestion);
+
+// PUT /api/visite/:id/quiz/:questionId = modifica una domanda
+router.put('/:id/quiz/:questionId', auth, visitsCtrl.updateQuizQuestion);
+
+// DELETE /api/visite/:id/quiz/:questionId = rimuove una domanda
+router.delete('/:id/quiz/:questionId', auth, visitsCtrl.removeQuizQuestion);
+
 module.exports = router;

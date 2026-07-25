@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const { quizQuestion: QuizQuestion, quizResult: QuizResult } = require('../models/museums.js');
 
 // Memoria RAM per le stanze
 // Struttura: { [pin]: { visitId, teacherId, currentArtworkIndex, clients: [] } }
@@ -34,11 +35,16 @@ router.post('/create', (req, res) => {
         visitId,
         teacherId: teacherId || null,
         currentArtworkIndex: 0,
-        clients: [], // conterranno gli oggetti response per SSE
-        students: [], // contiene i nomi degli studenti per mostrarli nella lobby
+        clients: [],
+        students: [],
         isStarted: false,
-        allowLateJoins: req.body.allowLateJoins !== false, // default true
-        pendingRequests: new Map() // reqId -> studentName
+        allowLateJoins: req.body.allowLateJoins !== false,
+        pendingRequests: new Map(),
+        // --- NUOVO: stato quiz ---
+        quizActive: false,
+        quizQuestions: [],   // copia completa (con correctIndex), solo server-side
+        quizAnswers: {},     // { studentName: { [questionId]: selectedIndex } }
+        quizResults: null    // array dei risultati calcolati a fine quiz
     });
 
     console.log(`Stanza creata: ${pin} per visita ${visitId}`);
@@ -224,6 +230,97 @@ router.post('/end', (req, res) => {
     activeRooms.delete(pin);
     
     res.json({ success: true });
+});
+
+// Docente avvia il quiz di fine visita
+router.post('/quiz/start', async (req, res) => {
+    const { pin } = req.body;
+    const room = activeRooms.get(pin);
+    if (!room) return res.status(404).json({ error: "Stanza non trovata" });
+
+    try {
+        const questions = await QuizQuestion.find({ visit_id: room.visitId }).sort({ order: 1 }).lean();
+        if (questions.length === 0) {
+            return res.status(400).json({ error: "Nessuna domanda quiz disponibile per questa visita" });
+        }
+
+        room.quizQuestions = questions;
+        room.quizAnswers = {};
+        room.quizResults = null;
+        room.quizActive = true;
+
+        // Versione senza risposta corretta, da mandare agli studenti
+        const sanitized = questions.map(q => ({ _id: q._id, question: q.question, options: q.options }));
+        broadcastToRoom(pin, 'quiz-started', { questions: sanitized });
+
+        res.json({ success: true, questionCount: questions.length });
+    } catch (err) {
+        console.error("Errore avvio quiz:", err);
+        res.status(500).json({ error: "Errore interno del server" });
+    }
+});
+
+// Studente invia le risposte
+router.post('/quiz/answer', (req, res) => {
+    const { pin, studentName, answers } = req.body; // answers: { [questionId]: selectedIndex }
+
+    const room = activeRooms.get(pin);
+    if (!room) return res.status(404).json({ error: "Stanza non trovata" });
+    if (!room.quizActive) return res.status(400).json({ error: "Il quiz non è attivo" });
+
+    room.quizAnswers[studentName] = answers;
+    broadcastToRoom(pin, 'quiz-student-submitted', { studentName });
+
+    res.json({ success: true });
+});
+
+// Docente termina il quiz: calcola i punteggi, li salva nel DB, li invia a tutti
+router.post('/quiz/finish', async (req, res) => {
+    const { pin } = req.body;
+    const room = activeRooms.get(pin);
+    if (!room) return res.status(404).json({ error: "Stanza non trovata" });
+
+    try {
+        const total = room.quizQuestions.length;
+        const results = [];
+
+        for (const [studentName, answers] of Object.entries(room.quizAnswers)) {
+            let score = 0;
+            const details = room.quizQuestions.map(q => {
+                const selectedIndex = answers ? answers[q._id.toString()] : undefined;
+                const correct = selectedIndex === q.correctIndex;
+                if (correct) score++;
+                return { question_id: q._id, selectedIndex, correct };
+            });
+
+            results.push({ studentName, score, total, details });
+
+            await QuizResult.create({
+                visit_id: room.visitId,
+                studentName,
+                score,
+                total,
+                details
+            });
+        }
+
+        // Studenti connessi che non hanno risposto: punteggio 0
+        room.students.forEach(name => {
+            if (!room.quizAnswers[name]) {
+                results.push({ studentName: name, score: 0, total, details: [] });
+            }
+        });
+
+        room.quizActive = false;
+        room.quizResults = results;
+
+        broadcastToRoom(pin, 'quiz-results', { results });
+
+        res.json({ success: true, results });
+    } catch (err) {
+        console.error("Errore chiusura quiz:", err);
+        res.status(500).json({ error: "Errore interno del server" });
+    }
 });
 
 module.exports = router;

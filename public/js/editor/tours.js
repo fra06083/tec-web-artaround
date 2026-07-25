@@ -35,6 +35,11 @@ document.addEventListener('alpine:init', () => {
         artworkSearch: '', // Search filter for available artworks
         tourSearch: '', // Search filter for tours
 
+        // QUIZ MANAGEMENT
+        quizQuestions: [],
+        newQuestion: { question: '', options: ['', ''], correctIndex: 0 },
+        editingQuestionId: null,
+
         // NOTIFICATIONS
         notification: {
             show: false,
@@ -185,6 +190,7 @@ document.addEventListener('alpine:init', () => {
                     logistic_info: []
                 };
                 this.selectedArtworks = [];
+                this.quizQuestions = [];
             } else {
                 // Load existing tour
                 await this.loadTour(this.selectedTourId);
@@ -217,6 +223,8 @@ document.addEventListener('alpine:init', () => {
 
                     // Load artworks in the tour
                     await this.fetchTourArtworks();
+                    // Load quiz questions in the tour
+                    await this.fetchQuizQuestions();
                 } else {
                     this.showToast("Errore nel caricamento della visita", "error");
                 }
@@ -365,6 +373,7 @@ document.addEventListener('alpine:init', () => {
                     const data = await res.json();
                     if (!isEdit) {
                         this.tour._id = data.visit._id;
+                        this.quizQuestions = []; // nuova visita, nessuna domanda ancora
                     }
                     this.showToast(isEdit ? "Visita aggiornata con successo!" : "Visita creata con successo!");
                 } else {
@@ -414,6 +423,113 @@ document.addEventListener('alpine:init', () => {
                     this.showToast("Visita eliminata con successo!");
                     await this.fetchToursByMuseum();
                     this.selectedTourId = '';
+                } else {
+                    this.showToast("Errore nell'eliminazione", "error");
+                }
+            } catch (e) {
+                this.showToast("Errore di connessione", "error");
+            }
+        },
+
+        // --- QUIZ MANAGEMENT ---
+        async fetchQuizQuestions() {
+            if (!this.tour._id) return;
+            try {
+                const res = await fetch(`/api/visite/${this.tour._id}/quiz`);
+                if (res.ok) {
+                    this.quizQuestions = await res.json();
+                }
+            } catch (e) {
+                this.showToast("Errore nel caricamento del quiz", "error");
+            }
+        },
+
+        addOption() {
+            if (this.newQuestion.options.length >= 6) return;
+            this.newQuestion.options.push('');
+        },
+
+        removeOption(index) {
+            if (this.newQuestion.options.length <= 2) return;
+            this.newQuestion.options.splice(index, 1);
+            if (this.newQuestion.correctIndex >= this.newQuestion.options.length) {
+                this.newQuestion.correctIndex = 0;
+            }
+        },
+
+        startEditQuestion(q) {
+            this.editingQuestionId = q._id;
+            this.newQuestion = {
+                question: q.question,
+                options: [...q.options],
+                correctIndex: q.correctIndex
+            };
+        },
+
+        cancelEditQuestion() {
+            this.editingQuestionId = null;
+            this.newQuestion = { question: '', options: ['', ''], correctIndex: 0 };
+        },
+
+        async saveQuizQuestion() {
+            if (!this.newQuestion.question.trim()) {
+                this.showToast("Inserisci il testo della domanda", "error");
+                return;
+            }
+            const filledOptions = this.newQuestion.options.map(o => o.trim()).filter(o => o !== '');
+            if (filledOptions.length < 2) {
+                this.showToast("Servono almeno 2 opzioni compilate", "error");
+                return;
+            }
+            if (this.newQuestion.correctIndex >= filledOptions.length) {
+                this.showToast("Seleziona quale opzione è corretta", "error");
+                return;
+            }
+
+            const isEdit = !!this.editingQuestionId;
+            const url = isEdit
+                ? `/api/visite/${this.tour._id}/quiz/${this.editingQuestionId}`
+                : `/api/visite/${this.tour._id}/quiz`;
+            const method = isEdit ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem('artaround_token')
+                    },
+                    body: JSON.stringify({
+                        question: this.newQuestion.question.trim(),
+                        options: filledOptions,
+                        correctIndex: this.newQuestion.correctIndex,
+                        order: this.quizQuestions.length
+                    })
+                });
+
+                if (res.ok) {
+                    this.showToast(isEdit ? "Domanda aggiornata!" : "Domanda aggiunta!");
+                    this.cancelEditQuestion();
+                    await this.fetchQuizQuestions();
+                } else {
+                    const err = await res.json();
+                    this.showToast(err.error || "Errore nel salvataggio della domanda", "error");
+                }
+            } catch (e) {
+                this.showToast("Errore di connessione", "error");
+            }
+        },
+
+        async deleteQuizQuestion(questionId) {
+            if (!confirm("Eliminare questa domanda?")) return;
+            try {
+                const res = await fetch(`/api/visite/${this.tour._id}/quiz/${questionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                });
+                if (res.ok) {
+                    this.showToast("Domanda eliminata");
+                    await this.fetchQuizQuestions();
                 } else {
                     this.showToast("Errore nell'eliminazione", "error");
                 }

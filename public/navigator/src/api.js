@@ -31,6 +31,13 @@ export async function fetchDescriptionsByItem(id) {
     return res.json();
 }
 
+// Ritorna le domande quiz associate a una visita (array vuoto se non ce ne sono)
+export async function fetchQuizByVisita(id) {
+    const res = await fetch(`${API_BASE}/visite/${id}/quiz`);
+    if (!res.ok) throw new Error('Errore nel caricamento quiz');
+    return res.json();
+}
+
 export function getUser() {
     // grab the jwt token to check if we are logged in
     const token = localStorage.getItem('artaround_token');

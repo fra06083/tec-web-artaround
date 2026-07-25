@@ -42,9 +42,50 @@ const languageSchema = new mongoose.Schema({
     }
 });
 
+// 4. LA DOMANDA QUIZ (Collegata alla visita)
+const quizQuestionSchema = new mongoose.Schema({
+    visit_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'visit', // Collega la domanda alla sua visita
+        required: true
+    },
+    question: { type: String, required: true },
+    options: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: (arr) => arr.length >= 2,
+            message: 'Servono almeno 2 opzioni di risposta'
+        }
+    },
+    correctIndex: { type: Number, required: true }, // indice dell'opzione corretta in "options"
+    order: { type: Number, default: 0 } // per ordinare le domande nel quiz
+});
+
+// 5. IL RISULTATO QUIZ (Punteggio di uno studente per una visita)
+const quizResultSchema = new mongoose.Schema({
+    visit_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'visit',
+        required: true
+    },
+    studentName: { type: String, required: true },
+    score: { type: Number, required: true },
+    total: { type: Number, required: true },
+    details: [{
+        question_id: { type: mongoose.Schema.Types.ObjectId, ref: 'quizQuestion' },
+        selectedIndex: Number,
+        correct: Boolean
+    }],
+    date: { type: Date, default: Date.now }
+});
+
 const museum = mongoose.model('museum', museumSchema);
 const item = mongoose.model('item', itemSchema);
 const language = mongoose.model('language', languageSchema);
 const visit = mongoose.model('visit', visitSchema);
+const quizQuestion = mongoose.model('quizQuestion', quizQuestionSchema);
+const quizResult = mongoose.model('quizResult', quizResultSchema);
 // Esportiamo tutto correttamente
-module.exports = { museum, item, visit, language };
+module.exports = { museum, item, visit, language, quizQuestion, quizResult };
+

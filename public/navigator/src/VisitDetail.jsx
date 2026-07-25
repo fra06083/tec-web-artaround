@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, getDarkMode, setDarkMode, getUser, fetchUser, logout } from './api';
+import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, fetchQuizByVisita, getDarkMode, setDarkMode, getUser, fetchUser, logout } from './api';
 import ProfileModal from './Profile';
 
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
@@ -37,6 +37,15 @@ function VisitDetail() {
     const [studentActions, setStudentActions] = useState({});
     const [lightboxImage, setLightboxImage] = useState(null);
     const messagesEndRef = useRef(null);
+
+    // Stati per il Quiz di fine visita
+    const [hasQuiz, setHasQuiz] = useState(false);
+    const [quizPhase, setQuizPhase] = useState('none'); // 'none' | 'active' | 'results'
+    const [quizQuestions, setQuizQuestions] = useState([]); // domande senza correctIndex (arrivano via SSE)
+    const [quizAnswers, setQuizAnswers] = useState({}); // { [questionId]: selectedIndex } - risposte locali dello studente
+    const [quizSubmitted, setQuizSubmitted] = useState(false);
+    const [quizResults, setQuizResults] = useState(null); // array [{ studentName, score, total, details }]
+    const [studentsSubmitted, setStudentsSubmitted] = useState([]); // nomi studenti che hanno gia' inviato (vista docente)
 
     // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
     useEffect(() => {
@@ -125,6 +134,58 @@ function VisitDetail() {
         }
     };
 
+    // --- QUIZ: azioni docente ---
+    const startQuiz = async () => {
+        if (!pin) return;
+        try {
+            const res = await fetch('/api/rooms/quiz/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                alert(err.error || "Errore nell'avvio del quiz");
+            }
+        } catch (err) {
+            console.error("Errore avvio quiz:", err);
+        }
+    };
+
+    const finishQuiz = async () => {
+        if (!pin) return;
+        try {
+            await fetch('/api/rooms/quiz/finish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin })
+            });
+        } catch (err) {
+            console.error("Errore chiusura quiz:", err);
+        }
+    };
+
+    // --- QUIZ: azioni studente ---
+    const selectQuizAnswer = (questionId, optionIndex) => {
+        setQuizAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
+    };
+
+    const submitQuizAnswers = async () => {
+        if (!pin) return;
+        const studentName = user?.name || localStorage.getItem('studentName');
+        if (!studentName) return;
+        try {
+            await fetch('/api/rooms/quiz/answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin, studentName, answers: quizAnswers })
+            });
+            setQuizSubmitted(true);
+        } catch (err) {
+            console.error("Errore invio risposte quiz:", err);
+        }
+    };
+
     useEffect(() => {
         // Applica la classe dark-mode al body
         if (darkMode) {
@@ -166,6 +227,15 @@ function VisitDetail() {
                 const [visitaData, itemsData] = await Promise.all([fetchVisita(id), fetchItemsByVisita(id)]);
                 setVisita(visitaData);
                 setItems(itemsData);
+
+                // Verifica se questa visita ha un quiz di fine visita associato
+                try {
+                    const quiz = await fetchQuizByVisita(id);
+                    setHasQuiz(quiz.length > 0);
+                } catch (quizErr) {
+                    // Non bloccante: se il quiz non si carica, semplicemente non viene mostrato
+                    console.error("Errore nel controllo quiz:", quizErr);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -277,6 +347,29 @@ function VisitDetail() {
                 alert("La visita è stata terminata dall'insegnante.");
                 window.location.href = '/navigator/';
             }
+        });
+
+        // --- QUIZ: eventi live ---
+        eventSource.addEventListener('quiz-started', (e) => {
+            const data = JSON.parse(e.data);
+            setQuizQuestions(data.questions || []);
+            setQuizAnswers({});
+            setQuizSubmitted(false);
+            setQuizResults(null);
+            setStudentsSubmitted([]);
+            setQuizPhase('active');
+        });
+
+        eventSource.addEventListener('quiz-student-submitted', (e) => {
+            if (role !== 'teacher') return;
+            const data = JSON.parse(e.data);
+            setStudentsSubmitted(prev => prev.includes(data.studentName) ? prev : [...prev, data.studentName]);
+        });
+
+        eventSource.addEventListener('quiz-results', (e) => {
+            const data = JSON.parse(e.data);
+            setQuizResults(data.results || []);
+            setQuizPhase('results');
         });
 
         return () => {
@@ -621,9 +714,15 @@ function VisitDetail() {
                                         </div>
                                         
                                         {currentIndex === items.length - 1 ? (
-                                            <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
-                                                <span className="d-none d-sm-inline">Termina Visita</span> <i className="bi bi-stop-circle"></i>
-                                            </button>
+                                            (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
+                                                <button onClick={startQuiz} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
+                                                    <span className="d-none d-sm-inline">Avvia Quiz</span> <i className="bi bi-patch-question"></i>
+                                                </button>
+                                            ) : (
+                                                <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
+                                                    <span className="d-none d-sm-inline">Termina Visita</span> <i className="bi bi-stop-circle"></i>
+                                                </button>
+                                            )
                                         ) : (
                                             <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
                                                 <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-arrow-right"></i>
@@ -636,6 +735,120 @@ function VisitDetail() {
                     </div>
                 </div>
             </main>
+
+            {/* QUIZ OVERLAY (monitoraggio docente / risposta studente / risultati) */}
+            {pin && quizPhase !== 'none' && (
+                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
+                    <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 w-100 max-w-600 ${darkMode ? 'bg-dark bg-opacity-90 text-white' : 'bg-white text-dark'}`} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="card-body p-4 p-md-5">
+
+                            {/* DOCENTE: monitoraggio quiz in corso */}
+                            {role === 'teacher' && quizPhase === 'active' && (
+                                <>
+                                    <h3 className="fw-black mb-2"><i className="bi bi-patch-question text-orange me-2"></i>Quiz in corso</h3>
+                                    <p className={textMuted}>Gli studenti stanno rispondendo a {quizQuestions.length} domande.</p>
+                                    <div className="my-4">
+                                        <h6 className="fw-bold mb-2">Hanno risposto ({studentsSubmitted.length}/{connectedStudents.length})</h6>
+                                        <div className="d-flex flex-wrap gap-2">
+                                            {connectedStudents.length === 0 && (
+                                                <span className={textMuted}>Nessuno studente connesso</span>
+                                            )}
+                                            {connectedStudents.map(s => (
+                                                <span key={s} className={`badge rounded-pill px-3 py-2 ${studentsSubmitted.includes(s) ? 'bg-success' : 'bg-secondary'}`}>
+                                                    {studentsSubmitted.includes(s) && <i className="bi bi-check-lg me-1"></i>}
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <button onClick={finishQuiz} className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100">
+                                        <i className="bi bi-flag-fill me-2"></i>Termina Quiz e mostra risultati
+                                    </button>
+                                </>
+                            )}
+
+                            {/* STUDENTE: rispondi al quiz */}
+                            {role !== 'teacher' && quizPhase === 'active' && !quizSubmitted && (
+                                <>
+                                    <h3 className="fw-black mb-3"><i className="bi bi-patch-question text-orange me-2"></i>Quiz finale</h3>
+                                    {quizQuestions.map((q, qi) => (
+                                        <div key={q._id} className="mb-4">
+                                            <h6 className="fw-bold mb-2">{qi + 1}. {q.question}</h6>
+                                            <div className="d-flex flex-column gap-2">
+                                                {q.options.map((opt, oi) => (
+                                                    <button
+                                                        key={oi}
+                                                        type="button"
+                                                        onClick={() => selectQuizAnswer(q._id, oi)}
+                                                        className={`btn text-start rounded-3 py-2 px-3 ${quizAnswers[q._id] === oi ? 'bg-orange text-white' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
+                                                    >
+                                                        {opt}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        onClick={submitQuizAnswers}
+                                        disabled={Object.keys(quizAnswers).length < quizQuestions.length}
+                                        className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100 mt-2"
+                                    >
+                                        Invia risposte
+                                    </button>
+                                </>
+                            )}
+
+                            {/* STUDENTE: in attesa dopo l'invio */}
+                            {role !== 'teacher' && quizPhase === 'active' && quizSubmitted && (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-orange mb-3" role="status"></div>
+                                    <h5 className="fw-bold">Risposte inviate!</h5>
+                                    <p className={textMuted}>In attesa che il docente concluda il quiz...</p>
+                                </div>
+                            )}
+
+                            {/* RISULTATI (docente e studente) */}
+                            {quizPhase === 'results' && quizResults && (
+                                <>
+                                    <h3 className="fw-black mb-3"><i className="bi bi-bar-chart-fill text-orange me-2"></i>Risultati Quiz</h3>
+
+                                    {role === 'teacher' ? (
+                                        <div className="d-flex flex-column gap-2 mb-4">
+                                            {[...quizResults]
+                                                .sort((a, b) => b.score - a.score)
+                                                .map(r => (
+                                                    <div key={r.studentName} className={`d-flex justify-content-between align-items-center p-3 rounded-3 ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
+                                                        <span className="fw-bold">{r.studentName}</span>
+                                                        <span className="badge bg-orange text-white rounded-pill px-3 py-2">{r.score}/{r.total}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    ) : (
+                                        (() => {
+                                            const studentName = user?.name || localStorage.getItem('studentName');
+                                            const myResult = quizResults.find(r => r.studentName === studentName);
+                                            return myResult ? (
+                                                <div className="text-center py-4">
+                                                    <h1 className="display-3 fw-black text-orange mb-0">{myResult.score}/{myResult.total}</h1>
+                                                    <p className={textMuted}>Il tuo punteggio</p>
+                                                </div>
+                                            ) : (
+                                                <p className={`text-center ${textMuted}`}>Non hai completato il quiz in tempo.</p>
+                                            );
+                                        })()
+                                    )}
+
+                                    {role === 'teacher' && (
+                                        <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-4 py-2 fw-bold w-100">
+                                            <i className="bi bi-stop-circle me-2"></i>Termina Visita
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* LIGHTBOX MODAL */}
             {lightboxImage && (
