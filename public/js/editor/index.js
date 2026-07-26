@@ -15,6 +15,7 @@ function marketplaceApp() {
         searchQuery: '',
         isLoading: true,
         isReady: false,
+        isCartOpen: false,
         darkMode: false,
         stats: {
             publishedTours: 0,

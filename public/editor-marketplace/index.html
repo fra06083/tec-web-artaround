@@ -258,16 +258,6 @@
             </div>
         </main>
 
-        <!-- FLOATING CART BUTTON -->
-        <div class="mobile-floating-cart d-lg-none" x-data="{ isCartOpen: false, isProfileOpen: false }" @cart-opened.window="isCartOpen = true" @cart-closed.window="isCartOpen = false" @profile-opened.window="isProfileOpen = true" @profile-closed.window="isProfileOpen = false" x-show="!isCartOpen && !isProfileOpen" x-transition.opacity>
-            <button @click="if(isLoggedIn) { var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show(); } else { showToast('Devi essere loggato per poter acquistare! Vai su ' + (window.innerWidth >= 992 ? 'Sign in' : 'ACCEDI'), 'error'); }"
-                class="btn btn-premium-orange rounded-circle d-flex align-items-center justify-content-center shadow-lg position-relative cart-fab">
-                <i class="bi bi-cart3"></i>
-                <span class="badge bg-white text-orange position-absolute top-0 end-0 rounded-circle shadow-sm"
-                    x-show="cartCount > 0" x-text="cartCount"></span>
-            </button>
-        </div>
-
         <!-- FOOTER -->
         <footer class="py-4 mt-auto pb-5 mb-5 pb-lg-4 mb-lg-0" :class="darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-light border-top'">
             <div class="container-lg">
@@ -490,6 +480,9 @@
     </div>
     <!-- CART FLOATING ACTION BUTTON (FAB) -->
     <button class="cart-fab"
+        x-show="!isCartOpen"
+        @cart-opened.window="isCartOpen = true"
+        @cart-closed.window="isCartOpen = false"
         @click="if(isLoggedIn) { var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show(); } else { showToast('Devi essere loggato per poter acquistare! Vai su Sign in', 'error'); }">
         <i class="bi bi-cart3 fs-3"></i>
         <span class="badge bg-danger rounded-pill"
