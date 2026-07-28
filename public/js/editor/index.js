@@ -43,6 +43,15 @@ function marketplaceApp() {
             const savedDarkMode = localStorage.getItem('artaround_darkmode');
             this.darkMode = savedDarkMode === 'true';
 
+            const savedCart = localStorage.getItem('artaround_cart');
+            if (savedCart) {
+                try {
+                    this.cart = JSON.parse(savedCart);
+                } catch (e) {
+                    console.error('Errore parsing carrello salvato', e);
+                }
+            }
+
             // Watch for dark mode changes
             this.$watch('darkMode', (value) => {
                 localStorage.setItem('artaround_darkmode', value);
@@ -161,9 +170,14 @@ function marketplaceApp() {
             return this.cart.some(item => item._id === tourId);
         },
 
+        saveCart() {
+            localStorage.setItem('artaround_cart', JSON.stringify(this.cart));
+        },
+
         addToCart(tour) {
             if (!this.isInCart(tour._id)) {
                 this.cart.push(tour);
+                this.saveCart();
                 this.showToast('Tour aggiunto al carrello!', 'success');
             } else {
                 this.showToast('Il tour è già nel carrello!', 'warning');
@@ -172,6 +186,7 @@ function marketplaceApp() {
 
         removeFromCart(tourId) {
             this.cart = this.cart.filter(item => item._id !== tourId);
+            this.saveCart();
         },
 
         editTour(tourId) {
@@ -229,6 +244,7 @@ function marketplaceApp() {
                 if (response.ok) {
                     this.purchasedVisits = [...this.purchasedVisits, ...visitIds];
                     this.cart = []; // Svuota carrello
+                    this.saveCart();
                     this.showToast('Acquisto completato con successo!', 'success');
                 } else {
                     this.showToast('Errore durante l\'acquisto.', 'error');
