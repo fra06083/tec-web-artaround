@@ -53,7 +53,7 @@ const getDescriptionsByArtwork = async (req, res) => {
 // POST /api/artworks
 const createArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license, description, desc_type } = req.body;
+        const { item, img_path, museum_id, author, license, description, desc_type, desc_length } = req.body;
 
         // for the moment the description is mandatory..
         if (!item || !img_path || !museum_id || !author || !license || !description) {
@@ -75,8 +75,7 @@ const createArtwork = async (req, res) => {
             // default
             type: desc_type || 'medio',
             text: description,
-            // this actually needs to a time selected by the user
-            length: description.length.toString(),
+            length: desc_length || '15s',
             item_id: newArtwork._id
         });
         await newLanguage.save();
@@ -93,7 +92,7 @@ const createArtwork = async (req, res) => {
 // PUT /api/artworks/:id
 const updateArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license, description, desc_type } = req.body;
+        const { item, img_path, museum_id, author, license, description, desc_type, desc_length } = req.body;
 
         const updated = await Item.findByIdAndUpdate(
             req.params.id,
@@ -102,10 +101,10 @@ const updateArtwork = async (req, res) => {
         );
 
         await Language.findOneAndUpdate(
-            { item_id: req.params.id, type: desc_type },
+            { item_id: req.params.id, type: desc_type || 'medio', length: desc_length || '15s' },
             { $set: {
                 text: description,
-                length: description.length.toString(),
+                length: desc_length || '15s',
                 type: desc_type || 'medio'
             }},
             { upsert: true }

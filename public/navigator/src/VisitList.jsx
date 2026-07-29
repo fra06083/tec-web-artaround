@@ -52,11 +52,11 @@ function VisitList() {
     };
 
     useEffect(() => {
-        // Applica la classe dark-mode al body
+        // Applica la classe dark-mode a documentElement
         if (darkMode) {
-            document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
         } else {
-            document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         }
 
         // Sincronizza dark mode con localStorage
@@ -64,9 +64,9 @@ function VisitList() {
             const newDarkMode = getDarkMode();
             setDarkModeState(newDarkMode);
             if (newDarkMode) {
-                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
             } else {
-                document.body.classList.remove('dark-mode');
+                document.documentElement.classList.remove('dark-mode');
             }
         };
 
@@ -89,7 +89,7 @@ function VisitList() {
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
-            document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         };
     }, [darkMode]);
 

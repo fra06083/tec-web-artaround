@@ -315,23 +315,33 @@
 
                             <!-- Description Tabs -->
                             <div class="mb-3">
-                                <label class="form-label text-white-50 small">Descrizioni per tipo</label>
+                                <label class="form-label text-white-50 small">Descrizioni dell'opera</label>
+                                
+                                <!-- Tab Livelli -->
                                 <div class="d-flex gap-2 mb-2 flex-wrap">
                                     <template x-for="type in ['infantile','semplice','medio','dettagliato']" :key="type">
-                                        <button type="button"
-                                            @click="activeDescType = type"
-                                            :class="activeDescType === type ? 'btn-orange' : 'btn-outline-secondary'"
-                                            class="btn btn-sm rounded-pill px-3 text-capitalize">
+                                        <button type="button" @click="activeDescType = type" :class="activeDescType === type ? 'btn-orange' : 'btn-outline-secondary'" class="btn btn-sm rounded-pill px-3 text-capitalize">
                                             <span x-text="type"></span>
-                                            <i x-show="descriptions[type]" class="bi bi-check-circle-fill ms-1 text-white opacity-75"></i>
+                                            <i x-show="Object.values(descriptions[type] || {}).some(t => t.trim() !== '')" class="bi bi-check-circle-fill ms-1 text-white opacity-75"></i>
                                         </button>
                                     </template>
                                 </div>
+
+                                <!-- Tab Lunghezze -->
+                                <div class="d-flex gap-2 mb-2 flex-wrap">
+                                    <template x-for="len in ['3s','15s','40s']" :key="len">
+                                        <button type="button" @click="activeDescLength = len" :class="activeDescLength === len ? 'btn-primary' : 'btn-outline-secondary'" class="btn btn-sm rounded-pill px-3 text-capitalize">
+                                            <span x-text="len"></span>
+                                            <i x-show="(descriptions[activeDescType] && descriptions[activeDescType][len] && descriptions[activeDescType][len].trim() !== '')" class="bi bi-check-circle-fill ms-1 text-white opacity-75"></i>
+                                        </button>
+                                    </template>
+                                </div>
+
                                 <textarea
                                     class="form-control bg-dark text-white border-secondary hover-glow"
                                     rows="4"
-                                    :placeholder="'Descrizione ' + activeDescType + '...'"
-                                    x-model="descriptions[activeDescType]">
+                                    :placeholder="'Descrizione ' + activeDescType + ' (' + activeDescLength + ')...'"
+                                    x-model="descriptions[activeDescType][activeDescLength]">
                                 </textarea>
                             </div>
 

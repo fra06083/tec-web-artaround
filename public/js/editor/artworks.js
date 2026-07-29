@@ -12,7 +12,13 @@ function artworkManager() {
         artworks: [],
         selectedMuseumId: '',
         activeDescType: 'medio',
-        descriptions: { infantile: '', semplice: '', medio: '', dettagliato: '' },
+        activeDescLength: '15s',
+        descriptions: { 
+            infantile: { '3s': '', '15s': '', '40s': '' }, 
+            semplice: { '3s': '', '15s': '', '40s': '' }, 
+            medio: { '3s': '', '15s': '', '40s': '' }, 
+            dettagliato: { '3s': '', '15s': '', '40s': '' } 
+        },
 
         // CURRENT ARTWORK OBJECT (For Form)
         currentArtwork: {
@@ -137,8 +143,14 @@ function artworkManager() {
         },
 
         async openArtworkForm(artwork = null) {
-            this.descriptions = { infantile: '', semplice: '', medio: '', dettagliato: '' };
+            this.descriptions = { 
+                infantile: { '3s': '', '15s': '', '40s': '' }, 
+                semplice: { '3s': '', '15s': '', '40s': '' }, 
+                medio: { '3s': '', '15s': '', '40s': '' }, 
+                dettagliato: { '3s': '', '15s': '', '40s': '' } 
+            };
             this.activeDescType = 'medio';
+            this.activeDescLength = '15s';
 
             // open form for new or existing artwork
             if (artwork) {
@@ -156,7 +168,11 @@ function artworkManager() {
                 try {
                     const res = await fetch(`/api/artworks/${artwork._id}/descriptions`, { headers: { Authorization: localStorage.getItem('artaround_token') } });
                     const descs = await res.json();
-                    descs.forEach(d => { this.descriptions[d.type] = d.text; });
+                    descs.forEach(d => { 
+                        if (this.descriptions[d.type] && d.length) {
+                            this.descriptions[d.type][d.length] = d.text;
+                        }
+                    });
                 } catch(e) { console.error(e); }
             } else {
                 // reset fields for new artwork
@@ -183,13 +199,22 @@ function artworkManager() {
                 return;
             }
 
-            const filledTypes = Object.entries(this.descriptions).filter(([, text]) => text.trim());
+            const allDescriptions = [];
+            for (const type of Object.keys(this.descriptions)) {
+                for (const len of Object.keys(this.descriptions[type])) {
+                    const text = this.descriptions[type][len].trim();
+                    if (text) {
+                        allDescriptions.push({ type, length: len, text });
+                    }
+                }
+            }
 
-            const [firstType, firstText] = filledTypes[0] || ['medio', ''];
+            const firstDesc = allDescriptions[0] || { type: 'medio', length: '15s', text: '' };
             const payload = {
                 ...this.currentArtwork,
-                desc_type: firstType,
-                description: firstText
+                desc_type: firstDesc.type,
+                desc_length: firstDesc.length,
+                description: firstDesc.text
             };
 
             const isEdit = !!this.currentArtwork._id;
@@ -205,12 +230,12 @@ function artworkManager() {
                 const data = await res.json();
                 const artworkId = isEdit ? this.currentArtwork._id : data.artwork._id;
 
-                // save remaining description types
-                for (const [type, text] of filledTypes.slice(1)) {
+                // save remaining description types/lengths
+                for (const desc of allDescriptions.slice(1)) {
                     await fetch(`/api/artworks/${artworkId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', Authorization: localStorage.getItem('artaround_token') },
-                        body: JSON.stringify({ ...this.currentArtwork, _id: artworkId, desc_type: type, description: text })
+                        body: JSON.stringify({ ...this.currentArtwork, _id: artworkId, desc_type: desc.type, desc_length: desc.length, description: desc.text })
                     });
                 }
 

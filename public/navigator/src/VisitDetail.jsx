@@ -4,6 +4,7 @@ import { fetchVisita, fetchItemsByVisita, fetchDescriptionsByItem, fetchQuizByVi
 import ProfileModal from './Profile';
 
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
+const LENGTHS = ['3s', '15s', '40s'];
 
 function VisitDetail() {
     const { id } = useParams();
@@ -25,6 +26,7 @@ function VisitDetail() {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [descriptions, setDescriptions] = useState([]);
     const [selectedType, setSelectedType] = useState('medio');
+    const [selectedLength, setSelectedLength] = useState('15s');
     const [isSpeaking, setIsSpeaking] = useState(false);
 
     // Nuovi stati per Chat e Azioni
@@ -37,6 +39,11 @@ function VisitDetail() {
     const [studentActions, setStudentActions] = useState({});
     const [lightboxImage, setLightboxImage] = useState(null);
     const messagesEndRef = useRef(null);
+    const currentIndexRef = useRef(currentIndex);
+
+    useEffect(() => {
+        currentIndexRef.current = currentIndex;
+    }, [currentIndex]);
 
     // Stati per il Quiz di fine visita
     const [hasQuiz, setHasQuiz] = useState(false);
@@ -46,6 +53,9 @@ function VisitDetail() {
     const [quizSubmitted, setQuizSubmitted] = useState(false);
     const [quizResults, setQuizResults] = useState(null); // array [{ studentName, score, total, details }]
     const [studentsSubmitted, setStudentsSubmitted] = useState([]); // nomi studenti che hanno gia' inviato (vista docente)
+
+    // Stato per riconoscimento vocale
+    const [isListeningForVoice, setIsListeningForVoice] = useState(false);
 
     // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
     useEffect(() => {
@@ -84,6 +94,26 @@ function VisitDetail() {
     const changeLevelDown = () => {
         const i = LEVELS.indexOf(selectedType);
         if (i > 0) setSelectedType(LEVELS[i - 1]);
+    };
+
+    const changeLengthUp = () => {
+        const i = LENGTHS.indexOf(selectedLength);
+        if (i < LENGTHS.length - 1) setSelectedLength(LENGTHS[i + 1]);
+    };
+    const changeLengthDown = () => {
+        const i = LENGTHS.indexOf(selectedLength);
+        if (i > 0) setSelectedLength(LENGTHS[i - 1]);
+    };
+
+    const goToNextItem = () => {
+        if (currentIndexRef.current < items.length - 1) {
+            handleIndexChange(currentIndexRef.current + 1);
+        }
+    };
+    const goToPrevItem = () => {
+        if (currentIndexRef.current > 0) {
+            handleIndexChange(currentIndexRef.current - 1);
+        }
     };
 
     const handleStudentAction = async (actionType) => {
@@ -131,6 +161,96 @@ function VisitDetail() {
             setChatMessages(prev => prev.filter(m => m.reqId !== reqId));
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    // Riconoscimento vocale per i comandi
+    const startVoiceRecognition = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.error('Il tuo browser non supporta i comandi vocali.');
+            return;
+        }
+
+        if (isListeningForVoice) return; // Prevent multiple starts
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'it-IT';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => setIsListeningForVoice(true);
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+
+            // Autore
+            if (transcript.includes('autore') || transcript.includes('dipinto') || transcript.includes("chi l'ha")) {
+                 const author = currentItem?.author || "Autore sconosciuto";
+                 speak("L'autore è " + author);
+                 return;
+            }
+
+            // Navigazione
+            if (transcript.includes('avanti') || transcript.includes('prossimo') || transcript.includes('successivo')) {
+                 if (role === 'student' && pin) {
+                     toast.warning("In visita guidata non puoi cambiare opera!");
+                 } else {
+                     goToNextItem();
+                 }
+                 return;
+            }
+            if (transcript.includes('indietro') || transcript.includes('precedente')) {
+                 if (role === 'student' && pin) {
+                     toast.warning("In visita guidata non puoi cambiare opera!");
+                 } else {
+                     goToPrevItem();
+                 }
+                 return;
+            }
+            
+            // Difficoltà
+            if (transcript.includes('più semplice') || transcript.includes('non capisco')) {
+                changeLevelDown();
+                handleStudentAction('minus');
+                return;
+            }
+            if (transcript.includes('troppo semplice') || transcript.includes('meno scolastico')) {
+                changeLevelUp();
+                handleStudentAction('plus');
+                return;
+            }
+
+            // Lunghezza
+            if (transcript.includes('di più') || transcript.includes('più dettagli') || transcript.includes('aumenta')) {
+                changeLengthUp();
+                handleStudentAction('plus');
+                return;
+            }
+            if (transcript.includes('di meno') || transcript.includes('meno dettagli') || transcript.includes('diminuisci')) {
+                changeLengthDown();
+                handleStudentAction('minus');
+                return;
+            }
+
+            console.error(`Comando non riconosciuto: "${transcript}"`);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Errore riconoscimento vocale:', event.error);
+            setIsListeningForVoice(false);
+            if (event.error !== 'no-speech') {
+                console.error("Errore durante l'ascolto.");
+            }
+        };
+
+        recognition.onend = () => setIsListeningForVoice(false);
+
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error('Impossibile avviare riconoscimento:', e);
+            setIsListeningForVoice(false);
         }
     };
 
@@ -189,9 +309,9 @@ function VisitDetail() {
     useEffect(() => {
         // Applica la classe dark-mode al body
         if (darkMode) {
-            document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
         } else {
-            document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         }
 
         // Sincronizza dark mode con localStorage
@@ -199,9 +319,9 @@ function VisitDetail() {
             const newDarkMode = getDarkMode();
             setDarkModeState(newDarkMode);
             if (newDarkMode) {
-                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
             } else {
-                document.body.classList.remove('dark-mode');
+                document.documentElement.classList.remove('dark-mode');
             }
         };
 
@@ -248,7 +368,7 @@ function VisitDetail() {
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
-            document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         };
     }, [id, darkMode]);
 
@@ -422,7 +542,9 @@ function VisitDetail() {
         }
     };
 
-    const currentDescription = descriptions.find(d => d.type === selectedType);
+    const currentDescription = descriptions.find(d => d.type === selectedType && d.length === selectedLength) 
+                             || descriptions.find(d => d.type === selectedType) 
+                             || descriptions[0];
 
     const toggleDarkMode = () => {
         const newValue = !darkMode;
@@ -670,18 +792,29 @@ function VisitDetail() {
                                             </div>
                                             
                                             {/* ACTION BUTTONS */}
-                                            <div className={`d-flex flex-wrap flex-shrink-0 align-items-center justify-content-center rounded-pill p-1 shadow-sm mt-2 mt-sm-0 border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
-                                                <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-sm btn-danger rounded-pill d-flex align-items-center gap-2 px-3 fw-bold" title="Meno dettagli">
-                                                    <i className="bi bi-dash-lg"></i> Dettagli
-                                                </button>
-                                                
-                                                <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-36 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
-                                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
-                                                </button>
-                                                
-                                                <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-sm btn-success rounded-pill d-flex align-items-center gap-2 px-3 fw-bold" title="Più dettagli">
-                                                    Dettagli <i className="bi bi-plus-lg"></i>
-                                                </button>
+                                            <div className="d-flex flex-column align-items-end gap-2 w-100 mt-2 mt-sm-0 flex-sm-row justify-content-sm-end">
+                                                <div className={`d-flex flex-wrap align-items-center justify-content-center rounded-pill p-1 shadow-sm border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
+                                                    <span className="small ms-2 me-1 fw-bold d-none d-sm-inline">Difficoltà:</span>
+                                                    <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-sm btn-outline-danger rounded-start-pill px-2 fw-bold" title="Più semplice"><i className="bi bi-dash"></i></button>
+                                                    <span className="px-2 fw-bold fs-085 text-uppercase" style={{ minWidth: '80px', textAlign: 'center' }}>{selectedType}</span>
+                                                    <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-sm btn-outline-success rounded-end-pill px-2 fw-bold" title="Più avanzato"><i className="bi bi-plus"></i></button>
+                                                    
+                                                    <span className="mx-2">|</span>
+                                                    
+                                                    <span className="small me-1 fw-bold d-none d-sm-inline">Tempo:</span>
+                                                    <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn btn-sm btn-outline-danger rounded-start-pill px-2 fw-bold" title="Meno dettagli"><i className="bi bi-dash"></i></button>
+                                                    <span className="px-2 fw-bold fs-085 text-uppercase" style={{ minWidth: '40px', textAlign: 'center' }}>{selectedLength}</span>
+                                                    <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn btn-sm btn-outline-success rounded-end-pill px-2 fw-bold" title="Più dettagli"><i className="bi bi-plus"></i></button>
+
+                                                    <span className="mx-2 text-muted">|</span>
+
+                                                    <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
+                                                        <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
+                                                    </button>
+                                                    <button onClick={startVoiceRecognition} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isListeningForVoice ? 'btn-danger pulse-animation' : 'btn-info'}`} title="Comandi vocali">
+                                                        <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-6`}></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
