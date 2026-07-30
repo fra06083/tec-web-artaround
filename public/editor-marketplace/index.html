@@ -191,12 +191,14 @@
             <!-- FILTRI (Gestiti con scroll orizzontale su mobile senza inline style) -->
             <div class="mb-4 overflow-auto">
                 <div class="d-flex flex-nowrap flex-lg-wrap gap-2 pb-2">
-                    <button class="btn filter-pill rounded-pill px-4 active">Tutti</button>
-                    <button class="btn filter-pill rounded-pill px-4">Arte</button>
-                    <button class="btn filter-pill rounded-pill px-4">Storia</button>
-                    <button class="btn filter-pill rounded-pill px-4">Scienza</button>
-                    <button class="btn filter-pill rounded-pill px-4">Natura</button>
-                    <button class="btn filter-pill rounded-pill px-4">Tecnologia</button>
+                    <button @click="toggleTag('Tutti')" 
+                            :class="{'active bg-orange text-white border-orange': selectedTags.length === 0}"
+                            class="btn filter-pill rounded-pill px-4">Tutti</button>
+                    <template x-for="tag in predefinedTags" :key="tag">
+                        <button @click="toggleTag(tag)" 
+                                :class="{'active bg-orange text-white border-orange': selectedTags.includes(tag)}"
+                                class="btn filter-pill rounded-pill px-4" x-text="tag"></button>
+                    </template>
                 </div>
             </div>
 

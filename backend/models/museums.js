@@ -28,7 +28,8 @@ const visitSchema = new mongoose.Schema({
     museum_id: { type: mongoose.Schema.Types.ObjectId, ref: 'museum', required: true },
     items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'item' }], // Sequenza degli oggetti da visitare 
     logistic_info: [{ type: String }], // Indicazioni tipo: "Entrata da Via Garibaldi, 2" 
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'user' } // Traccia il creatore (es. docente)
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'user' }, // Traccia il creatore (es. docente)
+    tags: [{ type: String }] // Es. "Arte", "Storia", ecc.
 });
 // 3. IL DIALOGO (Collegato all'opera)
 const languageSchema = new mongoose.Schema({

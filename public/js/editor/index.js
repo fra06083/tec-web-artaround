@@ -23,20 +23,46 @@ function marketplaceApp() {
             activeUsers: 0,
             serverStatus: 'Offline'
         },
+        predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
+        selectedTags: [],
         get cartCount() {
             return this.cart.length;
         },
         get filteredItems() {
-            if (!this.searchQuery || this.searchQuery.trim() === '') {
-                return this.items;
+            let result = this.items;
+            
+            if (this.selectedTags.length > 0) {
+                result = result.filter(tour => {
+                    if (!tour.tags || tour.tags.length === 0) return false;
+                    // Controlla se il tour possiede TUTTI i tag selezionati (condizione AND)
+                    return this.selectedTags.every(tag => tour.tags.includes(tag));
+                });
             }
+
+            if (!this.searchQuery || this.searchQuery.trim() === '') {
+                return result;
+            }
+            
             const query = this.searchQuery.toLowerCase().trim();
-            return this.items.filter(tour => {
+            return result.filter(tour => {
                 const name = tour.name?.toLowerCase() || '';
                 const museum = tour.museum_id?.museum?.toLowerCase() || '';
                 const description = tour.description?.toLowerCase() || '';
                 return name.includes(query) || museum.includes(query) || description.includes(query);
             });
+        },
+        toggleTag(tag) {
+            if (tag === 'Tutti') {
+                this.selectedTags = [];
+                return;
+            }
+            
+            const index = this.selectedTags.indexOf(tag);
+            if (index > -1) {
+                this.selectedTags.splice(index, 1);
+            } else {
+                this.selectedTags.push(tag);
+            }
         },
         async init() {
             // Load dark mode preference

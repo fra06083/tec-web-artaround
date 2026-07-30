@@ -12,6 +12,7 @@ document.addEventListener('alpine:init', () => {
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
         allowLateJoins: true,
+        predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
 
         // DATA
         museums: [],
@@ -26,7 +27,8 @@ document.addEventListener('alpine:init', () => {
             description: '',
             museum_id: '',
             items: [], // Array of artwork IDs
-            logistic_info: []
+            logistic_info: [],
+            tags: []
         },
 
         // ARTWORKS MANAGEMENT
@@ -187,7 +189,8 @@ document.addEventListener('alpine:init', () => {
                     description: '',
                     museum_id: this.selectedMuseum,
                     items: [],
-                    logistic_info: []
+                    logistic_info: [],
+                    tags: []
                 };
                 this.selectedArtworks = [];
                 this.quizQuestions = [];
@@ -218,7 +221,8 @@ document.addEventListener('alpine:init', () => {
                         description: tourData.description || '',
                         museum_id: museumId,
                         items: tourData.items || [],
-                        logistic_info: tourData.logistic_info || []
+                        logistic_info: tourData.logistic_info || [],
+                        tags: tourData.tags || []
                     };
 
                     // Load artworks in the tour
@@ -365,7 +369,8 @@ document.addEventListener('alpine:init', () => {
                         description: this.tour.description,
                         museum_id: this.tour.museum_id,
                         items: items, // Include artworks in the save
-                        logistic_info: this.tour.logistic_info
+                        logistic_info: this.tour.logistic_info,
+                        tags: this.tour.tags
                     })
                 });
 

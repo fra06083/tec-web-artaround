@@ -216,6 +216,16 @@ router.post('/student-action', (req, res) => {
     res.json({ success: true });
 });
 
+// Broadcast audio a tutti gli studenti
+router.post('/broadcast-audio', (req, res) => {
+    const { pin, text } = req.body;
+    if (!activeRooms.has(pin)) {
+        return res.status(404).json({ error: "Stanza non trovata" });
+    }
+    broadcastToRoom(pin, 'broadcast-audio', { text });
+    res.json({ success: true });
+});
+
 // Termina la visita e chiude la stanza
 router.post('/end', (req, res) => {
     const { pin } = req.body;

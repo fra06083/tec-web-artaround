@@ -208,10 +208,10 @@ function VisitList() {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="btn p-0 border-0 d-flex align-items-center gap-2 shadow-none"
                                 >
-                                    <div className="user-avatar position-relative rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden cursor-pointer avatar-font-sm">
-                                        <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                                    <div className="user-avatar position-relative rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden">
+                                        <span>{user.name ? user.name.charAt(0).toUpperCase() : ''}</span>
                                         {user.propic && (
-                                            <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
+                                            <img src={user.propic} alt="Profile" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = '1'} onError={(e) => e.target.style.opacity = '0'} />
                                         )}
                                     </div>
                                     <i className={`bi bi-chevron-down x-small chevron-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
@@ -399,10 +399,10 @@ function VisitList() {
                     </a>
                 ) : (
                     <a href="#mobileProfileOffcanvas" data-bs-toggle="offcanvas" className="mobile-nav-item" onClick={(e) => e.preventDefault()}>
-                        <div className={`user-avatar position-relative rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`} style={{ fontSize: '0.8rem' }}>
-                            <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                        <div className={`user-avatar position-relative rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 border-gold overflow-hidden ${darkMode ? 'bg-teal text-cream' : 'bg-cream text-teal'}`}>
+                            <span>{user.name ? user.name.charAt(0).toUpperCase() : ''}</span>
                             {user.propic && (
-                                <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
+                                <img src={user.propic} alt="Profile" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = '1'} onError={(e) => e.target.style.opacity = '0'} />
                             )}
                         </div>
                         <span>Profilo</span>
@@ -420,9 +420,9 @@ function VisitList() {
                         {user && (
                             <div className="mt-3">
                                 <div className={`user-avatar position-relative auth-hero-avatar rounded-circle bg-white d-flex align-items-center justify-content-center fw-bold shadow mx-auto mb-3 overflow-hidden ${darkMode ? 'text-dark' : 'text-orange'}`}>
-                                    <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                                    <span>{user.name ? user.name.charAt(0).toUpperCase() : ''}</span>
                                     {user.propic && (
-                                        <img src={user.propic} alt="" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
+                                        <img src={user.propic} alt="Profile" className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style={{ opacity: 0, transition: 'opacity 0.3s' }} onLoad={(e) => e.target.style.opacity = '1'} onError={(e) => e.target.style.opacity = '0'} />
                                     )}
                                 </div>
                                 <h4 className="fw-bold mb-1 text-white">{user.name}</h4>

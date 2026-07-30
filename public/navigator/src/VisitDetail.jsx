@@ -130,6 +130,19 @@ function VisitDetail() {
         }
     };
 
+    const broadcastAudio = async (text) => {
+        if (!text || !pin || role !== 'teacher') return;
+        try {
+            await fetch('/api/rooms/broadcast-audio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin, text })
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     const sendChatMessage = async (e) => {
         e.preventDefault();
         if (!chatInput.trim() || !pin) return;
@@ -422,7 +435,23 @@ function VisitDetail() {
                 [data.studentName]: data.action
             }));
 
-            // Rimuovi l'icona dopo 5 secondi
+            // Aggiungi un messaggio di sistema in chat
+            let actionText = '';
+            if (data.action === 'audio') actionText = 'ha avviato la riproduzione audio.';
+            else if (data.action === 'stop') actionText = 'ha fermato la riproduzione audio.';
+            else if (data.action === 'plus') actionText = 'ha aumentato i dettagli/difficoltà della descrizione.';
+            else if (data.action === 'minus') actionText = 'ha diminuito i dettagli/difficoltà della descrizione.';
+            else actionText = `ha eseguito l'azione: ${data.action}`;
+
+            setChatMessages(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                sender: 'Sistema',
+                message: `Lo studente ${data.studentName} ${actionText}`,
+                type: 'system',
+                timestamp: new Date().toISOString()
+            }]);
+
+            // Rimuovi l'icona fluttuante dopo 5 secondi
             setTimeout(() => {
                 setStudentActions(prev => {
                     const next = { ...prev };
@@ -432,6 +461,14 @@ function VisitDetail() {
                     return next;
                 });
             }, 5000);
+        });
+
+        eventSource.addEventListener('broadcast-audio', (e) => {
+            if (role === 'teacher') return;
+            const data = JSON.parse(e.data);
+            if (data.text) {
+                speak(data.text);
+            }
         });
 
         eventSource.addEventListener('join-request', (e) => {
@@ -808,9 +845,14 @@ function VisitDetail() {
 
                                                     <span className="mx-2 text-muted">|</span>
 
-                                                    <button onClick={() => { if(isSpeaking) stopSpeaking(); else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
+                                                    <button onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
                                                         <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
                                                     </button>
+                                                    {role === 'teacher' && (
+                                                        <button onClick={() => { broadcastAudio(currentDescription?.text); }} disabled={!currentDescription} className="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 btn-secondary" title="Riproduci per tutti">
+                                                            <i className="bi bi-broadcast fs-6"></i>
+                                                        </button>
+                                                    )}
                                                     <button onClick={startVoiceRecognition} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isListeningForVoice ? 'btn-danger pulse-animation' : 'btn-info'}`} title="Comandi vocali">
                                                         <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-6`}></i>
                                                     </button>
