@@ -4,6 +4,7 @@ document.addEventListener('alpine:init', () => {
         isReady: false,
         isLoggedIn: false,
         permissions: '',
+        propic: '',
         username: '',
         step: 'choice', // choice, selection, form
         mode: 'create', // create, edit
@@ -73,16 +74,37 @@ document.addEventListener('alpine:init', () => {
         },
 
         // AUTHENTICATION
-        async checkAuth() {
-            const token = localStorage.getItem('artaround_token');
-            const savedUsername = localStorage.getItem('artaround_user');
-
-            if (!token) {
-                this.isLoggedIn = false;
-                return;
-            }
-
+                async checkAuth() {
             try {
+                const token = localStorage.getItem('artaround_token');
+                const savedUsername = localStorage.getItem('artaround_user');
+
+                if (!token) {
+                    this.isLoggedIn = false;
+                    return;
+                }
+
+                if (savedUsername) {
+                    this.username = savedUsername;
+                    this.isLoggedIn = true;
+                }
+                
+                // CACHE LOCALE (per rendering istantaneo)
+                const savedUserDataStr = localStorage.getItem('artaround_user_data');
+                if (savedUserDataStr) {
+                    try {
+                        const savedUserData = JSON.parse(savedUserDataStr);
+                        this.permissions = savedUserData.permissions || '';
+                        this.propic = savedUserData.propic || '';
+                        if (this.hasOwnProperty('purchasedVisits')) {
+                            this.purchasedVisits = savedUserData.purchased_visits || [];
+                        }
+                    } catch (e) {
+                        console.error('Error parsing saved user data', e);
+                    }
+                }
+
+                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -95,11 +117,25 @@ document.addEventListener('alpine:init', () => {
                     const data = await response.json();
                     this.username = data.user?.name || savedUsername;
                     this.permissions = data.user?.permissions;
+                    this.propic = data.user?.propic || '';
+                    if (this.hasOwnProperty('purchasedVisits')) {
+                        this.purchasedVisits = data.user?.purchased_visits || [];
+                    }
                     this.isLoggedIn = true;
+                    // AGGIORNA LA CACHE
+                    localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
-                    this.logout();
+                    if (typeof this.logout === 'function') {
+                        this.logout();
+                    } else {
+                        localStorage.removeItem('artaround_token');
+                        localStorage.removeItem('artaround_user');
+                        localStorage.removeItem('artaround_user_data');
+                        this.isLoggedIn = false;
+                    }
                 }
             } catch (error) {
+                console.error('Errore durante il controllo autorizzazione:', error);
                 this.isLoggedIn = false;
             }
         },

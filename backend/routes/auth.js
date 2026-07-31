@@ -28,7 +28,18 @@ router.post('/login', async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
         });
 
-        res.json({ message: "Login ok", token });
+        res.json({ 
+            message: "Login ok", 
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                permissions: user.permissions,
+                propic: user.propic,
+                purchased_visits: user.purchased_visits,
+                museums: user.museums
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: 'Errore interno' });
     }

@@ -26,11 +26,6 @@
 <body class="bg-white text-dark font-sans marketplace-light" x-data="marketplaceApp()"
     :class="{ 'marketplace-dark-mode': darkMode }">
 
-    <!-- Schermata di caricamento -->
-    <div x-show="!isReady" x-transition.opacity class="artaround-loader">
-        <div class="artaround-brand-text">ArtAround</div>
-    </div>
-
     <div x-show="isReady" x-cloak class="d-flex flex-column min-vh-100">
 
         <!-- NAVBAR DESKTOP & MOBILE -->

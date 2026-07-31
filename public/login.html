@@ -164,6 +164,9 @@
                         // Salva il JWT e l'username per mantenere la sessione
                         localStorage.setItem('artaround_token', data.token);
                         localStorage.setItem('artaround_user', this.name);
+                        if (data.user) {
+                            localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
+                        }
 
                         // Rimanda alla homepage
                         const params = new URLSearchParams(window.location.search);

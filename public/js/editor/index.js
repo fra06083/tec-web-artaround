@@ -114,7 +114,7 @@ function marketplaceApp() {
             this.isReady = true;
         },
 
-        async checkAuth() {
+                async checkAuth() {
             try {
                 const token = localStorage.getItem('artaround_token');
                 const savedUsername = localStorage.getItem('artaround_user');
@@ -124,12 +124,27 @@ function marketplaceApp() {
                     return;
                 }
 
-                // pre caricamento del nome dal localStorage per evitare che sparisca quando si refresha la pagina
                 if (savedUsername) {
                     this.username = savedUsername;
                     this.isLoggedIn = true;
                 }
+                
+                // CACHE LOCALE (per rendering istantaneo)
+                const savedUserDataStr = localStorage.getItem('artaround_user_data');
+                if (savedUserDataStr) {
+                    try {
+                        const savedUserData = JSON.parse(savedUserDataStr);
+                        this.permissions = savedUserData.permissions || '';
+                        this.propic = savedUserData.propic || '';
+                        if (this.hasOwnProperty('purchasedVisits')) {
+                            this.purchasedVisits = savedUserData.purchased_visits || [];
+                        }
+                    } catch (e) {
+                        console.error('Error parsing saved user data', e);
+                    }
+                }
 
+                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -140,15 +155,24 @@ function marketplaceApp() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    // Se il backend restituisce il nome, usiamo quello, altrimenti teniamo quello del localStorage
                     this.username = data.user?.name || savedUsername;
                     this.permissions = data.user?.permissions;
                     this.propic = data.user?.propic || '';
-                    this.purchasedVisits = data.user?.purchased_visits || [];
+                    if (this.hasOwnProperty('purchasedVisits')) {
+                        this.purchasedVisits = data.user?.purchased_visits || [];
+                    }
                     this.isLoggedIn = true;
+                    // AGGIORNA LA CACHE
+                    localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
-                    // Se il token è scaduto o non valido, puliamo tutto
-                    this.logout();
+                    if (typeof this.logout === 'function') {
+                        this.logout();
+                    } else {
+                        localStorage.removeItem('artaround_token');
+                        localStorage.removeItem('artaround_user');
+                        localStorage.removeItem('artaround_user_data');
+                        this.isLoggedIn = false;
+                    }
                 }
             } catch (error) {
                 console.error('Errore durante il controllo autorizzazione:', error);

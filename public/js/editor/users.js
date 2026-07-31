@@ -3,6 +3,7 @@ document.addEventListener('alpine:init', () => {
         isReady: false,
         username: '',
         permissions: '',
+        propic: '',
         search: '',
         users: [],
         allMuseums: [],
