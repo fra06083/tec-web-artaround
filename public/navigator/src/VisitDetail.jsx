@@ -819,7 +819,7 @@ function VisitDetail() {
                     <div className="container-lg px-0">
                         <div className="row justify-content-center">
                             <div className="col-12 col-md-10 col-lg-8">
-                                <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 ${darkMode ? 'bg-dark bg-opacity-75 text-white' : 'bg-white bg-opacity-90 text-dark'}`}>
+                                <div className={`card border-0 rounded-4 shadow-lg ${darkMode ? 'navigator-card text-white' : 'bg-white bg-opacity-90 text-dark'}`}>
                                     <div className="card-body p-3 p-md-4">
                                         <div className="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
                                             <div className="flex-1-min-w-0">
@@ -828,35 +828,34 @@ function VisitDetail() {
                                                 <span className="badge bg-orange text-white rounded-pill px-3 py-2 shadow-sm"><i className="bi bi-person-fill me-1"></i>{currentItem.author}</span>
                                             </div>
                                             
-                                            {/* ACTION BUTTONS */}
-                                            <div className="d-flex flex-column align-items-end gap-2 w-100 mt-2 mt-sm-0 flex-sm-row justify-content-sm-end">
-                                                <div className={`d-flex flex-wrap align-items-center justify-content-center rounded-pill p-1 shadow-sm border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
-                                                    <span className="small ms-2 me-1 fw-bold d-none d-sm-inline">Difficoltà:</span>
-                                                    <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-sm btn-outline-danger rounded-start-pill px-2 fw-bold" title="Più semplice"><i className="bi bi-dash"></i></button>
-                                                    <span className="px-2 fw-bold fs-085 text-uppercase" style={{ minWidth: '80px', textAlign: 'center' }}>{selectedType}</span>
-                                                    <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-sm btn-outline-success rounded-end-pill px-2 fw-bold" title="Più avanzato"><i className="bi bi-plus"></i></button>
-                                                    
-                                                    <span className="mx-2">|</span>
-                                                    
-                                                    <span className="small me-1 fw-bold d-none d-sm-inline">Tempo:</span>
-                                                    <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn btn-sm btn-outline-danger rounded-start-pill px-2 fw-bold" title="Meno dettagli"><i className="bi bi-dash"></i></button>
-                                                    <span className="px-2 fw-bold fs-085 text-uppercase" style={{ minWidth: '40px', textAlign: 'center' }}>{selectedLength}</span>
-                                                    <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn btn-sm btn-outline-success rounded-end-pill px-2 fw-bold" title="Più dettagli"><i className="bi bi-plus"></i></button>
-
-                                                    <span className="mx-2 text-muted">|</span>
-
-                                                    <button onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
-                                                        <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
+                                            {/* AUDIO & BROADCAST BUTTONS */}
+                                            <div className="d-flex align-items-center justify-content-end gap-2 mt-2 mt-sm-0">
+                                                <button onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
+                                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
+                                                </button>
+                                                {role === 'teacher' && (
+                                                    <button onClick={() => { broadcastAudio(currentDescription?.text); }} disabled={!currentDescription} className="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 btn-secondary" title="Riproduci per tutti">
+                                                        <i className="bi bi-broadcast fs-6"></i>
                                                     </button>
-                                                    {role === 'teacher' && (
-                                                        <button onClick={() => { broadcastAudio(currentDescription?.text); }} disabled={!currentDescription} className="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 btn-secondary" title="Riproduci per tutti">
-                                                            <i className="bi bi-broadcast fs-6"></i>
-                                                        </button>
-                                                    )}
-                                                    <button onClick={startVoiceRecognition} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 text-white btn-icon-32 ${isListeningForVoice ? 'btn-danger pulse-animation' : 'btn-info'}`} title="Comandi vocali">
-                                                        <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-6`}></i>
-                                                    </button>
-                                                </div>
+                                                )}
+                                                <button onClick={startVoiceRecognition} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 ${isListeningForVoice ? 'btn-danger pulse-animation' : 'btn-info'}`} title="Comandi vocali">
+                                                    <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-6`}></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* TEXT DIFFICULTY BAR */}
+                                        <div className="d-flex justify-content-center w-100 mb-3">
+                                            <div className={`d-flex flex-wrap align-items-center justify-content-center rounded-pill px-3 py-1 shadow-sm border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
+                                                <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-link text-danger p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più semplice"><i className="bi bi-dash-circle fs-5"></i></button>
+                                                <span className="px-2 fw-bold fs-085 text-capitalize min-w-80 text-center">{selectedType}</span>
+                                                <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-link text-success p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più avanzato"><i className="bi bi-plus-circle fs-5"></i></button>
+
+                                                <span className="mx-3 text-muted">|</span>
+
+                                                <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn btn-link text-danger p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Meno dettagli"><i className="bi bi-dash-circle fs-5"></i></button>
+                                                <span className="px-2 fw-bold fs-085 min-w-40 text-center">{selectedLength}</span>
+                                                <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn btn-link text-success p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più dettagli"><i className="bi bi-plus-circle fs-5"></i></button>
                                             </div>
                                         </div>
 
@@ -1034,7 +1033,7 @@ function VisitDetail() {
                     <div className="modal-dialog modal-dialog-centered modal-xl" onClick={e => e.stopPropagation()}>
                         <div className="modal-content bg-transparent border-0">
                             <div className="modal-header border-0 pb-0 justify-content-end">
-                                <button type="button" className="btn-close btn-close-white shadow-none bg-dark rounded-circle p-2 opacity-80" onClick={() => setLightboxImage(null)}></button>
+                                <button type="button" className="btn-close btn-close-white shadow-none rounded-circle p-2 opacity-80" onClick={() => setLightboxImage(null)}></button>
                             </div>
                             <div className="modal-body text-center p-0">
                                 <img src={lightboxImage} alt="Ingrandita" className="img-fluid rounded-4 shadow-lg lightbox-img" />

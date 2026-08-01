@@ -63,7 +63,7 @@
 }
 
 .dark-mode .cart-fab .badge,
-.marketplace-dark-mode .cart-fab .badge {
+.dark-mode .cart-fab .badge {
     border-color: #1a1a2e;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .dark-mode .mobile-nav,
-.marketplace-dark-mode .mobile-nav,
+.dark-mode .mobile-nav,
 .admin-dark-mode .mobile-nav,
 [data-bs-theme="dark"] .mobile-nav {
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
@@ -105,7 +105,7 @@
 }
 
 .dark-mode .mobile-nav-item,
-.marketplace-dark-mode .mobile-nav-item,
+.dark-mode .mobile-nav-item,
 .admin-dark-mode .mobile-nav-item,
 [data-bs-theme="dark"] .mobile-nav-item {
     color: rgba(255, 255, 255, 0.6);
@@ -118,7 +118,7 @@
 }
 
 .dark-mode .mobile-nav-item.active,
-.marketplace-dark-mode .mobile-nav-item.active,
+.dark-mode .mobile-nav-item.active,
 .admin-dark-mode .mobile-nav-item.active,
 [data-bs-theme="dark"] .mobile-nav-item.active {
     color: #fd7e14 !important;
@@ -207,7 +207,7 @@
 
 /* Colore per Dark Mode (Sia Home che Marketplace) */
 .dark-mode .desktop-navbar,
-.marketplace-dark-mode .desktop-navbar {
+.dark-mode .desktop-navbar {
     background: rgba(26, 26, 46, 0.85) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -215,7 +215,7 @@
 
 /* Forza il colore degli elementi interni se necessario */
 .dark-mode .desktop-navbar .nav-link,
-.marketplace-dark-mode .desktop-navbar .nav-link {
+.dark-mode .desktop-navbar .nav-link {
     color: white !important;
 }
 

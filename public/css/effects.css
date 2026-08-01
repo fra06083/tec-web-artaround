@@ -141,7 +141,7 @@
     background: linear-gradient(180deg, #fdfbf7 0%, rgba(26, 67, 65, 0.05) 50%, #fdfbf7 100%) !important;
 }
 
-.dark-mode .section-gradient, .marketplace-dark-mode .section-gradient {
+.dark-mode .section-gradient {
     background: linear-gradient(180deg, #111111 0%, rgba(156, 66, 56, 0.05) 50%, #111111 100%) !important;
 }
 
@@ -167,13 +167,13 @@
    DARK MODE STYLES
 ========================================================= */
 
-html.dark-mode, html.marketplace-dark-mode {
-    background-color: #111111 !important; /* Perfect blend for the dark obsidian area */
+html.dark-mode {
+    background-color: #111111;
 }
 
-.dark-mode {
-    background-color: #111111 !important;
-    color: #fdfbf7 !important;
+html.dark-mode body {
+    background-color: #111111;
+    color: #fdfbf7;
 }
 
 .dark-mode .navbar {
@@ -346,32 +346,32 @@ html.dark-mode, html.marketplace-dark-mode {
    MARKETPLACE DARK MODE
 ========================================================= */
 
-.marketplace-dark-mode {
+.dark-mode {
     background-color: #0b0f19 !important;
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .navbar {
+.dark-mode .navbar {
     background-color: rgba(11, 15, 25, 0.9) !important;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.marketplace-dark-mode .navbar-brand {
+.dark-mode .navbar-brand {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .navbar-light .navbar-toggler-icon {
+.dark-mode .navbar-light .navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 @media (max-width: 991.98px) {
-    .marketplace-dark-mode .navbar-collapse {
+    .dark-mode .navbar-collapse {
         background-color: #0b0f19 !important;
     }
 }
 
-.marketplace-dark-mode .hero-section {
+.dark-mode .hero-section {
     position: relative;
     overflow: hidden;
     background-color: transparent !important;
@@ -380,12 +380,12 @@ html.dark-mode, html.marketplace-dark-mode {
     background-position: center 15% !important;
 }
 
-.marketplace-dark-mode .hero-section h1,
-.marketplace-dark-mode .hero-section .display-5 {
+.dark-mode .hero-section h1,
+.dark-mode .hero-section .display-5 {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .hero-section .lead {
+.dark-mode .hero-section .lead {
     color: rgba(255, 255, 255, 0.7) !important;
 }
 
@@ -434,38 +434,38 @@ html.dark-mode, html.marketplace-dark-mode {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .hero-section .text-white-75 {
+.dark-mode .hero-section .text-white-75 {
     color: rgba(255, 255, 255, 0.75) !important;
 }
 
-.marketplace-dark-mode .card {
+.dark-mode .card {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .card h5,
-.marketplace-dark-mode .card .text-dark {
+.dark-mode .card h5,
+.dark-mode .card .text-dark {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .card .text-secondary {
+.dark-mode .card .text-secondary {
     color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.marketplace-dark-mode .card .border-top {
+.dark-mode .card .border-top {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-.marketplace-dark-mode .input-group-text {
+.dark-mode .input-group-text {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
-.marketplace-dark-mode .form-control {
+.dark-mode .form-control {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -473,7 +473,7 @@ html.dark-mode, html.marketplace-dark-mode {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-.marketplace-dark-mode .form-control::placeholder {
+.dark-mode .form-control::placeholder {
     color: rgba(255, 255, 255, 0.4) !important;
 }
 
@@ -501,7 +501,7 @@ html.dark-mode, html.marketplace-dark-mode {
 }
 
 /* Marketplace Navbar Dark Mode */
-.marketplace-dark-mode .navbar {
+.dark-mode .navbar {
     background-color: rgba(11, 15, 25, 0.5) !important;
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -509,18 +509,18 @@ html.dark-mode, html.marketplace-dark-mode {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
-.marketplace-dark-mode .navbar-brand {
+.dark-mode .navbar-brand {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .input-group-text {
+.dark-mode .input-group-text {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
-.marketplace-dark-mode .form-control {
+.dark-mode .form-control {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -528,7 +528,7 @@ html.dark-mode, html.marketplace-dark-mode {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-.marketplace-dark-mode .form-control::placeholder {
+.dark-mode .form-control::placeholder {
     color: rgba(255, 255, 255, 0.4) !important;
 }
 
@@ -570,23 +570,23 @@ html.dark-mode, html.marketplace-dark-mode {
 }
 
 /* Marketplace Card Dark Mode */
-.marketplace-dark-mode .card {
+.dark-mode .card {
     background-color: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .card h5,
-.marketplace-dark-mode .card .text-dark {
+.dark-mode .card h5,
+.dark-mode .card .text-dark {
     color: #ffffff !important;
 }
 
-.marketplace-dark-mode .card .text-secondary {
+.dark-mode .card .text-secondary {
     color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.marketplace-dark-mode .card .border-top {
+.dark-mode .card .border-top {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -734,39 +734,39 @@ html.dark-mode, html.marketplace-dark-mode {
 }
 
 /* Dark Mode Search */
-.marketplace-dark-mode .search-input-wrapper,
+.dark-mode .search-input-wrapper,
 .dark-mode .search-input-wrapper {
     background: rgba(37, 37, 64, 0.8);
 }
 
-.marketplace-dark-mode .search-input-wrapper:hover,
+.dark-mode .search-input-wrapper:hover,
 .dark-mode .search-input-wrapper:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
-.marketplace-dark-mode .search-input-wrapper:focus-within,
+.dark-mode .search-input-wrapper:focus-within,
 .dark-mode .search-input-wrapper:focus-within {
     background: rgba(255, 255, 255, 0.05);
     border-color: #fd7e14;
     box-shadow: 0 0 0 4px rgba(253, 126, 20, 0.2);
 }
 
-.marketplace-dark-mode .search-icon,
+.dark-mode .search-icon,
 .dark-mode .search-icon {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.marketplace-dark-mode .search-input-wrapper:focus-within .search-icon,
+.dark-mode .search-input-wrapper:focus-within .search-icon,
 .dark-mode .search-input-wrapper:focus-within .search-icon {
     color: #fd7e14;
 }
 
-.marketplace-dark-mode .search-input,
+.dark-mode .search-input,
 .dark-mode .search-input {
     color: #ffffff;
 }
 
-.marketplace-dark-mode .search-input::placeholder,
+.dark-mode .search-input::placeholder,
 .dark-mode .search-input::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
@@ -898,14 +898,14 @@ html.dark-mode, html.marketplace-dark-mode {
 ========================================================= */
 
 .dark-mode .navigator-hero-gradient,
-.marketplace-dark-mode .navigator-hero-gradient {
+.dark-mode .navigator-hero-gradient {
   background: linear-gradient(135deg, rgba(157, 2, 8, 0.6) 0%, rgba(220, 47, 2, 0.4) 100%) !important;
   box-shadow: 0 10px 30px rgba(220, 47, 2, 0.15) !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dark-mode .card-hover-premium,
-.marketplace-dark-mode .card-hover-premium {
+.dark-mode .card-hover-premium {
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(12px);
@@ -913,21 +913,21 @@ html.dark-mode, html.marketplace-dark-mode {
 }
 
 .dark-mode .card-hover-premium:hover,
-.marketplace-dark-mode .card-hover-premium:hover {
+.dark-mode .card-hover-premium:hover {
   background: rgba(255, 255, 255, 0.06) !important;
   border-color: rgba(220, 47, 2, 0.5) !important;
   box-shadow: 0 15px 35px rgba(220, 47, 2, 0.15) !important;
 }
 
 .dark-mode .glass-search-wrapper,
-.marketplace-dark-mode .glass-search-wrapper {
+.dark-mode .glass-search-wrapper {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .glass-search-wrapper:focus-within,
-.marketplace-dark-mode .glass-search-wrapper:focus-within {
+.dark-mode .glass-search-wrapper:focus-within {
   border-color: rgba(253, 126, 20, 0.5);
   box-shadow: 0 0 15px rgba(253, 126, 20, 0.2);
 }
@@ -961,12 +961,6 @@ html.dark-mode, html.marketplace-dark-mode {
     border-color: #fd7e14 !important;
     color: white !important;
     box-shadow: 0 4px 12px rgba(253, 126, 20, 0.3);
-}
-.dark-mode .filter-pill.active,
-.marketplace-dark-mode .filter-pill.active {
-    background: #e85d04;
-    border-color: #e85d04 !important;
-    box-shadow: 0 4px 12px rgba(232, 93, 4, 0.4);
 }
 
 /* Premium Button Red */
@@ -1043,7 +1037,7 @@ html.dark-mode, html.marketplace-dark-mode {
     transition: opacity 0.6s cubic-bezier(0.87, 0, 0.13, 1), visibility 0.6s;
 }
 
-.marketplace-dark-mode .artaround-loader,
+.dark-mode .artaround-loader,
 .dark-mode .artaround-loader,
 .bg-dark .artaround-loader,
 [data-bs-theme="dark"] .artaround-loader {
@@ -1084,7 +1078,7 @@ html.dark-mode, html.marketplace-dark-mode {
     animation-delay: 0.4s;
 }
 
-.marketplace-dark-mode .artaround-brand-text,
+.dark-mode .artaround-brand-text,
 .dark-mode .artaround-brand-text,
 .bg-dark .artaround-brand-text,
 [data-bs-theme="dark"] .artaround-brand-text {
