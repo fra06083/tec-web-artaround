@@ -59,6 +59,29 @@ function VisitDetail() {
 
     // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
     useEffect(() => {
+        const handleStorageChange = () => {
+            const newDarkMode = getDarkMode();
+            setDarkModeState(newDarkMode);
+            if (newDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Setup iniziale
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, [darkMode]);
+
+    useEffect(() => {
         if (isChatOpen) {
             setUnreadCount(0);
             setTimeout(() => {
@@ -320,26 +343,6 @@ function VisitDetail() {
     };
 
     useEffect(() => {
-        // Applica la classe dark-mode al body
-        if (darkMode) {
-            document.documentElement.classList.add('dark-mode');
-        } else {
-            document.documentElement.classList.remove('dark-mode');
-        }
-
-        // Sincronizza dark mode con localStorage
-        const handleStorageChange = () => {
-            const newDarkMode = getDarkMode();
-            setDarkModeState(newDarkMode);
-            if (newDarkMode) {
-                document.documentElement.classList.add('dark-mode');
-            } else {
-                document.documentElement.classList.remove('dark-mode');
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-
         // Carica utente
         const initUser = async () => {
             const userData = await fetchUser();
@@ -380,8 +383,10 @@ function VisitDetail() {
         fetchAllData();
 
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            document.documentElement.classList.remove('dark-mode');
+            socket.off('studentUpdate');
+            socket.off('teacherAction');
+            socket.off('roomClosed');
+            document.body.classList.remove('dark-mode');
         };
     }, [id, darkMode]);
 
@@ -596,7 +601,11 @@ function VisitDetail() {
         window.location.href = '/index.html';
     };
 
-    const bgMain = darkMode ? 'bg-dark text-white' : 'bg-white text-dark';
+    useEffect(() => {
+        return () => window.speechSynthesis.cancel();
+    }, []);
+
+    const bgMain = darkMode ? 'text-white' : 'marketplace-light text-dark';
     const bgNavbar = darkMode ? 'glass-header border-bottom border-secondary border-opacity-10' : 'glass-header-light shadow-sm';
     const brandColor = darkMode ? 'text-white' : 'text-primary';
     const bgCard = darkMode ? 'bg-dark border border-secondary border-opacity-25' : 'bg-white border';

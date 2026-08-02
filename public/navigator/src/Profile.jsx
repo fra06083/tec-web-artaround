@@ -74,7 +74,7 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
         }
     };
 
-    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
 
     return (
         <>

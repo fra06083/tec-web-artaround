@@ -195,7 +195,7 @@ function marketplaceApp() {
         },
         async fetchTours() {
             try {
-                const response = await fetch('/api/visite?manage=true', {
+                const response = await fetch('/api/visite', {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
                 });
                 if (response.ok) {
