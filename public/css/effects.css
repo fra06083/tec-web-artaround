@@ -948,9 +948,13 @@ html.dark-mode body {
 .filter-pill {
     background: rgba(128, 128, 128, 0.08);
     border: 1px solid rgba(128, 128, 128, 0.15) !important;
-    color: inherit;
+    color: #212529 !important;
     font-weight: 600;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dark-mode .filter-pill,
+[data-bs-theme="dark"] .filter-pill {
+    color: #f8f9fa !important;
 }
 .filter-pill:hover {
     background: rgba(128, 128, 128, 0.15);
