@@ -408,22 +408,21 @@ function VisitList() {
                                             {v.tags && v.tags.length > 0 && (
                                                 <div className="d-flex flex-wrap gap-1 mb-3">
                                                     {v.tags.map(tag => (
-                                                        <span key={tag} className="badge bg-orange bg-opacity-10 text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1">
+                                                        <span key={tag} className="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1">
                                                             {tag}
                                                         </span>
                                                     ))}
                                                 </div>
                                             )}
 
-                                            <div className={`d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
-                                                <div className="d-flex flex-column">
-                                                    <span className="text-orange fw-black fs-5">
-                                                        <i className="bi bi-check2-circle me-1"></i>Acquistato
+                                            <div className={`mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
+                                                <div className="mb-2">
+                                                    <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                                                        <i className="bi bi-geo-fill text-orange me-1"></i> {v.items ? v.items.length : 0} tappe
                                                     </span>
-                                                    <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>{v.items ? v.items.length : 0} tappe</span>
                                                 </div>
-                                                <Link to={`/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
-                                                    Inizia
+                                                <Link to={`/visit/${v._id}`} className={`btn w-100 rounded-pill fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 ${darkMode ? 'btn-orange' : 'btn-orange text-white'}`} style={{ backgroundColor: '#fd7e14', color: 'white', border: 'none' }}>
+                                                    <i className="bi bi-play-circle-fill"></i> Inizia visita
                                                 </Link>
                                             </div>
                                         </div>

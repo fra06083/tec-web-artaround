@@ -158,7 +158,7 @@ router.get('/my-visits', authenticateToken, async (req, res) => {
         const userId = req.user.id;
         const user = await User.findById(userId).populate({
             path: 'purchased_visits',
-            populate: { path: 'museum_id', select: 'museum province' }
+            populate: { path: 'museum_id', select: 'museum province image' }
         });
         
         if (!user) {
