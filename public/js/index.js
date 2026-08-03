@@ -29,11 +29,31 @@ function homeApp() {
             });
 
             const token = localStorage.getItem('artaround_token');
+            const savedUsername = localStorage.getItem('artaround_user');
+
             if (!token) {
                 this.isLoggedIn = false;
                 return;
             }
 
+            if (savedUsername) {
+                this.username = savedUsername;
+                this.isLoggedIn = true;
+            }
+
+            // CACHE LOCALE (per rendering istantaneo)
+            const savedUserDataStr = localStorage.getItem('artaround_user_data');
+            if (savedUserDataStr) {
+                try {
+                    const savedUserData = JSON.parse(savedUserDataStr);
+                    this.permissions = savedUserData.permissions || '';
+                    this.propic = savedUserData.propic || '';
+                } catch (e) {
+                    console.error('Error parsing saved user data', e);
+                }
+            }
+
+            // VALIDAZIONE IN BACKGROUND
             try {
                 const response = await fetch('/api/check', {
                     method: 'POST',
@@ -42,15 +62,17 @@ function homeApp() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    this.username = data.user.name;
-                    this.permissions = data.user.permissions;
-                    this.propic = data.user.propic || '';
+                    this.username = data.user?.name || savedUsername;
+                    this.permissions = data.user?.permissions;
+                    this.propic = data.user?.propic || '';
                     this.isLoggedIn = true;
+                    localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
                     this.logout();
                 }
             } catch (error) {
                 console.error("Auth failed:", error);
+                this.isLoggedIn = false;
             }
         },
 

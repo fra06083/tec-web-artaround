@@ -472,6 +472,13 @@ body.dark-mode .form-control::placeholder {
 .flex-1-min-w-0 { min-width: 0; flex: 1; }
 .max-h-20vh { max-height: 20vh; }
 .scrollbar-thin { scrollbar-width: thin; }
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
 .transition-all-300 { transition: all 0.3s; }
 .lightbox-backdrop { z-index: 1050; background-color: rgba(0,0,0,0.9); }
 .opacity-80 { opacity: 0.8; }
@@ -491,7 +498,8 @@ body.dark-mode .form-control::placeholder {
 .tracking-wide-5px { letter-spacing: 5px; }
 .max-h-400 { max-height: 400px; }
 .min-h-400 { min-height: 400px; }
-.dynamic-bg-blur { background-size: cover; background-position: center; filter: blur(30px) brightness(0.4); opacity: 0.8; z-index: 0; }
+.dynamic-bg-blur { background-size: cover; background-position: center; filter: blur(30px) brightness(0.85); opacity: 0.6; z-index: 0; transition: filter 0.3s ease; }
+.dark-mode .dynamic-bg-blur { filter: blur(30px) brightness(0.3); opacity: 0.8; }
 .bg-chat-dark { background-color: #121212; }
 .bg-chat-light { background-color: #efeae2; }
 .chat-bubble { max-width: 85%; border-bottom-right-radius: 1rem; border-bottom-left-radius: 1rem; }
@@ -512,4 +520,141 @@ body.dark-mode .form-control::placeholder {
 }
 .btn-icon-hover:hover, .btn-icon-hover:active {
     opacity: 0.6 !important;
+}
+
+/* Ticket Card Styles */
+.ticket-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    border-radius: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.ticket-body {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.08), 
+        0 8px 10px -6px rgba(0, 0, 0, 0.04),
+        inset 0 0 0 1px rgba(0,0,0,0.05);
+    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.dark-mode .ticket-body {
+    background: linear-gradient(145deg, #2a2d32 0%, #1e2125 100%);
+    box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.4), 
+        0 8px 10px -6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.ticket-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    z-index: 2;
+}
+
+.ticket-card:hover .ticket-body {
+    box-shadow: 
+        0 20px 40px -5px rgba(253, 126, 20, 0.15), 
+        0 15px 20px -10px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px rgba(253, 126, 20, 0.3);
+}
+
+.dark-mode .ticket-card:hover .ticket-body {
+    box-shadow: 
+        0 20px 40px -5px rgba(253, 126, 20, 0.25), 
+        0 15px 20px -10px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        inset 0 0 0 1px rgba(253, 126, 20, 0.4);
+}
+
+/* Shine effect on hover */
+.ticket-body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    transition: all 0.7s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.dark-mode .ticket-body::after {
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+}
+
+.ticket-card:hover .ticket-body::after {
+    left: 200%;
+}
+
+/* Ticket Top / Dashed Divider */
+.ticket-top {
+    height: 180px;
+    position: relative;
+    border-bottom: none;
+}
+
+.ticket-card:hover .ticket-top {
+    border-bottom: none;
+}
+
+.dark-mode .ticket-card:hover .ticket-top {
+    border-bottom: none;
+}
+
+.ticket-vignette {
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%);
+    pointer-events: none;
+}
+
+.ticket-barcode-wrapper {
+    transform: rotate(90deg);
+    transform-origin: center;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.ticket-barcode-icon {
+    font-size: 3rem;
+    opacity: 0.05;
+}
+
+.text-shadow-strong {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* Sleek side cutouts */
+.ticket-top::before, .ticket-top::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    width: 24px;
+    height: 24px;
+    background-color: #f8f9fa;
+    border-radius: 50%;
+    z-index: 5;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.dark-mode .ticket-top::before, .dark-mode .ticket-top::after {
+    background-color: #292d31;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.ticket-top::before {
+    left: -12px;
+}
+
+.ticket-top::after {
+    right: -12px;
 }

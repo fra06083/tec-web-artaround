@@ -64,8 +64,10 @@ function VisitDetail() {
             setDarkModeState(newDarkMode);
             if (newDarkMode) {
                 document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
             } else {
                 document.body.classList.remove('dark-mode');
+                document.documentElement.classList.remove('dark-mode');
             }
         };
 
@@ -74,8 +76,10 @@ function VisitDetail() {
         // Setup iniziale
         if (darkMode) {
             document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
         } else {
             document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         }
 
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -383,12 +387,10 @@ function VisitDetail() {
         fetchAllData();
 
         return () => {
-            socket.off('studentUpdate');
-            socket.off('teacherAction');
-            socket.off('roomClosed');
             document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         };
-    }, [id, darkMode]);
+    }, [id]);
 
     useEffect(() => {
         if (items.length > 0) {
@@ -400,6 +402,18 @@ function VisitDetail() {
             }
         }
     }, [currentIndex, items]);
+
+    // Precarica le immagini per evitare caricamenti lenti durante la visita
+    useEffect(() => {
+        if (items && items.length > 0) {
+            items.forEach(item => {
+                if (item.img_path) {
+                    const img = new Image();
+                    img.src = item.img_path;
+                }
+            });
+        }
+    }, [items]);
 
     // SSE Effect per stanza (studenti e docente)
     useEffect(() => {
@@ -670,7 +684,7 @@ function VisitDetail() {
     }
 
     return (
-        <div className={`vh-100 d-flex flex-column overflow-hidden position-relative ${darkMode ? 'bg-black text-white' : 'bg-dark text-white'}`}>
+        <div className={`vh-100 d-flex flex-column overflow-hidden position-relative ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
             <style>{`
                 @keyframes slideDownFade {
                     0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
@@ -696,15 +710,15 @@ function VisitDetail() {
                         <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-icon-40 ${darkMode ? 'bg-dark text-white border border-secondary' : 'bg-light text-dark border'}`} title="Torna alla Home">
                             <i className="bi bi-arrow-left fs-5"></i>
                         </Link>
-                        <div className="d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary glass-blur-5">
+                        <div className={`d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill border glass-blur-5 ${darkMode ? 'bg-dark bg-opacity-50 border-secondary' : 'bg-white bg-opacity-75 border-light'}`}>
                             <i className="bi bi-box-seam text-orange fs-5"></i>
-                            <span className="fw-black fs-6 text-white tracking-tight-sm">ArtAround</span>
+                            <span className={`fw-black fs-6 tracking-tight-sm ${darkMode ? 'text-white' : 'text-dark'}`}>ArtAround</span>
                         </div>
                     </div>
 
                     {/* CENTRO: Titolo dell'opera (nascosto se lo schermo è piccolo) */}
                     <div className="text-center px-2 d-none d-md-block text-truncate">
-                        <h6 className="m-0 fw-bold text-white shadow-sm px-4 py-2 rounded-pill bg-dark bg-opacity-50 border border-secondary text-truncate max-w-400 glass-blur-5">
+                        <h6 className={`m-0 fw-bold shadow-sm px-4 py-2 rounded-pill border text-truncate max-w-400 glass-blur-5 ${darkMode ? 'text-white bg-dark bg-opacity-50 border-secondary' : 'text-dark bg-white bg-opacity-75 border-light'}`}>
                             {currentItem.item.replace(/\s*\d{10,}$/, '')}
                         </h6>
                     </div>
@@ -716,7 +730,7 @@ function VisitDetail() {
                             <div className="d-flex align-items-center pe-3 border-end border-secondary border-opacity-50 d-none d-sm-flex me-3">
                                 <div className="dropdown">
                                     <button 
-                                        className="btn btn-sm px-2 py-1 rounded-pill bg-dark bg-opacity-50 border border-secondary shadow-sm d-flex align-items-center gap-2" 
+                                        className={`btn btn-sm px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-2 border ${darkMode ? 'bg-dark bg-opacity-50 border-secondary' : 'bg-white bg-opacity-75 border-light'}`}
                                         data-bs-toggle="dropdown" 
                                         title="Gestione Studenti"
                                         type="button"
@@ -726,7 +740,7 @@ function VisitDetail() {
                                                 const action = studentActions[student];
                                                 return (
                                                     <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
-                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-dark avatar-sm-075 ${action ? 'border-orange' : ''}`}>
+                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-075 ${action ? 'border-orange' : ''} ${darkMode ? 'text-white border-dark' : 'text-dark border-white'}`}>
                                                             {student.charAt(0).toUpperCase()}
                                                         </div>
                                                         {action && (
@@ -736,12 +750,12 @@ function VisitDetail() {
                                                 );
                                             })}
                                             {hiddenCount > 0 && (
-                                                <div className="user-avatar rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold shadow-sm border border-2 border-secondary avatar-sm-065 overlap-avatar-left">
+                                                <div className={`user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-065 overlap-avatar-left ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light text-dark border-light'}`}>
                                                     +{hiddenCount}
                                                 </div>
                                             )}
                                         </div>
-                                        <i className="bi bi-chevron-down text-white-50 ms-1 me-1 fs-07"></i>
+                                        <i className={`bi bi-chevron-down ms-1 me-1 fs-07 ${darkMode ? 'text-white-50' : 'text-secondary'}`}></i>
                                     </button>
 
                                     {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}

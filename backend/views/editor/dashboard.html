@@ -62,9 +62,6 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
-                <a href="/editor/import" x-show="permissions === 'admin'" class="nav-link-admin">
-                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
-                </a>
 
                 <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -396,29 +393,7 @@
 
 
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav">
-        <a href="/editor/dashboard" class="mobile-nav-item">
-            <i class="bi bi-grid-fill"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="/editor/museum" x-show="permissions !== 'docente'" class="mobile-nav-item">
-            <i class="bi bi-bank"></i>
-            <span>Musei</span>
-        </a>
-        <a href="/editor/artworks" x-show="permissions !== 'docente'" class="mobile-nav-item">
-            <i class="bi bi-palette"></i>
-            <span>Opere</span>
-        </a>
-        <a href="/editor/tours" class="mobile-nav-item">
-            <i class="bi bi-pencil-square"></i>
-            <span>Visite</span>
-        </a>
-        <a href="/editor/user-management" x-show="permissions === 'admin'" class="mobile-nav-item">
-            <i class="bi bi-people"></i>
-            <span>Utenti</span>
-        </a>
-    </nav>
+    
 
     <!-- Modale Selezione Visita -->
     <div class="modal fade modal-backdrop-dark" tabindex="-1" :class="{ 'show d-block': isVisitSelectionModalOpen }" x-show="isVisitSelectionModalOpen" x-transition>
@@ -482,6 +457,31 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="/editor/dashboard" class="mobile-nav-item active">
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/editor/tours" class="mobile-nav-item">
+            <i class="bi bi-pencil-square"></i>
+            <span>Visite</span>
+        </a>
+        <a href="/editor/museum" x-show="permissions !== 'docente'" class="mobile-nav-item">
+            <i class="bi bi-bank"></i>
+            <span>Musei</span>
+        </a>
+        <a href="/editor/artworks" x-show="permissions !== 'docente'" class="mobile-nav-item">
+            <i class="bi bi-palette"></i>
+            <span>Opere</span>
+        </a>
+        <a href="/editor/user-management" x-show="permissions === 'admin'" class="mobile-nav-item">
+            <i class="bi bi-people"></i>
+            <span>Utenti</span>
+        </a>
+    </nav>
 
 </body>
 

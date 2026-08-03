@@ -75,7 +75,7 @@ function artworkManager() {
                         const savedUserData = JSON.parse(savedUserDataStr);
                         this.permissions = savedUserData.permissions || '';
                         this.propic = savedUserData.propic || '';
-                        if (this.hasOwnProperty('purchasedVisits')) {
+                        if (this.purchasedVisits !== undefined) {
                             this.purchasedVisits = savedUserData.purchased_visits || [];
                         }
                     } catch (e) {
@@ -97,7 +97,7 @@ function artworkManager() {
                     this.username = data.user?.name || savedUsername;
                     this.permissions = data.user?.permissions;
                     this.propic = data.user?.propic || '';
-                    if (this.hasOwnProperty('purchasedVisits')) {
+                    if (this.purchasedVisits !== undefined) {
                         this.purchasedVisits = data.user?.purchased_visits || [];
                     }
                     this.isLoggedIn = true;

@@ -73,9 +73,6 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
-                <a href="/editor/import" x-show="permissions === 'admin'" class="nav-link-admin active">
-                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
-                </a>
 
                 <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -136,7 +133,7 @@
                         <div class="col-md-8 col-lg-6">
                             <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-5 shadow-lg text-center">
                                 <div class="mb-4">
-                                    <div class="bg-orange bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
+                                    <div class="bg-orange-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
                                         <i class="bi bi-file-earmark-arrow-up text-orange fs-2"></i>
                                     </div>
                                     <h3 class="fw-bold mb-2">Importa Musei e Opere</h3>
@@ -151,13 +148,17 @@
                                     <input type="file" x-ref="fileInput" @change="handleFileSelect" accept=".json" class="d-none">
                                     <template x-if="!selectedFile">
                                         <div>
-                                            <i class="bi bi-cloud-upload text-orange fs-1 mb-3 d-block"></i>
+                                            <div class="bg-orange-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
+                                                <i class="bi bi-cloud-upload text-orange fs-2"></i>
+                                            </div>
                                             <p class="mb-0">Trascina qui il file JSON o <span class="text-orange fw-bold">clicca per selezionare</span></p>
                                         </div>
                                     </template>
                                     <template x-if="selectedFile">
                                         <div>
-                                            <i class="bi bi-file-earmark-text text-success fs-1 mb-3 d-block"></i>
+                                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
+                                                <i class="bi bi-file-earmark-text text-success fs-2"></i>
+                                            </div>
                                             <p class="fw-bold mb-0" x-text="selectedFile.name"></p>
                                             <p class="text-white-50 small mb-0" x-text="(selectedFile.size / 1024).toFixed(2) + ' KB'"></p>
                                         </div>
@@ -361,11 +362,18 @@
 
     
 
+    
+
+
     <!-- Mobile Navigation -->
     <nav class="mobile-nav">
         <a href="/editor/dashboard" class="mobile-nav-item">
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
+        </a>
+        <a href="/editor/tours" class="mobile-nav-item">
+            <i class="bi bi-pencil-square"></i>
+            <span>Visite</span>
         </a>
         <a href="/editor/museum" x-show="permissions !== 'docente'" class="mobile-nav-item">
             <i class="bi bi-bank"></i>
@@ -374,10 +382,6 @@
         <a href="/editor/artworks" x-show="permissions !== 'docente'" class="mobile-nav-item">
             <i class="bi bi-palette"></i>
             <span>Opere</span>
-        </a>
-        <a href="/editor/tours" class="mobile-nav-item">
-            <i class="bi bi-pencil-square"></i>
-            <span>Visite</span>
         </a>
         <a href="/editor/user-management" x-show="permissions === 'admin'" class="mobile-nav-item">
             <i class="bi bi-people"></i>

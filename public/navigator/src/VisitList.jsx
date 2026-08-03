@@ -55,8 +55,10 @@ function VisitList() {
         // Applica la classe dark-mode a body
         if (darkMode) {
             document.body.classList.add('dark-mode');
+            document.documentElement.classList.add('dark-mode');
         } else {
             document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         }
 
         // Sincronizza dark mode con localStorage
@@ -65,8 +67,10 @@ function VisitList() {
             setDarkModeState(newDarkMode);
             if (newDarkMode) {
                 document.body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
             } else {
                 document.body.classList.remove('dark-mode');
+                document.documentElement.classList.remove('dark-mode');
             }
         };
 
@@ -90,6 +94,7 @@ function VisitList() {
         return () => {
             window.removeEventListener('storage', handleStorageChange);
             document.body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark-mode');
         };
     }, [darkMode]);
 
@@ -312,12 +317,30 @@ function VisitList() {
                     </div>
                 </div>
 
-                <div className="d-flex align-items-center mb-4 mt-5">
-                    <h4 className={`fw-black mb-0 ${darkMode ? 'text-white' : 'text-dark'}`}>
-                        <i className="bi bi-stars text-orange me-2"></i>Esperienze da Scoprire
-                    </h4>
-                    <div className={`ms-3 flex-grow-1 border-bottom ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`}></div>
+                <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 mt-5 gap-3">
+                    <div className="d-flex align-items-center flex-grow-1">
+                        <h4 className={`fw-black mb-0 d-flex align-items-center gap-2 text-nowrap ${darkMode ? 'text-white' : 'text-dark'}`}>
+                            <i className="bi bi-stars text-orange"></i> Esperienze da Scoprire
+                        </h4>
+                        <div className={`ms-3 flex-grow-1 border-bottom d-none d-md-block ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`} style={{minWidth: '150px'}}></div>
+                    </div>
+                    
+                    {/* FILTRI/CERCA (Mobile-oriented: barra di ricerca visibile da smartphone) */}
+                    <div className="d-block d-lg-none ms-md-4 w-100" style={{maxWidth: '100%'}}>
+                        <div className="search-input-wrapper w-100 shadow-sm border border-secondary border-opacity-10 rounded-pill">
+                            <i className="bi bi-search search-icon"></i>
+                            <input 
+                                type="text" 
+                                placeholder="Cerca visite..." 
+                                className="search-input w-100 bg-transparent border-0" 
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </div>
+
+                <div className={`border-bottom mb-4 d-block d-md-none ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`}></div>
 
                 {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
                     <div className="text-center py-5">
@@ -333,31 +356,76 @@ function VisitList() {
                 ) : (
                     <div className="row g-4 mt-2 mb-5 pb-5">
                         {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).map(v => (
-                            <div key={v._id} className="col-12 col-md-6 col-lg-4">
-                                <div className={`card h-100 rounded-4 overflow-hidden shadow-sm card-hover-premium ${bgCard}`}>
-                                    <div className="card-body p-4 d-flex flex-column">
-                                        <h5 className={`fw-bold mb-1 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
-
-                                        {v.museum_id && (
-                                            <div className={`d-flex align-items-center gap-1 ${textMuted} small mb-3`}>
-                                                <i className="bi bi-geo-alt-fill text-orange"></i>
-                                                <span className="text-truncate">{v.museum_id.name || 'Museo sconosciuto'}</span>
-                                            </div>
-                                        )}
-
-                                        <p className={`card-text small mb-4 flex-grow-1 ${textMuted}`}>
-                                            {v.description && v.description.length > 100 ? v.description.substring(0, 100) + '...' : v.description || "Nessuna descrizione disponibile."}
-                                        </p>
+                            <div key={v._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                                <div className="card ticket-card h-100 border-0 bg-transparent">
+                                    <div className="ticket-body h-100 d-flex flex-column">
                                         
-                                        <div className={`mt-auto pt-3 border-top d-flex align-items-center justify-content-between ${darkMode ? 'border-secondary border-opacity-50' : 'border-light'}`}>
-                                            <div className="d-flex align-items-center">
-                                                <i className="bi bi-person-walking text-orange me-2"></i>
-                                                <span className={`fw-bold small ${darkMode ? 'text-white' : 'text-dark'}`}>{v.items ? v.items.length : 0}</span>
-                                                <span className={`ms-1 small ${textMuted}`}>tappe</span>
+                                        {/* Top part (Image) */}
+                                        <div className="ticket-top position-relative overflow-hidden bg-dark">
+                                            {v.museum_id && v.museum_id.image ? (
+                                                <img src={v.museum_id.image} alt="Museum" className="w-100 h-100 object-fit-cover" />
+                                            ) : (
+                                                <div className="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                    <i className="bi bi-image fs-1"></i>
+                                                </div>
+                                            )}
+                                            
+                                            {/* Subtle vignette for text readability */}
+                                            <div className="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
+                                            
+                                            <span className="badge bg-white text-orange position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2 fw-bold z-1">
+                                                Tour Guidato
+                                            </span>
+
+                                            {/* Museum Location overlaid on image */}
+                                            {v.museum_id && (
+                                                <div className="position-absolute bottom-0 start-0 p-3 z-1 w-100">
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <i className="bi bi-geo-alt-fill text-orange"></i>
+                                                        <span className="fw-bold text-truncate text-white text-shadow-strong">
+                                                            {v.museum_id.name || v.museum_id.museum || 'Museo sconosciuto'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Bottom part (Details) */}
+                                        <div className="ticket-bottom p-4 d-flex flex-column flex-grow-1 position-relative">
+                                            
+                                            {/* Decorative Barcode Watermark */}
+                                            <div className="position-absolute top-0 end-0 mt-4 me-3 ticket-barcode-wrapper">
+                                                <i className={`bi bi-upc ticket-barcode-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
                                             </div>
-                                            <Link to={`/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-4 fw-bold btn-sm shadow-sm transition-theme">
-                                                Inizia <i className="bi bi-arrow-right ms-1"></i>
-                                            </Link>
+                                            
+                                            <h5 className={`fw-black mb-3 position-relative z-1 pe-4 mt-2 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
+                                            
+                                            <p className={`small flex-grow-1 mb-3 position-relative z-1 pe-2 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                                                {v.description && v.description.length > 100 ? v.description.substring(0, 100) + '...' : v.description || "Nessuna descrizione disponibile."}
+                                            </p>
+                                            
+                                            {/* Tags */}
+                                            {v.tags && v.tags.length > 0 && (
+                                                <div className="d-flex flex-wrap gap-1 mb-3">
+                                                    {v.tags.map(tag => (
+                                                        <span key={tag} className="badge bg-orange bg-opacity-10 text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1">
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <div className={`d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
+                                                <div className="d-flex flex-column">
+                                                    <span className="text-orange fw-black fs-5">
+                                                        <i className="bi bi-check2-circle me-1"></i>Acquistato
+                                                    </span>
+                                                    <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>{v.items ? v.items.length : 0} tappe</span>
+                                                </div>
+                                                <Link to={`/visit/${v._id}`} className="btn btn-outline-orange rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
+                                                    Inizia
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
