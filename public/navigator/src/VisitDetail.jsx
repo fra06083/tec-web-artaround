@@ -697,6 +697,8 @@ function VisitDetail() {
     // --- MAPPA DEL MUSEO ---
     const piante = [...(visita.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
     const piantaAttiva = piante.find(p => p.piano === pianoAttivo);
+    // Il piano in cui si trova l'opera, indipendente dal piano visualizzato
+    const pianoOpera = piante.find(p => p.piano === currentItem.sala?.piano);
     // Solo le domande a cui il museo ha dato una risposta
     const domandeMappa = (visita.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
 
@@ -1131,9 +1133,7 @@ function VisitDetail() {
                             <span className="fw-bold">
                                 <i className="bi bi-geo-alt-fill text-orange me-1"></i>
                                 {currentItem.sala.nome}
-                                {piantaAttiva && currentItem.sala.piano === piantaAttiva.piano && (
-                                    <span className="fw-normal"> · {piantaAttiva.nome}</span>
-                                )}
+                                {pianoOpera && <span className="fw-normal"> · {pianoOpera.nome}</span>}
                             </span>
                         </div>
                     )}
