@@ -23,7 +23,7 @@ const getAllVisits = async (req, res) => {
 const getVisitById = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id)
-            .populate('museum_id', 'museum province image')
+            .populate('museum_id', 'museum province image mappa')
             .populate('items')
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });

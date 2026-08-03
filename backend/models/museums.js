@@ -8,7 +8,12 @@ const museumSchema = new mongoose.Schema({
     region: { type: String, required: true },
     address: { type: String, required: true },
     description: String,
-    image: String
+    image: String,
+    // in museumSchema, dopo image
+    mappa: {
+        piante: [{ piano: Number, nome: String, immagine: String }],
+        poi:    [{ tipo: String, piano: Number, testo: String }]
+    }
 });
 // 2. L'OPERA (Contenuta nel museo)
 const itemSchema = new mongoose.Schema({
@@ -21,6 +26,7 @@ const itemSchema = new mongoose.Schema({
     },
     author: { type: String, required: true }, // Metadato obbligatorio [cite: 268]
     license: { type: String, required: true }, // Metadato obbligatorio [cite: 269]
+    sala: { nome:  String, piano: Number }
 });
 const visitSchema = new mongoose.Schema({
     name: { type: String, required: true }, // Es. "I capolavori del Rinascimento"

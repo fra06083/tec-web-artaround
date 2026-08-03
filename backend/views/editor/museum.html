@@ -291,6 +291,83 @@
                                 <textarea class="form-control bg-dark text-white border-secondary"
                                     x-model="currentMuseum.description" rows="3"></textarea>
                             </div>
+
+                            <hr class="border-secondary opacity-25 my-4">
+                            <h6 class="fw-bold text-orange mb-3"><i class="bi bi-map-fill me-2"></i>Mappa del museo</h6>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label text-white-50 small m-0">Piante dei piani</label>
+                                    <button type="button" @click="addPiano()"
+                                        class="btn btn-sm btn-outline-orange rounded-pill px-3">
+                                        <i class="bi bi-plus-lg"></i> Aggiungi piano
+                                    </button>
+                                </div>
+
+                                <template x-if="currentMuseum.mappa.piante.length === 0">
+                                    <p class="small text-white-50 fst-italic">Nessun piano inserito.</p>
+                                </template>
+
+                                <template x-for="(p, i) in currentMuseum.mappa.piante" :key="i">
+                                    <div class="card bg-dark border-secondary rounded-3 p-3 mb-2">
+                                        <div class="row g-2 align-items-end">
+                                            <div class="col-4 col-md-2">
+                                                <label class="form-label text-white-50 x-small">Piano</label>
+                                                <input type="number"
+                                                    class="form-control form-control-sm bg-dark text-white border-secondary"
+                                                    x-model.number="p.piano">
+                                            </div>
+                                            <div class="col-8 col-md-4">
+                                                <label class="form-label text-white-50 x-small">Nome</label>
+                                                <input type="text"
+                                                    class="form-control form-control-sm bg-dark text-white border-secondary"
+                                                    x-model="p.nome">
+                                            </div>
+                                            <div class="col-9 col-md-4">
+                                                <label class="form-label text-white-50 x-small">Piantina (URL o file)</label>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                        class="form-control bg-dark text-white border-secondary"
+                                                        placeholder="Inserisci immagine..." x-model="p.immagine">
+                                                    <label class="btn btn-outline-orange cursor-pointer"
+                                                        title="Carica dal dispositivo">
+                                                        <i class="bi bi-upload"></i>
+                                                        <input type="file" class="d-none" accept="image/*"
+                                                            @change="uploadPianta($event, i)">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-3 col-md-2 text-end">
+                                                <button type="button" @click="removePiano(i)"
+                                                    class="btn btn-sm btn-outline-danger w-100">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <template x-if="p.immagine">
+                                            <img :src="p.immagine"
+                                                class="img-thumbnail bg-dark border-secondary mt-2 mx-auto d-block"
+                                                style="max-height: 120px;">
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Risposte ai visitatori</label>
+                                <p class="x-small text-white-50 fst-italic">Le domande senza risposta non verranno
+                                    mostrate durante la visita.</p>
+
+                                <template x-for="d in currentMuseum.mappa.poi" :key="d.tipo">
+                                    <div class="mb-2">
+                                        <label class="form-label text-white x-small fw-bold"
+                                            x-text="getDomanda(d.tipo)"></label>
+                                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                                            placeholder="Lascia vuoto per nascondere la domanda" x-model="d.testo">
+                                    </div>
+                                </template>
+                            </div>
+
                             <div class="d-flex gap-2 pt-3">
                                 <button type="button" @click="step = 'museum-list'"
                                     class="btn btn-slate w-100">Annulla</button>

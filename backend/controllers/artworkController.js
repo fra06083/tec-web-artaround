@@ -53,7 +53,7 @@ const getDescriptionsByArtwork = async (req, res) => {
 // POST /api/artworks
 const createArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license, description, desc_type, desc_length } = req.body;
+       const { item, img_path, museum_id, author, license, sala, description, desc_type, desc_length } = req.body;
 
         // for the moment the description is mandatory..
         if (!item || !img_path || !museum_id || !author || !license || !description) {
@@ -67,7 +67,8 @@ const createArtwork = async (req, res) => {
             img_path,
             museum_id,
             author,
-            license
+            license,
+            sala
         });
         await newArtwork.save();
 
@@ -92,11 +93,11 @@ const createArtwork = async (req, res) => {
 // PUT /api/artworks/:id
 const updateArtwork = async (req, res) => {
     try {
-        const { item, img_path, museum_id, author, license, description, desc_type, desc_length } = req.body;
+        const { item, img_path, museum_id, author, license, sala, description, desc_type, desc_length } = req.body;
 
         const updated = await Item.findByIdAndUpdate(
             req.params.id,
-            { $set: { item, img_path, museum_id, author, license } },
+            { $set: { item, img_path, museum_id, author, license, sala } },
             { returnDocument: 'after', runValidators: true }
         );
 

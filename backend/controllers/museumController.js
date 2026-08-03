@@ -33,7 +33,7 @@ const getMuseumById = async (req, res) => {
 // Richiede Auth (il middleware va nella rotta)
 const createMuseum = async (req, res) => {
     try {
-        const { museum, city, province, region, address, description, image } = req.body;
+        const { museum, city, province, region, address, description, image,mappa } = req.body;
 
         if (!museum) {
             return res.status(400).json({ error: 'Il nome del museo è obbligatorio' });
@@ -51,7 +51,8 @@ const createMuseum = async (req, res) => {
             region,
             address,
             description,
-            image
+            image,
+            mappa
         });
 
         await newMuseum.save();
@@ -71,7 +72,7 @@ const createMuseum = async (req, res) => {
 // PUT /api/museums/:id
 const updateMuseum = async (req, res) => {
     try {
-        const { museum, city, province, region, address, description, image } = req.body;
+        const { museum, city, province, region, address, description, image, mappa } = req.body;
 
         if (museum) {
             const existingMuseum = await Museum.findOne({ museum, _id: { $ne: req.params.id } });
@@ -82,7 +83,7 @@ const updateMuseum = async (req, res) => {
 
         const updated = await Museum.findByIdAndUpdate(
             req.params.id,
-            { $set: { museum, city, province, region, address, description, image } },
+            { $set: { museum, city, province, region, address, description, image, mappa } },
             { new: true, runValidators: true }
         );
         if (!updated) return res.status(404).json({ error: 'Museo non trovato' });

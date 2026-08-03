@@ -284,7 +284,26 @@
                                     id="artworkAuthor" x-model="currentArtwork.author" placeholder="Autore" required>
                                 <label for="artworkAuthor">Autore *</label>
                             </div>
-
+                            <!-- Sala e piano -->
+                            <div class="row mb-3">
+                                <div class="col-7">
+                                    <label class="form-label text-white-50 small">Sala *</label>
+                                    <input type="text" class="form-control bg-dark text-white border-secondary hover-glow"
+                                        x-model="currentArtwork.sala.nome" placeholder="Es. Sala 15" required>
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label text-white-50 small">Piano</label>
+                                    <select class="form-select bg-dark text-white border-secondary hover-glow"
+                                        x-model.number="currentArtwork.sala.piano">
+                                        <template x-for="p in getPianiMuseo()" :key="p.piano">
+                                            <option :value="p.piano" x-text="p.nome"></option>
+                                        </template>
+                                    </select>
+                                    <template x-if="getPianiMuseo().length === 0">
+                                        <small class="text-warning x-small">Nessun piano definito per questo museo.</small>
+                                    </template>
+                                </div>
+                            </div>
                             <!-- Image Path -->
                             <div class="mb-3">
                                 <label class="form-label text-white-50 small">Immagine (URL o Carica File) *</label>
