@@ -12,7 +12,7 @@ jobs:
       - name: Connessione SSH e aggiornamento
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: rosina.cs.unibo.it
+          host: annina.cs.unibo.it
           username: francesco.biglieri
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
