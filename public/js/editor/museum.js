@@ -1,3 +1,8 @@
+const POI_TIPI = [
+    { tipo: 'toilette', domanda: 'Dove sono i servizi igienici?' },
+    { tipo: 'bar',      domanda: "Dov'è la caffetteria?" },
+    { tipo: 'shop',     domanda: "Dov'è il bookshop?" }
+];
 function museumManager() {
     return {
         // --- STATO SESSIONE & NAVIGAZIONE ---
@@ -92,8 +97,9 @@ function museumManager() {
             if (museum) {
                 this.currentMuseum = { ...museum };
             } else {
-                this.currentMuseum = { museum: '', city: '', province: '', region: '', description: '', image: '' };
+                this.currentMuseum = { museum: '', city: '', province: '', region: '', address: '', description: '', image: '' };
             }
+            this.currentMuseum.mappa = this.normalizeMappa(this.currentMuseum);
             this.step = 'museum-form';
         },
 
@@ -110,7 +116,7 @@ function museumManager() {
                         'Content-Type': 'application/json',
                         'Authorization': localStorage.getItem('artaround_token')
                     },
-                    body: JSON.stringify(this.currentMuseum)
+                    body: JSON.stringify(this.buildMuseumPayload())
                 });
 
                 if (res.ok) {
@@ -171,6 +177,69 @@ function museumManager() {
             } catch (error) {
                 this.showToast('Errore di connessione durante l\'upload', 'error');
             }
+        },
+
+        // Garantisce che mappa esista e che ci sia una riga per ogni domanda prevista
+        normalizeMappa(m) {
+            const mappa = m.mappa || {};
+            return {
+                piante: mappa.piante ? [...mappa.piante] : [],
+                poi: POI_TIPI.map(t => {
+                    const esistente = (mappa.poi || []).find(p => p.tipo === t.tipo);
+                    return { tipo: t.tipo, piano: esistente?.piano ?? 0, testo: esistente?.testo || '' };
+                })
+            };
+        },
+
+        getDomanda(tipo) {
+            const t = POI_TIPI.find(x => x.tipo === tipo);
+            return t ? t.domanda : tipo;
+        },
+
+        addPiano() {
+            const piani = this.currentMuseum.mappa.piante;
+            const n = piani.length ? Math.max(...piani.map(p => p.piano)) + 1 : 0;
+            piani.push({ piano: n, nome: n === 0 ? 'Piano terra' : `Piano ${n}`, immagine: '' });
+        },
+
+        removePiano(i) {
+            this.currentMuseum.mappa.piante.splice(i, 1);
+        },
+
+        async uploadPianta(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch('/api/upload/museum', {
+                    method: 'POST',
+                    headers: { 'Authorization': localStorage.getItem('artaround_token') },
+                    body: formData
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.currentMuseum.mappa.piante[index].immagine = data.url;
+                    this.showToast('Pianta caricata!', 'success');
+                } else {
+                    const err = await res.json();
+                    this.showToast(err.error || 'Errore caricamento pianta', 'error');
+                }
+            } catch (e) {
+                this.showToast('Errore di connessione durante l\'upload', 'error');
+            }
+        },
+
+        // Scarta i piani senza immagine e le domande senza risposta
+        buildMuseumPayload() {
+            const mappa = this.currentMuseum.mappa || { piante: [], poi: [] };
+            return {
+                ...this.currentMuseum,
+                mappa: {
+                    piante: (mappa.piante || []).filter(p => p.immagine),
+                    poi: (mappa.poi || []).filter(p => p.testo && p.testo.trim() !== '')
+                }
+            };
         },
 
         // --- UTILITY ---

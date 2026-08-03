@@ -28,6 +28,7 @@ function artworkManager() {
             museum_id: '',
             author: '',
             license: '',
+            sala: { nome: '', piano: 0 },
 
             // remove maybe
             description: '',
@@ -157,6 +158,12 @@ function artworkManager() {
             return m ? m.museum : 'Selezionato';
         },
 
+        // Piani del museo selezionato, per la select della sala
+        getPianiMuseo() {
+            const m = this.museums.find(mu => mu._id === this.currentArtwork.museum_id);
+            return [...(m?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
+        },
+
         // ARTWORK LOGIC
         async fetchArtworks() {
             // load artworks for selected museum
@@ -198,6 +205,7 @@ function artworkManager() {
                     museum_id: artwork.museum_id || this.selectedMuseumId,
                     author: artwork.author || '',
                     license: artwork.license || '',
+                    sala: { nome: artwork.sala?.nome || '', piano: artwork.sala?.piano ?? 0 },
                     description: artwork.description || '',
                     desc_type: artwork.desc_type || 'medio'
                 };
@@ -218,6 +226,7 @@ function artworkManager() {
                     museum_id: this.selectedMuseumId,
                     author: '',
                     license: '',
+                    sala: { nome: '', piano: 0 },
                     description: '',
                     desc_type: 'medio'
                 };
@@ -234,7 +243,10 @@ function artworkManager() {
                 this.showToast("Compila tutti i campi obbligatori", "error");
                 return;
             }
-
+            if (!this.currentArtwork.sala?.nome) {
+                this.showToast("Indica in quale sala si trova l'opera", "error");
+                return;
+            }
             const allDescriptions = [];
             for (const type of Object.keys(this.descriptions)) {
                 for (const len of Object.keys(this.descriptions[type])) {
@@ -280,7 +292,7 @@ function artworkManager() {
                     await this.fetchArtworks(); // reload table
                     this.step = 'artwork-list'; // back to list
                 } else {
-                    this.showToast(err.error || "Errore nel salvataggio", "error");
+                    this.showToast(data.error || "Errore nel salvataggio", "error");
                 }
             } catch (e) {
                 this.showToast("Errore server", "error");

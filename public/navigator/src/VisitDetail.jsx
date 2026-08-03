@@ -6,6 +6,14 @@ import ProfileModal from './Profile';
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 const LENGTHS = ['3s', '15s', '40s'];
 
+// Domanda e icona per ogni tipo di punto di interesse della mappa.
+// Se il museo non inserisce la risposta, la domanda non viene mostrata.
+const POI_INFO = {
+    toilette: { icona: 'bi-droplet-fill', domanda: 'Dove sono i servizi igienici?' },
+    bar:      { icona: 'bi-cup-hot-fill', domanda: "Dov'è la caffetteria?" },
+    shop:     { icona: 'bi-bag-fill',     domanda: "Dov'è il bookshop?" }
+};
+
 function VisitDetail() {
     const { id } = useParams();
     const location = useLocation();
@@ -33,6 +41,9 @@ function VisitDetail() {
     const [chatMessages, setChatMessages] = useState([]);
     const [chatFilter, setChatFilter] = useState('all');
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isMapOpen, setIsMapOpen] = useState(false);
+    const [pianoAttivo, setPianoAttivo] = useState(null);
+    const [domandaAperta, setDomandaAperta] = useState(null);
     const [chatInput, setChatInput] = useState('');
     const [unreadCount, setUnreadCount] = useState(0);
     const [connectedStudents, setConnectedStudents] = useState([]);
@@ -93,6 +104,19 @@ function VisitDetail() {
             }, 100);
         }
     }, [isChatOpen, chatMessages]);
+
+    // All'apertura della mappa mostra il piano dell'opera corrente
+    useEffect(() => {
+        if (!isMapOpen) return;
+        setDomandaAperta(null);
+        const sala = items[currentIndex]?.sala;
+        const piani = [...(visita?.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
+        if (sala?.piano !== undefined && sala?.piano !== null) {
+            setPianoAttivo(sala.piano);
+        } else if (piani.length > 0) {
+            setPianoAttivo(piani[0].piano);
+        }
+    }, [isMapOpen, currentIndex, items, visita]);
     
     // Ferma la sintesi vocale
     const stopSpeaking = useCallback(() => {
@@ -670,6 +694,12 @@ function VisitDetail() {
 
     const currentItem = items[currentIndex];
 
+    // --- MAPPA DEL MUSEO ---
+    const piante = [...(visita.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
+    const piantaAttiva = piante.find(p => p.piano === pianoAttivo);
+    // Solo le domande a cui il museo ha dato una risposta
+    const domandeMappa = (visita.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
+
     // Avatar Logic
     const maxVisibleAvatars = 4;
     const activeRequesters = connectedStudents.filter(s => studentActions[s]);
@@ -802,6 +832,15 @@ function VisitDetail() {
                             <i className={`bi ${darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'} fs-4`}></i>
                         </button>
 
+                        {/* MAPPA TOGGLE (Solo Icona) */}
+                        <button
+                            className="btn btn-sm border-0 shadow-none p-1 d-flex align-items-center justify-content-center"
+                            onClick={() => setIsMapOpen(true)}
+                            title="Mappa del museo"
+                        >
+                            <i className={`bi bi-map-fill fs-4 ${darkMode ? 'text-white' : 'text-primary'}`}></i>
+                        </button>
+
                         {/* CHAT TOGGLE (Solo Icona) */}
                         {pin && (
                             <button 
@@ -847,7 +886,12 @@ function VisitDetail() {
                                         <div className="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
                                             <div className="flex-1-min-w-0">
                                                 <h3 className="fw-black mb-1 tracking-tight-sm">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h3>
-                                                {visita.museum_id && <small className="d-block mb-2 opacity-75"><i className="bi bi-geo-alt-fill text-orange me-1"></i>{visita.museum_id.museum}</small>}
+                                                {visita.museum_id && (
+                                                    <small className="d-block mb-2 opacity-75">
+                                                        <i className="bi bi-geo-alt-fill text-orange me-1"></i>{visita.museum_id.museum}
+                                                        {currentItem.sala?.nome && <> · {currentItem.sala.nome}</>}
+                                                    </small>
+                                                )}
                                                 <span className="badge bg-orange text-white rounded-pill px-3 py-2 shadow-sm"><i className="bi bi-person-fill me-1"></i>{currentItem.author}</span>
                                             </div>
                                             
@@ -1071,6 +1115,95 @@ function VisitDetail() {
                 user={user} 
                 onUpdate={(updatedUser) => setUser(updatedUser)} 
             />
+
+            {/* OFFCANVAS MAPPA DEL MUSEO */}
+            <div className={`offcanvas offcanvas-end z-1050 ${isMapOpen ? 'show d-flex visible' : 'invisible'} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} tabIndex="-1">
+                <div className={`offcanvas-header border-bottom ${darkMode ? 'border-secondary' : ''}`}>
+                    <h5 className="offcanvas-title fw-bold"><i className="bi bi-map-fill text-orange me-2"></i>Mappa del museo</h5>
+                    <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} onClick={() => setIsMapOpen(false)} aria-label="Chiudi mappa"></button>
+                </div>
+
+                <div className="offcanvas-body">
+                    {/* Dove si trova l'opera che sto guardando */}
+                    {currentItem.sala?.nome && (
+                        <div className={`p-3 rounded-3 mb-3 ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
+                            <small className={`d-block mb-1 ${textMuted}`}>Dove si trova quest'opera?</small>
+                            <span className="fw-bold">
+                                <i className="bi bi-geo-alt-fill text-orange me-1"></i>
+                                {currentItem.sala.nome}
+                                {piantaAttiva && currentItem.sala.piano === piantaAttiva.piano && (
+                                    <span className="fw-normal"> · {piantaAttiva.nome}</span>
+                                )}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Selettore dei piani */}
+                    {piante.length > 1 && (
+                        <div className="d-flex flex-wrap gap-2 mb-3">
+                            {piante.map(p => (
+                                <button
+                                    key={p.piano}
+                                    type="button"
+                                    onClick={() => setPianoAttivo(p.piano)}
+                                    className={`btn btn-sm rounded-pill px-3 ${p.piano === pianoAttivo ? 'bg-orange text-white' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
+                                >
+                                    {p.nome}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Pianta del piano selezionato */}
+                    {piantaAttiva?.immagine ? (
+                        <img
+                            src={piantaAttiva.immagine}
+                            alt={`Pianta - ${piantaAttiva.nome}`}
+                            className="img-fluid w-100 rounded-3 border mb-4"
+                        />
+                    ) : (
+                        <p className={`text-center py-4 ${textMuted}`}>
+                            <i className="bi bi-map d-block fs-3 mb-2"></i>
+                            Il museo non ha ancora caricato la pianta.
+                        </p>
+                    )}
+
+                    {/* Domande a cui il museo ha risposto */}
+                    {domandeMappa.length > 0 && (
+                        <>
+                            <h6 className="fw-bold mb-2">Domande frequenti</h6>
+                            <div className="d-flex flex-column gap-2">
+                                {domandeMappa.map((poi, i) => {
+                                    const info = POI_INFO[poi.tipo] || { icona: 'bi-geo-alt-fill', domanda: `Dov'è ${poi.tipo}?` };
+                                    const chiave = poi._id || i;
+                                    const aperta = domandaAperta === chiave;
+                                    return (
+                                        <div key={chiave} className={`rounded-3 ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
+                                            <button
+                                                type="button"
+                                                onClick={() => setDomandaAperta(aperta ? null : chiave)}
+                                                className={`btn w-100 text-start d-flex align-items-center gap-2 py-2 px-3 shadow-none ${darkMode ? 'text-white' : 'text-dark'}`}
+                                                aria-expanded={aperta}
+                                            >
+                                                <i className={`bi ${info.icona} text-orange`}></i>
+                                                <span className="flex-grow-1 fw-bold fs-095">{info.domanda}</span>
+                                                <i className={`bi ${aperta ? 'bi-chevron-up' : 'bi-chevron-down'} ${textMuted}`}></i>
+                                            </button>
+                                            {aperta && (
+                                                <p className={`mb-0 px-3 pb-3 fs-095 ${textMuted}`}>{poi.testo}</p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {isMapOpen && (
+                <div className="offcanvas-backdrop fade show z-1040" onClick={() => setIsMapOpen(false)}></div>
+            )}
 
             {/* OFFCANVAS CHAT */}
             {pin && (
