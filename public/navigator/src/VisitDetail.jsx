@@ -859,10 +859,10 @@ function VisitDetail() {
 
             {/* CONTENUTO CENTRATO E STRUTTURATO */}
             <main className="flex-grow-1 d-flex flex-column w-100 overflow-hidden z-10">
-                <div className="container d-flex flex-column flex-grow-1 justify-content-center align-items-center gap-2 py-2 w-100 h-100">
+                <div className="container d-flex flex-column flex-landscape-row flex-grow-1 justify-content-center align-items-center gap-2 gap-lg-4 py-2 w-100 h-100">
                     
                     {/* MAIN IMAGE */}
-                    <div className="w-100 d-flex flex-grow-1 justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0">
+                    <div className="w-100 w-landscape-50 h-landscape-100 d-flex flex-grow-1 justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0 min-h-landscape-0">
                         {currentItem.img_path && (
                             <div className="position-relative d-inline-block d-flex align-items-center justify-content-center h-100 w-100 cursor-pointer" onClick={() => setLightboxImage(currentItem.img_path)}>
                                 <img
@@ -878,7 +878,7 @@ function VisitDetail() {
                     </div>
 
                     {/* SCHEDA INFORMATIVA E COMANDI */}
-                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mb-1 border-secondary-subtle shadow-sm w-100 max-w-800 min-h-0 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
+                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-landscape-50 h-landscape-100 max-w-800 min-h-0 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
                         <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden">
                             
                             <div className="flex-shrink-0">

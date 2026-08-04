@@ -709,6 +709,24 @@ body.dark-mode .form-control::placeholder {
 .lightbox-close-btn { width: 44px; height: 44px; top: 24px; right: 24px; }
 .lightbox-img-max { max-height: 85vh; object-fit: contain; }
 
+/* Landscape Orientation Optimizations */
+@media (orientation: landscape) and (max-height: 600px) {
+    /* For landscape phones */
+    .flex-landscape-row { flex-direction: row !important; }
+    .w-landscape-50 { width: 50% !important; }
+    .h-landscape-100 { height: 100% !important; }
+    .artwork-main-img { max-height: 80vh !important; }
+    .min-h-landscape-0 { min-height: 0 !important; }
+}
+@media (orientation: landscape) and (min-width: 992px) {
+    /* For desktops/large tablets */
+    .flex-landscape-row { flex-direction: row !important; }
+    .w-landscape-50 { width: 50% !important; }
+    .h-landscape-100 { height: 100% !important; }
+    .artwork-main-img { max-height: 85vh !important; }
+    .min-h-landscape-0 { min-height: 0 !important; }
+}
+
 /* 
  * EXPANDABLE BUTTONS (Hover Pill Effect)
  * Transforms circular buttons into pills on hover, revealing text.
