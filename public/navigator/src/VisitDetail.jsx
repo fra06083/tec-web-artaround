@@ -878,8 +878,8 @@ function VisitDetail() {
                     </div>
 
                     {/* SCHEDA INFORMATIVA E COMANDI */}
-                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-landscape-50 h-landscape-100 max-w-800 min-h-0 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
-                        <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden">
+                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-landscape-50 h-landscape-100 max-w-800 min-h-0 overflow-hidden ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
+                        <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden flex-shrink-1 min-h-0">
                             
                             <div className="flex-shrink-0">
                                 <h4 className="fw-bold mb-1">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h4>
@@ -988,13 +988,13 @@ function VisitDetail() {
                         
                         {/* BOTTOM NAVIGATION */}
                         {(!pin || role === 'teacher') && (
-                            <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-3 px-md-4 mt-auto">
+                            <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-2 px-md-3 mt-auto">
                                 <div className="d-flex justify-content-between align-items-center w-100">
-                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-4 fw-medium shadow-sm d-flex align-items-center gap-1">
+                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-2 px-md-3 fw-medium shadow-sm d-flex align-items-center gap-1">
                                         <i className="bi bi-chevron-left small"></i> <span className="d-none d-sm-inline">Precedente</span>
                                     </button>
                                     
-                                    <div className="d-flex justify-content-center align-items-center gap-2 mx-3">
+                                    <div className="d-flex justify-content-center align-items-center gap-1 mx-1 mx-md-2">
                                         {items.map((_, index) => (
                                             <div
                                                 key={index}
@@ -1007,16 +1007,16 @@ function VisitDetail() {
 
                                     {currentIndex === items.length - 1 ? (
                                         (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
-                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-2">
                                                 <span className="d-none d-sm-inline">Avvia Quiz</span> <i className="bi bi-patch-question small"></i>
                                             </button>
                                         ) : (
-                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-2">
                                                 <span className="d-none d-sm-inline">Termina</span> <i className="bi bi-stop-circle small"></i>
                                             </button>
                                         )
                                     ) : (
-                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-1">
+                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-1">
                                             <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-chevron-right small"></i>
                                         </button>
                                     )}
