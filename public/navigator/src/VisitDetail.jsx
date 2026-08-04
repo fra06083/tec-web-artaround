@@ -64,9 +64,10 @@ function VisitDetail() {
     const [quizSubmitted, setQuizSubmitted] = useState(false);
     const [quizResults, setQuizResults] = useState(null); // array [{ studentName, score, total, details }]
     const [studentsSubmitted, setStudentsSubmitted] = useState([]); // nomi studenti che hanno gia' inviato (vista docente)
-
-    // Stato per riconoscimento vocale
+    
+    // Voice commands
     const [isListeningForVoice, setIsListeningForVoice] = useState(false);
+    const [isTextExpanded, setIsTextExpanded] = useState(false);
 
     // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
     useEffect(() => {
@@ -76,9 +77,11 @@ function VisitDetail() {
             if (newDarkMode) {
                 document.body.classList.add('dark-mode');
                 document.documentElement.classList.add('dark-mode');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
             } else {
                 document.body.classList.remove('dark-mode');
                 document.documentElement.classList.remove('dark-mode');
+                document.documentElement.removeAttribute('data-bs-theme');
             }
         };
 
@@ -88,9 +91,11 @@ function VisitDetail() {
         if (darkMode) {
             document.body.classList.add('dark-mode');
             document.documentElement.classList.add('dark-mode');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
         } else {
             document.body.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark-mode');
+            document.documentElement.removeAttribute('data-bs-theme');
         }
 
         return () => window.removeEventListener('storage', handleStorageChange);
@@ -413,6 +418,7 @@ function VisitDetail() {
         return () => {
             document.body.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark-mode');
+            document.documentElement.removeAttribute('data-bs-theme');
         };
     }, [id]);
 
@@ -717,272 +723,314 @@ function VisitDetail() {
 
     return (
         <div className={`vh-100 d-flex flex-column overflow-hidden position-relative ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
-            <style>{`
-                @keyframes slideDownFade {
-                    0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
-                    100% { opacity: 1; transform: translateY(0) scale(1); }
-                }
-                .animated-dropdown.show {
-                    animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                    transform-origin: top right;
-                }
-            `}</style>
             
             {/* BACKGROUND DINAMICO (Prende tutto lo schermo) */}
             {currentItem.img_path && (
                 <div className="position-absolute w-100 h-100 dynamic-bg-blur" style={{ backgroundImage: `url(${currentItem.img_path})` }}></div>
             )}
             
-            {/* NAVBAR (Semplice, non a pillola intera, icone separate) */}
-            <header className="w-100 px-3 py-3 position-relative z-1030">
-                <div className="d-flex align-items-center justify-content-between">
-                    
-                    {/* SINISTRA: Back + Logo */}
-                    <div className="d-flex align-items-center gap-3">
-                        <Link to="/" className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm btn-icon-40 ${darkMode ? 'bg-dark text-white border border-secondary' : 'bg-light text-dark border'}`} title="Torna alla Home">
-                            <i className="bi bi-arrow-left fs-5"></i>
-                        </Link>
-                        <div className={`d-none d-md-flex align-items-center gap-2 px-3 py-2 rounded-pill border glass-blur-5 ${darkMode ? 'bg-dark bg-opacity-50 border-secondary' : 'bg-white bg-opacity-75 border-light'}`}>
-                            <i className="bi bi-box-seam text-orange fs-5"></i>
-                            <span className={`fw-black fs-6 tracking-tight-sm ${darkMode ? 'text-white' : 'text-dark'}`}>ArtAround</span>
-                        </div>
+            {/* NAVBAR (Restyling Premium Bootstrap 5) */}
+            <header className="d-flex justify-content-between align-items-center w-100 px-3 py-3 position-relative z-1030">
+                
+                {/* SINISTRA: Back + Logo */}
+                <div className="d-flex align-items-center gap-3">
+                    <Link to="/" className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40" title="Torna alla Home">
+                        <i className="bi bi-arrow-left fs-5"></i>
+                    </Link>
+                    <div className="d-none d-md-flex align-items-center gap-2">
+                        <i className="bi bi-box-seam text-orange fs-5"></i>
+                        <span className="fw-black fs-6 tracking-tight-sm text-body">ArtAround</span>
                     </div>
+                </div>
 
-                    {/* CENTRO: Titolo dell'opera (nascosto se lo schermo è piccolo) */}
-                    <div className="text-center px-2 d-none d-md-block text-truncate">
-                        <h6 className={`m-0 fw-bold shadow-sm px-4 py-2 rounded-pill border text-truncate max-w-400 glass-blur-5 ${darkMode ? 'text-white bg-dark bg-opacity-50 border-secondary' : 'text-dark bg-white bg-opacity-75 border-light'}`}>
-                            {currentItem.item.replace(/\s*\d{10,}$/, '')}
-                        </h6>
+                {/* CENTRO: Titolo della Visita */}
+                <div className="text-center px-2 d-none d-md-block text-truncate">
+                    <div className="d-flex align-items-center px-3 py-1 rounded-pill bg-body-tertiary text-body-secondary small fw-medium border border-secondary-subtle shadow-sm mx-auto max-w-400 text-truncate">
+                        {visita.name}
                     </div>
+                </div>
 
-                    {/* DESTRA: Icone separate */}
-                    <div className="d-flex align-items-center">
-                        {/* AVATAR BAR DOCENTE - PILLOLA UNICA */}
-                        {role === 'teacher' && pin && (
-                            <div className="d-flex align-items-center pe-3 border-end border-secondary border-opacity-50 d-none d-sm-flex me-3">
-                                <div className="dropdown">
-                                    <button 
-                                        className={`btn btn-sm px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-2 border ${darkMode ? 'bg-dark bg-opacity-50 border-secondary' : 'bg-white bg-opacity-75 border-light'}`}
-                                        data-bs-toggle="dropdown" 
-                                        title="Gestione Studenti"
-                                        type="button"
-                                    >
-                                        <div className="d-flex align-items-center">
-                                            {visibleStudents.map((student, idx) => {
-                                                const action = studentActions[student];
-                                                return (
-                                                    <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
-                                                        <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-075 ${action ? 'border-orange' : ''} ${darkMode ? 'text-white border-dark' : 'text-dark border-white'}`}>
-                                                            {student.charAt(0).toUpperCase()}
-                                                        </div>
-                                                        {action && (
-                                                            <span className="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-orange border border-1 border-white shadow-sm indicator-dot"></span>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                            {hiddenCount > 0 && (
-                                                <div className={`user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-065 overlap-avatar-left ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light text-dark border-light'}`}>
-                                                    +{hiddenCount}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <i className={`bi bi-chevron-down ms-1 me-1 fs-07 ${darkMode ? 'text-white-50' : 'text-secondary'}`}></i>
-                                    </button>
-
-                                    {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}
-                                    <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 min-w-260 ${darkMode ? 'dropdown-menu-dark' : ''}`}>
-                                        <li className="px-3 pb-2 mb-2 border-bottom border-secondary border-opacity-25">
-                                            <h6 className="m-0 fw-bold">Stato Studenti ({connectedStudents.length})</h6>
-                                        </li>
-                                        {connectedStudents.length === 0 && (
-                                            <li className="dropdown-item text-muted small disabled">Nessuno studente connesso</li>
-                                        )}
-                                        {connectedStudents.map(student => {
+                {/* DESTRA: Icone separate */}
+                <div className="d-flex align-items-center gap-2">
+                    {/* AVATAR BAR DOCENTE - PILLOLA UNICA */}
+                    {role === 'teacher' && pin && (
+                        <div className="d-flex align-items-center pe-3 border-end border-secondary-subtle d-none d-sm-flex me-1">
+                            <div className="dropdown">
+                                <button 
+                                    className="btn btn-sm px-2 py-1 rounded-pill shadow-sm d-flex align-items-center gap-2 border border-secondary-subtle bg-body-tertiary text-body"
+                                    data-bs-toggle="dropdown" 
+                                    title="Gestione Studenti"
+                                    type="button"
+                                >
+                                    <div className="d-flex align-items-center">
+                                        {visibleStudents.map((student, idx) => {
                                             const action = studentActions[student];
-                                            let icon = ''; let iconColor = ''; let actionText = '';
-                                            if (action === 'plus') { icon = 'bi-plus-circle-fill'; iconColor = 'text-success'; actionText = 'Più dettagli'; }
-                                            else if (action === 'minus') { icon = 'bi-dash-circle-fill'; iconColor = 'text-danger'; actionText = 'Meno dettagli'; }
-                                            else if (action === 'audio') { icon = 'bi-mic-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
-                                            
                                             return (
-                                                <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1 cursor-default">
-                                                    <span className="fw-bold small text-truncate max-w-120">{student}</span>
-                                                    {actionText ? (
-                                                        <span className={`badge bg-opacity-10 d-flex align-items-center gap-1 fs-065 ${iconColor.replace('text-', 'bg-')} ${iconColor}`}>
-                                                            <i className={`bi ${icon}`}></i> {actionText}
-                                                        </span>
-                                                    ) : (
-                                                        <small className="text-muted fst-italic fs-065">
-                                                            <i className="bi bi-eye"></i> Online
-                                                        </small>
+                                                <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
+                                                    <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-075 ${action ? 'border-orange' : ''} ${darkMode ? 'text-white border-dark' : 'text-dark border-white'}`}>
+                                                        {student.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    {action && (
+                                                        <span className="position-absolute top-0 start-100 translate-middle p-1 rounded-circle bg-orange border border-1 border-white shadow-sm indicator-dot"></span>
                                                     )}
-                                                </li>
+                                                </div>
                                             );
                                         })}
-                                    </ul>
-                                </div>
+                                        {hiddenCount > 0 && (
+                                            <div className="user-avatar rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-065 overlap-avatar-left bg-body-tertiary text-body border-secondary-subtle">
+                                                +{hiddenCount}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <i className="bi bi-chevron-down ms-1 me-1 fs-07 text-body opacity-75"></i>
+                                </button>
+
+                                {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}
+                                <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 min-w-260 ${darkMode ? 'dropdown-menu-dark' : ''}`}>
+                                    <li className="px-3 pb-2 mb-2 border-bottom border-secondary border-opacity-25">
+                                        <h6 className="m-0 fw-bold">Stato Studenti ({connectedStudents.length})</h6>
+                                    </li>
+                                    {connectedStudents.length === 0 && (
+                                        <li className="dropdown-item text-muted small disabled">Nessuno studente connesso</li>
+                                    )}
+                                    {connectedStudents.map(student => {
+                                        const action = studentActions[student];
+                                        let icon = ''; let iconColor = ''; let actionText = '';
+                                        if (action === 'plus') { icon = 'bi-plus-circle-fill'; iconColor = 'text-success'; actionText = 'Più dettagli'; }
+                                        else if (action === 'minus') { icon = 'bi-dash-circle-fill'; iconColor = 'text-danger'; actionText = 'Meno dettagli'; }
+                                        else if (action === 'audio') { icon = 'bi-mic-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
+                                        
+                                        return (
+                                            <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1 cursor-default">
+                                                <span className="fw-bold small text-truncate max-w-120">{student}</span>
+                                                {actionText ? (
+                                                    <span className={`badge bg-opacity-10 d-flex align-items-center gap-1 fs-065 ${iconColor.replace('text-', 'bg-')} ${iconColor}`}>
+                                                        <i className={`bi ${icon}`}></i> {actionText}
+                                                    </span>
+                                                ) : (
+                                                    <small className="text-muted fst-italic fs-065">
+                                                        <i className="bi bi-eye"></i> Online
+                                                    </small>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {/* THEME TOGGLE (Solo Icona) */}
+                    {/* THEME TOGGLE (Solo Icona) */}
+                    <button 
+                        className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
+                        onClick={() => toggleDarkMode()}
+                        title="Cambia tema"
+                    >
+                        <i className={`bi ${darkMode ? 'bi-moon-stars-fill text-body' : 'bi-sun-fill text-warning'} fs-5`}></i>
+                    </button>
+
+                    {/* MAPPA TOGGLE (Solo Icona) */}
+                    <button
+                        className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
+                        onClick={() => setIsMapOpen(true)}
+                        title="Mappa del museo"
+                    >
+                        <i className="bi bi-map-fill fs-5 text-body"></i>
+                    </button>
+
+                    {/* CHAT TOGGLE (Solo Icona) */}
+                    {pin && (
                         <button 
-                            className="btn btn-sm border-0 shadow-none p-1 d-flex align-items-center justify-content-center"
-                            onClick={() => toggleDarkMode()}
-                            title="Cambia tema"
+                            className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm position-relative btn-icon-40"
+                            onClick={() => { setIsChatOpen(true); setUnreadCount(0); }}
+                            title="Chat Stanza"
                         >
-                            <i className={`bi ${darkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'} fs-4`}></i>
+                            <i className="bi bi-chat-dots-fill fs-5 text-body"></i>
+                            {unreadCount > 0 && (
+                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark fs-065">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
                         </button>
+                    )}
 
-                        {/* MAPPA TOGGLE (Solo Icona) */}
-                        <button
-                            className="btn btn-sm border-0 shadow-none p-1 d-flex align-items-center justify-content-center"
-                            onClick={() => setIsMapOpen(true)}
-                            title="Mappa del museo"
-                        >
-                            <i className={`bi bi-map-fill fs-4 ${darkMode ? 'text-white' : 'text-primary'}`}></i>
-                        </button>
-
-                        {/* CHAT TOGGLE (Solo Icona) */}
-                        {pin && (
-                            <button 
-                                className="btn btn-sm border-0 shadow-none p-1 position-relative d-flex align-items-center justify-content-center"
-                                onClick={() => { setIsChatOpen(true); setUnreadCount(0); }}
-                                title="Chat Stanza"
-                            >
-                                <i className={`bi bi-chat-dots-fill fs-4 ${darkMode ? 'text-info' : 'text-primary'}`}></i>
-                                {unreadCount > 0 && (
-                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark fs-065">
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </span>
-                                )}
-                            </button>
-                        )}
-
-                    </div>
                 </div>
             </header>
 
-            {/* CONTENUTO FULL SCREEN IMMERSIVO */}
-            <main className="flex-grow-1 w-100 d-flex flex-column scroll-y-hidden-x z-10">
-                
-                {/* MAIN IMAGE */}
-                <div className="flex-grow-1 w-100 d-flex justify-content-center align-items-center p-3 min-h-250">
-                    {currentItem.img_path && (
-                        <img
-                            src={currentItem.img_path}
-                            alt={currentItem.item.replace(/\s*\d{10,}$/, '')}
-                            className="img-fluid rounded-4 shadow-lg zoom-image-contain"
-                            onClick={() => setLightboxImage(currentItem.img_path)}
-                        />
-                    )}
-                </div>
+            {/* CONTENUTO CENTRATO E STRUTTURATO */}
+            <main className="flex-grow-1 d-flex flex-column w-100 overflow-hidden z-10">
+                <div className="container d-flex flex-column flex-grow-1 justify-content-center align-items-center gap-2 py-2 w-100 h-100">
+                    
+                    {/* MAIN IMAGE */}
+                    <div className="w-100 d-flex flex-grow-1 justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0">
+                        {currentItem.img_path && (
+                            <div className="position-relative d-inline-block d-flex align-items-center justify-content-center h-100 w-100 cursor-pointer" onClick={() => setLightboxImage(currentItem.img_path)}>
+                                <img
+                                    src={currentItem.img_path}
+                                    alt={currentItem.item.replace(/\s*\d{10,}$/, '')}
+                                    className="img-fluid rounded-4 shadow-lg artwork-main-img d-block mx-auto"
+                                />
+                                <div className="position-absolute bottom-0 end-0 m-2 badge bg-dark bg-opacity-75 text-white rounded-pill px-3 py-2 shadow-sm pointer-events-none d-flex align-items-center gap-2">
+                                    <i className="bi bi-zoom-in"></i> <span className="d-none d-sm-inline">Clicca per ingrandire</span><span className="d-sm-none">Ingrandisci</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
-                {/* BOTTOM TEXT & ACTION CARD */}
-                <div className="w-100 p-2 p-md-4 flex-shrink-0 z-20 pb-safe">
-                    <div className="container-lg px-0">
-                        <div className="row justify-content-center">
-                            <div className="col-12 col-md-10 col-lg-8">
-                                <div className={`card border-0 rounded-4 shadow-lg ${darkMode ? 'navigator-card text-white' : 'bg-white bg-opacity-90 text-dark'}`}>
-                                    <div className="card-body p-3 p-md-4">
-                                        <div className="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
-                                            <div className="flex-1-min-w-0">
-                                                <h3 className="fw-black mb-1 tracking-tight-sm">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h3>
-                                                {visita.museum_id && (
-                                                    <small className="d-block mb-2 opacity-75">
-                                                        <i className="bi bi-geo-alt-fill text-orange me-1"></i>{visita.museum_id.museum}
-                                                        {currentItem.sala?.nome && <> · {currentItem.sala.nome}</>}
-                                                    </small>
-                                                )}
-                                                <span className="badge bg-orange text-white rounded-pill px-3 py-2 shadow-sm"><i className="bi bi-person-fill me-1"></i>{currentItem.author}</span>
-                                            </div>
-                                            
-                                            {/* AUDIO & BROADCAST BUTTONS */}
-                                            <div className="d-flex align-items-center justify-content-end gap-2 mt-2 mt-sm-0">
-                                                <button onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} disabled={!currentDescription} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 ${isSpeaking ? 'btn-warning' : 'btn-primary'}`} title="Ascolta descrizione">
-                                                    <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-6`}></i>
-                                                </button>
-                                                {role === 'teacher' && (
-                                                    <button onClick={() => { broadcastAudio(currentDescription?.text); }} disabled={!currentDescription} className="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 btn-secondary" title="Riproduci per tutti">
-                                                        <i className="bi bi-broadcast fs-6"></i>
-                                                    </button>
-                                                )}
-                                                <button onClick={startVoiceRecognition} className={`btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-32 ${isListeningForVoice ? 'btn-danger pulse-animation' : 'btn-info'}`} title="Comandi vocali">
-                                                    <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-6`}></i>
-                                                </button>
-                                            </div>
+                    {/* SCHEDA INFORMATIVA E COMANDI */}
+                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mb-1 border-secondary-subtle shadow-sm w-100 max-w-800 min-h-0 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
+                        <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden">
+                            
+                            <div className="flex-shrink-0">
+                                <h4 className="fw-bold mb-1">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h4>
+                                <div className="d-flex flex-wrap gap-1 mb-2">
+                                    {visita.museum_id && (
+                                        <span className="badge rounded-pill text-body bg-body-tertiary border border-secondary-subtle fw-normal px-2 py-1 shadow-sm small">
+                                            <i className="bi bi-geo-alt-fill text-orange me-1"></i>
+                                            {visita.museum_id.museum}
+                                            {currentItem.sala?.nome && <> · {currentItem.sala.nome}</>}
+                                        </span>
+                                    )}
+                                    <span className="badge rounded-pill text-body bg-body-tertiary border border-secondary-subtle fw-normal px-2 py-1 shadow-sm small">
+                                        <i className="bi bi-person-fill text-orange me-1"></i>
+                                        {currentItem.author}
+                                    </span>
+                                </div>
+
+                                {/* BARRA DEI COMANDI REIMMAGINATA */}
+                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    {/* Lato Sinistro: Impostazioni Testo */}
+                                    <div>
+                                    <div className="text-body-secondary text-uppercase fw-bold mb-1 fs-065 letter-spacing-sm">Impostazioni Testo</div>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
+                                            <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
+                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis">{selectedType}</span>
+                                            <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
-
-                                        {/* TEXT DIFFICULTY BAR */}
-                                        <div className="d-flex justify-content-center w-100 mb-3">
-                                            <div className={`d-flex flex-wrap align-items-center justify-content-center rounded-pill px-3 py-1 shadow-sm border ${darkMode ? 'bg-dark border-secondary' : 'bg-white border-light'}`}>
-                                                <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn btn-link text-danger p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più semplice"><i className="bi bi-dash-circle fs-5"></i></button>
-                                                <span className="px-2 fw-bold fs-085 text-capitalize min-w-80 text-center">{selectedType}</span>
-                                                <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn btn-link text-success p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più avanzato"><i className="bi bi-plus-circle fs-5"></i></button>
-
-                                                <span className="mx-3 text-muted">|</span>
-
-                                                <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn btn-link text-danger p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Meno dettagli"><i className="bi bi-dash-circle fs-5"></i></button>
-                                                <span className="px-2 fw-bold fs-085 min-w-40 text-center">{selectedLength}</span>
-                                                <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn btn-link text-success p-0 border-0 shadow-none text-decoration-none btn-icon-hover" title="Più dettagli"><i className="bi bi-plus-circle fs-5"></i></button>
-                                            </div>
-                                        </div>
-
-                                        {/* SCROLLABLE TESTO */}
-                                        <div className="overflow-auto mt-2 pe-2 max-h-20vh scrollbar-thin">
-                                            {currentDescription ? (
-                                                <p className="mb-0 lh-lg fs-1-fw-500">
-                                                    {currentDescription.text}
-                                                </p>
-                                            ) : (
-                                                <p className="mb-0 text-center mt-3 text-muted">
-                                                    Manca la descrizione per il livello <strong>{selectedType}</strong>.
-                                                </p>
-                                            )}
+                                        <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
+                                            <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
+                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis">{selectedLength}</span>
+                                            <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* PREV NEXT BUTTONS FOR TEACHER */}
-                                {(!pin || role === 'teacher') && (
-                                    <div className="d-flex justify-content-center align-items-center mt-3 gap-2 gap-md-4">
-                                        <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className={`btn btn-lg rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10 ${darkMode ? 'bg-dark bg-opacity-75 border border-secondary text-white' : 'bg-white bg-opacity-90 border text-dark'}`}>
-                                            <i className="bi bi-arrow-left"></i> <span className="d-none d-sm-inline">Precedente</span>
+                                
+                                {/* Lato Destro: Azioni Audio/Vocali ed Info */}
+                                <div className="d-flex gap-3 mt-3 mt-md-0">
+                                    
+                                    <div className="d-flex flex-column align-items-center gap-1">
+                                        <button 
+                                            onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} 
+                                            disabled={!currentDescription} 
+                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isSpeaking ? 'bg-warning' : 'bg-primary'}`}
+                                        >
+                                            <i className={`bi ${isSpeaking ? 'bi-stop-fill' : 'bi-headphones'} fs-5`}></i>
                                         </button>
-                                        
-                                        <div className="d-flex flex-wrap justify-content-center gap-1 bg-dark bg-opacity-50 px-3 py-2 rounded-pill shadow-lg glass-blur-5">
-                                            {items.map((_, i) => (
-                                                <button key={i} onClick={() => handleIndexChange(i)} className={`btn p-0 border-0 rounded-circle shadow indicator-dot-lg transition-all-300 ${i === currentIndex ? 'bg-orange' : 'bg-secondary'}`}></button>
-                                            ))}
-                                        </div>
-                                        
-                                        {currentIndex === items.length - 1 ? (
-                                            (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
-                                                <button onClick={startQuiz} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
-                                                    <span className="d-none d-sm-inline">Avvia Quiz</span> <i className="bi bi-patch-question"></i>
-                                                </button>
-                                            ) : (
-                                                <button onClick={handleEndVisit} className="btn btn-lg btn-danger text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
-                                                    <span className="d-none d-sm-inline">Termina Visita</span> <i className="bi bi-stop-circle"></i>
-                                                </button>
-                                            )
-                                        ) : (
-                                            <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-lg bg-orange text-white rounded-pill px-4 py-2 shadow-lg fw-bold d-flex align-items-center gap-2 glass-blur-10">
-                                                <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-arrow-right"></i>
-                                            </button>
-                                        )}
+                                        <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">{isSpeaking ? 'Ferma' : 'Ascolta'}</span>
                                     </div>
-                                )}
+                                    
+                                    {role === 'teacher' && (
+                                        <div className="d-flex flex-column align-items-center gap-1">
+                                            <button 
+                                                onClick={() => { broadcastAudio(currentDescription?.text); }} 
+                                                disabled={!currentDescription} 
+                                                className="btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white bg-secondary btn-icon-40"
+                                            >
+                                                <i className="bi bi-broadcast fs-5"></i>
+                                            </button>
+                                            <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">Trasmetti</span>
+                                        </div>
+                                    )}
+
+                                    <div className="d-flex flex-column align-items-center gap-1">
+                                        <button 
+                                            onClick={startVoiceRecognition} 
+                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isListeningForVoice ? 'bg-danger pulse-animation' : 'bg-primary'}`}
+                                        >
+                                            <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-5`}></i>
+                                        </button>
+                                        <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">Parla</span>
+                                    </div>
+
+                                    {/* Info Modal Button */}
+                                    <div className="d-flex flex-column align-items-center gap-1">
+                                        <button 
+                                            type="button"
+                                            className={`btn rounded-circle d-flex justify-content-center align-items-center shadow-sm btn-icon-40 ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'btn-outline-secondary'}`}
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#commandsModal"
+                                        >
+                                            <i className="bi bi-info-circle fs-5"></i>
+                                        </button>
+                                        <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">Info</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            </div>
+
+                            {/* TESTO DESCRITTIVO SCORREVOLE */}
+                            <div className="overflow-y-auto flex-grow-1 pe-2 my-1 min-h-60">
+                                <div className="fs-6 lh-base">
+                                    {currentDescription ? (
+                                        <p className="mb-0">
+                                            {currentDescription.text}
+                                        </p>
+                                    ) : (
+                                        <p className="mb-0 text-center mt-3 text-muted">
+                                            Manca la descrizione per il livello <strong>{selectedType}</strong>.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
+                        
+                        {/* BOTTOM NAVIGATION */}
+                        {(!pin || role === 'teacher') && (
+                            <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-3 px-md-4 mt-auto">
+                                <div className="d-flex justify-content-between align-items-center w-100">
+                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-4 fw-medium shadow-sm d-flex align-items-center gap-1">
+                                        <i className="bi bi-chevron-left small"></i> <span className="d-none d-sm-inline">Precedente</span>
+                                    </button>
+                                    
+                                    <div className="d-flex justify-content-center align-items-center gap-2 mx-3">
+                                        {items.map((_, index) => (
+                                            <div
+                                                key={index}
+                                                className={`rounded-circle dot-indicator bg-orange ${index === currentIndex ? 'opacity-100' : 'opacity-25'}`}
+                                                onClick={() => handleIndexChange(index)}
+                                                aria-label={`Vai all'opera ${index + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {currentIndex === items.length - 1 ? (
+                                        (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
+                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                                <span className="d-none d-sm-inline">Avvia Quiz</span> <i className="bi bi-patch-question small"></i>
+                                            </button>
+                                        ) : (
+                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                                <span className="d-none d-sm-inline">Termina</span> <i className="bi bi-stop-circle small"></i>
+                                            </button>
+                                        )
+                                    ) : (
+                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-1">
+                                            <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-chevron-right small"></i>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
 
             {/* QUIZ OVERLAY (monitoraggio docente / risposta studente / risultati) */}
             {pin && quizPhase !== 'none' && (
-                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 2000 }}>
-                    <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 w-100 max-w-600 ${darkMode ? 'bg-dark bg-opacity-90 text-white' : 'bg-white text-dark'}`} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3 bg-black-85 z-2000">
+                    <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 w-100 max-w-600 max-h-90vh overflow-y-auto ${darkMode ? 'bg-dark bg-opacity-90 text-white' : 'bg-white text-dark'}`}>
                         <div className="card-body p-4 p-md-5">
 
                             {/* DOCENTE: monitoraggio quiz in corso */}
@@ -1095,19 +1143,25 @@ function VisitDetail() {
 
             {/* LIGHTBOX MODAL */}
             {lightboxImage && (
-                <div className="modal-backdrop fade show lightbox-backdrop" onClick={() => setLightboxImage(null)}></div>
-            )}
-            {lightboxImage && (
-                <div className="modal fade show d-block z-1060" tabIndex="-1" onClick={() => setLightboxImage(null)}>
-                    <div className="modal-dialog modal-dialog-centered modal-xl" onClick={e => e.stopPropagation()}>
-                        <div className="modal-content bg-transparent border-0">
-                            <div className="modal-header border-0 pb-0 justify-content-end">
-                                <button type="button" className="btn-close btn-close-white shadow-none rounded-circle p-2 opacity-80" onClick={() => setLightboxImage(null)}></button>
-                            </div>
-                            <div className="modal-body text-center p-0">
-                                <img src={lightboxImage} alt="Ingrandita" className="img-fluid rounded-4 shadow-lg lightbox-img" />
-                            </div>
-                        </div>
+                <div 
+                    className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-black z-1060 overflow-hidden" 
+                    onClick={() => setLightboxImage(null)}
+                >
+                    {/* Pulsante Chiusura Fluttuante Elegante */}
+                    <button 
+                        type="button" 
+                        className="btn btn-light rounded-circle position-absolute d-flex align-items-center justify-content-center shadow-lg lightbox-close-btn z-1061" 
+                        onClick={() => setLightboxImage(null)}
+                    >
+                        <i className="bi bi-x-lg fs-5 text-dark"></i>
+                    </button>
+
+                    <div className="d-flex flex-column align-items-center justify-content-center p-3 w-100 max-h-100" onClick={e => e.stopPropagation()}>
+                        <img 
+                            src={lightboxImage} 
+                            alt="Ingrandita" 
+                            className="img-fluid rounded-4 shadow-lg lightbox-img-max" 
+                        />
                     </div>
                 </div>
             )}
@@ -1119,13 +1173,15 @@ function VisitDetail() {
             />
 
             {/* OFFCANVAS MAPPA DEL MUSEO */}
-            <div className={`offcanvas offcanvas-end z-1050 ${isMapOpen ? 'show d-flex visible' : 'invisible'} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} tabIndex="-1">
-                <div className={`offcanvas-header border-bottom ${darkMode ? 'border-secondary' : ''}`}>
-                    <h5 className="offcanvas-title fw-bold"><i className="bi bi-map-fill text-orange me-2"></i>Mappa del museo</h5>
-                    <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} onClick={() => setIsMapOpen(false)} aria-label="Chiudi mappa"></button>
+            <div className={`offcanvas offcanvas-end z-1050 bg-body text-body w-100 max-w-400 ${isMapOpen ? 'show d-flex visible' : 'invisible'}`} tabIndex="-1">
+                <div className="offcanvas-header border-bottom border-secondary-subtle px-4 py-3">
+                    <h5 className="offcanvas-title fw-bold mb-0 d-flex align-items-center gap-2">
+                        <i className="bi bi-map-fill text-orange"></i>Mappa del museo
+                    </h5>
+                    <button type="button" className="btn-close" onClick={() => setIsMapOpen(false)} aria-label="Chiudi mappa"></button>
                 </div>
 
-                <div className="offcanvas-body">
+                <div className="offcanvas-body d-flex flex-column">
                     {/* Dove si trova l'opera che sto guardando */}
                     {currentItem.sala?.nome && (
                         <div className={`p-3 rounded-3 mb-3 ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
@@ -1154,7 +1210,7 @@ function VisitDetail() {
                         </div>
                     )}
 
-                    {/* Pianta del piano selezionato */}
+                    {/* Pianta del piano selezionato o Empty State */}
                     {piantaAttiva?.immagine ? (
                         <img
                             src={piantaAttiva.immagine}
@@ -1162,10 +1218,12 @@ function VisitDetail() {
                             className="img-fluid w-100 rounded-3 border mb-4"
                         />
                     ) : (
-                        <p className={`text-center py-4 ${textMuted}`}>
-                            <i className="bi bi-map d-block fs-3 mb-2"></i>
-                            Il museo non ha ancora caricato la pianta.
-                        </p>
+                        <div className="d-flex flex-column justify-content-center align-items-center h-100 text-center p-4 flex-grow-1">
+                            <i className="bi bi-map display-4 text-secondary-subtle"></i>
+                            <p className="text-body-secondary fw-medium mt-3 m-0">
+                                Il museo non ha ancora caricato la pianta.
+                            </p>
+                        </div>
                     )}
 
                     {/* Domande a cui il museo ha risposto */}
@@ -1207,25 +1265,25 @@ function VisitDetail() {
 
             {/* OFFCANVAS CHAT */}
             {pin && (
-                <div className={`offcanvas offcanvas-end z-1050 ${isChatOpen ? 'show d-flex visible' : 'invisible'} ${darkMode ? 'bg-dark text-white' : 'bg-light'}`} tabIndex="-1">
-                    <div className={`offcanvas-header border-bottom ${darkMode ? 'border-secondary' : ''}`}>
+                <div className={`offcanvas offcanvas-end z-1050 d-flex flex-column bg-body text-body ${isChatOpen ? 'show visible' : 'invisible'}`} tabIndex="-1">
+                    <div className="offcanvas-header border-bottom border-secondary-subtle px-4 py-3">
                         <h5 className="offcanvas-title fw-bold"><i className="bi bi-chat-dots-fill text-orange me-2"></i> Chat Stanza</h5>
-                        <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} onClick={() => setIsChatOpen(false)}></button>
+                        <button type="button" className="btn-close" onClick={() => setIsChatOpen(false)}></button>
                     </div>
                     {role === 'teacher' && (
-                        <div className={`p-2 border-bottom ${darkMode ? 'border-secondary' : ''}`}>
-                            <select className={`form-select form-select-sm ${darkMode ? 'bg-secondary text-white border-secondary' : ''}`} value={chatFilter} onChange={(e) => setChatFilter(e.target.value)}>
+                        <div className="p-2 border-bottom border-secondary-subtle bg-body-tertiary">
+                            <select className="form-select form-select-sm rounded-pill border-secondary-subtle bg-body text-body shadow-sm w-100" value={chatFilter} onChange={(e) => setChatFilter(e.target.value)}>
                                 <option value="all">Tutti i messaggi</option>
                                 <option value="user">Solo messaggi degli utenti</option>
                                 <option value="system">Solo messaggi di sistema</option>
                             </select>
                         </div>
                     )}
-                    <div className={`offcanvas-body flex-grow-1 chat-body-scroll ${darkMode ? 'bg-chat-dark' : 'bg-chat-light'}`}>
+                    <div className="offcanvas-body chat-background d-flex flex-column gap-3 p-3 pb-5 overflow-y-auto">
                         {chatMessages.length === 0 && (
                             <div className="d-flex justify-content-center mt-5">
-                                <div className={`px-4 py-2 rounded-pill shadow-sm small ${darkMode ? 'bg-dark text-white' : 'bg-white text-muted'}`}>
-                                    <i className="bi bi-shield-lock-fill me-2"></i>I messaggi sono crittografati end-to-end.
+                                <div className="px-4 py-2 rounded-pill shadow-sm small bg-body-secondary text-body-secondary">
+                                    <i className="bi bi-shield-lock-fill me-2"></i>I messaggi sono crittografati.
                                 </div>
                             </div>
                         )}
@@ -1242,8 +1300,8 @@ function VisitDetail() {
 
                             if (isSystem) {
                                 return (
-                                    <div key={msg.id} className="mb-3 d-flex flex-column align-items-center">
-                                        <div className={`p-2 px-3 rounded-pill text-center shadow-sm fs-07 max-w-90 ${darkMode ? 'bg-black bg-opacity-50 text-white-50' : 'bg-white text-muted border'} border-0`}>
+                                    <div key={msg.id} className="d-flex flex-column align-items-center">
+                                        <div className="p-2 px-3 rounded-pill text-center shadow-sm fs-07 bg-body-tertiary text-body-secondary border border-secondary-subtle max-w-90">
                                             <i className="bi bi-info-circle-fill me-1 text-orange"></i>
                                             {msg.message}
                                             {msg.type === 'system-action' && role === 'teacher' && (
@@ -1258,14 +1316,14 @@ function VisitDetail() {
                             }
 
                             return (
-                                <div key={msg.id} className={`mb-2 d-flex flex-column ${isMe ? 'align-items-end' : 'align-items-start'}`}>
-                                    <div className={`p-2 px-3 shadow-sm chat-bubble ${isMe ? 'bg-orange text-white chat-bubble-me' : (darkMode ? 'bg-dark text-white border border-secondary chat-bubble-other' : 'bg-white text-dark border-0 chat-bubble-other')}`}>
-                                        {!isMe && <small className="fw-bold text-orange d-block mb-1 lh-1 fs-075">{msg.sender}</small>}
-                                        <div className="d-flex align-items-end gap-2">
-                                            <p className="mb-0 lh-sm flex-grow-1 fs-095 break-word">{msg.message}</p>
-                                            <small className={`fs-065 text-nowrap ${isMe ? 'text-white-50' : 'text-muted'}`}>
+                                <div key={msg.id} className={isMe ? "align-self-end max-w-80" : "align-self-start max-w-80"}>
+                                    <div className={`rounded-4 p-2 px-3 shadow-sm ${isMe ? 'bg-orange text-white' : 'bg-body-secondary text-body'}`}>
+                                        {!isMe && <div className="text-orange fw-bold small mb-1 lh-1 fs-08">{msg.sender}</div>}
+                                        <div className="d-flex align-items-end flex-wrap gap-2">
+                                            <span className="mb-0 lh-sm break-word">{msg.message}</span>
+                                            <span className={`small ms-auto fs-07 ${isMe ? 'text-white-50' : 'text-body-secondary'}`}>
                                                 {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                            </small>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -1275,24 +1333,16 @@ function VisitDetail() {
                     </div>
                     
                     {/* INPUT MESSAGGI - FISSO IN BASSO */}
-                    <div className={`p-2 flex-shrink-0 mt-auto z-10 ${darkMode ? 'bg-dark' : 'bg-light'}`}>
-                        <form onSubmit={sendChatMessage} className="d-flex gap-2 align-items-end">
-                            <div className={`d-flex align-items-end flex-grow-1 rounded-4 px-3 py-1 shadow-sm ${darkMode ? 'bg-black bg-opacity-50' : 'bg-white border'}`}>
-                                <textarea 
-                                    className={`form-control border-0 bg-transparent shadow-none px-0 py-2 chat-input-textarea ${darkMode ? 'text-white' : ''}`}
-                                    placeholder="Scrivi un messaggio..." 
-                                    value={chatInput} 
-                                    onChange={e => setChatInput(e.target.value)}
-                                    rows="1"
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            if (chatInput.trim()) sendChatMessage(e);
-                                        }
-                                    }}
-                                ></textarea>
-                            </div>
-                            <button type="submit" disabled={!chatInput.trim()} className={`btn rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm mb-1 btn-icon-46 ${chatInput.trim() ? 'bg-orange text-white' : (darkMode ? 'bg-secondary text-white-50' : 'bg-secondary text-white')}`}>
+                    <div className="p-3 border-top border-secondary-subtle bg-body-tertiary mt-auto z-10">
+                        <form onSubmit={sendChatMessage} className="d-flex gap-2 align-items-center">
+                            <input 
+                                type="text" 
+                                className="form-control rounded-pill bg-body border-secondary-subtle px-3 py-2 shadow-none" 
+                                placeholder="Scrivi un messaggio..." 
+                                value={chatInput} 
+                                onChange={e => setChatInput(e.target.value)}
+                            />
+                            <button type="submit" disabled={!chatInput.trim()} className="btn btn-orange rounded-circle d-flex align-items-center justify-content-center p-2 text-white shadow-sm btn-icon-42">
                                 <i className="bi bi-send-fill fs-5"></i>
                             </button>
                         </form>
@@ -1304,6 +1354,65 @@ function VisitDetail() {
             {isChatOpen && (
                 <div className="offcanvas-backdrop fade show z-1040" onClick={() => setIsChatOpen(false)}></div>
             )}
+
+            {/* MODAL COMANDI INFO */}
+            <div className="modal fade" id="commandsModal" tabIndex="-1" aria-labelledby="commandsModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className={`modal-content rounded-4 shadow-lg border-0 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
+                        <div className="modal-header border-bottom border-secondary-subtle">
+                            <h5 className="modal-title fw-bold" id="commandsModalLabel"><i className="bi bi-info-circle text-orange me-2"></i>Comandi Disponibili</h5>
+                            <button type="button" className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                        </div>
+                        <div className="modal-body p-0">
+                            <div className="list-group list-group-flush rounded-bottom-4">
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; speak("L'autore è " + author); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Autore", "Chi l'ha dipinto?"</h6>
+                                    </div>
+                                    <small className="text-muted">Risponde pronunciando il nome dell'autore dell'opera.</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToNextItem(); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Avanti", "Prossimo", "Successivo"</h6>
+                                    </div>
+                                    <small className="text-muted">Passa all'opera successiva (solo se abilitato).</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToPrevItem(); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Indietro", "Precedente"</h6>
+                                    </div>
+                                    <small className="text-muted">Torna all'opera precedente (solo se abilitato).</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Più semplice", "Non capisco"</h6>
+                                    </div>
+                                    <small className="text-muted">Rende la descrizione più semplice.</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Troppo semplice", "Meno scolastico"</h6>
+                                    </div>
+                                    <small className="text-muted">Aumenta la complessità accademica della descrizione.</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Di più", "Più dettagli", "Aumenta"</h6>
+                                    </div>
+                                    <small className="text-muted">Aumenta la lunghezza della descrizione.</small>
+                                </button>
+                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
+                                    <div className="d-flex w-100 justify-content-between mb-1">
+                                        <h6 className="mb-0 fw-bold">"Di meno", "Meno dettagli", "Diminuisci"</h6>
+                                    </div>
+                                    <small className="text-muted">Riduce la lunghezza della descrizione.</small>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }

@@ -18,6 +18,22 @@ document.addEventListener('alpine:init', () => {
             const token = localStorage.getItem('artaround_token');
             if (!token) return window.location.href = '../index.html';
 
+            // PRE-CARICAMENTO ISTANTANEO DATI UTENTE (propic, name, permissions)
+            const savedUserDataStr = localStorage.getItem('artaround_user_data');
+            if (savedUserDataStr) {
+                try {
+                    const savedUserData = JSON.parse(savedUserDataStr);
+                    this.username = savedUserData.name || localStorage.getItem('artaround_user') || '';
+                    this.permissions = savedUserData.permissions || '';
+                    this.propic = savedUserData.propic || '';
+                } catch (e) {
+                    console.error('Error parsing saved user data', e);
+                }
+            } else {
+                // Fallback username se user_data non esiste
+                this.username = localStorage.getItem('artaround_user') || '';
+            }
+
             try {
                 // Verifica auth e permessi admin
                 const authRes = await fetch('/api/check', {
@@ -34,6 +50,10 @@ document.addEventListener('alpine:init', () => {
 
                 this.username = authData.user.name;
                 this.permissions = authData.user.permissions;
+                this.propic = authData.user.propic || '';
+                
+                // Aggiorna cache locale per le prossime volte
+                localStorage.setItem('artaround_user_data', JSON.stringify(authData.user));
 
                 // 2. Caricamento dati iniziali per la gestione
                 await this.loadMuseums();

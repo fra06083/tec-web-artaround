@@ -25,9 +25,21 @@
     <style>
         [x-cloak] { display: none !important; }
     </style>
+    <script>
+        // Gestione nativa Tema Light/Dark per evitare FOUC
+        const adminTheme = localStorage.getItem('adminTheme') || 'dark';
+        document.documentElement.setAttribute('data-bs-theme', adminTheme);
+        function toggleAdminTheme() {
+            const current = document.documentElement.getAttribute('data-bs-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', next);
+            localStorage.setItem('adminTheme', next);
+            window.dispatchEvent(new CustomEvent('theme-changed'));
+        }
+    </script>
 </head>
 
-<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
+<body class="bg-body-tertiary text-body font-sans" x-data="marketplaceApp()">
 
     <div x-show="isReady && isLoggedIn && (permissions === 'admin' || permissions === 'editor' || permissions === 'docente')"
         x-transition.opacity
@@ -109,17 +121,10 @@
                     </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="input-group d-none d-lg-flex search-input">
-                            <span class="input-group-text bg-secondary border-0 text-white-50 ps-3">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" class="form-control bg-secondary border-0 text-white shadow-none"
-                                placeholder="Cerca...">
+                        <div class="text-end me-2">
+                            <span class="d-block text-white-50 text-uppercase fw-bold fs-065 tracking-wide-1px">Ruolo</span>
+                            <span class="text-orange fw-bold text-uppercase" x-text="permissions"></span>
                         </div>
-                        <button
-                            class="btn bg-slate rounded-circle p-2 d-flex align-items-center justify-content-center hover-lift icon-btn">
-                            <i class="bi bi-bell"></i>
-                        </button>
                     </div>
                 </div>
             </header>
@@ -133,16 +138,16 @@
                         <div class="row g-4 mb-5">
                             <div class="col-12 col-sm-6 col-xl-4">
                                 <div
-                                    class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    class="card bg-body border border-secondary-subtle p-4 rounded-4 shadow-sm hover-lift overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
                                         <div>
-                                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Tour Pubblicati
+                                            <p class="text-body-secondary small fw-bold text-uppercase mb-1">Tour Pubblicati
                                             </p>
-                                            <h2 class="fw-black mb-0 text-white display-6"
+                                            <h2 class="fw-black mb-0 text-body display-6"
                                                 x-text="stats.publishedTours">0</h2>
                                         </div>
-                                        <div class="p-3 rounded-4 glass-search-wrapper bg-orange-subtle">
-                                            <i class="bi bi-map-fill text-orange fs-3"></i>
+                                        <div class="p-3 rounded-4 text-bg-warning bg-opacity-10">
+                                            <i class="bi bi-map-fill text-warning fs-3"></i>
                                         </div>
                                     </div>
                                     <div class="text-success small fw-medium mt-2 position-relative z-1"><i class="bi bi-arrow-up me-1"></i>Live dal DB</div>
@@ -151,81 +156,90 @@
 
                             <div class="col-12 col-sm-6 col-xl-4">
                                 <div
-                                    class="card bg-dark border border-secondary border-opacity-25 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    class="card bg-body border border-secondary-subtle p-4 rounded-4 shadow-sm hover-lift overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
                                         <div>
-                                            <p class="text-white-50 small fw-bold text-uppercase mb-1">Utenti Totali</p>
-                                            <h2 class="fw-black mb-0 text-white display-6" x-text="stats.activeUsers">0
+                                            <p class="text-body-secondary small fw-bold text-uppercase mb-1">Utenti Totali</p>
+                                            <h2 class="fw-black mb-0 text-body display-6" x-text="stats.activeUsers">0
                                             </h2>
                                         </div>
-                                        <div class="p-3 rounded-4 glass-search-wrapper bg-primary-subtle">
+                                        <div class="p-3 rounded-4 text-bg-primary bg-opacity-10">
                                             <i class="bi bi-people-fill text-primary fs-3"></i>
                                         </div>
                                     </div>
-                                    <div class="text-white-50 small fw-medium mt-2 position-relative z-1">Account creati nel sistema</div>
+                                    <div class="text-body-secondary small fw-medium mt-2 position-relative z-1">Account creati nel sistema</div>
                                 </div>
                             </div>
 
                             <div class="col-12 col-sm-6 col-xl-4">
                                 <div
-                                    class="card bg-gradient-orange border-0 p-4 rounded-4 shadow-lg hover-lift text-white overflow-hidden">
+                                    class="card bg-body border border-secondary-subtle p-4 rounded-4 shadow-sm hover-lift overflow-hidden">
                                     <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
                                         <div>
-                                            <p class="text-white-75 small fw-bold text-uppercase mb-1">Stato Server</p>
-                                            <h2 class="fw-black mb-0 text-white display-6" x-text="stats.serverStatus">
+                                            <p class="text-body-secondary small fw-bold text-uppercase mb-1">Stato Server</p>
+                                            <h2 class="fw-black mb-0 text-body display-6" x-text="stats.serverStatus">
                                                 Offline</h2>
                                         </div>
-                                        <div class="p-3 rounded-4 glass-search-wrapper bg-white-20">
-                                            <i class="bi bi-hdd-network-fill text-white fs-3"></i>
+                                        <div class="p-3 rounded-4 text-bg-success bg-opacity-10">
+                                            <i class="bi bi-hdd-network-fill text-success fs-3"></i>
                                         </div>
                                     </div>
-                                    <div class="text-white small fw-medium mt-2 position-relative z-1 op-90"><i
+                                    <div class="text-success small fw-medium mt-2 position-relative z-1 op-90"><i
                                             class="bi bi-check-circle-fill me-1"></i>Sistema operativo</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card bg-gradient-dark-blue border-0 rounded-4 shadow-lg overflow-hidden mb-5">
+                        <div class="card bg-body border border-secondary-subtle rounded-4 shadow-sm overflow-hidden mb-5">
                             <div
-                                class="card-header bg-transparent border-bottom border-secondary border-opacity-25 p-4 d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-orange me-2"></i>Ultimi Tour
+                                class="card-header bg-transparent border-bottom border-secondary-subtle p-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-primary me-2"></i>Ultimi Tour
                                     Gestiti</h5>
-                                <button class="btn btn-outline-orange btn-sm rounded-pill px-4 fw-medium btn-glow">Vedi
-                                    tutti</button>
+                                <a href="/editor/tours" class="btn btn-outline-secondary btn-sm rounded-pill px-4 fw-medium">Vedi
+                                    tutti</a>
                             </div>
                             <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-dark table-hover table-borderless m-0 align-middle">
-                                        <thead class="thead-custom">
-                                            <tr>
-                                                <th class="ps-4 py-3">Titolo Visita</th>
-                                                <th class="py-3">Museo</th>
-                                                <th class="py-3 text-center">N° Opere</th>
-                                                <th class="text-end pe-4 py-3">Azioni</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template x-for="item in items" :key="item._id">
-                                                <tr class="table-row-custom">
-                                                    <td class="ps-4 py-3 fw-bold" x-text="item.name || 'Senza titolo'">
-                                                    </td>
-                                                    <td class="py-3"><span class="badge bg-slate px-2 py-1 shadow-sm"
-                                                            x-text="(item.museum_id && item.museum_id.museum) ? item.museum_id.museum : 'Sconosciuto'"></span>
-                                                    </td>
-                                                    <td class="py-3 fw-medium text-white-50 text-center"><span
-                                                            class="badge bg-orange text-white rounded-pill px-2"
-                                                            x-text="item.items ? item.items.length : 0"></span></td>
-                                                    <td class="text-end pe-4 py-3">
-                                                        <button @click="editTour(item._id)"
-                                                            class="btn btn-sm btn-action bg-slate shadow-sm hover-lift"><i
-                                                                class="bi bi-pencil-square"></i></button>
-                                                        <button @click="deleteTour(item._id)"
-                                                            class="btn btn-sm btn-action btn-outline-danger border-0 ms-2 hover-lift"><i
-                                                                class="bi bi-trash3-fill"></i></button>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
-                                    </table>
+                                <div class="d-flex flex-column">
+                                    <template x-for="item in items" :key="item._id">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4 border-bottom border-secondary-subtle">
+                                            
+                                            <!-- Gruppo Info (Sinistra su PC, Alto su Mobile) -->
+                                            <div class="d-flex flex-column align-items-start gap-2">
+                                                <h6 class="mb-0 fw-bold text-body fs-5" x-text="item.name || 'Senza titolo'"></h6>
+                                                
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    <span class="badge bg-secondary-subtle text-body border border-secondary-subtle px-2 py-1 shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-bank2 text-secondary me-2"></i>
+                                                        <span x-text="(item.museum_id && item.museum_id.museum) ? item.museum_id.museum : 'Sconosciuto'"></span>
+                                                    </span>
+                                                    <span class="badge text-bg-primary rounded-pill px-2 py-1 shadow-sm d-flex align-items-center">
+                                                        <i class="bi bi-images me-1"></i>
+                                                        <span x-text="item.items ? item.items.length : 0"></span><span class="ms-1 d-none d-sm-inline">Opere</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Gruppo Bottoni (Destra su PC, Basso su Mobile) -->
+                                            <div class="d-flex align-items-center gap-2 justify-content-end mt-2 mt-md-0">
+                                                <button @click="editTour(item._id)"
+                                                    class="btn btn-sm btn-outline-secondary shadow-sm hover-lift px-3">
+                                                    <i class="bi bi-pencil-square"></i><span class="d-none d-sm-inline ms-2">Modifica</span>
+                                                </button>
+                                                <button @click="deleteTour(item._id)"
+                                                    class="btn btn-sm btn-outline-danger shadow-sm hover-lift">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Stato vuoto nel caso non ci siano tour -->
+                                    <template x-if="items && items.length === 0">
+                                        <div class="p-5 text-center text-body-secondary">
+                                            <i class="bi bi-inbox fs-1 mb-2"></i>
+                                            <p class="m-0">Nessun tour trovato.</p>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -237,39 +251,39 @@
                 <!-- EDITOR DASHBOARD -->
                 <template x-if="permissions === 'editor'">
                     <div>
-                        <h4 class="fw-bold mb-2">Il Mio Spazio di Lavoro</h4>
-                        <p class="text-white-50 mb-4">Benvenuto nel tuo pannello di amministrazione museale.</p>
+                        <h4 class="fw-bold mb-2 text-body">Il Mio Spazio di Lavoro</h4>
+                        <p class="text-body-secondary mb-4">Benvenuto nel tuo pannello di amministrazione museale.</p>
 
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm h-100 border border-orange border-opacity-25 border-2">
+                                <div class="card bg-body border border-primary-subtle border-2 rounded-4 p-4 shadow-sm h-100">
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="bg-orange-subtle p-3 rounded-circle text-orange me-3">
+                                        <div class="text-bg-primary bg-opacity-10 p-3 rounded-circle text-primary me-3">
                                             <i class="bi bi-bank fs-3"></i>
                                         </div>
-                                        <h5 class="fw-bold m-0">I Miei Musei</h5>
+                                        <h5 class="fw-bold m-0 text-body">I Miei Musei</h5>
                                     </div>
-                                    <p class="text-white-50 small">Gestisci i musei a te assegnati, inserisci nuove
+                                    <p class="text-body-secondary small">Gestisci i musei a te assegnati, inserisci nuove
                                         opere e organizza le collezioni.</p>
                                     <div class="mt-auto pt-3">
-                                        <a href="/editor/museum" class="btn btn-orange fw-bold px-4 py-2 w-100">Vai ai
+                                        <a href="/editor/museum" class="btn btn-primary fw-bold px-4 py-2 w-100">Vai ai
                                             Musei <i class="bi bi-arrow-right ms-2"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm h-100">
+                                <div class="card bg-body border border-secondary-subtle rounded-4 p-4 shadow-sm h-100">
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="bg-white bg-opacity-10 p-3 rounded-circle text-white me-3">
+                                        <div class="text-bg-secondary bg-opacity-10 p-3 rounded-circle text-secondary me-3">
                                             <i class="bi bi-pencil-square fs-3"></i>
                                         </div>
-                                        <h5 class="fw-bold m-0">Le Mie Visite</h5>
+                                        <h5 class="fw-bold m-0 text-body">Le Mie Visite</h5>
                                     </div>
-                                    <p class="text-white-50 small">Crea nuovi tour guidati per i tuoi musei o modifica
+                                    <p class="text-body-secondary small">Crea nuovi tour guidati per i tuoi musei o modifica
                                         quelli esistenti per migliorare l'esperienza dei visitatori.</p>
                                     <div class="mt-auto pt-3">
                                         <a href="/editor/tours"
-                                            class="btn btn-outline-light fw-bold px-4 py-2 w-100 border-secondary">Gestisci
+                                            class="btn btn-outline-secondary fw-bold px-4 py-2 w-100">Gestisci
                                             Visite <i class="bi bi-arrow-right ms-2"></i></a>
                                     </div>
                                 </div>
@@ -279,81 +293,28 @@
                 </template>
             </div>
 
-            <!-- EDITOR DASHBOARD -->
-            <template x-if="permissions === 'editor'">
-                <div class="d-flex flex-column h-100">
-                    <div class="d-flex align-items-center mb-4">
-                        <div>
-                            <h3 class="fw-black text-white m-0 ls-minus-1">Spazio Creativo</h3>
-                            <p class="text-white-50 m-0 mt-1">Bentornato nel tuo hub di amministrazione museale.</p>
-                        </div>
-                        <div class="ms-auto d-none d-sm-block">
-                            <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 border border-white border-opacity-10 shadow-sm glass-search-wrapper">
-                                <i class="bi bi-star-fill text-warning me-2"></i>Editor Certificato
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="row g-4 flex-grow-1">
-                        <div class="col-md-6">
-                            <a href="/editor/museum" class="text-decoration-none">
-                                <div
-                                    class="card bg-gradient-dark-blue border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
-                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle scale-4-origin">
-                                        <i class="bi bi-bank"></i>
-                                    </div>
-                                    <div
-                                        class="bg-white bg-opacity-10 p-4 rounded-circle text-white mb-4 position-relative z-1 shadow-sm">
-                                        <i class="bi bi-bank display-5"></i>
-                                    </div>
-                                    <h4 class="fw-bold text-white m-0 position-relative z-1">Gestione Musei</h4>
-                                    <p class="text-white-50 mt-2 mb-0 small position-relative z-1 max-w-250">Gestisci i musei, inserisci nuove opere e organizza le
-                                        tue collezioni artistiche.</p>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="/editor/tours" class="text-decoration-none">
-                                <div
-                                    class="card bg-gradient-orange border-0 rounded-4 p-5 text-center shadow-lg h-100 hover-scale-sm d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden group">
-                                    <div class="position-absolute opacity-10 top-50 start-50 translate-middle scale-4-origin">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </div>
-                                    <div
-                                        class="bg-white bg-opacity-25 p-4 rounded-circle text-white mb-4 position-relative z-1 shadow-sm border border-white border-opacity-25">
-                                        <i class="bi bi-pencil-square display-5"></i>
-                                    </div>
-                                    <h4 class="fw-bold text-white m-0 position-relative z-1">Le Mie Visite</h4>
-                                    <p class="text-white-75 mt-2 mb-0 small position-relative z-1 max-w-250">Crea nuovi tour guidati interattivi o modifica i tuoi
-                                        percorsi esistenti.</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </template>
+            <!-- EDITOR DASHBOARD DUPLICATO? Rimosso perché il blocco sopra fa già la stessa cosa ed era un probabile errore nel vecchio codice -->
 
             <!-- DOCENTE DASHBOARD -->
             <template x-if="permissions === 'docente'">
                 <div class="d-flex flex-column align-items-center justify-content-center h-100 min-vh-50">
-                    <h2 class="fw-black mb-2 text-center">Ciao <span class="text-orange" x-text="username"></span>, cosa
+                    <h2 class="fw-black mb-2 text-center text-body">Ciao <span class="text-primary" x-text="username"></span>, cosa
                         vuoi fare oggi?</h2>
-                    <p class="text-white-50 text-center mb-5 max-w-500">Sei nella tua area protetta. Usa
+                    <p class="text-body-secondary text-center mb-5 max-w-500">Sei nella tua area protetta. Usa
                         gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la tua
                         classe.</p>
 
                     <div class="row g-4 w-100 max-w-800">
                         <div class="col-md-6">
-                            <div class="card bg-dark border-0 rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm cursor-pointer"
+                            <div class="card bg-body border border-secondary-subtle rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm cursor-pointer"
                                 @click="openVisitSelection()">
                                 <div
-                                    class="bg-orange p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
+                                    class="text-bg-primary bg-opacity-10 p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
                                     <i
-                                        class="bi bi-play-circle-fill display-3 text-white mb-3 position-relative z-1"></i>
-                                    <h3 class="fw-black text-white m-0 position-relative z-1">INIZIA VISITA</h3>
+                                        class="bi bi-play-circle-fill display-3 text-primary mb-3 position-relative z-1"></i>
+                                    <h3 class="fw-black text-primary m-0 position-relative z-1">INIZIA VISITA</h3>
                                     <p
-                                        class="text-white-50 mt-2 m-0 position-relative z-1 small fw-bold text-uppercase">
+                                        class="text-primary mt-2 m-0 position-relative z-1 small fw-bold text-uppercase opacity-75">
                                         Avvia Tour Interattivo</p>
                                 </div>
                             </div>
@@ -361,10 +322,10 @@
                         <div class="col-md-6">
                             <a href="/editor/tours" class="text-decoration-none">
                                 <div
-                                    class="card bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
-                                    <i class="bi bi-pencil-square display-3 text-white-50 mb-3"></i>
-                                    <h4 class="fw-bold text-white m-0">Gestisci Visite</h4>
-                                    <p class="text-white-50 mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
+                                    class="card bg-body-tertiary border border-secondary-subtle rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
+                                    <i class="bi bi-pencil-square display-3 text-body-secondary opacity-50 mb-3"></i>
+                                    <h4 class="fw-bold text-body m-0">Gestisci Visite</h4>
+                                    <p class="text-body-secondary mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
                                 </div>
                             </a>
                         </div>

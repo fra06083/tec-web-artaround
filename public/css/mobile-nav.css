@@ -408,3 +408,43 @@
     background-color: #0d6efd;
     border-color: #0d6efd !important;
 }
+
+/* =========================================================
+   TOUR NAVIGATOR STYLES
+========================================================= */
+@keyframes slideDownFade {
+    0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animated-dropdown.show {
+    animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: top right;
+}
+
+@media (max-width: 767.98px) {
+    .img-tour-mobile {
+        max-height: 35vh !important;
+    }
+    .text-truncate-lines {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
+
+.btn-touch-target {
+    min-width: 48px;
+    min-height: 48px;
+}
+
+.dot-container-touch {
+    min-height: 48px;
+}
+
+.dot-indicator-touch {
+    min-width: 16px;
+    min-height: 16px;
+    margin: 0 4px;
+}

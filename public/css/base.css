@@ -658,3 +658,99 @@ body.dark-mode .form-control::placeholder {
 .ticket-top::after {
     right: -12px;
 }
+
+/* Chat Styling */
+.chat-background {
+    background-image: url('../images/chat-bg-light.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .chat-background,
+.dark-mode .chat-background {
+    background-image: url('../images/chat-bg-dark.jpg');
+}
+
+/* Custom sizes */
+.max-w-80 { max-width: 80%; }
+.fs-08 { font-size: 0.8rem; }
+.fs-085 { font-size: 0.85rem; }
+.min-w-50 { min-width: 50px; }
+.min-w-40 { min-width: 40px; }
+.btn-icon-42 { width: 42px; height: 42px; flex-shrink: 0; }
+.btn-icon-32 { width: 32px; height: 32px; flex-shrink: 0; }
+
+.artwork-main-img {
+    max-height: 35vh;
+    object-fit: contain;
+}
+@media (min-width: 768px) {
+    .artwork-main-img {
+        max-height: 45vh;
+    }
+.max-w-800 { max-width: 800px; }
+.max-w-400 { max-width: 400px; }
+.min-h-0 { min-height: 0; }
+.min-h-60 { min-height: 60px; }
+.max-h-100 { max-height: 100%; }
+.max-h-90vh { max-height: 90vh; }
+.fs-06 { font-size: 0.6rem; }
+.fs-065 { font-size: 0.65rem; }
+.letter-spacing-sm { letter-spacing: 0.5px; }
+.btn-icon-40 { width: 40px; height: 40px; flex-shrink: 0; }
+.dot-indicator { width: 8px; height: 8px; cursor: pointer; transition: opacity 0.2s ease; }
+.bg-black-85 { background-color: rgba(0,0,0,0.85); }
+.z-2000 { z-index: 2000; }
+.z-1060 { z-index: 1060; }
+.z-1061 { z-index: 1061; }
+.lightbox-close-btn { width: 44px; height: 44px; top: 24px; right: 24px; }
+.lightbox-img-max { max-height: 85vh; object-fit: contain; }
+
+/* 
+ * EXPANDABLE BUTTONS (Hover Pill Effect)
+ * Transforms circular buttons into pills on hover, revealing text.
+ */
+.expandable-btn {
+    border-radius: 50px !important; /* Force pill shape always */
+    transition: max-width 0.3s ease, padding 0.3s ease, background-color 0.3s ease;
+    max-width: 40px; /* Base width for circular state */
+    height: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align start to keep icon in place */
+    padding: 0 !important;
+    border: none;
+}
+
+.expandable-btn .icon-container {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.expandable-btn .text-container {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    margin-left: 4px;
+    font-weight: 600;
+}
+
+/* On PC (hover) or when focused/active */
+@media (hover: hover) and (pointer: fine) {
+    .expandable-btn:hover {
+        max-width: 200px; /* Expanded width */
+        padding-right: 16px !important;
+    }
+    .expandable-btn:hover .text-container {
+        opacity: 1;
+    }
+}
+
