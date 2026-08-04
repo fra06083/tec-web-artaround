@@ -294,7 +294,7 @@ function VisitDetail() {
 
             // Navigazione tra opere
             if (/(avanti|prossimo|successivo)/i.test(transcript)) {
-                 if (role === 'student' && pin) {
+                 if (pin && role !== 'teacher') {
                      //toast.warning("In visita guidata non puoi cambiare opera!");
                  } else {
                      goToNextItem();
@@ -302,7 +302,7 @@ function VisitDetail() {
                  return;
             }
             if (/(indietro|precedente)/i.test(transcript)) {
-                 if (role === 'student' && pin) {
+                 if (pin && role !== 'teacher') {
                      //toast.warning("In visita guidata non puoi cambiare opera!");
                  } else {
                      goToPrevItem();
@@ -1493,7 +1493,7 @@ function VisitDetail() {
                                 </button>
 
                                 {/* CATEGORIA PERSONALIZZAZIONE */}
-                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Personalizzazione (AI)</h6>
+                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Personalizzazione</h6>
 
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
                                     <i className="bi bi-chat-left-text fs-3 text-info opacity-75"></i>

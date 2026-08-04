@@ -497,7 +497,8 @@ function marketplaceApp() {
                         this.roomState.students = eventData.students;
                     });
                 } else {
-                    this.showToast('Errore creazione stanza', 'error');
+                    const err = await response.json();
+                    this.showToast(err.error || 'Errore creazione stanza', 'error');
                 }
             } catch (error) {
                 console.error("Errore creazione stanza:", error);

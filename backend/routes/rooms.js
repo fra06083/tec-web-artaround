@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { quizQuestion: QuizQuestion, quizResult: QuizResult } = require('../models/museums.js');
+const { quizQuestion: QuizQuestion, quizResult: QuizResult, visit: Visit } = require('../models/museums.js');
 
 // Memoria RAM per le stanze
 // Struttura: { [pin]: { visitId, teacherId, currentArtworkIndex, clients: [] } }
@@ -18,18 +18,33 @@ const broadcastToRoom = (pin, eventName, data) => {
 };
 
 // Crea una nuova stanza
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     const { visitId, teacherId } = req.body;
     
     if (!visitId) {
         return res.status(400).json({ error: "visitId è obbligatorio" });
     }
 
-    // Genera PIN univoco di 5 cifre
     let pin;
-    do {
-        pin = Math.floor(10000 + Math.random() * 90000).toString();
-    } while (activeRooms.has(pin));
+    
+    try {
+        const visit = await Visit.findById(visitId);
+        if (visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '') {
+            pin = visit.mnemonicCode.trim();
+            if (activeRooms.has(pin)) {
+                return res.status(409).json({ error: "Questo codice è già in uso, scegline uno diverso." });
+            }
+        }
+    } catch (err) {
+        console.error("Errore nel recupero della visita per mnemonicCode:", err);
+    }
+
+    if (!pin) {
+        // Fallback: Genera PIN univoco di 5 cifre
+        do {
+            pin = Math.floor(10000 + Math.random() * 90000).toString();
+        } while (activeRooms.has(pin));
+    }
 
     activeRooms.set(pin, {
         visitId,

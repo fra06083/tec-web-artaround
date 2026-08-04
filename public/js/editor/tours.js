@@ -33,7 +33,8 @@ document.addEventListener('alpine:init', () => {
             museum_id: '',
             items: [], // Array of artwork IDs
             logistic_info: [],
-            tags: []
+            tags: [],
+            mnemonicCode: ''
         },
 
         // ARTWORKS MANAGEMENT
@@ -243,13 +244,13 @@ document.addEventListener('alpine:init', () => {
             if (this.mode === 'create') {
                 // Create new tour
                 this.tour = {
-                    _id: '',
                     name: '',
                     description: '',
                     museum_id: this.selectedMuseum,
                     items: [],
                     logistic_info: [],
-                    tags: []
+                    tags: [],
+                    mnemonicCode: ''
                 };
                 this.selectedArtworks = [];
                 this.quizQuestions = [];
@@ -281,7 +282,8 @@ document.addEventListener('alpine:init', () => {
                         museum_id: museumId,
                         items: tourData.items || [],
                         logistic_info: tourData.logistic_info || [],
-                        tags: tourData.tags || []
+                        tags: tourData.tags || [],
+                        mnemonicCode: tourData.mnemonicCode || ''
                     };
 
                     // Load artworks in the tour
@@ -429,7 +431,8 @@ document.addEventListener('alpine:init', () => {
                         museum_id: this.tour.museum_id,
                         items: items, // Include artworks in the save
                         logistic_info: this.tour.logistic_info,
-                        tags: this.tour.tags
+                        tags: this.tour.tags,
+                        mnemonicCode: this.tour.mnemonicCode
                     })
                 });
 

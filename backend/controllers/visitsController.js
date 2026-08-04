@@ -37,7 +37,7 @@ const getVisitById = async (req, res) => {
 // POST /api/visite
 const createVisit = async (req, res) => {
     try {
-        const { name, description, museum_id, logistic_info, items, createdBy, tags } = req.body;
+        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode } = req.body;
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
@@ -50,6 +50,7 @@ const createVisit = async (req, res) => {
             logistic_info: logistic_info || [],
             items: items || [],
             tags: tags || [],
+            mnemonicCode: mnemonicCode || '',
             createdBy: req.user._id // Salva l'id dell'utente che crea la visita
         });
 

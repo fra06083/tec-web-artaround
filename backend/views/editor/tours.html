@@ -237,6 +237,12 @@
                                             placeholder="Descrizione breve della visita..."></textarea>
                                     </div>
                                     <div class="col-12">
+                                        <label class="form-label small fw-bold text-white-50">Codice Stanza (Opzionale)</label>
+                                        <input type="text" class="form-control bg-dark border-secondary text-white p-3"
+                                            x-model="tour.mnemonicCode" placeholder="Es: Classe5A, FeniceRossa">
+                                        <div class="form-text text-white-50 small">Questo codice verrà usato dagli studenti per accedere alla stanza. Se lasciato vuoto, verrà generato un PIN casuale a 5 cifre.</div>
+                                    </div>
+                                    <div class="col-12">
                                         <label class="form-label small fw-bold text-white-50">Categorie Predefinite</label>
                                         <div class="d-flex flex-wrap gap-3 mb-3">
                                             <template x-for="t in predefinedTags" :key="t">
