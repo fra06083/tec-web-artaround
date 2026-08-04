@@ -13,7 +13,7 @@ function homeApp() {
         propic: savedUser ? savedUser.propic : '',
         darkMode: false,
         isProfileModalOpen: false,
-        profileForm: { name: '', propic: '' },
+        profileForm: { name: '', propic: '', nameError: '' },
 
         async init() {
             const savedDarkMode = localStorage.getItem('artaround_darkmode');
@@ -91,7 +91,17 @@ function homeApp() {
             this.isProfileModalOpen = true;
         },
 
+        validateUsername(val) {
+            if (val.length < 5) return "L'username deve avere almeno 5 caratteri.";
+            if (/\s/.test(val)) return "Gli spazi non sono consentiti. Usa '_' o '.'.";
+            if (!/^[a-zA-Z0-9_.]+$/.test(val)) return "Caratteri non validi. Usa solo lettere, numeri, '_' e '.'.";
+            return "";
+        },
+
         async updateProfile() {
+            this.profileForm.nameError = this.validateUsername(this.profileForm.name);
+            if (this.profileForm.nameError) return;
+
             try {
                 const token = localStorage.getItem('artaround_token');
                 const response = await fetch('/api/profile', {
@@ -110,7 +120,12 @@ function homeApp() {
                     this.isProfileModalOpen = false;
                     alert('Profilo aggiornato con successo');
                 } else {
-                    alert('Errore aggiornamento profilo');
+                    const err = await response.json();
+                    if (err.error === 'Nome utente già in uso' || err.error?.toLowerCase().includes('in uso')) {
+                        this.profileForm.nameError = err.error;
+                    } else {
+                        alert(err.error || 'Errore aggiornamento profilo');
+                    }
                 }
             } catch (error) {
                 console.error("Errore aggiornamento profilo", error);

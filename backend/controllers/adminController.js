@@ -6,8 +6,10 @@ module.exports = {
     // used for sending dashboard statistics (JSON)
     getStats: async (req, res) => {
         try {
-            const publishedTours = await visit.countDocuments();
-            const totalUsers = await User.countDocuments();
+            const [publishedTours, totalUsers] = await Promise.all([
+                visit.countDocuments(),
+                User.countDocuments()
+            ]);
 
             res.json({
                 publishedTours,

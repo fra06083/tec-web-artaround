@@ -505,8 +505,19 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Nome Visualizzato</label>
-                        <input type="text" class="form-control" x-model="profileForm.name">
+                        <label class="form-label fw-bold">Username</label>
+                        <div class="input-group has-validation">
+                            <span class="input-group-text bg-light text-secondary border-end-0 fw-bold">@</span>
+                            <input type="text" class="form-control"
+                                   x-model="profileForm.name" @input="profileForm.nameError = validateUsername(profileForm.name)"
+                                   :class="profileForm.nameError ? 'is-invalid border-danger' : ''"
+                                   placeholder="tuo_username">
+                            <template x-if="profileForm.nameError">
+                                <div class="invalid-feedback d-flex align-items-center gap-1 mt-1 text-danger fw-medium">
+                                    <i class="bi bi-exclamation-circle-fill fs-6"></i> <span x-text="profileForm.nameError"></span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">URL Immagine Profilo</label>

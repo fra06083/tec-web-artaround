@@ -20,19 +20,27 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="login-page d-flex align-items-center justify-content-center vh-100 font-sans">
+<body class="login-page d-flex align-items-center justify-content-center min-vh-100 py-4 py-md-0 font-sans transition-theme" 
+      x-data="authApp()"
+      :data-bs-theme="darkMode ? 'dark' : 'light'" 
+      :class="darkMode ? 'bg-dark text-white' : 'bg-light text-dark'">
 
-
-
-    <!-- Floating shapes background -->
+    <!-- Dark Mode Toggle -->
+    <button @click="toggleTheme()" 
+            class="btn rounded-circle position-fixed top-0 end-0 m-3 m-md-4 shadow-sm z-3 d-flex align-items-center justify-content-center" 
+            :class="darkMode ? 'btn-outline-secondary' : 'btn-outline-secondary bg-white'"
+            style="width: 45px; height: 45px;"
+            aria-label="Toggle Dark Mode">
+        <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill text-warning' : 'bi-sun-fill text-warning'"></i>
+    </button>    <!-- Floating shapes background -->
     <div class="login-shapes">
         <div class="login-shape"></div>
         <div class="login-shape"></div>
         <div class="login-shape"></div>
     </div>
 
-    <div x-data="authApp()"
-        class="card login-card border-0 shadow-sm rounded-4 p-4 p-md-5 overflow-hidden position-relative w-100 max-w-450">
+    <div class="card login-card border-0 shadow-sm rounded-4 p-4 p-md-5 overflow-hidden position-relative w-100 max-w-450"
+        :class="darkMode ? 'bg-dark text-white border border-secondary-subtle' : 'bg-white text-dark'">
 
         <div class="position-relative z-1">
 
@@ -103,6 +111,17 @@
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
+                darkMode: localStorage.getItem('artaround_theme') === 'dark' || (!localStorage.getItem('artaround_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+
+                init() {
+                    this.$watch('darkMode', val => {
+                        localStorage.setItem('artaround_theme', val ? 'dark' : 'light');
+                    });
+                },
+                
+                toggleTheme() {
+                    this.darkMode = !this.darkMode;
+                },
 
                 toggleView() {
                     this.isLogin = !this.isLogin;

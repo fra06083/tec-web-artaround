@@ -5,7 +5,7 @@ function marketplaceApp() {
         permissions: '',
         propic: '',
         isProfileModalOpen: false,
-        profileForm: { name: '', propic: '' },
+        profileForm: { name: '', propic: '', nameError: '' },
         isVisitSelectionModalOpen: false,
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
@@ -110,13 +110,30 @@ function marketplaceApp() {
                 });
             }, 100);
 
-            await this.checkAuth();
-            await this.fetchTours();
+            const promises = [this.checkAuth(), this.fetchTours()];
+            
+            // Check cache to immediately decide if we should load admin stats in parallel
+            const savedUserDataStr = localStorage.getItem('artaround_user_data');
+            let cachedAdmin = false;
+            if (savedUserDataStr) {
+                try {
+                    const savedUserData = JSON.parse(savedUserDataStr);
+                    cachedAdmin = (savedUserData.permissions === 'admin');
+                } catch(e) {}
+            }
+            if (cachedAdmin) {
+                promises.push(this.refreshStats());
+            }
+
+            await Promise.all(promises);
 
             this.isLoading = false;
-            if (this.permissions === 'admin') {
+            
+            // Fallback in case cache was wrong or empty, but auth yielded admin
+            if (this.permissions === 'admin' && !cachedAdmin) {
                 this.refreshStats();
             }
+            
             this.isReady = true;
         },
 
@@ -317,7 +334,17 @@ function marketplaceApp() {
             this.isProfileModalOpen = true;
         },
 
+        validateUsername(val) {
+            if (val.length < 5) return "L'username deve avere almeno 5 caratteri.";
+            if (/\s/.test(val)) return "Gli spazi non sono consentiti. Usa '_' o '.'.";
+            if (!/^[a-zA-Z0-9_.]+$/.test(val)) return "Caratteri non validi. Usa solo lettere, numeri, '_' e '.'.";
+            return "";
+        },
+
         async updateProfile() {
+            this.profileForm.nameError = this.validateUsername(this.profileForm.name);
+            if (this.profileForm.nameError) return;
+
             try {
                 const token = localStorage.getItem('artaround_token');
                 const response = await fetch('/api/profile', {
@@ -338,7 +365,11 @@ function marketplaceApp() {
                     this.showToast('Profilo aggiornato con successo', 'success');
                 } else {
                     const err = await response.json();
-                    this.showToast(err.error || 'Errore aggiornamento profilo', 'error');
+                    if (err.error === 'Nome utente già in uso' || err.error?.toLowerCase().includes('in uso')) {
+                        this.profileForm.nameError = err.error;
+                    } else {
+                        this.showToast(err.error || 'Errore aggiornamento profilo', 'error');
+                    }
                 }
             } catch (error) {
                 console.error("Errore aggiornamento profilo:", error);

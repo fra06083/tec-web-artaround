@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
-    const [name, setName] = useState('');
-    const [propic, setPropic] = useState('');
+    const [name, setName] = useState(user?.name || '');
+    const [propic, setPropic] = useState(user?.propic || '');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [fieldError, setFieldError] = useState('');
 
     useEffect(() => {
         if (isOpen && user) {
@@ -12,15 +13,36 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
             setPropic(user.propic || '');
             setMessage('');
             setError('');
+            setFieldError('');
         }
     }, [isOpen, user]);
 
     if (!isOpen) return null;
 
+    const validateUsername = (val) => {
+        if (val.length < 5) return "L'username deve avere almeno 5 caratteri.";
+        if (/\s/.test(val)) return "Gli spazi non sono consentiti. Usa '_' o '.'.";
+        if (!/^[a-zA-Z0-9_.]+$/.test(val)) return "Caratteri non validi. Usa solo lettere, numeri, '_' e '.'.";
+        return "";
+    };
+
+    const handleNameChange = (e) => {
+        const val = e.target.value;
+        setName(val);
+        setFieldError(validateUsername(val));
+    };
+
     const handleSave = async (e) => {
         e.preventDefault();
         setMessage('');
         setError('');
+        
+        const vErr = validateUsername(name);
+        if (vErr) {
+            setFieldError(vErr);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('artaround_token');
             const res = await fetch('/api/profile', {
@@ -36,7 +58,11 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                 setTimeout(() => onClose(), 1000);
             } else {
                 const data = await res.json();
-                setError(data.error || 'Errore durante l\'aggiornamento');
+                if (data.error === 'Nome utente già in uso' || data.error?.toLowerCase().includes('in uso') || data.error?.toLowerCase().includes('già')) {
+                    setFieldError(data.error);
+                } else {
+                    setError(data.error || 'Errore durante l\'aggiornamento');
+                }
             }
         } catch (err) {
             setError('Errore di connessione');
@@ -100,13 +126,22 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                             </div>
                             
                             <div className="mb-3">
-                                <label className="form-label">Nome Visualizzato</label>
-                                <input 
-                                    type="text" 
-                                    className="form-control" 
-                                    value={name} 
-                                    onChange={(e) => setName(e.target.value)} 
-                                />
+                                <label className="form-label">Username</label>
+                                <div className="input-group has-validation">
+                                    <span className="input-group-text bg-light text-secondary border-end-0 fw-bold">@</span>
+                                    <input 
+                                        type="text" 
+                                        className={`form-control ${fieldError ? 'is-invalid border-danger' : ''}`} 
+                                        value={name} 
+                                        onChange={handleNameChange} 
+                                        placeholder="tuo_username"
+                                    />
+                                    {fieldError && (
+                                        <div className="invalid-feedback d-flex align-items-center gap-1 mt-1 text-danger fw-medium">
+                                            <i className="bi bi-exclamation-circle-fill fs-6"></i> {fieldError}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             
                             <div className="mb-3">

@@ -148,7 +148,8 @@ module.exports = {
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
             // Controlla se il nome esiste già (siccome il model richiede che 'name' sia unique)
-            const existing = await User.findOne({ name: name.trim() });
+            const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const existing = await User.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
             if (existing && existing._id.toString() !== id) {
                 return res.status(400).json({ error: "Questo username è già in uso da un altro utente" });
             }

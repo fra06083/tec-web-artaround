@@ -57,8 +57,9 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'Nome e password sono obbligatori' });
         }
 
-        // CHECK EXISTING USER (NOT OVERWRITE)
-        const existingUser = await User.findOne({ name });
+        // CHECK EXISTING USER (NOT OVERWRITE) (Case Insensitive)
+        const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const existingUser = await User.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
         if (existingUser) {
             return res.status(400).json({ error: 'Nome utente già in uso' });
         }
@@ -128,9 +129,10 @@ router.put('/profile', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Il nome è obbligatorio' });
         }
 
-        // Verifica che il nome non sia usato da altri (se è cambiato)
+        // Verifica che il nome non sia usato da altri (se è cambiato, case insensitive)
         if (name !== req.user.name) {
-            const existingUser = await User.findOne({ name });
+            const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const existingUser = await User.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
             if (existingUser && existingUser._id.toString() !== userId) {
                 return res.status(400).json({ error: 'Nome utente già in uso' });
             }
@@ -148,6 +150,9 @@ router.put('/profile', authenticateToken, async (req, res) => {
             propic: user.propic
         }});
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ error: 'Nome utente già in uso' });
+        }
         console.error("Errore aggiornamento profilo:", error);
         res.status(500).json({ error: 'Errore interno' });
     }
