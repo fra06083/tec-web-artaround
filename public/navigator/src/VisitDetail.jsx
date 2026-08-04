@@ -113,7 +113,6 @@ function VisitDetail() {
     // All'apertura della mappa mostra il piano dell'opera corrente
     useEffect(() => {
         if (!isMapOpen) return;
-        setDomandaAperta(null);
         const sala = items[currentIndex]?.sala;
         const piani = [...(visita?.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
         if (sala?.piano !== undefined && sala?.piano !== null) {
@@ -284,7 +283,7 @@ function VisitDetail() {
                  if (targetType) {
                      const poi = domandeMappa.find(p => p.tipo === targetType);
                      if (poi) {
-                         speak(`Ecco dove si trova ${targetName}: ${poi.testo}`);
+                         speak(poi.testo);
                          setDomandaAperta(poi._id || domandeMappa.indexOf(poi));
                      }
                  }
@@ -1251,6 +1250,8 @@ function VisitDetail() {
                             src={piantaAttiva.immagine}
                             alt={`Pianta - ${piantaAttiva.nome}`}
                             className="img-fluid w-100 rounded-3 border mb-4"
+                            onClick={() => setLightboxImage(piantaAttiva.immagine)}
+                            style={{cursor: 'zoom-in'}}
                         />
                     ) : (
                         <div className="d-flex flex-column justify-content-center align-items-center h-100 text-center p-4 flex-grow-1">
@@ -1423,7 +1424,7 @@ function VisitDetail() {
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { 
                                     const dm = (visita?.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
                                     const p = dm.find(x => x.tipo === 'toilette');
-                                    if(p){ speak(`Ecco dove si trova il bagno: ${p.testo}`); setDomandaAperta(p._id || dm.indexOf(p)); } 
+                                    if(p){ speak(p.testo); setDomandaAperta(p._id || dm.indexOf(p)); } 
                                     setIsMapOpen(true); 
                                 }} data-bs-dismiss="modal">
                                     <i className="bi bi-droplet fs-3 text-info opacity-75"></i>
@@ -1436,7 +1437,7 @@ function VisitDetail() {
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { 
                                     const dm = (visita?.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
                                     const p = dm.find(x => x.tipo === 'bar');
-                                    if(p){ speak(`Ecco dove si trova la caffetteria: ${p.testo}`); setDomandaAperta(p._id || dm.indexOf(p)); } 
+                                    if(p){ speak(p.testo); setDomandaAperta(p._id || dm.indexOf(p)); } 
                                     setIsMapOpen(true); 
                                 }} data-bs-dismiss="modal">
                                     <i className="bi bi-cup-hot fs-3 text-warning opacity-75"></i>
@@ -1448,8 +1449,21 @@ function VisitDetail() {
 
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { 
                                     const dm = (visita?.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
+                                    const p = dm.find(x => x.tipo === 'shop');
+                                    if(p){ speak(p.testo); setDomandaAperta(p._id || dm.indexOf(p)); } 
+                                    setIsMapOpen(true); 
+                                }} data-bs-dismiss="modal">
+                                    <i className="bi bi-bag-fill fs-3 text-primary opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Dov'è il bookshop?", "Shop"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Mostra sulla mappa dove si trova il negozio del museo.</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { 
+                                    const dm = (visita?.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
                                     const p = dm.find(x => x.tipo === 'uscita');
-                                    if(p){ speak(`Ecco dove si trova l'uscita: ${p.testo}`); setDomandaAperta(p._id || dm.indexOf(p)); } 
+                                    if(p){ speak(p.testo); setDomandaAperta(p._id || dm.indexOf(p)); } 
                                     setIsMapOpen(true); 
                                 }} data-bs-dismiss="modal">
                                     <i className="bi bi-door-open fs-3 text-danger opacity-75"></i>
