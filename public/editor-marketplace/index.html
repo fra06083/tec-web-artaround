@@ -195,17 +195,59 @@
                     <div class="ms-3 flex-grow-1 border-bottom" :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
                 </div>
                 
-                <!-- FILTRI (Mobile-oriented: scroll orizzontale nascosto) -->
-                <div class="overflow-x-auto hide-scrollbar ms-md-4" style="max-width: 100%; -webkit-overflow-scrolling: touch;">
-                    <div class="d-flex flex-nowrap gap-2 pb-1 pe-1">
+                <!-- FILTRI DESKTOP (pills) -->
+                <div class="d-none d-md-block overflow-x-auto hide-scrollbar ms-md-4 mw-100">
+                    <div class="d-flex flex-nowrap gap-2 pb-1 pe-1 align-items-center">
+                        <div class="position-relative me-2">
+                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
+                            <input type="text" class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5 w-auto" placeholder="Cerca categoria..." x-model="tagSearchQuery">
+                        </div>
                         <button @click="toggleTag('Tutti')" 
                                 :class="{'active bg-orange text-white border-orange': selectedTags.length === 0}"
-                                class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm">Tutti</button>
-                        <template x-for="tag in predefinedTags" :key="tag">
+                                class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm">Tutte</button>
+                        <template x-for="tag in filteredAvailableTags" :key="tag">
                             <button @click="toggleTag(tag)" 
                                     :class="{'active bg-orange text-white border-orange': selectedTags.includes(tag)}"
                                     class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm" x-text="tag"></button>
                         </template>
+                        <span x-show="filteredAvailableTags.length === 0" class="text-secondary small ms-2 text-nowrap">Nessuna categoria trovata</span>
+                    </div>
+                </div>
+
+                <!-- FILTRI MOBILE (dropdown) -->
+                <div class="d-md-none w-100 mt-2">
+                    <div class="dropdown w-100">
+                        <button class="btn btn-outline-secondary w-100 rounded-pill px-4 py-2 dropdown-toggle fw-bold d-flex align-items-center justify-content-between text-start shadow-sm border border-secondary border-opacity-25" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" :class="darkMode ? 'text-white bg-dark' : 'text-dark bg-white'">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="bi bi-funnel text-orange"></i> 
+                                <span x-text="selectedTags.length === 0 ? 'Filtra categorie (Tutte)' : 'Filtra: ' + selectedTags.length + ' selezionate'"></span>
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu w-100 shadow-lg border-0 mt-2 rounded-4 p-2" :class="darkMode ? 'dropdown-menu-dark bg-dark' : 'bg-white'">
+                            <li class="px-2 mb-2">
+                                <input type="text" class="form-control rounded-pill border-secondary border-opacity-25" placeholder="Cerca categoria..." x-model="tagSearchQuery" @click.stop>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3" @click="toggleTag('Tutti')">
+                                    <span class="fw-bold">Tutte le categorie</span>
+                                    <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.length === 0"></i>
+                                    <i class="bi bi-circle text-secondary fs-5" x-show="selectedTags.length > 0"></i>
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider mx-2"></li>
+                            <template x-for="tag in filteredAvailableTags" :key="tag">
+                                <li>
+                                    <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3" @click="toggleTag(tag)">
+                                        <span x-text="tag"></span>
+                                        <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.includes(tag)"></i>
+                                        <i class="bi bi-circle text-secondary fs-5" x-show="!selectedTags.includes(tag)"></i>
+                                    </button>
+                                </li>
+                            </template>
+                            <li x-show="filteredAvailableTags.length === 0" class="text-center py-2 text-secondary small">
+                                Nessuna categoria trovata
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

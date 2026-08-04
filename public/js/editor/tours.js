@@ -14,6 +14,10 @@ document.addEventListener('alpine:init', () => {
         isLobbyModalOpen: false,
         allowLateJoins: true,
         predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
+        newCustomTag: '',
+        get customTags() {
+            return this.tour.tags ? this.tour.tags.filter(t => !this.predefinedTags.includes(t)) : [];
+        },
 
         // DATA
         museums: [],
@@ -48,6 +52,25 @@ document.addEventListener('alpine:init', () => {
             show: false,
             message: '',
             type: 'success'
+        },
+
+        // TAGS MANAGEMENT
+        addCustomTag() {
+            const tag = this.newCustomTag.trim();
+            if (tag) {
+                const formattedTag = tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
+                if (!this.tour.tags) this.tour.tags = [];
+                if (!this.tour.tags.includes(formattedTag)) {
+                    this.tour.tags.push(formattedTag);
+                }
+                this.newCustomTag = '';
+            }
+        },
+
+        removeTag(tagToRemove) {
+            if (this.tour.tags) {
+                this.tour.tags = this.tour.tags.filter(t => t !== tagToRemove);
+            }
         },
 
         // INITIALIZATION

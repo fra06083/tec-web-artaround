@@ -23,7 +23,30 @@ function marketplaceApp() {
             activeUsers: 0,
             serverStatus: 'Offline'
         },
-        predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
+        tagSearchQuery: '',
+        get availableTags() {
+            const tagsSet = new Set();
+            this.items.forEach(tour => {
+                if (tour.tags && Array.isArray(tour.tags)) {
+                    tour.tags.forEach(t => tagsSet.add(t));
+                }
+            });
+            return Array.from(tagsSet).sort();
+        },
+        get filteredAvailableTags() {
+            if (!this.tagSearchQuery || this.tagSearchQuery.trim() === '') {
+                const tagsToShow = [...this.selectedTags];
+                for (let tag of this.availableTags) {
+                    if (tagsToShow.length >= 5) break;
+                    if (!tagsToShow.includes(tag)) {
+                        tagsToShow.push(tag);
+                    }
+                }
+                return tagsToShow;
+            }
+            const query = this.tagSearchQuery.toLowerCase().trim();
+            return this.availableTags.filter(t => t.toLowerCase().includes(query));
+        },
         selectedTags: [],
         get cartCount() {
             return this.cart.length;
