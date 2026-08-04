@@ -1126,3 +1126,20 @@ html.dark-mode body {
     0% { width: 0%; opacity: 0; }
     100% { width: 100%; opacity: 1; }
 }
+
+/* Pulse Animation for Voice Recognition */
+.pulse-animation {
+    animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}

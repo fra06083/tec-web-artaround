@@ -241,7 +241,7 @@ function VisitDetail() {
             return;
         }
 
-        if (isListeningForVoice) return; // Prevent multiple starts
+        if (isListeningForVoice) return;
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'it-IT';
@@ -253,25 +253,58 @@ function VisitDetail() {
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript.toLowerCase();
 
-            // Autore
-            if (transcript.includes('autore') || transcript.includes('dipinto') || transcript.includes("chi l'ha")) {
+            // Autore / Opera (Match avanzato tramite Regex)
+            if (/(autore|chi (ha dipinto|ha creato|è l'autore)|come si chiama l'opera|quest'opera)/i.test(transcript)) {
                  const author = currentItem?.author || "Autore sconosciuto";
-                 speak("L'autore è " + author);
+                 const title = currentItem?.title || "Opera senza titolo";
+                 speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`);
                  return;
             }
 
-            // Navigazione
-            if (transcript.includes('avanti') || transcript.includes('prossimo') || transcript.includes('successivo')) {
+            // Navigazione / Mappa / POI (Match avanzato tramite Regex)
+            if (/(mappa|bagno|toilette|uscita|caffetteria|bar|shop|bookshop|dove mi trovo)/i.test(transcript)) {
+                 const pois = visita?.museum_id?.mappa?.poi || [];
+                 let targetType = null;
+                 let targetName = "";
+                 
+                 if (/(bagno|toilette|servizi igienici)/i.test(transcript)) {
+                     targetType = 'toilette';
+                     targetName = 'il bagno';
+                 } else if (/(caffetteria|bar)/i.test(transcript)) {
+                     targetType = 'bar';
+                     targetName = 'la caffetteria';
+                 } else if (/(shop|bookshop)/i.test(transcript)) {
+                     targetType = 'shop';
+                     targetName = 'il bookshop';
+                 } else if (/(uscita)/i.test(transcript)) {
+                     targetType = 'uscita';
+                     targetName = "l'uscita";
+                 }
+
+                 if (targetType) {
+                     const poi = pois.find(p => p.tipo === targetType && p.testo && p.testo.trim() !== '');
+                     if (poi) {
+                         speak(`Ecco dove si trova ${targetName}: ${poi.testo}`);
+                         setDomandaAperta(poi._id || pois.indexOf(poi));
+                     }
+                 }
+                 
+                 setIsMapOpen(true);
+                 return;
+            }
+
+            // Navigazione tra opere
+            if (/(avanti|prossimo|successivo)/i.test(transcript)) {
                  if (role === 'student' && pin) {
-                     toast.warning("In visita guidata non puoi cambiare opera!");
+                     //toast.warning("In visita guidata non puoi cambiare opera!");
                  } else {
                      goToNextItem();
                  }
                  return;
             }
-            if (transcript.includes('indietro') || transcript.includes('precedente')) {
+            if (/(indietro|precedente)/i.test(transcript)) {
                  if (role === 'student' && pin) {
-                     toast.warning("In visita guidata non puoi cambiare opera!");
+                     //toast.warning("In visita guidata non puoi cambiare opera!");
                  } else {
                      goToPrevItem();
                  }
@@ -279,24 +312,24 @@ function VisitDetail() {
             }
             
             // Difficoltà
-            if (transcript.includes('più semplice') || transcript.includes('non capisco')) {
+            if (/(più semplice|non capisco)/i.test(transcript)) {
                 changeLevelDown();
                 handleStudentAction('minus');
                 return;
             }
-            if (transcript.includes('troppo semplice') || transcript.includes('meno scolastico')) {
+            if (/(troppo semplice|meno scolastico)/i.test(transcript)) {
                 changeLevelUp();
                 handleStudentAction('plus');
                 return;
             }
 
             // Lunghezza
-            if (transcript.includes('di più') || transcript.includes('più dettagli') || transcript.includes('aumenta')) {
+            if (/(di più|più dettagli|aumenta)/i.test(transcript)) {
                 changeLengthUp();
                 handleStudentAction('plus');
                 return;
             }
-            if (transcript.includes('di meno') || transcript.includes('meno dettagli') || transcript.includes('diminuisci')) {
+            if (/(di meno|meno dettagli|diminuisci)/i.test(transcript)) {
                 changeLengthDown();
                 handleStudentAction('minus');
                 return;
@@ -946,18 +979,20 @@ function VisitDetail() {
                                     <div className="d-flex flex-column align-items-center gap-1">
                                         <button 
                                             onClick={startVoiceRecognition} 
-                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isListeningForVoice ? 'bg-danger pulse-animation' : 'bg-primary'}`}
+                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isListeningForVoice ? 'bg-danger pulse-animation' : (isSpeaking ? 'bg-success pulse-animation' : 'bg-primary')}`}
                                         >
-                                            <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-5`}></i>
+                                            <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : (isSpeaking ? 'bi-volume-up-fill' : 'bi-mic')} fs-5`}></i>
                                         </button>
-                                        <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">Parla</span>
+                                        <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">
+                                            {isListeningForVoice ? 'In ascolto...' : (isSpeaking ? 'In riproduzione' : 'Parla')}
+                                        </span>
                                     </div>
 
                                     {/* Info Modal Button */}
                                     <div className="d-flex flex-column align-items-center gap-1">
                                         <button 
                                             type="button"
-                                            className={`btn rounded-circle d-flex justify-content-center align-items-center shadow-sm btn-icon-40 ${darkMode ? 'bg-secondary bg-opacity-25 text-white border-0' : 'btn-outline-secondary'}`}
+                                            className={`btn btn-outline-secondary rounded-circle d-flex justify-content-center align-items-center shadow-sm btn-icon-40 ${darkMode ? 'border-light text-light' : ''}`}
                                             data-bs-toggle="modal" 
                                             data-bs-target="#commandsModal"
                                         >
@@ -1365,47 +1400,78 @@ function VisitDetail() {
                         </div>
                         <div className="modal-body p-0">
                             <div className="list-group list-group-flush rounded-bottom-4">
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; speak("L'autore è " + author); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Autore", "Chi l'ha dipinto?"</h6>
+                                
+                                {/* CATEGORIA ESPLORAZIONE */}
+                                <h6 className="text-uppercase fw-bold text-primary mt-3 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Esplorazione</h6>
+                                
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; const title = currentItem?.title || "Opera senza titolo"; speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-person-badge fs-3 text-primary opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Chi è l'autore?", "Quest'opera..."</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Risponde pronunciando il nome dell'autore dell'opera.</span>
                                     </div>
-                                    <small className="text-muted">Risponde pronunciando il nome dell'autore dell'opera.</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToNextItem(); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Avanti", "Prossimo", "Successivo"</h6>
+                                
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { setIsMapOpen(true); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-map fs-3 text-success opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Dov'è il bagno?", "Mappa", "Uscita"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Apre automaticamente la mappa del museo.</span>
                                     </div>
-                                    <small className="text-muted">Passa all'opera successiva (solo se abilitato).</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToPrevItem(); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Indietro", "Precedente"</h6>
+
+                                {/* CATEGORIA NAVIGAZIONE */}
+                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Navigazione</h6>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToNextItem(); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-arrow-right-circle fs-3 text-orange opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Avanti", "Prossimo", "Successivo"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Passa all'opera successiva (solo se abilitato).</span>
                                     </div>
-                                    <small className="text-muted">Torna all'opera precedente (solo se abilitato).</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Più semplice", "Non capisco"</h6>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToPrevItem(); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-arrow-left-circle fs-3 text-orange opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Indietro", "Precedente"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Torna all'opera precedente (solo se abilitato).</span>
                                     </div>
-                                    <small className="text-muted">Rende la descrizione più semplice.</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Troppo semplice", "Meno scolastico"</h6>
+
+                                {/* CATEGORIA PERSONALIZZAZIONE */}
+                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Personalizzazione (AI)</h6>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-chat-left-text fs-3 text-info opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Più semplice", "Non capisco"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Rende la descrizione più adatta ad un principiante.</span>
                                     </div>
-                                    <small className="text-muted">Aumenta la complessità accademica della descrizione.</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Di più", "Più dettagli", "Aumenta"</h6>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-chat-right-text fs-3 text-info opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Troppo semplice", "Meno scolastico"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Aumenta la complessità accademica della descrizione.</span>
                                     </div>
-                                    <small className="text-muted">Aumenta la lunghezza della descrizione.</small>
                                 </button>
-                                <button type="button" className={`list-group-item list-group-item-action py-3 border-secondary-subtle ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
-                                    <div className="d-flex w-100 justify-content-between mb-1">
-                                        <h6 className="mb-0 fw-bold">"Di meno", "Meno dettagli", "Diminuisci"</h6>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-arrows-expand fs-3 text-secondary opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Di più", "Più dettagli", "Aumenta"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Aumenta la lunghezza della spiegazione dell'opera.</span>
                                     </div>
-                                    <small className="text-muted">Riduce la lunghezza della descrizione.</small>
+                                </button>
+
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
+                                    <i className="bi bi-arrows-collapse fs-3 text-secondary opacity-75"></i>
+                                    <div>
+                                        <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Di meno", "Meno dettagli", "Diminuisci"</div>
+                                        <span className={`small d-block ${darkMode ? 'text-white-50' : 'text-muted'}`}>Riduce la lunghezza e fornisce un riassunto breve.</span>
+                                    </div>
                                 </button>
                             </div>
                         </div>
