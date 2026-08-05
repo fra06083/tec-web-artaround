@@ -121,6 +121,7 @@ router.get('/events/:pin', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Fondamentale per evitare che Nginx blocchi/bafferizzi l'SSE
     // flush headers
     res.flushHeaders();
 
@@ -134,8 +135,14 @@ router.get('/events/:pin', (req, res) => {
     // Invia lo stato iniziale
     res.write(`event: connected\ndata: ${JSON.stringify({ message: "Connesso alla stanza", students: room.students, currentArtworkIndex: room.currentArtworkIndex })}\n\n`);
 
+    // Ping periodico per tenere viva la connessione dietro al reverse proxy (evita ERR_HTTP2_PROTOCOL_ERROR)
+    const pingInterval = setInterval(() => {
+        res.write(':\n\n'); // SSE comment, ignorato dal client ma tiene viva la socket TCP
+    }, 25000);
+
     // Gestione disconnessione
     req.on('close', () => {
+        clearInterval(pingInterval);
         room.clients = room.clients.filter(c => c.id !== clientId);
         // Se non ci sono più client, e la visita è finita? Potremmo rimuovere la stanza dopo tot tempo
     });
