@@ -156,6 +156,24 @@ function marketplaceApp() {
             if (this.permissions === 'admin' && !cachedAdmin) {
                 this.refreshStats();
             }
+
+            const activePin = sessionStorage.getItem('activeRoomPin');
+            if (activePin) {
+                this.roomState.pin = activePin;
+                this.roomState.visitId = sessionStorage.getItem('activeRoomVisitId');
+                this.roomState.students = [];
+                this.isLobbyModalOpen = true;
+
+                if (this.roomState.eventSource) {
+                    this.roomState.eventSource.close();
+                }
+                this.roomState.eventSource = new EventSource(`/api/rooms/events/${activePin}`);
+                
+                this.roomState.eventSource.addEventListener('student-joined', (e) => {
+                    const eventData = JSON.parse(e.data);
+                    this.roomState.students = eventData.students;
+                });
+            }
             
             this.isReady = true;
         },
@@ -487,6 +505,9 @@ function marketplaceApp() {
                     this.isVisitSelectionModalOpen = false;
                     this.isLobbyModalOpen = true;
 
+                    sessionStorage.setItem('activeRoomPin', data.pin);
+                    sessionStorage.setItem('activeRoomVisitId', visitId);
+
                     if (this.roomState.eventSource) {
                         this.roomState.eventSource.close();
                     }
@@ -517,8 +538,10 @@ function marketplaceApp() {
 
                 if (response.ok) {
                     this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
+                    sessionStorage.removeItem('activeRoomPin');
+                    sessionStorage.removeItem('activeRoomVisitId');
                     const teacherLink = `/navigator/visit/${this.roomState.visitId}?role=teacher&pin=${this.roomState.pin}`;
-                    window.open(teacherLink, '_blank');
+                    window.location.href = teacherLink;
                 }
             } catch (error) {
                 console.error("Errore avvio visita:", error);
@@ -532,6 +555,8 @@ function marketplaceApp() {
                 this.roomState.eventSource = null;
             }
             this.roomState.pin = null;
+            sessionStorage.removeItem('activeRoomPin');
+            sessionStorage.removeItem('activeRoomVisitId');
         }
     };
 }

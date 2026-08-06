@@ -7,6 +7,12 @@ const getAllVisits = async (req, res) => {
         let query = {};
         if (req.user && req.user.permissions === 'docente' && req.query.manage === 'true') {
             query = { createdBy: req.user._id };
+        } else {
+            query = { isPrivate: { $ne: true } };
+        }
+
+        if (req.query.museum_id) {
+            query.museum_id = req.query.museum_id;
         }
 
         const visits = await Visit.find(query)
@@ -37,7 +43,7 @@ const getVisitById = async (req, res) => {
 // POST /api/visite
 const createVisit = async (req, res) => {
     try {
-        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode } = req.body;
+        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate } = req.body;
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
@@ -51,7 +57,8 @@ const createVisit = async (req, res) => {
             items: items || [],
             tags: tags || [],
             mnemonicCode: mnemonicCode || '',
-            createdBy: req.user._id // Salva l'id dell'utente che crea la visita
+            isPrivate: isPrivate || false,
+            createdBy: req.user ? req.user._id : (createdBy || null)
         });
 
         await newVisit.save();

@@ -6,8 +6,10 @@ document.addEventListener('alpine:init', () => {
         permissions: '',
         propic: '',
         username: '',
-        step: 'choice', // choice, selection, form
-        mode: 'create', // create, edit
+        step: 'selection',
+            mode: null, // selection, form
+         // create, edit, null (non selezionato)
+        formTab: 'info', // info, artworks, quiz
 
         // ROOM STATE
         roomState: { pin: null, students: [], eventSource: null },
@@ -23,7 +25,8 @@ document.addEventListener('alpine:init', () => {
         museums: [],
         availableTours: [],
         selectedMuseum: '',
-        selectedTourId: '',
+            museumSearch: '',
+                    selectedTourId: '',
 
         // TOUR DATA
         tour: {
@@ -33,8 +36,10 @@ document.addEventListener('alpine:init', () => {
             museum_id: '',
             items: [], // Array of artwork IDs
             logistic_info: [],
+            pre_visit: [],
             tags: [],
-            mnemonicCode: ''
+            mnemonicCode: '',
+            isPrivate: false
         },
 
         // ARTWORKS MANAGEMENT
@@ -42,6 +47,8 @@ document.addEventListener('alpine:init', () => {
         selectedArtworks: [], // Artworks currently selected for the tour (with full data)
         artworkSearch: '', // Search filter for available artworks
         tourSearch: '', // Search filter for tours
+        mobileArtworksTab: 'selected', // mobile sub-tab for artworks: 'selected' | 'catalog'
+        mobileQuizTab: 'list',          // mobile sub-tab for quiz: 'list' | 'editor'
 
         // QUIZ MANAGEMENT
         quizQuestions: [],
@@ -79,22 +86,98 @@ document.addEventListener('alpine:init', () => {
             await this.checkAuth();
             if (this.isLoggedIn) {
                 await this.fetchMuseums();
+                await this.fetchAllTours();
                 
-                // Verifica se è stato passato un ID da modificare tramite querystring
                 const urlParams = new URLSearchParams(window.location.search);
                 const editId = urlParams.get('id');
                 if (editId) {
+                    // Deep-link via URL: priorità assoluta
                     this.mode = 'edit';
                     this.selectedTourId = editId;
-                    await this.loadTour(editId);
-                    this.selectedMuseum = this.tour.museum_id;
-                    await this.fetchAvailableArtworks();
-                    this.step = 'form';
+                    const success = await this.loadTour(editId);
+                    if (success) {
+                        this.selectedMuseum = this.tour.museum_id;
+                        await this.fetchAvailableArtworks();
+                        this.step = 'form';
+                        this.formTab = 'info';
+                    } else {
+                        this.step = 'marketplace';
+                        this.selectedTourId = '';
+                    }
+                } else {
+                    // Ripristina l'ultima posizione salvata (se presente)
+                    const savedState = localStorage.getItem('artaround_tours_state');
+                    if (savedState) {
+                        try {
+                            const state = JSON.parse(savedState);
+                            const savedMuseum = this.museums.find(m => m._id === state.selectedMuseum);
+                            if (savedMuseum && state.step && state.step !== 'selection') {
+                                this.selectedMuseum = state.selectedMuseum;
+                                this.mode = state.mode || 'edit';
+                                this.step = state.step;
+                                // Se era nel form di modifica, ricarica la visita
+                                if (state.step === 'form' && state.selectedTourId) {
+                                    this.selectedTourId = state.selectedTourId;
+                                    const success = await this.loadTour(state.selectedTourId);
+                                    if (success) {
+                                        await this.fetchAvailableArtworks();
+                                        this.formTab = 'info';
+                                    } else {
+                                        this.step = 'marketplace';
+                                        this.selectedTourId = '';
+                                    }
+                                } else if (state.step === 'marketplace') {
+                                    // Torna al marketplace, nessun tour da ricaricare
+                                }
+                            }
+                        } catch (e) {
+                            localStorage.removeItem('artaround_tours_state');
+                        }
+                    }
                 }
+
+                // Salva automaticamente lo stato navigazione ad ogni cambiamento
+                this.$watch('step', () => this._saveNavState());
+                this.$watch('selectedMuseum', () => this._saveNavState());
+                this.$watch('selectedTourId', () => this._saveNavState());
+                this.$watch('mode', () => this._saveNavState());
             } else {
                 this.logout();
             }
+
+            const activePin = sessionStorage.getItem('activeRoomPin');
+            if (activePin) {
+                this.roomState.pin = activePin;
+                this.roomState.visitId = sessionStorage.getItem('activeRoomVisitId');
+                this.roomState.students = [];
+                this.isLobbyModalOpen = true;
+
+                if (this.roomState.eventSource) {
+                    this.roomState.eventSource.close();
+                }
+                this.roomState.eventSource = new EventSource(`/api/rooms/events/${activePin}`);
+                
+                this.roomState.eventSource.addEventListener('student-joined', (e) => {
+                    const eventData = JSON.parse(e.data);
+                    this.roomState.students = eventData.students;
+                });
+            }
+
             this.isReady = true;
+        },
+
+        _saveNavState() {
+            // Non salvare lo step 'selection' (schermata iniziale): all'avvio si parte sempre da lì
+            if (this.step === 'selection') {
+                localStorage.removeItem('artaround_tours_state');
+                return;
+            }
+            localStorage.setItem('artaround_tours_state', JSON.stringify({
+                step: this.step,
+                selectedMuseum: this.selectedMuseum,
+                selectedTourId: this.selectedTourId,
+                mode: this.mode
+            }));
         },
 
         // AUTHENTICATION
@@ -167,6 +250,7 @@ document.addEventListener('alpine:init', () => {
         logout() {
             localStorage.removeItem('artaround_token');
             localStorage.removeItem('artaround_user');
+            localStorage.removeItem('artaround_tours_state');
             window.location.href = '/login.html';
         },
 
@@ -180,20 +264,6 @@ document.addEventListener('alpine:init', () => {
         },
 
         // NAVIGATION
-        setMode(mode) {
-            this.mode = mode;
-            this.step = 'selection';
-            this.selectedTourId = '';
-            this.selectedArtworks = [];
-            this.artworkSearch = '';
-        },
-
-        get canProceed() {
-            if (this.mode === 'create') {
-                return !!this.selectedMuseum;
-            }
-            return !!this.selectedMuseum && !!this.selectedTourId;
-        },
 
         // MUSEUMS
         async fetchMuseums() {
@@ -209,60 +279,109 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        async onMuseumChange() {
-            if (this.mode === 'edit') {
-                await this.fetchToursByMuseum();
-            }
-            // Reset tour data
-            this.selectedTourId = '';
-        },
+
 
         // TOURS
-        async fetchToursByMuseum() {
-            if (!this.selectedMuseum) return;
-
-            try {
-                const res = await fetch('/api/visite?manage=true', {
-                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
-                });
-                if (res.ok) {
-                    const allTours = await res.json();
-                    // Fix: museum_id might be an object (when populated) or ObjectId string
-                    this.availableTours = allTours.filter(t => {
-                        if (!t.museum_id) return false;
-                        // If museum_id is an object (populated), get its _id
-                        const museumId = typeof t.museum_id === 'object' ? t.museum_id._id : t.museum_id;
-                        return museumId.toString() === this.selectedMuseum.toString();
-                    });
-                }
-            } catch (e) {
-                this.showToast("Errore nel caricamento delle visite", "error");
+                        get canProceed() {
+            return this.selectedMuseum !== '';
+        },
+        
+        setMode(mode) {
+            this.mode = mode;
+            this.formTab = 'info';
+            this.selectedMuseum = '';
+            this.selectedTourId = '';
+            this.selectedArtworks = [];
+            this.artworkSearch = '';
+            
+            if (mode === 'edit') {
+                // Instant Marketplace navigation
+                this.step = 'marketplace';
+            } else {
+                this.step = 'selection';
             }
+        },
+        
+
+        goBackFromForm() {
+            if (this.mode === 'edit') {
+                this.step = 'marketplace';
+                this.selectedTourId = '';
+            } else {
+                this.step = 'selection';
+                this.mode = null;
+            }
+        },
+        proceed() {
+            if (!this.canProceed) return;
+            this.goToForm();
+        },
+        
+                async editTour(tourId) {
+            this.mode = 'edit';
+            this.selectedTourId = tourId;
+            await this.goToForm();
         },
 
         async goToForm() {
             if (this.mode === 'create') {
-                // Create new tour
                 this.tour = {
+                    _id: '',
                     name: '',
                     description: '',
                     museum_id: this.selectedMuseum,
                     items: [],
                     logistic_info: [],
+                    pre_visit: [],
                     tags: [],
-                    mnemonicCode: ''
+                    mnemonicCode: '',
+                    isPrivate: false
                 };
-                this.selectedArtworks = [];
-                this.quizQuestions = [];
-            } else {
-                // Load existing tour
-                await this.loadTour(this.selectedTourId);
+            } else if (this.mode === 'edit' && this.selectedTourId) {
+                const success = await this.loadTour(this.selectedTourId);
+                if (!success) {
+                    this.step = 'marketplace'; // return to marketplace
+                    return;
+                }
             }
-
-            // Load artworks for the museum
             await this.fetchAvailableArtworks();
-
             this.step = 'form';
+        },
+
+        createNewTour() {
+            if (!this.selectedMuseum) {
+                this.showToast("Seleziona prima un museo dal menu a tendina per creare una visita", "error");
+                return;
+            }
+            this.tour = {
+                _id: '',
+                name: '',
+                description: '',
+                museum_id: this.selectedMuseum,
+                items: [],
+                logistic_info: [],
+                pre_visit: [],
+                tags: [],
+                mnemonicCode: '',
+                isPrivate: false
+            };
+            this.selectedTourId = '';
+            this.selectedArtworks = [];
+            this.step = 'form';
+            this.formTab = 'info';
+        },
+
+        async fetchAllTours() {
+            try {
+                const res = await fetch('/api/visite?manage=true', {
+                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                });
+                if (res.ok) {
+                    this.availableTours = await res.json();
+                }
+            } catch (e) {
+                this.showToast("Errore nel caricamento delle visite", "error");
+            }
         },
 
         async loadTour(tourId) {
@@ -273,28 +392,36 @@ document.addEventListener('alpine:init', () => {
                 if (res.ok) {
                     const tourData = await res.json();
                     // Handle museum_id that might be an object (populated) or ObjectId
-                    const museumId = typeof tourData.museum_id === 'object' ? tourData.museum_id._id : tourData.museum_id;
+                    const museumId = tourData.museum_id ? (typeof tourData.museum_id === 'object' ? tourData.museum_id._id : tourData.museum_id) : '';
 
+                    // Sostituisco l'intero oggetto tour in una sola operazione per garantire
+                    // che Alpine.js rilevi il cambiamento e aggiorni tutti i binding del form.
                     this.tour = {
-                        _id: tourData._id,
+                        _id: tourData._id || '',
                         name: tourData.name || '',
                         description: tourData.description || '',
                         museum_id: museumId,
                         items: tourData.items || [],
                         logistic_info: tourData.logistic_info || [],
+                        pre_visit: tourData.pre_visit || [],
                         tags: tourData.tags || [],
-                        mnemonicCode: tourData.mnemonicCode || ''
+                        mnemonicCode: tourData.mnemonicCode || '',
+                        isPrivate: tourData.isPrivate || false
                     };
 
                     // Load artworks in the tour
                     await this.fetchTourArtworks();
                     // Load quiz questions in the tour
                     await this.fetchQuizQuestions();
+                    return true;
                 } else {
                     this.showToast("Errore nel caricamento della visita", "error");
+                    return false;
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -312,7 +439,9 @@ document.addEventListener('alpine:init', () => {
                     this.showToast("Errore nel caricamento delle opere", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -358,14 +487,25 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+                get filteredMuseums() {
+            if (!this.museumSearch) return this.museums;
+            return this.museums.filter(m => m.museum.toLowerCase().includes(this.museumSearch.toLowerCase()));
+        },
+
         get filteredTours() {
-            if (!this.tourSearch) {
-                // Show all tours, sorted by most recent (newest first)
-                return [...this.availableTours].reverse();
+            if (!this.selectedMuseum) return []; // Non mostrare NULLA se non c'è museo
+
+            let tours = this.availableTours;
+            tours = tours.filter(t => {
+                if (!t.museum_id) return false;
+                const museumId = typeof t.museum_id === 'object' ? t.museum_id._id : t.museum_id;
+                return museumId.toString() === this.selectedMuseum.toString();
+            });
+
+            if (this.tourSearch) {
+                tours = tours.filter(t => t.name.toLowerCase().includes(this.tourSearch.toLowerCase()));
             }
-            return this.availableTours.filter(t =>
-                t.name.toLowerCase().includes(this.tourSearch.toLowerCase())
-            );
+            return tours.reverse();
         },
 
         // Add artwork locally (no need for tour._id anymore)
@@ -432,7 +572,8 @@ document.addEventListener('alpine:init', () => {
                         items: items, // Include artworks in the save
                         logistic_info: this.tour.logistic_info,
                         tags: this.tour.tags,
-                        mnemonicCode: this.tour.mnemonicCode
+                        mnemonicCode: this.tour.mnemonicCode,
+                        isPrivate: this.tour.isPrivate
                     })
                 });
 
@@ -448,7 +589,9 @@ document.addEventListener('alpine:init', () => {
                     this.showToast(err.error || "Errore nel salvataggio", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -472,7 +615,9 @@ document.addEventListener('alpine:init', () => {
                     this.showToast("Errore nell'eliminazione", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -488,13 +633,16 @@ document.addEventListener('alpine:init', () => {
 
                 if (res.ok) {
                     this.showToast("Visita eliminata con successo!");
-                    await this.fetchToursByMuseum();
+                    await this.fetchAllTours();
                     this.selectedTourId = '';
+            this.selectedArtworks = [];
                 } else {
                     this.showToast("Errore nell'eliminazione", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -583,7 +731,9 @@ document.addEventListener('alpine:init', () => {
                     this.showToast(err.error || "Errore nel salvataggio della domanda", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -601,7 +751,9 @@ document.addEventListener('alpine:init', () => {
                     this.showToast("Errore nell'eliminazione", "error");
                 }
             } catch (e) {
-                this.showToast("Errore di connessione", "error");
+                console.error("loadTour error:", e);
+                this.showToast("Errore di connessione o formato dati", "error");
+                return false;
             }
         },
 
@@ -620,6 +772,9 @@ document.addEventListener('alpine:init', () => {
                     this.roomState.visitId = visitId;
                     this.roomState.students = [];
                     this.isLobbyModalOpen = true;
+                    
+                    sessionStorage.setItem('activeRoomPin', data.pin);
+                    sessionStorage.setItem('activeRoomVisitId', visitId);
 
                     // Collegamento SSE
                     if (this.roomState.eventSource) {
@@ -651,9 +806,11 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.ok) {
                     this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
+                    sessionStorage.removeItem('activeRoomPin');
+                    sessionStorage.removeItem('activeRoomVisitId');
                     // Potremmo aprire in un'altra tab il navigator con il PIN, o generare il link
                     const teacherLink = `/navigator/visit/${this.roomState.visitId}?role=teacher&pin=${this.roomState.pin}`;
-                    window.open(teacherLink, '_blank');
+                    window.location.href = teacherLink;
                 }
             } catch (error) {
                 console.error("Errore avvio visita:", error);
@@ -667,6 +824,8 @@ document.addEventListener('alpine:init', () => {
                 this.roomState.eventSource = null;
             }
             this.roomState.pin = null;
+            sessionStorage.removeItem('activeRoomPin');
+            sessionStorage.removeItem('activeRoomVisitId');
         }
     }));
 });

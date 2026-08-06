@@ -88,29 +88,31 @@ export default function Lobby() {
     }, [pin, visitId, pending, reqId, navigate]);
 
     return (
-        <div className="container mt-5 text-center">
-            <h1 className="fw-black mb-4">Sei nella Lobby</h1>
-            <p className="lead mb-4">Stanza: <span className="fw-bold text-orange">{pin}</span></p>
-            <h4 className="fw-bold text-secondary mb-5">{status}</h4>
+        <div className="container-fluid min-vh-100 bg-dark text-white d-flex flex-column justify-content-center align-items-center" data-bs-theme="dark">
+            <div className="text-center w-100" style={{ maxWidth: '600px' }}>
+                <h1 className="fw-black mb-4">Sei nella Lobby</h1>
+                <p className="lead mb-4">Stanza: <span className="fw-bold text-orange">{pin}</span></p>
+                <h4 className="fw-bold text-light mb-5">{status}</h4>
 
-            {rejected && (
-                <button onClick={() => navigate('/room')} className="btn bg-orange text-white rounded-pill px-4 fw-bold">
-                    Torna alla schermata precedente
-                </button>
-            )}
+                {rejected && (
+                    <button onClick={() => navigate('/room')} className="btn bg-orange text-white rounded-pill px-4 fw-bold">
+                        Torna alla schermata precedente
+                    </button>
+                )}
 
-            {!pending && (
-                <div className="card shadow-sm border-0 rounded-4 mx-auto max-w-400">
-                    <div className="card-body">
-                        <h5 className="fw-bold mb-3">Studenti Connessi ({students.length})</h5>
-                        <div className="d-flex flex-wrap justify-content-center gap-2">
-                            {students.map((s, idx) => (
-                                <span key={idx} className="badge bg-secondary px-3 py-2 rounded-pill fs-6">{s}</span>
-                            ))}
+                {!pending && (
+                    <div className="card shadow-sm border-0 rounded-4 mx-auto bg-dark-subtle" style={{ maxWidth: '400px' }}>
+                        <div className="card-body">
+                            <h5 className="fw-bold mb-3">Studenti Connessi ({students.length})</h5>
+                            <div className="d-flex flex-wrap justify-content-center gap-2">
+                                {students.map((s, idx) => (
+                                    <span key={idx} className="badge bg-secondary px-3 py-2 rounded-pill fs-6">{s}</span>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

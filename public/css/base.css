@@ -765,3 +765,10 @@ body.dark-mode .form-control::placeholder {
     }
 }
 
+
+.w-85px { width: 85px !important; }
+.w-40px { width: 40px !important; }
+
+
+.transition-opacity { transition: opacity 0.3s ease; }
+

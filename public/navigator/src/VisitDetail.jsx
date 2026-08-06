@@ -247,7 +247,7 @@ function VisitDetail() {
         recognition.continuous = false;
         recognition.interimResults = false;
 
-        recognition.onstart = () => setIsListeningForVoice(true);
+        recognition.onstart = () => { setIsListeningForVoice(true); handleStudentAction('microphone'); };
 
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript.toLowerCase();
@@ -281,6 +281,7 @@ function VisitDetail() {
                  }
 
                  if (targetType) {
+                     handleStudentAction('info');
                      const poi = domandeMappa.find(p => p.tipo === targetType);
                      if (poi) {
                          speak(poi.testo);
@@ -776,8 +777,8 @@ function VisitDetail() {
                 </div>
 
                 {/* CENTRO: Titolo della Visita */}
-                <div className="text-center px-2 d-none d-md-block text-truncate">
-                    <div className="d-flex align-items-center px-3 py-1 rounded-pill bg-body-tertiary text-body-secondary small fw-medium border border-secondary-subtle shadow-sm mx-auto max-w-400 text-truncate">
+                <div className="position-absolute top-50 start-50 translate-middle text-center px-2 d-none d-md-block text-truncate" style={{ zIndex: 0 }}>
+                    <div className="d-flex align-items-center justify-content-center px-3 py-1 rounded-pill bg-body-tertiary text-body-secondary small fw-medium border border-secondary-subtle shadow-sm mx-auto max-w-400 text-truncate">
                         {visita.name}
                     </div>
                 </div>
@@ -830,7 +831,9 @@ function VisitDetail() {
                                         let icon = ''; let iconColor = ''; let actionText = '';
                                         if (action === 'plus') { icon = 'bi-plus-circle-fill'; iconColor = 'text-success'; actionText = 'Più dettagli'; }
                                         else if (action === 'minus') { icon = 'bi-dash-circle-fill'; iconColor = 'text-danger'; actionText = 'Meno dettagli'; }
-                                        else if (action === 'audio') { icon = 'bi-mic-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
+                                        else if (action === 'audio') { icon = 'bi-volume-up-fill'; iconColor = 'text-primary'; actionText = 'Audio'; }
+                                        else if (action === 'microphone') { icon = 'bi-mic-fill'; iconColor = 'text-warning'; actionText = 'Microfono attivo'; }
+                                        else if (action === 'info') { icon = 'bi-info-circle-fill'; iconColor = 'text-info'; actionText = 'Richiesta info/bagno'; }
                                         
                                         return (
                                             <li key={student} className="dropdown-item rounded d-flex align-items-center justify-content-between py-2 mb-1 cursor-default">
@@ -937,12 +940,12 @@ function VisitDetail() {
                                     <div className="d-flex align-items-center gap-2">
                                         <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
                                             <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
-                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis">{selectedType}</span>
+                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis d-inline-block w-85px">{selectedType}</span>
                                             <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
                                         <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
                                             <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
-                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis">{selectedLength}</span>
+                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis d-inline-block w-40px">{selectedLength}</span>
                                             <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
                                     </div>

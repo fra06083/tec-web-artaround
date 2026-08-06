@@ -1143,3 +1143,174 @@ html.dark-mode body {
         box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
     }
 }
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-pop-in {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.delay-100 { animation-delay: 100ms; opacity: 0; }
+.delay-200 { animation-delay: 200ms; opacity: 0; }
+.delay-300 { animation-delay: 300ms; opacity: 0; }
+
+.glass-card {
+    background: rgba(33, 37, 41, 0.7) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-header {
+    background: rgba(33, 37, 41, 0.85) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+
+.scale-105 {
+    transform: scale(1.05);
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.glow-orange {
+    box-shadow: 0 0 25px rgba(253, 126, 20, 0.4) !important;
+}
+
+.glow-info {
+    box-shadow: 0 0 25px rgba(13, 202, 240, 0.4) !important;
+}
+
+/* Segmented Control Styles */
+
+
+
+
+
+
+
+
+
+
+/* FAB Save Button for Mobile */
+.fab-save {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    border-radius: 50px;
+    box-shadow: 0 8px 24px rgba(253, 126, 20, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab-save:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 767.98px) {
+    
+    
+}
+
+/* Premium Input Focus Ring */
+.input-premium:focus {
+    box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25) !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Premium Input V2 */
+.premium-input:focus {
+    border-color: rgba(253, 126, 20, 0.8) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 0 0 0.25rem rgba(253, 126, 20, 0.25) !important;
+}
+.premium-input-group:focus-within {
+    border-color: rgba(253, 126, 20, 0.8) !important;
+    box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25) !important;
+}
+
+/* Fix for tab click targets */
+
+
+.transition-color {
+    transition: color 0.2s ease-in-out;
+}
+.hover-text-white:hover {
+    color: #ffffff !important;
+}
+
+.segmented-control {
+    position: relative;
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50px;
+    padding: 4px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.segmented-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(33.333% - 2.66px);
+    background-color: var(--bs-orange, #fd7e14);
+    border-radius: 50px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(253, 126, 20, 0.3);
+    z-index: 1;
+}
+
+.segmented-tab {
+    position: relative;
+    flex: 1; /* Divides the space equally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Spacing between icon and text */
+    padding: 10px 20px; /* Touch target on the button itself */
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    font-size: 0.95rem;
+    z-index: 2;
+    transition: color 0.3s ease;
+    cursor: pointer; /* Pointer on the whole button */
+    appearance: none;
+    outline: none;
+}
+
+.segmented-tab.active {
+    color: #ffffff;
+}
+
+.segmented-tab * {
+    pointer-events: none; /* Crucial: clicks on the icon/text bubble up directly to the button */
+}
+
+/* Slider Translations (replacing inline styles) */
+.translate-x-0 { transform: translateX(0%); }
+.translate-x-100 { transform: translateX(100%); }
+.translate-x-200 { transform: translateX(200%); }
+
+/* Custom Private Badge */
+.badge-private {
+    background-color: rgba(253, 126, 20, 0.2) !important;
+    color: #fd7e14 !important;
+}

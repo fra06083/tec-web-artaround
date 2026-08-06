@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - ArtAround</title>
 
@@ -304,31 +305,37 @@
                         gli strumenti qui sotto per gestire i tuoi tour educativi o avviarne uno subito con la tua
                         classe.</p>
 
-                    <div class="row g-4 w-100 max-w-800">
+                    <div class="row g-4 w-100 max-w-800 justify-content-center">
+                        
+                        <!-- Primary Action: Inizia Visita -->
                         <div class="col-md-6">
-                            <div class="card bg-body border border-secondary-subtle rounded-4 shadow-sm h-100 overflow-hidden group hover-scale-sm cursor-pointer"
-                                @click="openVisitSelection()">
-                                <div
-                                    class="text-bg-primary bg-opacity-10 p-5 text-center position-relative overflow-hidden h-100 d-flex flex-column align-items-center justify-content-center">
-                                    <i
-                                        class="bi bi-play-circle-fill display-3 text-primary mb-3 position-relative z-1"></i>
-                                    <h3 class="fw-black text-primary m-0 position-relative z-1">INIZIA VISITA</h3>
-                                    <p
-                                        class="text-primary mt-2 m-0 position-relative z-1 small fw-bold text-uppercase opacity-75">
-                                        Avvia Tour Interattivo</p>
+                            <div @click="openVisitSelection()" 
+                                 class="glass-card rounded-5 h-100 cursor-pointer transition-transform transform hover-scale shadow-lg overflow-hidden group border border-2 border-orange glow-orange d-flex flex-column">
+                                <div class="card-body p-5 text-center d-flex flex-column align-items-center justify-content-center position-relative h-100">
+                                    <div class="rounded-circle border border-2 border-orange d-flex align-items-center justify-content-center mb-4 shadow-sm transition-transform" style="width: 90px; height: 90px; color: #fd7e14; background: transparent;">
+                                        <i class="bi bi-play-fill fs-1"></i>
+                                    </div>
+                                    <h3 class="fw-bold text-white mb-2 position-relative z-1 fs-3">Inizia Visita</h3>
+                                    <p class="text-white-50 mb-0 position-relative z-1">Avvia un tour interattivo live con i tuoi studenti.</p>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Secondary Action: Gestisci Visite -->
                         <div class="col-md-6">
-                            <a href="/editor/tours" class="text-decoration-none">
-                                <div
-                                    class="card bg-body-tertiary border border-secondary-subtle rounded-4 p-5 text-center shadow-sm h-100 hover-scale-sm">
-                                    <i class="bi bi-pencil-square display-3 text-body-secondary opacity-50 mb-3"></i>
-                                    <h4 class="fw-bold text-body m-0">Gestisci Visite</h4>
-                                    <p class="text-body-secondary mt-2 m-0 small">Crea o modifica i tuoi percorsi</p>
+                            <a href="/editor/tours" class="text-decoration-none d-block h-100">
+                                <div class="glass-card rounded-5 h-100 cursor-pointer transition-transform transform hover-scale shadow-lg overflow-hidden group border border-secondary border-opacity-25 hover-bg-light d-flex flex-column">
+                                    <div class="card-body p-5 text-center d-flex flex-column align-items-center justify-content-center position-relative h-100">
+                                        <div class="rounded-circle bg-secondary bg-opacity-25 text-white-50 d-flex align-items-center justify-content-center mb-4 transition-transform" style="width: 90px; height: 90px;">
+                                            <i class="bi bi-pencil-square fs-1"></i>
+                                        </div>
+                                        <h3 class="fw-bold text-white mb-2 position-relative z-1 fs-3">Gestisci Visite</h3>
+                                        <p class="text-white-50 mb-0 position-relative z-1">Crea, modifica ed esplora la tua libreria di percorsi.</p>
+                                    </div>
                                 </div>
                             </a>
                         </div>
+
                     </div>
                 </div>
             </template>

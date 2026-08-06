@@ -36,7 +36,8 @@ const visitSchema = new mongoose.Schema({
     logistic_info: [{ type: String }], // Indicazioni tipo: "Entrata da Via Garibaldi, 2" 
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'user' }, // Traccia il creatore (es. docente)
     tags: [{ type: String }], // Es. "Arte", "Storia", ecc.
-    mnemonicCode: { type: String } // Codice univoco facoltativo (es. "FeniceRossa")
+    mnemonicCode: { type: String }, // Codice univoco facoltativo (es. "FeniceRossa")
+    isPrivate: { type: Boolean, default: false } // Se true, non appare nel marketplace
 });
 // 3. IL DIALOGO (Collegato all'opera)
 const languageSchema = new mongoose.Schema({

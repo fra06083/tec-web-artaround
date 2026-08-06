@@ -448,3 +448,141 @@
     min-height: 16px;
     margin: 0 4px;
 }
+
+/* =========================================================
+   FORM STEP — MOBILE OPTIMIZATIONS
+========================================================= */
+
+/* Header back button: size ridotta su mobile */
+.form-header-back-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+}
+
+@media (min-width: 576px) {
+    .form-header-back-btn {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+    }
+}
+
+/* Titolo header troncato su mobile */
+.form-header-title {
+    font-size: 1.1rem;
+    max-width: calc(100vw - 160px);
+}
+
+@media (min-width: 576px) {
+    .form-header-title {
+        font-size: 1.4rem;
+        max-width: 420px;
+    }
+}
+
+@media (min-width: 992px) {
+    .form-header-title {
+        font-size: 1.75rem;
+        max-width: 600px;
+    }
+}
+
+/* FAB Salva mobile — fluttua sopra la mobile-nav */
+.form-mobile-fab {
+    position: fixed;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1035;
+    pointer-events: auto;
+}
+
+/* =========================================================
+   ARTWORKS & QUIZ LIST — FIX MOBILE OVERFLOW
+   
+   Strategia: su mobile la lista opere/quiz NON usa max-h-400
+   (fisso) ma occupa lo spazio residuo del viewport sottraendo:
+     - mobile header:   ~56px  (padding-top su .main-content)
+     - form header row: ~52px
+     - segmented tabs:  ~52px
+     - sub-tab switch:  ~48px  (solo su opere/quiz)
+     - card header:     ~56px  (titolo sezione + bordo)
+     - search bar:      ~48px  (solo catalogo)
+     - mobile nav:      ~70px
+     - padding vari:    ~32px
+   Totale da sottrarre: ~414px → lista ≈ calc(100dvh - 420px)
+   Su schermi da 667px (iPhone SE) → lista ≈ 247px = ~4-5 item
+   Su schermi da 844px (iPhone 14) → lista ≈ 424px = ~8 item
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    /* Rimuove max-h fisso dalla lista — viene ridefinita sotto */
+    .artworks-tab-list {
+        max-height: none !important;
+        overflow-y: auto;
+        /* altezza dinamica: viewport - tutto lo spazio occupato sopra e sotto */
+        height: calc(100dvh - 420px);
+        min-height: 160px; /* evita collasso su schermi minuscoli */
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Item opera ultra-compatto su mobile: altezza ~52px */
+    .artwork-item-mobile {
+        padding: 8px 10px !important;
+        margin-bottom: 6px !important;
+        border-radius: 12px !important;
+    }
+
+    .artwork-item-mobile img {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .artwork-item-mobile .artwork-number-sm {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.7rem !important;
+    }
+
+    /* Nasconde l'autore per risparmiare altezza su mobile */
+    .artwork-item-mobile .artwork-author-sm {
+        display: none !important;
+    }
+
+    /* Tasto +/rimuovi più piccolo su mobile */
+    .artwork-item-mobile .btn-artwork-action {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Card contenitore: niente padding laterale eccessivo su mobile */
+    .artworks-panel-mobile {
+        padding: 12px !important;
+    }
+
+    /* Nasconde il contatore autore nel catalogo se lo spazio è stretto */
+    .artwork-catalog-author {
+        display: none;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    /* Tablet: autore visibile, altezza lista maggiore */
+    .artwork-catalog-author {
+        display: block;
+    }
+
+    .artworks-tab-list {
+        height: calc(100dvh - 380px);
+    }
+
+    .artwork-item-mobile img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+}
