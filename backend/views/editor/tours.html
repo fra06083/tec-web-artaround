@@ -24,6 +24,15 @@
     <script src="/js/editor/tours.js?v=1786035040"></script>
     <style>
         [x-cloak] { display: none !important; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 18px 4px rgba(253,126,20,.35), 0 0 40px 10px rgba(253,126,20,.15); }
+            50%       { box-shadow: 0 0 32px 8px rgba(253,126,20,.6),  0 0 70px 20px rgba(253,126,20,.28); }
+        }
+        @keyframes pulse-glow-blue {
+            0%, 100% { box-shadow: 0 0 16px 4px rgba(99,179,237,.25), 0 0 36px 10px rgba(99,179,237,.1); }
+            50%       { box-shadow: 0 0 28px 8px rgba(99,179,237,.45), 0 0 60px 18px rgba(99,179,237,.2); }
+        }
     </style>
 </head>
 
@@ -121,47 +130,94 @@
                     
                     <div class="row g-4 justify-content-center w-100 max-w-900 mx-auto mb-5">
                         <div class="col-sm-6 col-lg-5">
-                            <div @click="setMode('create')" class="glass-card rounded-5 h-100 cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in" :class="mode === 'create' ? 'border border-2 border-orange transform scale-105 glow-orange' : (mode !== null ? 'opacity-50' : 'transform hover-scale')">
-                                <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center position-relative">
-                                    <div class="rounded-circle border border-2 border-orange d-flex align-items-center justify-content-center mb-4 shadow-sm transition-transform" style="width: 90px; height: 90px; color: #fd7e14; background: transparent;">
+                            <div @click="setMode('create')" class="cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in rounded-5"
+                                 :class="mode === 'create'
+                                    ? 'border border-2 border-orange'
+                                    : (mode !== null ? 'opacity-50' : '')"
+                                 style="background: linear-gradient(135deg, #1a1a2e 0%, #2d1810 60%, #3d200a 100%); min-height: 220px;"
+                                 :style="mode === 'create' ? 'animation: pulse-glow 2.8s ease-in-out infinite;' : ''">
+                                <div class="card-body p-4 p-sm-5 text-center d-flex flex-column align-items-center justify-content-center position-relative">
+                                    <!-- decorative blob -->
+                                    <div class="position-absolute top-0 end-0" style="width:140px;height:140px;background:radial-gradient(circle,rgba(253,126,20,.18) 0%,transparent 70%);border-radius:50%;transform:translate(30%,-30%);pointer-events:none;"></div>
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width:80px;height:80px;background:rgba(253,126,20,.15);border:2px solid rgba(253,126,20,.4);color:#fd7e14;backdrop-filter:blur(8px);">
                                         <i class="bi bi-magic fs-1"></i>
                                     </div>
                                     <h3 class="fw-bold text-white mb-2 position-relative z-1">Nuova Visita</h3>
-                                    <p class="text-white-50 mb-0 position-relative z-1">Progetta un percorso da zero, scegliendo le opere dal museo.</p>
+                                    <p class="text-white-50 mb-0 position-relative z-1 small">Progetta un percorso da zero, scegliendo le opere dal museo.</p>
+                                    <div class="mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1" style="background:rgba(253,126,20,.2);color:#fd7e14;border:1px solid rgba(253,126,20,.3);font-size:.8rem;">
+                                        <i class="bi bi-plus-circle me-1"></i> Crea ora
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-5">
-                            <div @click="setMode('edit')" class="glass-card rounded-5 h-100 cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in delay-100" :class="mode === 'edit' ? 'border border-2 border-info transform scale-105 glow-info' : (mode !== null ? 'opacity-50' : 'transform hover-scale')">
-                                <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center position-relative">
-                                    <div class="rounded-circle border border-2 border-info d-flex align-items-center justify-content-center mb-4 shadow-sm transition-transform" style="width: 90px; height: 90px; color: #0dcaf0; background: transparent;">
+                            <div @click="setMode('edit')" class="cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in delay-100 rounded-5"
+                                 :class="mode === 'edit'
+                                    ? 'border border-2 border-info'
+                                    : (mode !== null ? 'opacity-50' : '')"
+                                 style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); min-height: 220px;"
+                                 :style="mode === 'edit' ? 'animation: pulse-glow-blue 3.2s ease-in-out infinite;' : ''">
+                                <div class="card-body p-4 p-sm-5 text-center d-flex flex-column align-items-center justify-content-center position-relative">
+                                    <!-- decorative blob -->
+                                    <div class="position-absolute top-0 end-0" style="width:140px;height:140px;background:radial-gradient(circle,rgba(99,179,237,.15) 0%,transparent 70%);border-radius:50%;transform:translate(30%,-30%);pointer-events:none;"></div>
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width:80px;height:80px;background:rgba(99,179,237,.12);border:2px solid rgba(99,179,237,.35);color:#63b3ed;backdrop-filter:blur(8px);">
                                         <i class="bi bi-collection-play fs-1"></i>
                                     </div>
                                     <h3 class="fw-bold text-white mb-2 position-relative z-1">Le mie Visite</h3>
-                                    <p class="text-white-50 mb-0 position-relative z-1">Avvia una visita, modificala o consultane le statistiche.</p>
+                                    <p class="text-white-50 mb-0 position-relative z-1 small">Avvia una visita, modificala o consultane le statistiche.</p>
+                                    <div class="mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1" style="background:rgba(99,179,237,.18);color:#63b3ed;border:1px solid rgba(99,179,237,.3);font-size:.8rem;">
+                                        <i class="bi bi-arrow-right-circle me-1"></i> Vai alle visite
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Dynamic Content Area -->
+                    <!-- Dynamic Content Area: Selezione Museo per Nuova Visita -->
                     <div x-show="mode === 'create'" x-transition class="max-w-900 mx-auto">
-                        <div class="glass-card rounded-4 p-4 mb-4 transition-all">
-                            <label class="form-label fw-bold text-white-50 mb-4 d-flex align-items-center gap-2">
-                                <i class="bi bi-bank fs-5 text-orange"></i> 
-                                <span class="fs-5">1. Scegli per quale Museo creare la visita</span>
-                            </label>
-                            <div class="d-flex flex-column flex-sm-row gap-4 align-items-sm-center">
-                                <select class="form-select form-select-lg bg-secondary bg-opacity-10 border-secondary text-white rounded-4 shadow-sm cursor-pointer flex-grow-1" x-model="selectedMuseum">
-                                    <option value="" class="text-dark">-- Seleziona un museo dalla tua lista --</option>
+                        <div class="rounded-4 overflow-hidden shadow-lg" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.07);">
+
+                            <!-- Panel Header -->
+                            <div class="px-4 py-3 d-flex align-items-center gap-3" style="background:rgba(253,126,20,.12);border-bottom:1px solid rgba(253,126,20,.2);">
+                                <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width:36px;height:36px;background:rgba(253,126,20,.2);">
+                                    <i class="bi bi-bank text-orange"></i>
+                                </div>
+                                <div>
+                                    <p class="m-0 fw-bold text-white" style="font-size:.95rem;">Scegli il Museo</p>
+                                    <p class="m-0 text-white-50" style="font-size:.78rem;">Per quale museo vuoi creare questa visita?</p>
+                                </div>
+                            </div>
+
+                            <!-- Museum chips grid -->
+                            <div class="p-4">
+                                <template x-if="museums.length === 0">
+                                    <p class="text-white-50 text-center py-3 m-0 small">Nessun museo assegnato al tuo account.</p>
+                                </template>
+
+                                <div class="d-flex flex-wrap gap-2 mb-4">
                                     <template x-for="m in museums" :key="m._id">
-                                        <option :value="m._id" x-text="m.museum" class="text-dark"></option>
+                                        <button type="button"
+                                            @click="selectedMuseum = (selectedMuseum === m._id ? '' : m._id)"
+                                            class="btn rounded-pill fw-bold d-flex align-items-center gap-2 transition-all"
+                                            :class="selectedMuseum === m._id
+                                                ? 'bg-orange text-white shadow'
+                                                : 'btn-outline-secondary text-white-50'"
+                                            style="font-size:.88rem;">
+                                            <i class="bi bi-building" :class="selectedMuseum === m._id ? 'text-white' : 'text-white-50'"></i>
+                                            <span x-text="m.museum"></span>
+                                            <i x-show="selectedMuseum === m._id" class="bi bi-check-circle-fill text-white"></i>
+                                        </button>
                                     </template>
-                                </select>
-                                
-                                <button x-show="selectedMuseum" x-transition @click="proceed()" class="btn btn-lg bg-orange text-white px-5 py-3 rounded-4 fw-bold shadow-lg flex-shrink-0 d-flex align-items-center justify-content-center gap-2 transform hover-scale" :disabled="!canProceed">
-                                    Procedi <i class="bi bi-arrow-right fs-5"></i>
-                                </button>
+                                </div>
+
+                                <!-- CTA Procedi -->
+                                <div x-show="selectedMuseum" x-transition class="d-flex justify-content-end">
+                                    <button @click="proceed()" :disabled="!canProceed"
+                                        class="btn bg-orange text-white rounded-pill fw-bold px-5 py-2 shadow d-flex align-items-center gap-2"
+                                        style="font-size:.95rem;">
+                                        <i class="bi bi-arrow-right-circle-fill"></i> Procedi
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

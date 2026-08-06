@@ -90,6 +90,10 @@ document.addEventListener('alpine:init', () => {
                 
                 const urlParams = new URLSearchParams(window.location.search);
                 const editId = urlParams.get('id');
+
+                // Flag: blocca _saveNavState durante il ripristino
+                this._restoringState = true;
+
                 if (editId) {
                     // Deep-link via URL: priorità assoluta
                     this.mode = 'edit';
@@ -136,6 +140,9 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
 
+                // Ripristino completato: ora è sicuro registrare i watch
+                this._restoringState = false;
+
                 // Salva automaticamente lo stato navigazione ad ogni cambiamento
                 this.$watch('step', () => this._saveNavState());
                 this.$watch('selectedMuseum', () => this._saveNavState());
@@ -167,7 +174,9 @@ document.addEventListener('alpine:init', () => {
         },
 
         _saveNavState() {
-            // Non salvare lo step 'selection' (schermata iniziale): all'avvio si parte sempre da lì
+            // Non salvare durante il ripristino iniziale
+            if (this._restoringState) return;
+            // Non salvare lo step 'selection': all'avvio si parte sempre da lì
             if (this.step === 'selection') {
                 localStorage.removeItem('artaround_tours_state');
                 return;
