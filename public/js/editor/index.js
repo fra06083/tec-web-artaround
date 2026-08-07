@@ -272,7 +272,9 @@ function marketplaceApp() {
         },
         async fetchTours() {
             try {
-                const response = await fetch('/api/visite', {
+                const isDashboard = window.location.pathname.includes('/editor/dashboard');
+                const url = isDashboard ? '/api/visite?manage=true' : '/api/visite';
+                const response = await fetch(url, {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
                 });
                 if (response.ok) {

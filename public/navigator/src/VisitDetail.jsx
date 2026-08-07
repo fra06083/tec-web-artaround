@@ -426,7 +426,7 @@ function VisitDetail() {
                         throw new Error("Stanza non disponibile o codice errato.");
                     }
                 }
-                const [visitaData, itemsData] = await Promise.all([fetchVisita(id), fetchItemsByVisita(id)]);
+                const [visitaData, itemsData] = await Promise.all([fetchVisita(id, pin), fetchItemsByVisita(id)]);
                 setVisita(visitaData);
                 setItems(itemsData);
 

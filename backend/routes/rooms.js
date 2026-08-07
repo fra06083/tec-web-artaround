@@ -75,33 +75,8 @@ router.post('/join', async (req, res) => {
 
     pin = pin.trim();
 
-    // Se la stanza non è ancora attiva in memoria RAM, verifica se esiste una visita con questo mnemonicCode (vecchio o nuovo codice)
-    if (!activeRooms.has(pin)) {
-        try {
-            const matchedVisit = await Visit.findOne({ 
-                mnemonicCode: { $regex: new RegExp('^' + pin + '$', 'i') } 
-            });
-            if (matchedVisit) {
-                // Auto-attiva la stanza per questo codice mnemonic
-                activeRooms.set(pin, {
-                    visitId: matchedVisit._id.toString(),
-                    teacherId: matchedVisit.createdBy ? matchedVisit.createdBy.toString() : 'Docente',
-                    currentArtworkIndex: 0,
-                    clients: [],
-                    students: [],
-                    isStarted: true,
-                    allowLateJoins: true,
-                    pendingRequests: new Map(),
-                    quizActive: false,
-                    quizQuestions: [],
-                    quizAnswers: {},
-                    quizResults: null
-                });
-            }
-        } catch (e) {
-            console.error("Errore ricerca visita per codice:", e);
-        }
-    }
+    // Gli studenti non possono creare la stanza se non è stata avviata dal docente.
+    // La stanza DEVE essere già in activeRooms per permettere l'accesso.
 
     if (!activeRooms.has(pin)) {
         return res.status(404).json({ error: "Stanza o Codice non trovato. Verifica il codice e riprova." });
