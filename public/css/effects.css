@@ -1629,6 +1629,15 @@ html.dark-mode body {
     box-shadow: 0 4px 16px rgba(99, 179, 237, 0.2);
 }
 
+@media (max-width: 575.98px) {
+    .play-circle, .pencil-circle {
+        width: 54px;
+        height: 54px;
+        font-size: 1.4rem;
+    }
+}
+
+
 /* Artwork List Components (Base & Desktop) */
 .artworks-tab-list {
     max-height: 480px;

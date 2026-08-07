@@ -67,11 +67,44 @@ router.post('/create', async (req, res) => {
 });
 
 // Studente si unisce a una stanza (chiamata REST iniziale)
-router.post('/join', (req, res) => {
-    const { pin, studentName } = req.body;
+router.post('/join', async (req, res) => {
+    let { pin, studentName } = req.body;
+    if (!pin || !pin.trim()) {
+        return res.status(400).json({ error: "PIN o Codice Stanza obbligatorio" });
+    }
+
+    pin = pin.trim();
+
+    // Se la stanza non è ancora attiva in memoria RAM, verifica se esiste una visita con questo mnemonicCode (vecchio o nuovo codice)
+    if (!activeRooms.has(pin)) {
+        try {
+            const matchedVisit = await Visit.findOne({ 
+                mnemonicCode: { $regex: new RegExp('^' + pin + '$', 'i') } 
+            });
+            if (matchedVisit) {
+                // Auto-attiva la stanza per questo codice mnemonic
+                activeRooms.set(pin, {
+                    visitId: matchedVisit._id.toString(),
+                    teacherId: matchedVisit.createdBy ? matchedVisit.createdBy.toString() : 'Docente',
+                    currentArtworkIndex: 0,
+                    clients: [],
+                    students: [],
+                    isStarted: true,
+                    allowLateJoins: true,
+                    pendingRequests: new Map(),
+                    quizActive: false,
+                    quizQuestions: [],
+                    quizAnswers: {},
+                    quizResults: null
+                });
+            }
+        } catch (e) {
+            console.error("Errore ricerca visita per codice:", e);
+        }
+    }
 
     if (!activeRooms.has(pin)) {
-        return res.status(404).json({ error: "Stanza non trovata" });
+        return res.status(404).json({ error: "Stanza o Codice non trovato. Verifica il codice e riprova." });
     }
 
     const room = activeRooms.get(pin);
@@ -100,14 +133,23 @@ router.post('/join', (req, res) => {
     res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex });
 });
 
-// Verifica esistenza stanza
-router.get('/check/:pin', (req, res) => {
-    if (activeRooms.has(req.params.pin)) {
-        res.json({ exists: true });
-    } else {
-        res.json({ exists: false });
+// Verifica esistenza stanza o codice mnemonic
+router.get('/check/:pin', async (req, res) => {
+    const pin = (req.params.pin || '').trim();
+    if (activeRooms.has(pin)) {
+        return res.json({ exists: true });
     }
+    try {
+        const matchedVisit = await Visit.findOne({ 
+            mnemonicCode: { $regex: new RegExp('^' + pin + '$', 'i') } 
+        });
+        if (matchedVisit) {
+            return res.json({ exists: true, visitId: matchedVisit._id });
+        }
+    } catch (e) {}
+    res.json({ exists: false });
 });
+
 
 // Connessione SSE per ascoltare gli eventi della stanza
 router.get('/events/:pin', (req, res) => {

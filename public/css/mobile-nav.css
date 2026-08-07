@@ -482,15 +482,7 @@
     }
 }
 
-/* Floating action button for mobile form */
-.form-mobile-fab {
-    position: fixed;
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1035;
-    pointer-events: auto;
-}
+
 
 /* Prevent body horizontal overflow on mobile viewports */
 @media (max-width: 575.98px) {

@@ -409,20 +409,26 @@
                             </div>
                         </div>
                         
-                        <!-- Right: Save button desktop / badge mobile -->
+                        <!-- Right: Save button (Mobile, Tablet, Desktop) -->
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            <!-- Mobile save button -->
+                            <button type="button" @click="saveTour()" 
+                                class="btn bg-orange text-white px-3 py-1.5 rounded-pill fw-bold shadow-lg d-flex d-sm-none align-items-center gap-1.5 fs-7">
+                                <i class="bi bi-cloud-arrow-up-fill fs-6"></i> Salva
+                            </button>
+                            <!-- Tablet save button -->
+                            <button type="button" @click="saveTour()" 
+                                class="h-40 btn bg-orange text-white px-3 rounded-pill fw-bold shadow d-none d-sm-flex d-lg-none align-items-center gap-2">
+                                <i class="bi bi-cloud-arrow-up-fill"></i> Salva
+                            </button>
                             <!-- Desktop save button -->
                             <button type="button" @click="saveTour()" 
                                 class="h-46 btn bg-orange text-white px-4 rounded-pill fw-bold shadow-lg d-none d-lg-flex align-items-center gap-2 transition-transform transform hover-scale">
-                                <i class="bi bi-cloud-arrow-up"></i> Salva Modifiche
-                            </button>
-                            <!-- Tablet save button (compact) -->
-                            <button type="button" @click="saveTour()" 
-                                class="h-40 btn bg-orange text-white px-3 rounded-pill fw-bold shadow d-none d-sm-flex d-lg-none align-items-center gap-2">
-                                <i class="bi bi-cloud-arrow-up"></i> Salva
+                                <i class="bi bi-cloud-arrow-up-fill"></i> Salva Modifiche
                             </button>
                         </div>
                     </div>
+
 
                     <!-- Segmented Control (Tabs) -->
                     <div class="d-flex w-100 justify-content-center mb-3 max-w-1200 mx-auto">
@@ -819,13 +825,7 @@
                         </div>
                     </div>
 
-                    <!-- Mobile FAB: Salva (visibile solo su mobile, rimane in basso sopra la mobile-nav) -->
-                    <div class="d-sm-none form-mobile-fab" x-show="formTab === 'info'" x-transition.opacity>
-                        <button type="button" @click="saveTour()" class="h-50 btn bg-orange text-white rounded-pill fw-bold shadow-lg d-flex align-items-center gap-2 px-5">
-                            <i class="bi bi-cloud-arrow-up fs-5"></i>
-                            <span>Salva</span>
-                        </button>
-                    </div>
+
 
                 </div>
                 

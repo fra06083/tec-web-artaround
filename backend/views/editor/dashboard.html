@@ -306,22 +306,22 @@
                     </div>
 
                     <!-- Action Cards -->
-                    <div class="row g-3 g-md-4 w-100 mw-780 mb-4 mb-md-5 align-items-stretch">
+                    <div class="row g-3 g-md-4 w-100 mw-780 mb-3 mb-md-4 align-items-stretch">
 
                         <!-- PRIMARY: Inizia Visita -->
                         <div class="col-md-6 d-flex">
                             <div @click="openVisitSelection()"
                                  class="hero-start-visit card-glow-orange rounded-4 rounded-sm-5 cursor-pointer d-flex flex-column w-100 h-100 transform hover-lift">
-                                <div class="card-body p-3.5 p-sm-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
-                                    <div class="play-circle icon-float mb-2 mb-sm-4 flex-shrink-0">
+                                <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                    <div class="play-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
                                         <i class="bi bi-broadcast"></i>
                                     </div>
-                                    <h3 class="fw-black text-white mb-1.5 fs-card-title">Inizia Visita</h3>
-                                    <p class="text-white mb-0 opacity-85 fs-body-sm flex-grow-1 d-flex align-items-center">
+                                    <h3 class="fw-black text-white mb-1 fs-card-title">Inizia Visita</h3>
+                                    <p class="text-white mb-0 opacity-85 small flex-grow-1 d-flex align-items-center justify-content-center">
                                         Avvia una sessione live con la password della visita o un PIN automatico.
                                     </p>
-                                    <div class="mt-3 mt-sm-4 badge rounded-pill px-4 py-2 fw-bold badge-glass-white shadow-sm flex-shrink-0">
-                                        <i class="bi bi-play-circle-fill me-1"></i> Avvia ora
+                                    <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
                                     </div>
                                 </div>
                             </div>
@@ -331,16 +331,16 @@
                         <div class="col-md-6 d-flex">
                             <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="text-decoration-none d-flex flex-column w-100 h-100">
                                 <div class="hero-manage card-glow-blue rounded-4 rounded-sm-5 d-flex flex-column w-100 h-100 transform hover-lift">
-                                    <div class="card-body p-3.5 p-sm-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
-                                        <div class="pencil-circle icon-float mb-2 mb-sm-4 flex-shrink-0">
+                                    <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                        <div class="pencil-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
                                             <i class="bi bi-easel2-fill"></i>
                                         </div>
-                                        <h3 class="fw-black text-white mb-1.5 fs-card-title">Gestisci Visite</h3>
-                                        <p class="text-white-50 mb-0 fs-body-sm flex-grow-1 d-flex align-items-center">
+                                        <h3 class="fw-black text-white mb-1 fs-card-title">Gestisci Visite</h3>
+                                        <p class="text-white-50 mb-0 small flex-grow-1 d-flex align-items-center justify-content-center">
                                             Crea nuovi percorsi didattici e configura i quiz interattivi per la classe.
                                         </p>
-                                        <div class="mt-3 mt-sm-4 badge rounded-pill px-4 py-2 fw-bold badge-glass-info shadow-sm flex-shrink-0">
-                                            <i class="bi bi-arrow-right-circle me-1"></i> Vai alle visite
+                                        <div class="mt-3 btn btn-info text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-arrow-right-circle fs-6"></i> <span>Vai alle visite</span>
                                         </div>
                                     </div>
                                 </div>
@@ -348,6 +348,7 @@
                         </div>
 
                     </div>
+
 
 
 

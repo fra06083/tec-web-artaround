@@ -1,13 +1,20 @@
 const { visit: Visit, museum: Museum, quizQuestion: QuizQuestion } = require('../models/museums');
 
 // GET /api/visite
-// Ritorna le visite. Se l'utente loggato è un docente, ritorna solo le sue.
+// Ritorna le visite. Se l'utente loggato è un docente e manage=true, ritorna solo le sue. Altrimenti nasconde le visite private.
 const getAllVisits = async (req, res) => {
     try {
         let query = {};
-        if (req.user && req.user.permissions === 'docente' && req.query.manage === 'true') {
-            query = { createdBy: req.user._id };
+        if (req.query.manage === 'true' && req.user) {
+            if (req.user.permissions === 'docente') {
+                query = { createdBy: req.user._id };
+            } else if (req.user.permissions === 'admin') {
+                query = {};
+            } else {
+                query = { isPrivate: { $ne: true } };
+            }
         } else {
+            // Marketplace / Navigator pubblico: mostra SOLO visite non private
             query = { isPrivate: { $ne: true } };
         }
 
@@ -33,12 +40,19 @@ const getVisitById = async (req, res) => {
             .populate('items')
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
+
+        // Se la visita è privata, vieta la fruizione individuale diretta senza PIN o permessi
+        if (visit.isPrivate && !req.query.pin && (!req.user || req.user.permissions === 'studente')) {
+            return res.status(403).json({ error: 'Questa visita è privata. Puoi accedervi solo tramite il codice PIN fornito dal docente.' });
+        }
+
         res.json(visit);
     } catch (error) {
         console.error('Errore nel recupero della visita:', error);
         res.status(500).json({ error: 'Errore interno del server' });
     }
 };
+
 
 // POST /api/visite
 const createVisit = async (req, res) => {
