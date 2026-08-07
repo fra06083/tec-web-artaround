@@ -520,6 +520,38 @@
                             <!-- Right Column: Settings -->
                             <div class="col-lg-4">
                                 <div class="d-flex flex-column gap-3">
+                                    <!-- Cover Image Card -->
+                                    <div class="glass-card rounded-4 p-3 p-md-4">
+                                        <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2 d-flex align-items-center gap-2">
+                                            <i class="bi bi-image text-orange fs-5"></i> Immagine di copertina
+                                        </label>
+
+                                        <div class="rounded-4 overflow-hidden bg-dark border border-secondary border-opacity-25 mb-3 h-120 d-flex align-items-center justify-content-center">
+                                            <template x-if="tour.image">
+                                                <img :src="tour.image" alt="Anteprima della copertina" class="w-100 h-100 object-fit-cover">
+                                            </template>
+                                            <template x-if="!tour.image">
+                                                <div class="text-center text-white-50 small px-3">
+                                                    <i class="bi bi-image fs-2 d-block mb-1 opacity-50"></i>
+                                                    Verrà usata l'immagine del museo
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control bg-dark border-secondary text-white shadow-none"
+                                                x-model="tour.image" placeholder="https://... oppure carica">
+                                            <label class="btn btn-outline-orange mb-0">
+                                                <i class="bi bi-upload"></i> Carica
+                                                <input type="file" class="d-none" accept="image/*" @change="uploadTourImage">
+                                            </label>
+                                        </div>
+
+                                        <button type="button" x-show="tour.image" @click="tour.image = ''"
+                                                class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                            <i class="bi bi-x-lg me-1"></i> Rimuovi
+                                        </button>
+                                    </div>  
                                     
                                     <!-- Mnemonic Code Card -->
                                     <div class="glass-card rounded-4 p-3 p-md-4 border-top border-4 border-info">

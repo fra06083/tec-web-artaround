@@ -34,6 +34,7 @@ document.addEventListener('alpine:init', () => {
             _id: '',
             name: '',
             description: '',
+            image: '',
             museum_id: '',
             items: [], // Array of artwork IDs
             logistic_info: [],
@@ -287,6 +288,42 @@ document.addEventListener('alpine:init', () => {
                 this.notification.show = false;
             }, 3000);
         },
+        async uploadTourImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                this.showToast("Seleziona un'immagine", 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                this.showToast("L'immagine non deve superare i 5MB", 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch('/api/upload/visit', {
+                    method: 'POST',
+                    headers: { 'Authorization': localStorage.getItem('artaround_token') },
+                    body: formData
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.tour.image = data.url;
+                    this.showToast('Immagine caricata');
+                } else {
+                    const err = await res.json();
+                    this.showToast(err.error || 'Errore durante il caricamento', 'error');
+                }
+            } catch (e) {
+                this.showToast('Errore durante il caricamento', 'error');
+            } finally {
+                event.target.value = '';   // permette di ricaricare lo stesso file
+            }
+        },
 
         // NAVIGATION
 
@@ -362,6 +399,7 @@ document.addEventListener('alpine:init', () => {
                     _id: '',
                     name: '',
                     description: '',
+                    image: '',
                     museum_id: this.selectedMuseum,
                     items: [],
                     logistic_info: [],
@@ -390,6 +428,7 @@ document.addEventListener('alpine:init', () => {
                 _id: '',
                 name: '',
                 description: '',
+                image: '',
                 museum_id: this.selectedMuseum,
                 items: [],
                 logistic_info: [],
@@ -433,6 +472,7 @@ document.addEventListener('alpine:init', () => {
                         _id: tourData._id || '',
                         name: tourData.name || '',
                         description: tourData.description || '',
+                        image: tourData.image || '',
                         museum_id: museumId,
                         items: tourData.items || [],
                         logistic_info: tourData.logistic_info || [],
@@ -608,6 +648,7 @@ document.addEventListener('alpine:init', () => {
                     body: JSON.stringify({
                         name: this.tour.name,
                         description: this.tour.description,
+                        image: this.tour.image,
                         museum_id: this.tour.museum_id,
                         items: items, // Include artworks in the save
                         logistic_info: this.tour.logistic_info,

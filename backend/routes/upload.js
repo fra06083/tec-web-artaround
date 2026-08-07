@@ -18,6 +18,8 @@ const storage = multer.diskStorage({
             dest = path.join(__dirname, '../../public/images/artworks');
         } else if (type === 'user') {
             dest = path.join(__dirname, '../../public/images/users');
+        } else if (type === 'visit') {
+            dest = path.join(__dirname, '../../public/images/visits');
         }
 
         // Crea la cartella se non esiste
@@ -56,6 +58,7 @@ router.post('/:type', auth, upload.single('image'), (req, res) => {
         if (type === 'museum') folder = 'museums';
         if (type === 'artwork') folder = 'artworks';
         if (type === 'user') folder = 'users';
+        if (type === 'visit') folder = 'visits';
 
         // URL pubblico da restituire (relativo alla directory public)
         const imageUrl = `/images/${folder}/${req.file.filename}`;

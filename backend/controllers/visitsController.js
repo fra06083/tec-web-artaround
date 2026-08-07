@@ -23,7 +23,7 @@ const getAllVisits = async (req, res) => {
         }
 
         const visits = await Visit.find(query)
-            .populate('museum_id', 'museum province image')
+            .populate('museum_id', 'museum province image mappa description')
             .lean();
         res.json(visits);
     } catch (error) {
@@ -57,7 +57,7 @@ const getVisitById = async (req, res) => {
 // POST /api/visite
 const createVisit = async (req, res) => {
     try {
-        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate } = req.body;
+        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate, image } = req.body;
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
@@ -66,6 +66,7 @@ const createVisit = async (req, res) => {
         const newVisit = new Visit({
             name,
             description,
+            image,
             museum_id,
             logistic_info: logistic_info || [],
             items: items || [],

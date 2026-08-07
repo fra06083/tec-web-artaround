@@ -31,6 +31,7 @@ const itemSchema = new mongoose.Schema({
 const visitSchema = new mongoose.Schema({
     name: { type: String, required: true }, // Es. "I capolavori del Rinascimento"
     description: { type: String }, // Utile per la card nel marketplace
+    image: String,
     museum_id: { type: mongoose.Schema.Types.ObjectId, ref: 'museum', required: true },
     items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'item' }], // Sequenza degli oggetti da visitare 
     logistic_info: [{ type: String }], // Indicazioni tipo: "Entrata da Via Garibaldi, 2" 

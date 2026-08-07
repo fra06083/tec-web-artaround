@@ -25,6 +25,11 @@ function marketplaceApp() {
             serverStatus: 'Offline'
         },
         tagSearchQuery: '',
+        selectedMuseumId: null,
+        museumSearchQuery: '',
+        museumView: 'visite',      // 'visite' | 'mappa'
+        mapFloor: null,            // numero del piano scelto, null = primo disponibile
+
         get filteredSelectionVisits() {
             if (!this.visitSearchQuery || !this.visitSearchQuery.trim()) {
                 return this.items;
@@ -67,11 +72,107 @@ function marketplaceApp() {
         get cartTotal() {
             return (this.cart.length * 12).toFixed(2).replace('.', ',');
         },
+        // Elenco musei ricavato dalle visite già caricate: niente fetch in più.
+        // Compaiono solo i musei che hanno almeno una visita pubblica, che è
+        // esattamente ciò che ha senso mostrare in un marketplace.
+        get museums() {
+            const trovati = new Map();
+            this.items.forEach(tour => {
+                const m = tour.museum_id;
+                if (m && m._id && !trovati.has(m._id)) trovati.set(m._id, m);
+            });
+            return Array.from(trovati.values())
+                .sort((a, b) => (a.museum || '').localeCompare(b.museum || ''));
+        },
+ 
+        get filteredMuseums() {
+            const q = this.museumSearchQuery.trim().toLowerCase();
+            if (!q) return this.museums;
+            return this.museums.filter(m =>
+                (m.museum || '').toLowerCase().includes(q) ||
+                (m.province || '').toLowerCase().includes(q)
+            );
+        },
+ 
+        get selectedMuseum() {
+            return this.museums.find(m => m._id === this.selectedMuseumId) || null;
+        },
+ 
+        tourCountFor(museumId) {
+            return this.items.filter(t => t.museum_id && t.museum_id._id === museumId).length;
+        },
+ 
+        // Piante ordinate per piano
+        get piante() {
+            const p = (this.selectedMuseum && this.selectedMuseum.mappa)
+                ? (this.selectedMuseum.mappa.piante || [])
+                : [];
+            return [...p].sort((a, b) => (a.piano || 0) - (b.piano || 0));
+        },
+ 
+        get piantaAttiva() {
+            if (this.piante.length === 0) return null;
+            if (this.mapFloor === null) return this.piante[0];
+            return this.piante.find(p => p.piano === this.mapFloor) || this.piante[0];
+        },
+ 
+        selectMuseum(id) {
+            this.selectedMuseumId = id;
+            this.museumView = 'visite';
+            this.selectedTags = [];
+            this.mapFloor = null;
+            this.syncMuseumUrl(true);
+            window.scrollTo({ top: 0 });
+        },
+ 
+        clearMuseum() {
+            this.selectedMuseumId = null;
+            this.selectedTags = [];
+            this.museumSearchQuery = '';
+            this.syncMuseumUrl(true);
+            window.scrollTo({ top: 0 });
+        },
+ 
+        // Il museo scelto sta nell'URL: il tasto indietro funziona
+        // e il link è condivisibile.
+        syncMuseumUrl(push) {
+            const url = new URL(window.location.href);
+            if (this.selectedMuseumId) url.searchParams.set('museo', this.selectedMuseumId);
+            else url.searchParams.delete('museo');
+            if (push) history.pushState({}, '', url);
+            else history.replaceState({}, '', url);
+        },
+ 
+        // Da chiamare DOPO che le visite sono state caricate.
+        initMuseumFunnel() {
+            // La funzione gira solo nel marketplace: la dashboard usa lo stesso
+            // marketplaceApp() e non deve essere toccata.
+            if (!window.location.pathname.includes('/editor-marketplace')) return;
+ 
+            const daUrl = new URLSearchParams(window.location.search).get('museo');
+            if (daUrl && this.museums.some(m => m._id === daUrl)) {
+                this.selectedMuseumId = daUrl;
+            } else if (this.museums.length === 1) {
+                // Un museo solo: salta il passaggio, ma resta possibile tornare indietro.
+                this.selectedMuseumId = this.museums[0]._id;
+                this.syncMuseumUrl(false);
+            }
+ 
+            window.addEventListener('popstate', () => {
+                const id = new URLSearchParams(window.location.search).get('museo');
+                this.selectedMuseumId = (id && this.museums.some(m => m._id === id)) ? id : null;
+            });
+        },
+ 
         get filteredItems() {
             let result = this.items;
             
             // Nascondi i tour già acquistati dal marketplace
             result = result.filter(tour => !this.isPurchased(tour._id));
+ 
+            if (this.selectedMuseumId) {
+                result = result.filter(t => t.museum_id && t.museum_id._id === this.selectedMuseumId);
+            }
             
             if (this.selectedTags.length > 0) {
                 result = result.filter(tour => {
@@ -162,6 +263,8 @@ function marketplaceApp() {
             }
 
             await Promise.all(promises);
+ 
+            this.initMuseumFunnel();
 
             this.isLoading = false;
             

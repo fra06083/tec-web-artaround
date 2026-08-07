@@ -152,201 +152,357 @@
         </header>
 
         <!-- MAIN CONTENT -->
-        <main class="flex-grow-1 p-3 p-lg-5 pt-5 mt-5" :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'">
 
-            <!-- MARKETPLACE HERO & CARDS -->
-            <div class="container-lg flex-grow-1 py-2 py-lg-4">
+    <main class="flex-grow-1 p-3 p-lg-5 pt-5 mt-5" :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'">
+        <div class="container-lg flex-grow-1 py-2 py-lg-4">
 
-            <!-- HERO SECTION (usa la classe .navigator-hero-gradient animata) -->
-            <div class="mb-5 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
-                <div class="row align-items-center position-relative z-1">
-                    <div class="col-12 col-md-8 text-center text-md-start">
-                        <h1 class="fw-black mb-2 text-white display-5 tracking-tight">Esplora i Pacchetti Tour</h1>
-                        <p class="text-white-75 lead mb-4 fw-medium">Acquista i pacchetti per i migliori musei ed esposizioni.</p>
+            <!-- ============================================================
+                SCHERMATA 1 — SCELTA DEL MUSEO
+                ============================================================ -->
+            <template x-if="!selectedMuseumId">
+                <div>
 
-                        <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
-                            <!-- Badge Musei -->
-                            <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill p-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper">
-                                <i class="bi bi-building me-2 text-white opacity-75"></i>
-                                <span><strong class="fw-bold">500+</strong> Musei</span>
-                            </span>
-
-                            <!-- Badge Rating -->
-                            <span
-                                class="badge bg-white bg-opacity-10 text-white rounded-pill p-2 d-inline-flex align-items-center border border-white border-opacity-10 shadow-sm glass-search-wrapper">
-                                <i class="bi bi-star-fill me-2 text-warning"></i>
-                                <span><strong class="fw-bold">4.9</strong> Rating</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 d-none d-md-block text-end">
-                        <i class="bi bi-shop text-white opacity-50 hero-icon-animated hero-icon-large"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION HEADER / SEPARATOR -->
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 mt-5 gap-3">
-                <div class="d-flex align-items-center flex-grow-1">
-                    <h4 class="fw-black mb-0 d-flex align-items-center gap-2 text-nowrap" :class="darkMode ? 'text-white' : 'text-dark'">
-                        <i class="bi bi-stars text-orange"></i> Tutti i Tour
-                    </h4>
-                    <div class="ms-3 flex-grow-1 border-bottom" :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
-                </div>
-                
-                <!-- FILTRI DESKTOP (pills) -->
-                <div class="d-none d-md-block overflow-x-auto hide-scrollbar ms-md-4 mw-100">
-                    <div class="d-flex flex-nowrap gap-2 pb-1 pe-1 align-items-center">
-                        <div class="position-relative me-2">
-                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
-                            <input type="text" class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5 w-auto" placeholder="Cerca categoria..." x-model="tagSearchQuery">
-                        </div>
-                        <button @click="toggleTag('Tutti')" 
-                                :class="{'active bg-orange text-white border-orange': selectedTags.length === 0}"
-                                class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm">Tutte</button>
-                        <template x-for="tag in filteredAvailableTags" :key="tag">
-                            <button @click="toggleTag(tag)" 
-                                    :class="{'active bg-orange text-white border-orange': selectedTags.includes(tag)}"
-                                    class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm" x-text="tag"></button>
-                        </template>
-                        <span x-show="filteredAvailableTags.length === 0" class="text-secondary small ms-2 text-nowrap">Nessuna categoria trovata</span>
-                    </div>
-                </div>
-
-                <!-- FILTRI MOBILE (dropdown) -->
-                <div class="d-md-none w-100 mt-2">
-                    <div class="dropdown w-100">
-                        <button class="btn btn-outline-secondary w-100 rounded-pill px-4 py-2 dropdown-toggle fw-bold d-flex align-items-center justify-content-between text-start shadow-sm border border-secondary border-opacity-25" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" :class="darkMode ? 'text-white bg-dark' : 'text-dark bg-white'">
-                            <span class="d-flex align-items-center gap-2">
-                                <i class="bi bi-funnel text-orange"></i> 
-                                <span x-text="selectedTags.length === 0 ? 'Filtra categorie (Tutte)' : 'Filtra: ' + selectedTags.length + ' selezionate'"></span>
-                            </span>
-                        </button>
-                        <ul class="dropdown-menu w-100 shadow-lg border-0 mt-2 rounded-4 p-2" :class="darkMode ? 'dropdown-menu-dark bg-dark' : 'bg-white'">
-                            <li class="px-2 mb-2">
-                                <input type="text" class="form-control rounded-pill border-secondary border-opacity-25" placeholder="Cerca categoria..." x-model="tagSearchQuery" @click.stop>
-                            </li>
-                            <li>
-                                <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3" @click="toggleTag('Tutti')">
-                                    <span class="fw-bold">Tutte le categorie</span>
-                                    <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.length === 0"></i>
-                                    <i class="bi bi-circle text-secondary fs-5" x-show="selectedTags.length > 0"></i>
-                                </button>
-                            </li>
-                            <li><hr class="dropdown-divider mx-2"></li>
-                            <template x-for="tag in filteredAvailableTags" :key="tag">
-                                <li>
-                                    <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3" @click="toggleTag(tag)">
-                                        <span x-text="tag"></span>
-                                        <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.includes(tag)"></i>
-                                        <i class="bi bi-circle text-secondary fs-5" x-show="!selectedTags.includes(tag)"></i>
-                                    </button>
-                                </li>
-                            </template>
-                            <li x-show="filteredAvailableTags.length === 0" class="text-center py-2 text-secondary small">
-                                Nessuna categoria trovata
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- GRID DEI TOUR -->
-            <div class="row g-4">
-                <!-- Messaggio Nessuna Visita -->
-                <template x-if="filteredItems.length === 0 && !isLoading">
-                    <div class="col-12 text-center py-5 mt-5">
-                        <div class="d-inline-block rounded-circle bg-secondary bg-opacity-10 p-4 mb-4">
-                            <i class="bi bi-compass text-orange fs-1"></i>
-                        </div>
-                        <h4 class="fw-bold" :class="darkMode ? 'text-white' : 'text-dark'">Nessuna visita disponibile</h4>
-                        <p class="text-muted" :class="darkMode ? 'text-white-50' : 'text-muted'">Al momento non ci sono visite che corrispondono ai criteri. Torna più tardi o cambia i filtri.</p>
-                        <button x-show="selectedTags.length > 0 || searchQuery !== ''" @click="selectedTags = []; searchQuery = ''" class="btn btn-outline-orange rounded-pill px-4 mt-2 fw-bold">Azzera filtri</button>
-                    </div>
-                </template>
-
-                <template x-for="tour in filteredItems" :key="tour._id">
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <!-- BIGLIETTO STRUCTURE -->
-                        <div class="card ticket-card h-100 border-0 bg-transparent">
-                            <div class="ticket-body h-100 d-flex flex-column">
-                                
-                                <!-- Top part (Image) -->
-                                <div class="ticket-top position-relative overflow-hidden bg-dark">
-                                    <template x-if="tour.museum_id && tour.museum_id.image">
-                                        <img :src="tour.museum_id.image" alt="Museum" class="w-100 h-100 object-fit-cover">
-                                    </template>
-                                    <template x-if="!tour.museum_id || !tour.museum_id.image">
-                                        <div class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                            <i class="bi bi-image fs-1"></i>
-                                        </div>
-                                    </template>
-                                    
-                                    <!-- Subtle vignette for text readability -->
-                                    <div class="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
-                                    
-                                    <span class="badge bg-white text-orange position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2 fw-bold z-1">
-                                        Tour Guidato
-                                    </span>
-
-                                    <!-- Museum Location overlaid on image -->
-                                    <div class="position-absolute bottom-0 start-0 p-3 z-1 w-100">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-geo-alt-fill text-orange"></i>
-                                            <span x-text="tour.museum_id.museum" class="fw-bold text-truncate text-white text-shadow-strong"></span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Bottom part (Details) -->
-                                <div class="ticket-bottom p-4 d-flex flex-column flex-grow-1 position-relative">
-                                    
-                                    <!-- Decorative Barcode Watermark -->
-                                    <div class="position-absolute top-0 end-0 mt-4 me-3 ticket-barcode-wrapper">
-                                        <i class="bi bi-upc ticket-barcode-icon" :class="darkMode ? 'text-white' : 'text-dark'"></i>
-                                    </div>
-                                    
-                                    <h5 class="fw-black mb-3 position-relative z-1 pe-4 mt-2" x-text="tour.name" :class="darkMode ? 'text-white' : 'text-dark'"></h5>
-                                    
-                                    <p class="small flex-grow-1 mb-3 position-relative z-1 pe-2" :class="darkMode ? 'text-white-50' : 'text-secondary'" x-text="tour.description && tour.description.length > 100 ? tour.description.substring(0, 100) + '...' : tour.description || 'Nessuna descrizione disponibile.'"></p>
-                                    
-                                    <!-- Tags -->
-                                    <div class="d-flex flex-wrap gap-1 mb-3" x-show="tour.tags && tour.tags.length > 0">
-                                        <template x-for="tag in tour.tags" :key="tag">
-                                            <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1" x-text="tag"></span>
-                                        </template>
-                                    </div>
-
-                                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary" :class="darkMode ? 'border-opacity-25' : 'border-opacity-10'">
-                                        <div class="d-flex flex-column">
-                                            <span class="text-orange fw-black fs-5">€ 12,00</span>
-                                            <span class="x-small fw-bold" :class="darkMode ? 'text-white-50' : 'text-secondary'" x-text="tour.items.length + ' opere'"></span>
-                                        </div>
-                                        
-                                        <template x-if="isPurchased(tour._id)">
-                                            <button class="btn btn-secondary rounded-pill px-3 fw-bold btn-sm shadow-sm" disabled>
-                                                <i class="bi bi-check-circle"></i> Acquistato
-                                            </button>
-                                        </template>
-                                        <template x-if="!isPurchased(tour._id) && !isInCart(tour._id)">
-                                            <button @click="addToCart(tour)" class="btn btn-outline-orange rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
-                                                Aggiungi
-                                            </button>
-                                        </template>
-                                        <template x-if="!isPurchased(tour._id) && isInCart(tour._id)">
-                                            <button @click="var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show();" class="btn bg-orange text-white rounded-pill px-3 fw-bold btn-sm shadow-sm">
-                                                Carrello
-                                            </button>
-                                        </template>
-                                    </div>
-                                </div>
+                    <div class="mb-5 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
+                        <div class="row align-items-center position-relative z-1">
+                            <div class="col-12 col-md-8 text-center text-md-start">
+                                <h1 class="fw-black mb-2 text-white display-5 tracking-tight">Scegli un museo</h1>
+                                <p class="text-white-75 lead mb-0 fw-medium">
+                                    Seleziona la sede da esplorare: vedrai i suoi tour e la mappa delle sale.
+                                </p>
+                            </div>
+                            <div class="col-md-4 d-none d-md-block text-end">
+                                <i class="bi bi-buildings text-white opacity-50 hero-icon-animated hero-icon-large"></i>
                             </div>
                         </div>
                     </div>
-                </template>
-            </div>
-        </main>
+
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <h4 class="fw-black mb-0 d-flex align-items-center gap-2 text-nowrap"
+                                :class="darkMode ? 'text-white' : 'text-dark'">
+                                <i class="bi bi-geo-alt-fill text-orange"></i> Musei disponibili
+                            </h4>
+                            <div class="ms-3 flex-grow-1 border-bottom"
+                                :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
+                        </div>
+                        <div class="position-relative">
+                            <label for="museumSearch" class="visually-hidden">Cerca un museo</label>
+                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
+                            <input type="text" id="museumSearch"
+                                class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5"
+                                placeholder="Cerca per nome o provincia..." x-model="museumSearchQuery">
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <template x-for="m in filteredMuseums" :key="m._id">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <button type="button" @click="selectMuseum(m._id)"
+                                        class="btn text-start p-0 border-0 w-100 h-100 rounded-4 overflow-hidden shadow-sm hover-lift"
+                                        :class="darkMode ? 'bg-dark-grey' : 'bg-white'">
+                                    <div class="position-relative bg-dark h-120 overflow-hidden">
+                                        <template x-if="m.image">
+                                            <img :src="m.image" :alt="'Foto di ' + m.museum"
+                                                class="w-100 h-100 object-fit-cover">
+                                        </template>
+                                        <template x-if="!m.image">
+                                            <div class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                <i class="bi bi-bank fs-1"></i>
+                                            </div>
+                                        </template>
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
+                                    </div>
+                                    <div class="p-4">
+                                        <h5 class="fw-black mb-1" :class="darkMode ? 'text-white' : 'text-dark'"
+                                            x-text="m.museum"></h5>
+                                        <p class="small mb-2" :class="darkMode ? 'text-white-50' : 'text-secondary'" x-text="m.province || ''"></p>
+
+                                        <p class="small mb-3 break-word" x-show="m.description"
+                                            :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                            x-text="m.description && m.description.length > 120 ? m.description.substring(0, 120) + '...' : m.description"></p>
+                                        <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill px-3 py-2"
+                                            x-text="tourCountFor(m._id) + (tourCountFor(m._id) === 1 ? ' tour' : ' tour')"></span>
+                                    </div>
+                                </button>
+                            </div>
+                        </template>
+
+                        <template x-if="filteredMuseums.length === 0 && !isLoading">
+                            <div class="col-12 text-center py-5">
+                                <div class="d-inline-block rounded-circle bg-secondary bg-opacity-10 p-4 mb-4">
+                                    <i class="bi bi-bank text-orange fs-1"></i>
+                                </div>
+                                <h4 class="fw-bold" :class="darkMode ? 'text-white' : 'text-dark'">Nessun museo trovato</h4>
+                                <p :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                    Prova a cambiare il testo cercato.
+                                </p>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </template>
+
+
+            <!-- ============================================================
+                SCHERMATA 2 — PAGINA DEL MUSEO (visite + mappa)
+                ============================================================ -->
+            <template x-if="selectedMuseumId && selectedMuseum">
+                <div>
+
+                    <button type="button" @click="clearMuseum()"
+                            class="btn btn-link text-decoration-none fw-bold px-0 mb-3 d-inline-flex align-items-center gap-2"
+                            :class="darkMode ? 'text-white-50' : 'text-secondary'">
+                        <i class="bi bi-arrow-left"></i> Tutti i musei
+                    </button>
+
+                    <div class="mb-4 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
+                        <div class="row align-items-center position-relative z-1">
+                            <div class="col-12 col-md-8 text-center text-md-start">
+                                <h1 class="fw-black mb-2 text-white display-6 tracking-tight" x-text="selectedMuseum.museum"></h1>
+                                <p class="text-white-75 mb-0 fw-medium" x-show="selectedMuseum.province"
+                                x-text="selectedMuseum.province"></p>
+                            </div>
+                            <div class="col-md-4 d-none d-md-block text-end">
+                                <i class="bi bi-bank text-white opacity-50 hero-icon-animated hero-icon-large"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Visite / Mappa -->
+                    <ul class="nav nav-pills gap-2 mb-4">
+                        <li class="nav-item">
+                            <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
+                                    :class="museumView === 'visite' ? 'active bg-orange text-white border-orange' : ''"
+                                    @click="museumView = 'visite'">
+                                <i class="bi bi-ticket-perforated me-1"></i> Visite
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
+                                    :class="museumView === 'mappa' ? 'active bg-orange text-white border-orange' : ''"
+                                    @click="museumView = 'mappa'">
+                                <i class="bi bi-map me-1"></i> Mappa
+                            </button>
+                        </li>
+                    </ul>
+
+
+                    <!-- ---------- TAB VISITE ---------- -->
+                    <div x-show="museumView === 'visite'">
+
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <h4 class="fw-black mb-0 d-flex align-items-center gap-2 text-nowrap"
+                                    :class="darkMode ? 'text-white' : 'text-dark'">
+                                    <i class="bi bi-stars text-orange"></i> Tour disponibili
+                                </h4>
+                                <div class="ms-3 flex-grow-1 border-bottom"
+                                    :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
+                            </div>
+
+                            <!-- FILTRI DESKTOP (pills) — invariati -->
+                            <div class="d-none d-md-block overflow-x-auto hide-scrollbar ms-md-4 mw-100">
+                                <div class="d-flex flex-nowrap gap-2 pb-1 pe-1 align-items-center">
+                                    <div class="position-relative me-2">
+                                        <label for="tagSearch" class="visually-hidden">Cerca categoria</label>
+                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
+                                        <input type="text" id="tagSearch"
+                                            class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5 w-auto"
+                                            placeholder="Cerca categoria..." x-model="tagSearchQuery">
+                                    </div>
+                                    <button @click="toggleTag('Tutti')"
+                                            :class="{'active bg-orange text-white border-orange': selectedTags.length === 0}"
+                                            class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm">Tutte</button>
+                                    <template x-for="tag in filteredAvailableTags" :key="tag">
+                                        <button @click="toggleTag(tag)"
+                                                :class="{'active bg-orange text-white border-orange': selectedTags.includes(tag)}"
+                                                class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm" x-text="tag"></button>
+                                    </template>
+                                    <span x-show="filteredAvailableTags.length === 0"
+                                        class="text-secondary small ms-2 text-nowrap">Nessuna categoria trovata</span>
+                                </div>
+                            </div>
+
+                            <!-- FILTRI MOBILE (dropdown) — invariati -->
+                            <div class="d-md-none w-100 mt-2">
+                                <div class="dropdown w-100">
+                                    <button class="btn btn-outline-secondary w-100 rounded-pill px-4 py-2 dropdown-toggle fw-bold d-flex align-items-center justify-content-between text-start shadow-sm border border-secondary border-opacity-25"
+                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                            aria-expanded="false" :class="darkMode ? 'text-white bg-dark' : 'text-dark bg-white'">
+                                        <span class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-funnel text-orange"></i>
+                                            <span x-text="selectedTags.length === 0 ? 'Filtra categorie (Tutte)' : 'Filtra: ' + selectedTags.length + ' selezionate'"></span>
+                                        </span>
+                                    </button>
+                                    <ul class="dropdown-menu w-100 shadow-lg border-0 mt-2 rounded-4 p-2"
+                                        :class="darkMode ? 'dropdown-menu-dark bg-dark' : 'bg-white'">
+                                        <li class="px-2 mb-2">
+                                            <input type="text" class="form-control rounded-pill border-secondary border-opacity-25"
+                                                placeholder="Cerca categoria..." x-model="tagSearchQuery" @click.stop>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3"
+                                                    @click="toggleTag('Tutti')">
+                                                <span class="fw-bold">Tutte le categorie</span>
+                                                <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.length === 0"></i>
+                                                <i class="bi bi-circle text-secondary fs-5" x-show="selectedTags.length > 0"></i>
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider mx-2"></li>
+                                        <template x-for="tag in filteredAvailableTags" :key="tag">
+                                            <li>
+                                                <button class="dropdown-item d-flex align-items-center justify-content-between py-2 rounded-3"
+                                                        @click="toggleTag(tag)">
+                                                    <span x-text="tag"></span>
+                                                    <i class="bi bi-check-circle-fill text-orange fs-5" x-show="selectedTags.includes(tag)"></i>
+                                                    <i class="bi bi-circle text-secondary fs-5" x-show="!selectedTags.includes(tag)"></i>
+                                                </button>
+                                            </li>
+                                        </template>
+                                        <li x-show="filteredAvailableTags.length === 0" class="text-center py-2 text-secondary small">
+                                            Nessuna categoria trovata
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GRID DEI TOUR — card invariate, tolto solo il nome museo -->
+                        <div class="row g-4">
+                            <template x-if="filteredItems.length === 0 && !isLoading">
+                                <div class="col-12 text-center py-5 mt-5">
+                                    <div class="d-inline-block rounded-circle bg-secondary bg-opacity-10 p-4 mb-4">
+                                        <i class="bi bi-compass text-orange fs-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold" :class="darkMode ? 'text-white' : 'text-dark'">Nessuna visita disponibile</h4>
+                                    <p :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                        Per questo museo non ci sono visite che corrispondono ai criteri.
+                                    </p>
+                                    <button x-show="selectedTags.length > 0 || searchQuery !== ''"
+                                            @click="selectedTags = []; searchQuery = ''"
+                                            class="btn btn-outline-orange rounded-pill px-4 mt-2 fw-bold">Azzera filtri</button>
+                                </div>
+                            </template>
+
+                            <template x-for="tour in filteredItems" :key="tour._id">
+                                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                    <div class="card ticket-card h-100 border-0 bg-transparent">
+                                        <div class="ticket-body h-100 d-flex flex-column">
+
+                                            <div class="ticket-top position-relative overflow-hidden bg-dark">
+                                                <template x-if="tour.image">
+                                                    <img :src="tour.image" alt="" class="w-100 h-100 object-fit-cover">
+                                                </template>
+                                                <template x-if="!tour.image && tour.museum_id && tour.museum_id.image">
+                                                    <img :src="tour.museum_id.image" alt="" class="w-100 h-100 object-fit-cover">
+                                                </template>
+                                                <template x-if="!tour.image && (!tour.museum_id || !tour.museum_id.image)">
+                                                    <div class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                        <i class="bi bi-image fs-1"></i>
+                                                    </div>
+                                                </template>
+                                                <div class="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
+                                                <span class="badge bg-white text-orange position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2 fw-bold z-1">
+                                                    Tour Guidato
+                                                </span>
+                                            </div>
+
+                                            <div class="ticket-bottom p-4 d-flex flex-column flex-grow-1 position-relative">
+                                                <div class="position-absolute top-0 end-0 mt-4 me-3 ticket-barcode-wrapper">
+                                                    <i class="bi bi-upc ticket-barcode-icon" :class="darkMode ? 'text-white' : 'text-dark'"></i>
+                                                </div>
+
+                                                <h5 class="fw-black mb-3 position-relative z-1 pe-4 mt-2" x-text="tour.name"
+                                                    :class="darkMode ? 'text-white' : 'text-dark'"></h5>
+
+                                                <p class="small flex-grow-1 mb-3 position-relative z-1 pe-2"
+                                                :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                                x-text="tour.description && tour.description.length > 100 ? tour.description.substring(0, 100) + '...' : tour.description || 'Nessuna descrizione disponibile.'"></p>
+
+                                                <div class="d-flex flex-wrap gap-1 mb-3" x-show="tour.tags && tour.tags.length > 0">
+                                                    <template x-for="tag in tour.tags" :key="tag">
+                                                        <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1"
+                                                            x-text="tag"></span>
+                                                    </template>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary"
+                                                    :class="darkMode ? 'border-opacity-25' : 'border-opacity-10'">
+                                                    <div class="d-flex flex-column">
+                                                        <span class="text-orange fw-black fs-5">€ 12,00</span>
+                                                        <span class="x-small fw-bold" :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                                            x-text="tour.items.length + ' opere'"></span>
+                                                    </div>
+
+                                                    <template x-if="isPurchased(tour._id)">
+                                                        <button class="btn btn-secondary rounded-pill px-3 fw-bold btn-sm shadow-sm" disabled>
+                                                            <i class="bi bi-check-circle"></i> Acquistato
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="!isPurchased(tour._id) && !isInCart(tour._id)">
+                                                        <button @click="addToCart(tour)"
+                                                                class="btn btn-outline-orange rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
+                                                            Aggiungi
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="!isPurchased(tour._id) && isInCart(tour._id)">
+                                                        <button @click="var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show();"
+                                                                class="btn bg-orange text-white rounded-pill px-3 fw-bold btn-sm shadow-sm">
+                                                            Carrello
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+
+                    <!-- ---------- TAB MAPPA ---------- -->
+                    <div x-show="museumView === 'mappa'" x-cloak>
+
+                        <!-- Selettore piano, solo se il museo ha più di una pianta -->
+                        <div class="d-flex flex-wrap gap-2 mb-4" x-show="piante.length > 1">
+                            <template x-for="p in piante" :key="p.piano">
+                                <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
+                                        :class="(piantaAttiva && piantaAttiva.piano === p.piano) ? 'active bg-orange text-white border-orange' : ''"
+                                        @click="mapFloor = p.piano"
+                                        x-text="p.nome || ('Piano ' + p.piano)"></button>
+                            </template>
+                        </div>
+
+                        <template x-if="piantaAttiva && piantaAttiva.immagine">
+                            <figure class="mb-0">
+                                <img :src="piantaAttiva.immagine"
+                                    :alt="'Pianta di ' + selectedMuseum.museum + (piantaAttiva.nome ? ' — ' + piantaAttiva.nome : '')"
+                                    class="w-100 rounded-4 shadow-sm">
+                                <figcaption class="small mt-3" :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                            x-text="piantaAttiva.nome || ('Piano ' + piantaAttiva.piano)"></figcaption>
+                            </figure>
+                        </template>
+
+                        <template x-if="!piantaAttiva || !piantaAttiva.immagine">
+                            <div class="text-center py-5">
+                                <div class="d-inline-block rounded-circle bg-secondary bg-opacity-10 p-4 mb-4">
+                                    <i class="bi bi-map text-orange fs-1"></i>
+                                </div>
+                                <h4 class="fw-bold" :class="darkMode ? 'text-white' : 'text-dark'">Mappa non disponibile</h4>
+                                <p :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                    Il curatore di questo museo non ha ancora caricato una pianta delle sale.
+                                </p>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </template>
+
+        </div>
+    </main>
 
         <!-- FOOTER -->
         <footer class="py-4 mt-auto pb-5 mb-5 pb-lg-4 mb-lg-0" :class="darkMode ? 'bg-dark border-top border-secondary border-opacity-25' : 'bg-light border-top'">
@@ -481,8 +637,16 @@
                             <div class="card border-0 shadow-sm rounded-4 overflow-hidden" :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white'">
                                 <div class="row g-0 align-items-center p-2">
                                     <div class="col-3">
-                                        <div class="rounded-3 bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center text-orange cart-item-img-placeholder">
-                                            <i class="bi bi-ticket-perforated fs-4"></i>
+                                        <div class="rounded-3 overflow-hidden bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center text-orange cart-item-img-placeholder">
+                                            <template x-if="item.image">
+                                                <img :src="item.image" alt="" class="w-100 h-100 object-fit-cover">
+                                            </template>
+                                            <template x-if="!item.image && item.museum_id && item.museum_id.image">
+                                                <img :src="item.museum_id.image" alt="" class="w-100 h-100 object-fit-cover">
+                                            </template>
+                                            <template x-if="!item.image && (!item.museum_id || !item.museum_id.image)">
+                                                <i class="bi bi-ticket-perforated fs-4"></i>
+                                            </template>
                                         </div>
                                     </div>
                                     <div class="col-7 ps-3">
