@@ -112,16 +112,15 @@
 }
 
 .mobile-nav-item.active {
-    color: #fd7e14 !important;
-    background: rgba(253, 126, 20, 0.15) !important;
+    color: #fd7e14;
+    background: rgba(253, 126, 20, 0.15);
     transform: translateY(-2px);
 }
 
 .dark-mode .mobile-nav-item.active,
-.dark-mode .mobile-nav-item.active,
 .admin-dark-mode .mobile-nav-item.active,
 [data-bs-theme="dark"] .mobile-nav-item.active {
-    color: #fd7e14 !important;
+    color: #fd7e14;
 }
 
 .mobile-nav-item i {
@@ -134,10 +133,10 @@
 }
 
 .mobile-nav-item .user-avatar {
-    height: 28px !important;
-    width: 28px !important;
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
+    height: 28px;
+    width: 28px;
+    margin-bottom: 0;
+    margin-top: 0;
 }
 
 .mobile-nav-item:hover i, .mobile-nav-item:hover .user-avatar {
@@ -146,9 +145,10 @@
 
 .mobile-nav-item:active {
     transform: scale(0.95);
-    color: #fd7e14 !important;
-    background: rgba(253, 126, 20, 0.15) !important;
+    color: #fd7e14;
+    background: rgba(253, 126, 20, 0.15);
 }
+
 
 /* Mobile Header */
 .mobile-header {
@@ -198,35 +198,33 @@
 ========================================================= */
 /* Colore di base per Light Mode */
 .desktop-navbar {
-    background-color: rgba(255, 255, 255, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
 /* Colore per Dark Mode (Sia Home che Marketplace) */
-.dark-mode .desktop-navbar,
 .dark-mode .desktop-navbar {
-    background: rgba(26, 26, 46, 0.85) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(26, 26, 46, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Forza il colore degli elementi interni se necessario */
-.dark-mode .desktop-navbar .nav-link,
 .dark-mode .desktop-navbar .nav-link {
-    color: white !important;
+    color: white;
 }
 
 .desktop-navbar .user-avatar {
-    background: #fd7e14 !important;
+    background: #fd7e14;
     box-shadow: none;
     transition: all 0.3s ease;
 }
 
 .desktop-navbar .user-avatar:hover {
-    background: #e85d04 !important;
+    background: #e85d04;
     transform: scale(1.05);
 }
 
@@ -238,40 +236,41 @@
 }
 
 .desktop-navbar .btn-orange {
-    background: #fd7e14 !important;
+    background: #fd7e14;
     box-shadow: none;
 }
 
 .desktop-navbar .btn-orange:hover {
-    background: #e85d04 !important;
+    background: #e85d04;
     transform: translateY(-1px);
 }
 
 .desktop-navbar .icon-btn {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
 }
 
 .desktop-navbar .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.1);
     border-color: rgba(253, 126, 20, 0.3);
 }
 
 .desktop-navbar .search-input .input-group-text {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .desktop-navbar .search-input .form-control {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .desktop-navbar .search-input .form-control:focus {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(253, 126, 20, 0.3) !important;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(253, 126, 20, 0.3);
 }
+
 
 /* Mobile User Menu */
 .mobile-user-menu {
@@ -449,11 +448,7 @@
     margin: 0 4px;
 }
 
-/* =========================================================
-   FORM STEP — MOBILE OPTIMIZATIONS
-========================================================= */
-
-/* Header back button: size ridotta su mobile */
+/* Mobile form layout fixes */
 .form-header-back-btn {
     width: 38px;
     height: 38px;
@@ -468,7 +463,6 @@
     }
 }
 
-/* Titolo header troncato su mobile */
 .form-header-title {
     font-size: 1.1rem;
     max-width: calc(100vw - 160px);
@@ -488,7 +482,7 @@
     }
 }
 
-/* FAB Salva mobile — fluttua sopra la mobile-nav */
+/* Floating action button for mobile form */
 .form-mobile-fab {
     position: fixed;
     bottom: calc(70px + env(safe-area-inset-bottom, 0px));
@@ -498,81 +492,88 @@
     pointer-events: auto;
 }
 
-/* =========================================================
-   ARTWORKS & QUIZ LIST — FIX MOBILE OVERFLOW
-   
-   Strategia: su mobile la lista opere/quiz NON usa max-h-400
-   (fisso) ma occupa lo spazio residuo del viewport sottraendo:
-     - mobile header:   ~56px  (padding-top su .main-content)
-     - form header row: ~52px
-     - segmented tabs:  ~52px
-     - sub-tab switch:  ~48px  (solo su opere/quiz)
-     - card header:     ~56px  (titolo sezione + bordo)
-     - search bar:      ~48px  (solo catalogo)
-     - mobile nav:      ~70px
-     - padding vari:    ~32px
-   Totale da sottrarre: ~414px → lista ≈ calc(100dvh - 420px)
-   Su schermi da 667px (iPhone SE) → lista ≈ 247px = ~4-5 item
-   Su schermi da 844px (iPhone 14) → lista ≈ 424px = ~8 item
-========================================================= */
+/* Prevent body horizontal overflow on mobile viewports */
+@media (max-width: 575.98px) {
+    .main-content {
+        overflow-x: hidden;
+    }
 
-@media (max-width: 991.98px) {
+    /* Segmented nav control mobile responsive width */
+    .segmented-control {
+        max-width: 100%;
+        padding: 3px;
+    }
 
-    /* Rimuove max-h fisso dalla lista — viene ridefinita sotto */
+    .segmented-tab {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+        gap: 4px;
+    }
+
+    /* Dynamic height and compact items for mobile artworks list */
     .artworks-tab-list {
-        max-height: none !important;
+        max-height: none;
         overflow-y: auto;
-        /* altezza dinamica: viewport - tutto lo spazio occupato sopra e sotto */
-        height: calc(100dvh - 420px);
-        min-height: 160px; /* evita collasso su schermi minuscoli */
+        overflow-x: hidden;
+        height: calc(100dvh - 390px);
+        min-height: 160px;
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Item opera ultra-compatto su mobile: altezza ~52px */
     .artwork-item-mobile {
-        padding: 8px 10px !important;
-        margin-bottom: 6px !important;
-        border-radius: 12px !important;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .artwork-item-mobile img {
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px;
+        height: 32px;
     }
 
     .artwork-item-mobile .artwork-number-sm {
-        width: 26px !important;
-        height: 26px !important;
-        font-size: 0.7rem !important;
+        width: 22px;
+        height: 22px;
+        font-size: 0.65rem;
     }
 
-    /* Nasconde l'autore per risparmiare altezza su mobile */
+    .artwork-item-mobile .artwork-title-sm {
+        font-size: 0.82rem;
+        line-height: 1.2;
+    }
+
     .artwork-item-mobile .artwork-author-sm {
-        display: none !important;
+        display: block;
+        font-size: 0.7rem;
+        opacity: 0.7;
     }
 
-    /* Tasto +/rimuovi più piccolo su mobile */
     .artwork-item-mobile .btn-artwork-action {
-        width: 32px !important;
-        height: 32px !important;
-        padding: 0 !important;
-        font-size: 0.8rem !important;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
-    /* Card contenitore: niente padding laterale eccessivo su mobile */
     .artworks-panel-mobile {
-        padding: 12px !important;
+        padding: 10px;
     }
 
-    /* Nasconde il contatore autore nel catalogo se lo spazio è stretto */
     .artwork-catalog-author {
-        display: none;
+        display: block;
+        font-size: 0.7rem;
+        opacity: 0.7;
     }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {
-    /* Tablet: autore visibile, altezza lista maggiore */
     .artwork-catalog-author {
         display: block;
     }
@@ -582,7 +583,21 @@
     }
 
     .artwork-item-mobile img {
-        width: 40px !important;
-        height: 40px !important;
+        width: 40px;
+        height: 40px;
+    }
+
+    .artwork-item-mobile .btn-artwork-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 }
+
+
+
+

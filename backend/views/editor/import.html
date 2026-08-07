@@ -23,9 +23,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/import.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
 </head>
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="importManager()">
@@ -59,7 +56,7 @@
                 <a href="/editor/dashboard" class="nav-link-admin">
                     <i class="bi bi-grid-fill"></i> <span>Dashboard</span>
                 </a>
-                <a href="/editor/tours" class="nav-link-admin">
+                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="nav-link-admin">
                     <i class="bi bi-pencil-square"></i> <span>Gestione Visite</span>
                 </a>
 
@@ -74,6 +71,10 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
+                <a href="/editor/import" x-show="permissions !== 'docente'" class="nav-link-admin active">
+                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
+                </a>
+
 
                 <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -109,7 +110,7 @@
                         <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
                             <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
                             <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style="opacity: 0; transition: opacity 0.3s;" onload="this.style.opacity='1'" onerror="this.style.opacity='0'">
+                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
                             </template>
                         </div>
                         <div>
@@ -372,7 +373,7 @@
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
         </a>
-        <a href="/editor/tours" class="mobile-nav-item">
+        <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="mobile-nav-item">
             <i class="bi bi-pencil-square"></i>
             <span>Visite</span>
         </a>

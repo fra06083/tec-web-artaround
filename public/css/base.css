@@ -4,30 +4,30 @@
 
 /* Brand Colors */
 .text-orange {
-    color: #fd7e14 !important;
+    color: #fd7e14;
 }
 
 .bg-orange {
-    background-color: #fd7e14 !important;
+    background-color: #fd7e14;
     color: #ffffff;
 }
 
 .bg-orange-subtle {
-    background-color: rgba(253, 126, 20, 0.1) !important;
+    background-color: rgba(253, 126, 20, 0.1);
 }
 
 .bg-orange-dark {
-    background-color: #e85d04 !important;
+    background-color: #e85d04;
     color: #ffffff;
 }
 
 /* Navigator Red Color */
 .text-red {
-    color: #ef4444 !important;
+    color: #ef4444;
 }
 
 .bg-red {
-    background-color: #ef4444 !important;
+    background-color: #ef4444;
     color: #ffffff;
 }
 
@@ -61,41 +61,42 @@
 }
 
 .bg-slate {
-    background-color: #334155 !important;
-    color: #ffffff !important;
+    background-color: #334155;
+    color: #ffffff;
     transition: all 0.2s ease-in-out;
 }
 
 .btn-orange {
-    background-color: #fd7e14 !important;
-    color: #ffffff !important;
+    background-color: #fd7e14;
+    color: #ffffff;
     border: none;
     transition: all 0.3s ease;
 }
 
 .btn-orange:hover {
-    background-color: #e85d04 !important;
-    color: #ffffff !important;
+    background-color: #e85d04;
+    color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
 }
 
 .btn-slate {
-    background-color: #334155 !important;
-    color: #ffffff !important;
+    background-color: #334155;
+    color: #ffffff;
     border: none;
     transition: all 0.3s ease;
 }
 
 .btn-slate:hover {
-    background-color: #1e293b !important;
-    color: #ffffff !important;
+    background-color: #1e293b;
+    color: #ffffff;
 }
 
 .bg-slate:hover {
-    background-color: #1e293b !important;
-    color: #ffffff !important;
+    background-color: #1e293b;
+    color: #ffffff;
 }
+
 
 /* Utility Classes */
 .icon-5xl {
@@ -106,6 +107,8 @@
     width: 3rem;
     height: 3rem;
 }
+
+
 
 .max-w-450 {
     max-width: 450px;
@@ -121,8 +124,9 @@
 }
 
 .hover-bg-light:hover {
-    background-color: #f8f9fa;
+    background-color: rgba(255, 255, 255, 0.08);
 }
+
 
 .max-w-550 {
     max-width: 550px;
@@ -277,9 +281,9 @@
     -webkit-backdrop-filter: blur(12px);
     min-width: 240px;
     z-index: 1100;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05) !important;
-    border-radius: 1.25rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+    border-radius: 1.25rem;
     overflow: hidden;
     transform-origin: top right;
 }
@@ -327,8 +331,8 @@
 /* --- Gestione DARK MODE per Dropdown --- */
 .dark-mode .auth-dropdown-menu {
     background: rgba(30, 30, 47, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0,0,0,0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0,0,0,0.2);
 }
 
 .dark-mode .dropdown-link-item {
@@ -341,7 +345,7 @@
 }
 
 .dark-mode .user-name-text {
-    color: #f9fafb;
+    color: #f3f4f6;
 }
 
 .dark-mode .chevron-icon {
@@ -354,27 +358,27 @@
 
 /* Stile speciale Logout */
 .logout-item {
-    color: #ef4444 !important;
+    color: #ef4444;
 }
 
 .logout-item:hover {
-    background-color: rgba(239, 68, 68, 0.1) !important;
-    color: #dc2626 !important;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
 }
 
 /* Mobile Floating Buttons */
 .mobile-floating-buttons {
-    position: fixed !important;
-    bottom: 1rem !important;
-    right: 1rem !important;
-    z-index: 1050 !important;
-    display: flex !important;
-    gap: 0.5rem !important;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050;
+    display: flex;
+    gap: 0.5rem;
 }
 
 @media (min-width: 992px) {
     .mobile-floating-buttons {
-        display: none !important;
+        display: none;
     }
 }
 

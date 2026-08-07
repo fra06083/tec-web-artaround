@@ -95,13 +95,17 @@ function museumManager() {
 
         openMuseumForm(museum = null) {
             if (museum) {
-                this.currentMuseum = { ...museum };
+                this.currentMuseum = JSON.parse(JSON.stringify(museum));
+                if (!this.currentMuseum.image && this.currentMuseum.immagine) {
+                    this.currentMuseum.image = this.currentMuseum.immagine;
+                }
             } else {
                 this.currentMuseum = { museum: '', city: '', province: '', region: '', address: '', description: '', image: '' };
             }
             this.currentMuseum.mappa = this.normalizeMappa(this.currentMuseum);
             this.step = 'museum-form';
         },
+
 
         async saveMuseum() {
             const isEdit = !!this.currentMuseum._id;

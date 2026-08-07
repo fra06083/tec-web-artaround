@@ -22,23 +22,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/tours.js?v=1786035040"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 18px 4px rgba(253,126,20,.35), 0 0 40px 10px rgba(253,126,20,.15); }
-            50%       { box-shadow: 0 0 32px 8px rgba(253,126,20,.6),  0 0 70px 20px rgba(253,126,20,.28); }
-        }
-        @keyframes pulse-glow-blue {
-            0%, 100% { box-shadow: 0 0 16px 4px rgba(99,179,237,.25), 0 0 36px 10px rgba(99,179,237,.1); }
-            50%       { box-shadow: 0 0 28px 8px rgba(99,179,237,.45), 0 0 60px 18px rgba(99,179,237,.2); }
-        }
-    </style>
 </head>
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="toursManager()" x-cloak>
 
-    <div x-show="isReady && isLoggedIn" class="d-flex" x-transition.opacity x-cloak>
+    <div x-show="isLoggedIn" class="d-flex" x-cloak>
+
+
         <aside class="sidebar bg-dark shadow d-flex flex-column">
             <div class="p-4 mb-2">
                 <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2"
@@ -52,7 +42,7 @@
                 <a href="/editor/dashboard" class="nav-link-admin">
                     <i class="bi bi-grid-fill"></i> <span>Dashboard</span>
                 </a>
-                <a href="/editor/tours" class="nav-link-admin active">
+                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" @click.prevent="resetToSelection()" class="nav-link-admin active">
                     <i class="bi bi-pencil-square"></i> <span>Gestione Visite</span>
                 </a>
 
@@ -67,6 +57,10 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
+                <a href="/editor/import" x-show="permissions !== 'docente'" class="nav-link-admin">
+                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
+                </a>
+
 
                 <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -79,7 +73,7 @@
             </nav>
 
             <div class="p-3 mt-auto">
-                                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
+                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
         <main class="main-content flex-grow-1">
@@ -93,7 +87,6 @@
                 </a>
             </header>
 
-
             <!-- Desktop Header -->
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
@@ -101,7 +94,7 @@
                         <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
                             <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
                             <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover transition-opacity opacity-0" onload="this.classList.replace('opacity-0', 'opacity-100')" onerror="this.classList.add('opacity-0')">
+                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
                             </template>
                         </div>
                         <div>
@@ -123,49 +116,41 @@
 
                 <!-- Choice Step -->
                 <div x-show="step === 'selection'" class="py-4" x-transition.opacity>
-                    <div class="text-center mb-4 max-w-550 mx-auto animate-pop-in">
+                    <div class="text-center mb-4 max-w-550 mx-auto">
                         <h2 class="fw-bolder display-5 text-white mb-2 tracking-tight">Cosa vuoi fare oggi?</h2>
                         <p class="fs-6 text-white-50 lh-base">Gestisci il tuo catalogo visite. Crea nuovi percorsi didattici o aggiorna quelli esistenti per i tuoi studenti.</p>
                     </div>
                     
                     <div class="row g-4 justify-content-center w-100 max-w-900 mx-auto mb-5">
                         <div class="col-sm-6 col-lg-5">
-                            <div @click="setMode('create')" class="cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in rounded-5"
-                                 :class="mode === 'create'
-                                    ? 'border border-2 border-orange'
-                                    : (mode !== null ? 'opacity-50' : '')"
-                                 style="background: linear-gradient(135deg, #1a1a2e 0%, #2d1810 60%, #3d200a 100%); min-height: 220px;"
-                                 :style="mode === 'create' ? 'animation: pulse-glow 2.8s ease-in-out infinite;' : ''">
+                            <div @click="setMode('create')" class="card-create-tour cursor-pointer transition-all shadow-lg overflow-hidden group rounded-5"
+                                 :class="mode === 'create' ? 'border border-2 border-orange card-glow-orange' : (mode !== null ? 'opacity-50' : '')">
                                 <div class="card-body p-4 p-sm-5 text-center d-flex flex-column align-items-center justify-content-center position-relative">
-                                    <!-- decorative blob -->
-                                    <div class="position-absolute top-0 end-0" style="width:140px;height:140px;background:radial-gradient(circle,rgba(253,126,20,.18) 0%,transparent 70%);border-radius:50%;transform:translate(30%,-30%);pointer-events:none;"></div>
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width:80px;height:80px;background:rgba(253,126,20,.15);border:2px solid rgba(253,126,20,.4);color:#fd7e14;backdrop-filter:blur(8px);">
+                                    <div class="blob-decorative-orange"></div>
+                                    <div class="circle-icon-orange rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm">
                                         <i class="bi bi-magic fs-1"></i>
                                     </div>
                                     <h3 class="fw-bold text-white mb-2 position-relative z-1">Nuova Visita</h3>
                                     <p class="text-white-50 mb-0 position-relative z-1 small">Progetta un percorso da zero, scegliendo le opere dal museo.</p>
-                                    <div class="mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1" style="background:rgba(253,126,20,.2);color:#fd7e14;border:1px solid rgba(253,126,20,.3);font-size:.8rem;">
+                                    <div class="badge-pill-orange mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1">
                                         <i class="bi bi-plus-circle me-1"></i> Crea ora
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6 col-lg-5">
-                            <div @click="setMode('edit')" class="cursor-pointer transition-all shadow-lg overflow-hidden group animate-pop-in delay-100 rounded-5"
-                                 :class="mode === 'edit'
-                                    ? 'border border-2 border-info'
-                                    : (mode !== null ? 'opacity-50' : '')"
-                                 style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); min-height: 220px;"
-                                 :style="mode === 'edit' ? 'animation: pulse-glow-blue 3.2s ease-in-out infinite;' : ''">
+                            <div @click="setMode('edit')" class="card-edit-tour cursor-pointer transition-all shadow-lg overflow-hidden group rounded-5"
+
+                                 :class="mode === 'edit' ? 'border border-2 border-info card-glow-blue' : (mode !== null ? 'opacity-50' : '')">
                                 <div class="card-body p-4 p-sm-5 text-center d-flex flex-column align-items-center justify-content-center position-relative">
-                                    <!-- decorative blob -->
-                                    <div class="position-absolute top-0 end-0" style="width:140px;height:140px;background:radial-gradient(circle,rgba(99,179,237,.15) 0%,transparent 70%);border-radius:50%;transform:translate(30%,-30%);pointer-events:none;"></div>
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width:80px;height:80px;background:rgba(99,179,237,.12);border:2px solid rgba(99,179,237,.35);color:#63b3ed;backdrop-filter:blur(8px);">
+                                    <div class="blob-decorative-blue"></div>
+                                    <div class="circle-icon-blue rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm">
                                         <i class="bi bi-collection-play fs-1"></i>
                                     </div>
                                     <h3 class="fw-bold text-white mb-2 position-relative z-1">Le mie Visite</h3>
                                     <p class="text-white-50 mb-0 position-relative z-1 small">Avvia una visita, modificala o consultane le statistiche.</p>
-                                    <div class="mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1" style="background:rgba(99,179,237,.18);color:#63b3ed;border:1px solid rgba(99,179,237,.3);font-size:.8rem;">
+                                    <div class="badge-pill-blue mt-3 badge rounded-pill px-3 py-2 fw-bold position-relative z-1">
                                         <i class="bi bi-arrow-right-circle me-1"></i> Vai alle visite
                                     </div>
                                 </div>
@@ -174,57 +159,75 @@
                     </div>
 
                     <!-- Dynamic Content Area: Selezione Museo per Nuova Visita -->
-                    <div x-show="mode === 'create'" x-transition class="max-w-900 mx-auto">
-                        <div class="rounded-4 overflow-hidden shadow-lg" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.07);">
+                    <div x-show="mode === 'create'" id="museum-picker-section" x-transition class="max-w-900 mx-auto pt-2">
+
+                        <div class="panel-museum-picker rounded-4 overflow-hidden shadow-lg">
 
                             <!-- Panel Header -->
-                            <div class="px-4 py-3 d-flex align-items-center gap-3" style="background:rgba(253,126,20,.12);border-bottom:1px solid rgba(253,126,20,.2);">
-                                <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width:36px;height:36px;background:rgba(253,126,20,.2);">
+                            <div class="panel-museum-header px-4 py-3 d-flex align-items-center gap-3">
+                                <div class="icon-box-36-orange d-flex align-items-center justify-content-center rounded-3 flex-shrink-0">
                                     <i class="bi bi-bank text-orange"></i>
                                 </div>
                                 <div>
-                                    <p class="m-0 fw-bold text-white" style="font-size:.95rem;">Scegli il Museo</p>
-                                    <p class="m-0 text-white-50" style="font-size:.78rem;">Per quale museo vuoi creare questa visita?</p>
+                                    <p class="fs-subheading m-0 fw-bold text-white">Scegli il Museo</p>
+                                    <p class="fs-caption m-0 text-white-50">Per quale museo vuoi creare questa visita?</p>
                                 </div>
                             </div>
 
-                            <!-- Museum chips grid -->
+                            <!-- Museum Selection Container -->
                             <div class="p-4">
                                 <template x-if="museums.length === 0">
                                     <p class="text-white-50 text-center py-3 m-0 small">Nessun museo assegnato al tuo account.</p>
                                 </template>
 
-                                <div class="d-flex flex-wrap gap-2 mb-4">
-                                    <template x-for="m in museums" :key="m._id">
-                                        <button type="button"
-                                            @click="selectedMuseum = (selectedMuseum === m._id ? '' : m._id)"
-                                            class="btn rounded-pill fw-bold d-flex align-items-center gap-2 transition-all"
-                                            :class="selectedMuseum === m._id
-                                                ? 'bg-orange text-white shadow'
-                                                : 'btn-outline-secondary text-white-50'"
-                                            style="font-size:.88rem;">
-                                            <i class="bi bi-building" :class="selectedMuseum === m._id ? 'text-white' : 'text-white-50'"></i>
-                                            <span x-text="m.museum"></span>
-                                            <i x-show="selectedMuseum === m._id" class="bi bi-check-circle-fill text-white"></i>
-                                        </button>
-                                    </template>
-                                </div>
+                                <template x-if="museums.length > 0">
+                                    <div>
+                                        <!-- Mobile & Desktop Select Dropdown -->
+                                        <div class="mb-4">
+                                            <label class="form-label text-white-50 small fw-bold mb-2">Seleziona o Cerca Museo dal Menù:</label>
+                                            <select class="form-select bg-dark text-white border border-secondary border-opacity-50 rounded-4 p-3 fw-bold fs-6 shadow-sm cursor-pointer"
+                                                x-model="selectedMuseum">
+                                                <option value="">-- Tocca qui per scegliere un Museo --</option>
+                                                <template x-for="m in museums" :key="m._id">
+                                                    <option :value="m._id" x-text="m.museum + (m.city ? ' (' + m.city + ')' : '')"></option>
+                                                </template>
+                                            </select>
+                                        </div>
 
-                                <!-- CTA Procedi -->
-                                <div x-show="selectedMuseum" x-transition class="d-flex justify-content-end">
-                                    <button @click="proceed()" :disabled="!canProceed"
-                                        class="btn bg-orange text-white rounded-pill fw-bold px-5 py-2 shadow d-flex align-items-center gap-2"
-                                        style="font-size:.95rem;">
-                                        <i class="bi bi-arrow-right-circle-fill"></i> Procedi
-                                    </button>
-                                </div>
+                                        <!-- Quick Chips Grid -->
+                                        <div class="mb-4">
+                                            <label class="form-label text-white-50 x-small fw-bold mb-2 text-uppercase tracking-wide">Oppure tocca un museo rapido:</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <template x-for="m in museums" :key="m._id">
+                                                    <button type="button"
+                                                        @click="selectedMuseum = (selectedMuseum === m._id ? '' : m._id)"
+                                                        class="museum-chip"
+                                                        :class="{ 'active': selectedMuseum === m._id }">
+                                                        <i class="bi bi-building"></i>
+                                                        <span x-text="m.museum"></span>
+                                                        <i x-show="selectedMuseum === m._id" class="bi bi-check-circle-fill ms-1"></i>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <!-- CTA Procedi -->
+                                        <div x-show="selectedMuseum" x-transition class="d-flex justify-content-end pt-2">
+                                            <button @click="proceed()" :disabled="!canProceed"
+                                                class="btn bg-orange text-white rounded-pill fw-bold px-4 py-3 shadow-lg d-inline-flex align-items-center gap-2 fs-6 hover-lift w-100 w-sm-auto justify-content-center">
+                                                <span>Procedi con il museo selezionato</span> <i class="bi bi-arrow-right-circle-fill fs-5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
+
                         </div>
                     </div>
                 </div>
 
                 <!-- Marketplace Step -->
-                <div x-show="step === 'marketplace'" x-transition.opacity class="py-4 animate-pop-in">
+                <div x-show="step === 'marketplace'" x-transition.opacity class="py-4">
                     
                     <!-- Marketplace Header (Borderless & Floating) -->
                     <div class="mb-5">
@@ -241,7 +244,7 @@
                                     
                                     <!-- Borderless Museum Selector -->
                                     <div class="position-relative mt-2">
-                                        <select class="form-select form-select-sm bg-transparent border-0 text-white-50 hover-text-white shadow-none cursor-pointer fs-6 fw-bold transition-color p-0" x-model="selectedMuseum" style="outline: none; box-shadow: none;">
+                                        <select class="form-select form-select-sm bg-transparent border-0 text-white-50 hover-text-white shadow-none cursor-pointer fs-6 fw-bold transition-color p-0" x-model="selectedMuseum">
                                             <option value="" class="text-dark" disabled selected>Scegli un museo per iniziare...</option>
                                             <template x-for="m in museums" :key="m._id">
                                                 <option :value="m._id" x-text="m.museum" class="text-dark"></option>
@@ -254,20 +257,37 @@
                             <!-- Right: Actions -->
                             <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
                                 <!-- Search -->
-                                <div class="input-group shadow-sm bg-secondary bg-opacity-10 rounded-pill overflow-hidden border border-secondary border-opacity-25" style="max-width: 250px;">
+                                <div class="mw-250 input-group shadow-sm bg-secondary bg-opacity-10 rounded-pill overflow-hidden border border-secondary border-opacity-25">
                                     <span class="input-group-text bg-transparent border-0 text-white-50 ps-3">
                                         <i class="bi bi-search"></i>
                                     </span>
                                     <input type="text" class="form-control bg-transparent border-0 text-white shadow-none" placeholder="Cerca visita..." x-model="tourSearch">
                                 </div>
                                 
-                                <!-- Free Entry Toggle -->
-                                <div class="form-check form-switch m-0 d-flex align-items-center gap-2 bg-secondary bg-opacity-10 px-3 py-2 rounded-pill border border-secondary border-opacity-25 cursor-pointer">
-                                    <input class="form-check-input cursor-pointer m-0 mt-1" type="checkbox" role="switch" id="lateJoinsSwitchGlobal" x-model="allowLateJoins">
-                                    <label class="form-check-label text-white-50 cursor-pointer select-none small fw-bold" for="lateJoinsSwitchGlobal">
-                                        Ingresso Libero
-                                    </label>
+                                <!-- Visibility Filter (Tutte / Pubbliche / Private) -->
+                                <div class="segmented-filter-control">
+                                    <button type="button" 
+                                        @click="visibilityFilter = 'all'" 
+                                        class="filter-pill"
+                                        :class="{ 'active-all': visibilityFilter === 'all' }">
+                                        Tutte
+                                    </button>
+                                    <button type="button" 
+                                        @click="visibilityFilter = 'public'" 
+                                        class="filter-pill"
+                                        :class="{ 'active-public': visibilityFilter === 'public' }">
+                                        <i class="bi bi-globe"></i> Pubbliche
+                                    </button>
+                                    <button type="button" 
+                                        @click="visibilityFilter = 'private'" 
+                                        class="filter-pill"
+                                        :class="{ 'active-private': visibilityFilter === 'private' }">
+                                        <i class="bi bi-lock-fill"></i> Private
+                                    </button>
                                 </div>
+
+
+
                             </div>
                         </div>
                     </div>
@@ -276,12 +296,12 @@
                     <div class="position-relative min-vh-50">
                         
                         <!-- Museum Grid (When No Museum Selected) -->
-                        <div x-show="!selectedMuseum" class="animate-pop-in mt-2">
+                        <div x-show="!selectedMuseum" class="mt-2">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
                                 <h4 class="fw-bold text-white m-0 d-flex align-items-center gap-2">
                                     <i class="bi bi-bank text-orange"></i> Seleziona un Museo
                                 </h4>
-                                <div class="input-group shadow-sm bg-secondary bg-opacity-10 rounded-pill overflow-hidden border border-secondary border-opacity-25" style="max-width: 300px;" x-show="museums.length > 4">
+                                <div class="mw-300 input-group shadow-sm bg-secondary bg-opacity-10 rounded-pill overflow-hidden border border-secondary border-opacity-25" x-show="museums.length > 4">
                                     <span class="input-group-text bg-transparent border-0 text-white-50 ps-3">
                                         <i class="bi bi-search"></i>
                                     </span>
@@ -292,14 +312,21 @@
                             <div class="row g-4">
                                 <template x-for="m in filteredMuseums" :key="m._id">
                                     <div class="col-sm-6 col-md-4 col-lg-3">
-                                        <div @click="selectedMuseum = m._id" class="glass-card rounded-4 p-4 h-100 cursor-pointer transition-all transform hover-scale hover-bg-light border border-secondary border-opacity-25 shadow-sm d-flex flex-column justify-content-center align-items-center text-center gap-2">
-                                            <div class="rounded-circle bg-secondary bg-opacity-25 text-white-50 d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                        <div @click="selectedMuseum = m._id"
+                                             class="museum-card rounded-4 p-4 h-100 cursor-pointer d-flex flex-column justify-content-center align-items-center text-center gap-2"
+                                             :class="selectedMuseum === m._id ? 'bg-orange-selected' : ''">
+                                            <div class="icon-box-56 rounded-circle d-flex align-items-center justify-content-center mb-2 transition-all"
+                                                 :class="selectedMuseum === m._id ? 'bg-orange text-white shadow-sm' : 'bg-secondary bg-opacity-25 text-white-50'">
                                                 <i class="bi bi-building fs-3"></i>
                                             </div>
-                                            <h6 class="fw-bold text-white m-0 lh-sm" x-text="m.museum"></h6>
+                                            <h6 class="fw-bold m-0 lh-sm transition-color text-white" x-text="m.museum"></h6>
+                                            <span x-show="selectedMuseum === m._id" class="badge bg-orange text-white rounded-pill px-2.5 py-1 fs-caption mt-1">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Selezionato
+                                            </span>
                                         </div>
                                     </div>
                                 </template>
+
                             </div>
                         </div>
                         
@@ -310,7 +337,8 @@
                         </div>
 
                         <!-- Tours Grid -->
-                        <div x-show="filteredTours.length > 0" class="row g-4 animate-pop-in delay-100">
+                        <div x-show="filteredTours.length > 0" class="row g-4">
+
                             <template x-for="t in filteredTours" :key="t._id">
                                 <div class="col-12 col-md-6 col-xl-4">
                                     <div class="glass-card h-100 rounded-4 overflow-hidden position-relative group transition-all transform hover-lift"
@@ -339,11 +367,11 @@
 
                                             <!-- Bottom: Actions (Editing Centric) -->
                                             <div class="mt-auto pt-3 border-top border-secondary border-opacity-25 d-flex gap-2">
-                                                <button type="button" @click.prevent.stop="editTour(t._id)" class="btn btn-orange text-white w-100 fw-bold d-flex align-items-center justify-content-center gap-2 transform hover-scale position-relative z-3" style="height: 44px;" title="Modifica Visita">
+                                                <button type="button" @click.prevent.stop="editTour(t._id)" class="h-44 btn btn-orange text-white w-100 fw-bold d-flex align-items-center justify-content-center gap-2 transform hover-scale position-relative z-3" title="Modifica Visita">
                                                     <i class="bi bi-pencil-fill"></i> Modifica
                                                 </button>
                                                 
-                                                <button type="button" @click.prevent.stop="deleteTourFromList(t._id)" class="btn btn-outline-danger d-flex align-items-center justify-content-center px-4 hover-text-white transition-all position-relative z-3" style="height: 44px;" title="Elimina Visita">
+                                                <button type="button" @click.prevent.stop="deleteTourFromList(t._id)" class="h-44 btn btn-outline-danger d-flex align-items-center justify-content-center px-4 hover-text-white transition-all position-relative z-3" title="Elimina Visita">
                                                     <i class="bi bi-trash3-fill fs-5"></i>
                                                 </button>
                                             </div>
@@ -360,7 +388,7 @@
                 <div x-show="step === 'form'">
                     
                     <!-- Page Header mobile-ottimizzato -->
-                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 animate-pop-in max-w-1200 mx-auto w-100">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 max-w-1200 mx-auto w-100">
                         
                         <!-- Left: Back & Title -->
                         <div class="d-flex align-items-center gap-2 gap-sm-3 min-w-0">
@@ -372,9 +400,12 @@
                             <div class="min-w-0">
                                 <h2 class="fw-bolder m-0 text-white tracking-tight lh-sm text-truncate form-header-title" 
                                     x-text="tour.name || (mode === 'edit' ? 'Modifica Visita' : 'Nuova Visita')"></h2>
-                                <p class="text-white-50 mt-1 mb-0 small d-none d-sm-block" x-show="tour._id">
-                                    ID: <span class="font-monospace" x-text="tour._id"></span>
-                                </p>
+                                <template x-if="mode === 'edit' && tour._id">
+                                    <p class="text-white-50 mt-1 mb-0 small d-none d-sm-block">
+                                        ID: <span class="font-monospace" x-text="tour._id"></span>
+                                    </p>
+                                </template>
+
                             </div>
                         </div>
                         
@@ -382,21 +413,19 @@
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
                             <!-- Desktop save button -->
                             <button type="button" @click="saveTour()" 
-                                class="btn bg-orange text-white px-4 rounded-pill fw-bold shadow-lg d-none d-lg-flex align-items-center gap-2 transition-transform transform hover-scale" 
-                                style="height: 46px;">
+                                class="h-46 btn bg-orange text-white px-4 rounded-pill fw-bold shadow-lg d-none d-lg-flex align-items-center gap-2 transition-transform transform hover-scale">
                                 <i class="bi bi-cloud-arrow-up"></i> Salva Modifiche
                             </button>
                             <!-- Tablet save button (compact) -->
                             <button type="button" @click="saveTour()" 
-                                class="btn bg-orange text-white px-3 rounded-pill fw-bold shadow d-none d-sm-flex d-lg-none align-items-center gap-2" 
-                                style="height: 40px;">
+                                class="h-40 btn bg-orange text-white px-3 rounded-pill fw-bold shadow d-none d-sm-flex d-lg-none align-items-center gap-2">
                                 <i class="bi bi-cloud-arrow-up"></i> Salva
                             </button>
                         </div>
                     </div>
 
                     <!-- Segmented Control (Tabs) -->
-                    <div class="d-flex w-100 justify-content-center mb-3 max-w-1200 mx-auto animate-pop-in delay-100">
+                    <div class="d-flex w-100 justify-content-center mb-3 max-w-1200 mx-auto">
                         <div class="segmented-control shadow-sm">
                             <div class="segmented-slider" :class="{ 'translate-x-0': formTab === 'info', 'translate-x-100': formTab === 'artworks', 'translate-x-200': formTab === 'quiz' }"></div>
                             
@@ -423,14 +452,14 @@
                                         
                                         <!-- Title -->
                                         <div>
-                                            <label class="form-label small text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px;">Titolo Visita</label>
+                                            <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2">Titolo Visita</label>
                                             <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
                                                 x-model="tour.name" placeholder="Es: I capolavori del Rinascimento" required>
                                         </div>
                                         
                                         <!-- Description -->
                                         <div>
-                                            <label class="form-label small text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px;">Descrizione</label>
+                                            <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2">Descrizione</label>
                                             <textarea class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
                                                 x-model="tour.description" rows="3"
                                                 placeholder="Scrivi una descrizione accattivante per questa visita..."></textarea>
@@ -441,7 +470,7 @@
                                             <div class="row g-3">
                                                 <!-- Categorie Predefinite -->
                                                 <div class="col-12 col-md-6">
-                                                    <label class="form-label small text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px;">Categorie</label>
+                                                    <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2">Categorie</label>
                                                     <div class="d-flex flex-wrap gap-2">
                                                         <template x-for="t in predefinedTags" :key="t">
                                                             <label class="badge rounded-pill px-3 py-2 cursor-pointer transition-all user-select-none border fs-7 fw-bold m-0"
@@ -455,7 +484,7 @@
                                                 
                                                 <!-- Tag Personalizzati -->
                                                 <div class="col-12 col-md-6">
-                                                    <label class="form-label small text-uppercase fw-bold text-white-50 mb-2" style="letter-spacing: 1px;">Tag Extra</label>
+                                                    <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2">Tag Extra</label>
                                                     
                                                     <div class="input-group mb-3 shadow-sm rounded-pill overflow-hidden bg-dark border border-secondary border-opacity-25 p-1 premium-input-group">
                                                         <span class="input-group-text bg-transparent border-0 text-white-50 ps-3"><i class="bi bi-tag"></i></span>
@@ -488,7 +517,7 @@
                                     
                                     <!-- Mnemonic Code Card -->
                                     <div class="glass-card rounded-4 p-3 p-md-4 border-top border-4 border-info">
-                                        <label class="form-label small text-uppercase fw-bold text-white-50 mb-2 d-flex align-items-center gap-2" style="letter-spacing: 1px;">
+                                        <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2 d-flex align-items-center gap-2">
                                             <i class="bi bi-upc-scan text-info fs-5"></i> Codice Stanza
                                         </label>
                                         <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input text-center fw-bolder fs-5 text-info"
@@ -497,27 +526,28 @@
                                     </div>
                                     
                                     <!-- Private Visit Card -->
-                                    <div class="rounded-4 p-3 p-md-4 border border-secondary border-opacity-25 transition-all cursor-pointer position-relative overflow-hidden"
-                                         :class="tour.isPrivate ? 'bg-orange bg-opacity-10 border-orange border-opacity-50' : 'bg-dark hover-bg-light'"
+                                    <div class="private-visit-card cursor-pointer transition-all position-relative overflow-hidden"
+                                         :class="{ 'active': tour.isPrivate }"
                                          @click="tour.isPrivate = !tour.isPrivate">
                                         <div class="d-flex align-items-center gap-3 position-relative z-1">
-                                            <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 44px; height: 44px;"
-                                                 :class="tour.isPrivate ? 'bg-orange text-white' : 'bg-secondary bg-opacity-25 text-white-50'">
-                                                <i class="bi bi-lock-fill fs-5"></i>
+                                            <div class="lock-icon-circle transition-all"
+                                                 :class="tour.isPrivate ? 'bg-orange text-white shadow-sm' : 'bg-secondary bg-opacity-25 text-white-50'">
+                                                <i class="bi bi-lock-fill"></i>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <h6 class="fw-bolder m-0" :class="tour.isPrivate ? 'text-white' : 'text-white-50'">Visita Privata</h6>
-                                                    <div class="form-check form-switch m-0 fs-5 pe-none">
-                                                        <input class="form-check-input cursor-pointer shadow-none border-secondary" :class="tour.isPrivate ? 'bg-orange border-orange' : ''" type="checkbox" role="switch" :checked="tour.isPrivate">
+                                                    <h6 class="fw-bolder m-0 text-white">Visita Privata</h6>
+                                                    <div class="form-check form-switch custom-switch-orange m-0 pe-none">
+                                                        <input class="form-check-input" type="checkbox" role="switch" :checked="tour.isPrivate">
                                                     </div>
                                                 </div>
-                                                <p class="small mb-0 lh-sm" :class="tour.isPrivate ? 'text-white-75' : 'text-white-50'">
+                                                <p class="small mb-0 lh-sm text-white-50">
                                                     Non pubblicata sul Marketplace. Gestiscila privatamente con le tue classi.
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
+
                                     
                                 </div>
                             </div>
@@ -531,14 +561,14 @@
                         <!-- Mobile Sub-Tab Switcher -->
                         <div class="d-flex d-lg-none gap-2 mb-3">
                             <button type="button"
-                                class="btn flex-grow-1 rounded-pill fw-bold py-2"
+                                class="btn flex-grow-1 rounded-pill fw-bold py-2 px-2 small d-flex align-items-center justify-content-center"
                                 :class="mobileArtworksTab === 'selected' ? 'bg-orange text-white' : 'btn-outline-secondary text-white-50'"
                                 @click="mobileArtworksTab = 'selected'">
                                 <i class="bi bi-list-check me-1"></i>Nella visita
                                 <span class="badge ms-1 rounded-pill" :class="mobileArtworksTab === 'selected' ? 'bg-white text-orange' : 'bg-secondary'" x-text="selectedArtworks.length"></span>
                             </button>
                             <button type="button"
-                                class="btn flex-grow-1 rounded-pill fw-bold py-2"
+                                class="btn flex-grow-1 rounded-pill fw-bold py-2 px-2 small d-flex align-items-center justify-content-center"
                                 :class="mobileArtworksTab === 'catalog' ? 'bg-orange text-white' : 'btn-outline-secondary text-white-50'"
                                 @click="mobileArtworksTab = 'catalog'">
                                 <i class="bi bi-collection me-1"></i>Catalogo
@@ -549,7 +579,7 @@
                         <div class="row g-3">
                             <!-- Left: Selected Artworks -->
                             <div class="col-lg-6" :class="mobileArtworksTab === 'catalog' ? 'd-none d-lg-block' : ''">
-                                <div class="glass-card rounded-4 p-3 p-md-4 h-100 animate-pop-in delay-100 artworks-panel-mobile">
+                                <div class="glass-card rounded-4 p-3 p-md-4 h-100 artworks-panel-mobile">
                                     <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3 pb-2 pb-md-3 border-bottom border-secondary border-opacity-25">
                                         <h6 class="fw-bold m-0 d-flex align-items-center">
                                             <i class="bi bi-list-check text-orange me-2"></i>
@@ -569,31 +599,31 @@
 
                                     <div x-show="selectedArtworks.length > 0" class="artworks-tab-list max-h-400 pe-1">
                                         <template x-for="(artwork, index) in selectedArtworks" :key="artwork._id">
-                                            <div class="artwork-item artwork-item-mobile d-flex align-items-center gap-2 p-2 p-sm-3 mb-2 rounded-4 bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
-                                                <div class="artwork-number-sm flex-shrink-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:28px;height:28px;font-size:0.75rem;" x-text="index + 1"></div>
-                                                <img :src="artwork.img_path" :alt="artwork.item" class="rounded-3 flex-shrink-0 object-fit-cover" style="width:36px;height:36px;">
-                                                <div class="flex-grow-1 min-w-0">
-                                                    <div class="fw-bold text-truncate text-white" style="font-size:0.8rem;line-height:1.2;" x-text="artwork.item"></div>
+                                            <div class="artwork-item artwork-item-mobile d-flex align-items-center gap-2 p-2 p-sm-3 mb-2 rounded-4 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 overflow-hidden">
+                                                <div class="artwork-number-sm flex-shrink-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" x-text="index + 1"></div>
+                                                <img :src="artwork.img_path" :alt="artwork.item" class="artwork-img-sm rounded-3 flex-shrink-0 object-fit-cover">
+                                                <div class="flex-grow-1 min-w-0 overflow-hidden">
+                                                    <div class="artwork-title-sm fw-bold text-truncate text-white" x-text="artwork.item"></div>
                                                     <small class="text-white-50 text-truncate d-block artwork-author-sm" x-text="artwork.author"></small>
                                                 </div>
-                                                <!-- Reorder: visibili solo su tablet+ -->
-                                                <div class="d-none d-sm-flex flex-column gap-1 flex-shrink-0">
-                                                    <button @click="moveArtworkUp(index)" class="btn btn-sm btn-outline-light rounded-circle btn-artwork-action" :disabled="index === 0" title="Sposta su" style="width:30px;height:30px;padding:0;"><i class="bi bi-chevron-up" style="font-size:0.7rem;"></i></button>
-                                                    <button @click="moveArtworkDown(index)" class="btn btn-sm btn-outline-light rounded-circle btn-artwork-action" :disabled="index === selectedArtworks.length - 1" title="Sposta giù" style="width:30px;height:30px;padding:0;"><i class="bi bi-chevron-down" style="font-size:0.7rem;"></i></button>
+                                                <!-- Reorder & Action Controls -->
+                                                <div class="d-flex align-items-center gap-1 flex-shrink-0 ms-auto">
+                                                    <button @click="moveArtworkUp(index)" class="btn-artwork-action btn btn-sm btn-outline-light rounded-circle d-flex align-items-center justify-content-center" :disabled="index === 0" title="Sposta su"><i class="bi bi-chevron-up"></i></button>
+                                                    <button @click="moveArtworkDown(index)" class="btn-artwork-action btn btn-sm btn-outline-light rounded-circle d-flex align-items-center justify-content-center" :disabled="index === selectedArtworks.length - 1" title="Sposta giù"><i class="bi bi-chevron-down"></i></button>
+                                                    <button @click="removeArtworkFromTour(artwork._id)" class="btn-artwork-action btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" title="Rimuovi">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
                                                 </div>
-                                                <!-- Reorder compact su mobile: long-press drag o solo rimuovi -->
-                                                <button @click="removeArtworkFromTour(artwork._id)" class="btn btn-sm btn-outline-danger rounded-circle btn-artwork-action flex-shrink-0" title="Rimuovi" style="width:30px;height:30px;padding:0;">
-                                                    <i class="bi bi-x-lg" style="font-size:0.75rem;"></i>
-                                                </button>
                                             </div>
                                         </template>
                                     </div>
+
                                 </div>
                             </div>
 
                             <!-- Right: Available Artworks -->
                             <div class="col-lg-6" :class="mobileArtworksTab === 'selected' ? 'd-none d-lg-block' : ''">
-                                <div class="glass-card rounded-4 p-3 p-md-4 h-100 animate-pop-in delay-200 artworks-panel-mobile">
+                                <div class="glass-card rounded-4 p-3 p-md-4 h-100 artworks-panel-mobile">
                                     <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3 pb-2 pb-md-3 border-bottom border-secondary border-opacity-25">
                                         <h6 class="fw-bold m-0 d-flex align-items-center">
                                             <i class="bi bi-collection text-orange me-2"></i>
@@ -622,13 +652,13 @@
                                     <div x-show="filteredAvailableArtworks.length > 0" class="artworks-tab-list max-h-400 pe-1">
                                         <template x-for="artwork in filteredAvailableArtworks" :key="artwork._id">
                                             <div class="artwork-item artwork-item-mobile d-flex align-items-center gap-2 p-2 p-sm-3 mb-2 rounded-4 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
-                                                <img :src="artwork.img_path" :alt="artwork.item" class="rounded-3 flex-shrink-0 object-fit-cover" style="width:36px;height:36px;">
+                                                <img :src="artwork.img_path" :alt="artwork.item" class="artwork-img-sm rounded-3 flex-shrink-0 object-fit-cover">
                                                 <div class="flex-grow-1 min-w-0">
-                                                    <div class="fw-bold text-truncate text-white" style="font-size:0.8rem;line-height:1.3;" x-text="artwork.item"></div>
+                                                    <div class="artwork-title-sm fw-bold text-truncate text-white" x-text="artwork.item"></div>
                                                     <small class="text-white-50 text-truncate d-block artwork-catalog-author" x-text="artwork.author"></small>
                                                 </div>
-                                                <button @click="addArtworkToTour(artwork)" class="btn btn-sm btn-outline-orange rounded-circle btn-artwork-action flex-shrink-0" title="Aggiungi" style="width:32px;height:32px;padding:0;">
-                                                    <i class="bi bi-plus-lg" style="font-size:0.85rem;"></i>
+                                                <button @click="addArtworkToTour(artwork)" class="btn-icon-32 btn btn-sm btn-outline-orange rounded-circle btn-artwork-action flex-shrink-0" title="Aggiungi">
+                                                    <i class="bi bi-plus-lg fs-85"></i>
                                                 </button>
                                             </div>
                                         </template>
@@ -637,6 +667,7 @@
                             </div>
                         </div>
                     </div>
+
 
                     <!-- TAB 3: QUIZ -->
                     <div x-show="formTab === 'quiz'" x-transition.opacity.duration.200ms>
@@ -672,7 +703,7 @@
                             <div class="row g-3">
                                 <!-- Quiz List -->
                                 <div class="col-lg-6" :class="mobileQuizTab === 'editor' ? 'd-none d-lg-block' : ''">
-                                    <div class="glass-card rounded-4 p-3 p-md-4 h-100 animate-pop-in delay-100">
+                                    <div class="glass-card rounded-4 p-3 p-md-4 h-100">
                                         <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-secondary border-opacity-25">
                                             <h5 class="fw-bold m-0 d-flex align-items-center">
                                                 <i class="bi bi-patch-question text-orange me-2 fs-5"></i>
@@ -724,7 +755,7 @@
 
                                 <!-- Quiz Editor -->
                                 <div class="col-lg-6" :class="mobileQuizTab === 'list' ? 'd-none d-lg-block' : ''">
-                                    <div class="glass-card rounded-4 p-3 p-md-4 h-100 animate-pop-in delay-200">
+                                    <div class="glass-card rounded-4 p-3 p-md-4 h-100">
                                         <div class="mb-3 pb-3 border-bottom border-secondary border-opacity-25">
                                             <h5 class="fw-bold m-0 text-white d-flex align-items-center">
                                                 <i class="bi me-3" :class="editingQuestionId ? 'bi-pencil-square text-info' : 'bi-plus-circle text-success'"></i>
@@ -790,11 +821,12 @@
 
                     <!-- Mobile FAB: Salva (visibile solo su mobile, rimane in basso sopra la mobile-nav) -->
                     <div class="d-sm-none form-mobile-fab" x-show="formTab === 'info'" x-transition.opacity>
-                        <button type="button" @click="saveTour()" class="btn bg-orange text-white rounded-pill fw-bold shadow-lg d-flex align-items-center gap-2 px-5" style="height: 50px;">
+                        <button type="button" @click="saveTour()" class="h-50 btn bg-orange text-white rounded-pill fw-bold shadow-lg d-flex align-items-center gap-2 px-5">
                             <i class="bi bi-cloud-arrow-up fs-5"></i>
                             <span>Salva</span>
                         </button>
                     </div>
+
                 </div>
                 
                 <div class="pb-5 mb-4"></div>
@@ -859,7 +891,7 @@
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
         </a>
-        <a href="/editor/tours" class="mobile-nav-item active">
+        <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" @click.prevent="resetToSelection()" class="mobile-nav-item active">
             <i class="bi bi-pencil-square"></i>
             <span>Visite</span>
         </a>

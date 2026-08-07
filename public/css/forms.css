@@ -357,8 +357,9 @@ body.login-page[data-bs-theme="dark"] .login-shape {
 }
 
 .hover-bg-light:hover {
-    background-color: rgba(13, 110, 253, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
 }
+
 
 /* Max width constraint */
 .max-w-450 {

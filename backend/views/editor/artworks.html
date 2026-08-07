@@ -19,9 +19,6 @@
     <link rel="stylesheet" href="/css/effects.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/artworks.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
 </head>
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="artworkManager()">
@@ -43,7 +40,7 @@
                 <a href="/editor/dashboard" class="nav-link-admin">
                     <i class="bi bi-grid-fill"></i> <span>Dashboard</span>
                 </a>
-                <a href="/editor/tours" class="nav-link-admin">
+                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="nav-link-admin">
                     <i class="bi bi-pencil-square"></i> <span>Gestione Visite</span>
                 </a>
 
@@ -58,6 +55,10 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin active">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
+                <a href="/editor/import" x-show="permissions !== 'docente'" class="nav-link-admin">
+                    <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
+                </a>
+
 
                 <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
@@ -70,12 +71,12 @@
             </nav>
 
             <div class="p-3 mt-auto">
-                                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
+                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content flex-grow-1 pb-5 pb-md-0">
+        <!-- Main Workspace -->
+        <main class="main-content flex-grow-1">
             <!-- Mobile Header -->
             <header class="mobile-header">
                 <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
@@ -86,7 +87,6 @@
                 </a>
             </header>
 
-
             <!-- Desktop Header -->
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
                 <div class="container-fluid">
@@ -94,7 +94,7 @@
                         <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
                             <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
                             <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style="opacity: 0; transition: opacity 0.3s;" onload="this.style.opacity='1'" onerror="this.style.opacity='0'">
+                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
                             </template>
                         </div>
                         <div>
@@ -104,17 +104,15 @@
                     </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <button x-show="step === 'artwork-list'" @click="openArtworkForm()"
-                            class="btn btn-orange rounded-pill px-4 py-2 d-inline-flex align-items-center justify-content-center btn-glow hover-lift lh-1">
-                            <i class="bi bi-plus-lg fs-5 text-white fw-bold my-auto"></i>
-                            <span class="ms-2 fw-semibold text-white">Aggiungi Opera</span>
-                        </button>
+                        <div class="text-end me-2">
+                            <span class="d-block text-white-50 text-uppercase fw-bold fs-065 tracking-wide-1px">Ruolo</span>
+                            <span class="text-orange fw-bold" x-text="permissions"></span>
+                        </div>
                     </div>
                 </div>
             </header>
 
             <div class="p-4 p-lg-5">
-
                 <!-- Museum Selection -->
                 <div x-show="step === 'artwork-museum-select'" class="museum-select-state fade-in">
                     <i class="bi bi-search text-orange float"></i>
@@ -173,15 +171,15 @@
                                             <td class="ps-4 py-3">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <div class="artwork-preview artwork-preview-sm">
-                                                        <template x-if="art.img_path">
-                                                            <img :src="art.img_path"
-                                                                @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'"
-                                                                class="rounded-3">
-                                                        </template>
-                                                        <div class="artwork-placeholder rounded-3"
-                                                            :style="art.img_path ? 'display:none' : 'display:flex'">
-                                                            IMG
-                                                        </div>
+                                                         <template x-if="art.img_path">
+                                                             <img :src="art.img_path"
+                                                                 @error="$el.classList.add('d-none'); $el.nextElementSibling.classList.replace('d-none', 'd-flex')"
+                                                                 class="rounded-3">
+                                                         </template>
+                                                         <div class="artwork-placeholder rounded-3"
+                                                             :class="art.img_path ? 'd-none' : 'd-flex'">
+                                                             IMG
+                                                         </div>
                                                     </div>
                                                     <span class="fw-bold text-white" x-text="art.item"></span>
                                                 </div>
@@ -216,15 +214,15 @@
                                 <div class="card-body p-3">
                                     <div class="d-flex gap-3">
                                         <div class="artwork-preview artwork-preview-md">
-                                            <template x-if="art.img_path">
-                                                <img :src="art.img_path"
-                                                    @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'"
-                                                    class="rounded-3">
-                                            </template>
-                                            <div class="artwork-placeholder rounded-3"
-                                                :style="art.img_path ? 'display:none' : 'display:flex'">
-                                                IMG
-                                            </div>
+                                             <template x-if="art.img_path">
+                                                 <img :src="art.img_path"
+                                                     @error="$el.classList.add('d-none'); $el.nextElementSibling.classList.replace('d-none', 'd-flex')"
+                                                     class="rounded-3">
+                                             </template>
+                                             <div class="artwork-placeholder rounded-3"
+                                                 :class="art.img_path ? 'd-none' : 'd-flex'">
+                                                 IMG
+                                             </div>
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="fw-bold mb-1" x-text="art.item"></h6>
@@ -311,7 +309,7 @@
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control bg-dark text-white border-secondary hover-glow"
                                         x-model="currentArtwork.img_path" placeholder="URL immagine..." required>
-                                    <label class="btn btn-outline-orange" style="cursor: pointer;">
+                                    <label class="btn btn-outline-orange cursor-pointer-label">
                                         <i class="bi bi-upload"></i> Carica
                                         <input type="file" class="d-none" accept="image/*" @change="uploadImage">
                                     </label>
@@ -320,10 +318,10 @@
                                     <div class="artwork-preview mx-auto">
                                         <template x-if="currentArtwork.img_path">
                                             <img :src="currentArtwork.img_path"
-                                                @error="$el.style.display='none'; $el.nextElementSibling.style.display='flex'">
+                                                @error="$el.classList.add('d-none'); $el.nextElementSibling.classList.replace('d-none', 'd-flex')">
                                         </template>
                                         <div class="artwork-placeholder"
-                                            :style="currentArtwork.img_path ? 'display:none' : 'display:flex'">
+                                            :class="currentArtwork.img_path ? 'd-none' : 'd-flex'">
                                             Anteprima
                                         </div>
                                     </div>
@@ -422,7 +420,7 @@
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
         </a>
-        <a href="/editor/tours" class="mobile-nav-item">
+        <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="mobile-nav-item">
             <i class="bi bi-pencil-square"></i>
             <span>Visite</span>
         </a>

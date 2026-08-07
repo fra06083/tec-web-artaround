@@ -7,6 +7,7 @@ function marketplaceApp() {
         isProfileModalOpen: false,
         profileForm: { name: '', propic: '', nameError: '' },
         isVisitSelectionModalOpen: false,
+        visitSearchQuery: '',
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
         items: [],
@@ -24,6 +25,18 @@ function marketplaceApp() {
             serverStatus: 'Offline'
         },
         tagSearchQuery: '',
+        get filteredSelectionVisits() {
+            if (!this.visitSearchQuery || !this.visitSearchQuery.trim()) {
+                return this.items;
+            }
+            const q = this.visitSearchQuery.toLowerCase().trim();
+            return this.items.filter(tour => {
+                const name = tour.name?.toLowerCase() || '';
+                const museum = tour.museum_id?.museum?.toLowerCase() || '';
+                return name.includes(q) || museum.includes(q);
+            });
+        },
+
         get availableTags() {
             const tagsSet = new Set();
             this.items.forEach(tour => {

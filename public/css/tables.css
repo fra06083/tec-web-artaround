@@ -52,7 +52,7 @@
     color: #fd7e14;
     text-transform: uppercase;
     font-weight: 800;
-    border-bottom: 2px solid rgba(253, 126, 20, 0.2) !important;
+    border-bottom: 2px solid rgba(253, 126, 20, 0.2);
     padding: 1.25rem 1rem;
 }
 
@@ -63,19 +63,19 @@
 }
 
 .table-row-custom td {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     color: #e5e7eb;
 }
 
 /* Ultima riga senza bordo */
 .table tbody tr:last-child td {
-    border-bottom: none !important;
+    border-bottom: none;
 }
 
 /* Hover Effect per le righe */
 .table-row-custom:hover,
 .table-hover tbody tr:hover {
-    background: linear-gradient(90deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.02) 100%) !important;
+    background: linear-gradient(90deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.02) 100%);
 }
 
 .table-row-custom:hover td,
@@ -154,10 +154,10 @@
     
     /* Ogni riga diventa una bellissima "Scheda" (Card) molto visibile */
     .table-row-custom {
-        background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%) !important;
-        background-color: #2b2b3d !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+        background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+        background-color: #2b2b3d;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-top: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 16px;
         margin-bottom: 1.5rem;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -175,8 +175,8 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        padding: 0.8rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 0.8rem 1rem;
         font-size: 1rem;
         text-align: right;
         color: #f8f9fa; /* Testo più chiaro e leggibile */
@@ -188,8 +188,8 @@
         font-size: 1.25rem;
         font-weight: 900;
         color: #fd7e14;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 1.2rem 1rem !important;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding: 1.2rem 1rem;
         margin-bottom: 0.5rem;
         text-align: left;
         background: rgba(0,0,0,0.1);
@@ -198,13 +198,13 @@
     
     /* L'ultima cella (generalmente le Azioni) */
     .table-row-custom td:last-child {
-        border-bottom: none !important;
+        border-bottom: none;
         background: rgba(0, 0, 0, 0.3);
         border-radius: 12px;
         margin-top: 0.5rem;
         justify-content: center;
         gap: 1rem;
-        padding: 1rem !important;
+        padding: 1rem;
     }
     
     /* Se c'è un'immagine, modifichiamo leggermente il layout */
@@ -214,3 +214,4 @@
         border-radius: 10px;
     }
 }
+

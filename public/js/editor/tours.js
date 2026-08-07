@@ -14,8 +14,9 @@ document.addEventListener('alpine:init', () => {
         // ROOM STATE
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
-        allowLateJoins: true,
+        visibilityFilter: 'all', // 'all', 'public', 'private'
         predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
+
         newCustomTag: '',
         get customTags() {
             return this.tour.tags ? this.tour.tags.filter(t => !this.predefinedTags.includes(t)) : [];
@@ -83,6 +84,8 @@ document.addEventListener('alpine:init', () => {
 
         // INITIALIZATION
         async init() {
+            this._restoringState = true;
+
             await this.checkAuth();
             if (this.isLoggedIn) {
                 await this.fetchMuseums();
@@ -91,11 +94,8 @@ document.addEventListener('alpine:init', () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const editId = urlParams.get('id');
 
-                // Flag: blocca _saveNavState durante il ripristino
-                this._restoringState = true;
-
                 if (editId) {
-                    // Deep-link via URL: priorità assoluta
+                    // Deep-link via URL parameter
                     this.mode = 'edit';
                     this.selectedTourId = editId;
                     const success = await this.loadTour(editId);
@@ -105,33 +105,37 @@ document.addEventListener('alpine:init', () => {
                         this.step = 'form';
                         this.formTab = 'info';
                     } else {
-                        this.step = 'marketplace';
-                        this.selectedTourId = '';
+                        this.resetToSelection();
                     }
                 } else {
-                    // Ripristina l'ultima posizione salvata (se presente)
+                    // Restore saved navigation position on page refresh (F5)
                     const savedState = localStorage.getItem('artaround_tours_state');
                     if (savedState) {
                         try {
                             const state = JSON.parse(savedState);
-                            const savedMuseum = this.museums.find(m => m._id === state.selectedMuseum);
-                            if (savedMuseum && state.step && state.step !== 'selection') {
-                                this.selectedMuseum = state.selectedMuseum;
-                                this.mode = state.mode || 'edit';
-                                this.step = state.step;
-                                // Se era nel form di modifica, ricarica la visita
-                                if (state.step === 'form' && state.selectedTourId) {
-                                    this.selectedTourId = state.selectedTourId;
-                                    const success = await this.loadTour(state.selectedTourId);
-                                    if (success) {
-                                        await this.fetchAvailableArtworks();
-                                        this.formTab = 'info';
-                                    } else {
-                                        this.step = 'marketplace';
-                                        this.selectedTourId = '';
+                            if (state.step && state.step !== 'selection') {
+                                this.mode = state.mode || null;
+                                this.selectedMuseum = state.selectedMuseum || '';
+                                this.selectedTourId = state.selectedTourId || '';
+                                this.formTab = state.formTab || 'info';
+
+                                if (state.step === 'form') {
+                                    this.step = 'form';
+                                    if (this.mode === 'create' && this.selectedMuseum) {
+                                        await this.goToForm();
+                                    } else if (this.selectedTourId) {
+                                        const success = await this.loadTour(this.selectedTourId);
+                                        if (success) {
+                                            await this.fetchAvailableArtworks();
+                                        } else {
+                                            this.resetToSelection();
+                                        }
                                     }
                                 } else if (state.step === 'marketplace') {
-                                    // Torna al marketplace, nessun tour da ricaricare
+                                    this.step = 'marketplace';
+                                    if (this.selectedMuseum) {
+                                        await this.fetchAvailableArtworks();
+                                    }
                                 }
                             }
                         } catch (e) {
@@ -140,14 +144,14 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
 
-                // Ripristino completato: ora è sicuro registrare i watch
+                // Restoration complete, safe to attach state watchers
                 this._restoringState = false;
 
-                // Salva automaticamente lo stato navigazione ad ogni cambiamento
                 this.$watch('step', () => this._saveNavState());
                 this.$watch('selectedMuseum', () => this._saveNavState());
                 this.$watch('selectedTourId', () => this._saveNavState());
                 this.$watch('mode', () => this._saveNavState());
+                this.$watch('formTab', () => this._saveNavState());
             } else {
                 this.logout();
             }
@@ -173,10 +177,16 @@ document.addEventListener('alpine:init', () => {
             this.isReady = true;
         },
 
+        resetToSelection() {
+            this.step = 'selection';
+            this.mode = null;
+            this.selectedMuseum = '';
+            this.selectedTourId = '';
+            localStorage.removeItem('artaround_tours_state');
+        },
+
         _saveNavState() {
-            // Non salvare durante il ripristino iniziale
             if (this._restoringState) return;
-            // Non salvare lo step 'selection': all'avvio si parte sempre da lì
             if (this.step === 'selection') {
                 localStorage.removeItem('artaround_tours_state');
                 return;
@@ -185,9 +195,15 @@ document.addEventListener('alpine:init', () => {
                 step: this.step,
                 selectedMuseum: this.selectedMuseum,
                 selectedTourId: this.selectedTourId,
-                mode: this.mode
+                mode: this.mode,
+                formTab: this.formTab
             }));
         },
+
+
+
+
+
 
         // AUTHENTICATION
                 async checkAuth() {
@@ -308,8 +324,16 @@ document.addEventListener('alpine:init', () => {
                 this.step = 'marketplace';
             } else {
                 this.step = 'selection';
+                this.$nextTick(() => {
+                    const pickerEl = document.getElementById('museum-picker-section');
+                    if (pickerEl) {
+                        pickerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
             }
         },
+
+
         
 
         goBackFromForm() {
@@ -511,11 +535,18 @@ document.addEventListener('alpine:init', () => {
                 return museumId.toString() === this.selectedMuseum.toString();
             });
 
+            if (this.visibilityFilter === 'public') {
+                tours = tours.filter(t => !t.isPrivate);
+            } else if (this.visibilityFilter === 'private') {
+                tours = tours.filter(t => t.isPrivate);
+            }
+
             if (this.tourSearch) {
                 tours = tours.filter(t => t.name.toLowerCase().includes(this.tourSearch.toLowerCase()));
             }
             return tours.reverse();
         },
+
 
         // Add artwork locally (no need for tour._id anymore)
         addArtworkToTour(artwork) {

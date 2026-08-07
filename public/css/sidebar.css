@@ -74,26 +74,6 @@
     }
 }
 
-@media (max-width: 991px) {
-    .sidebar {
-        width: 80px !important;
-        transition: width 0.3s ease;
-    }
-
-    .sidebar span,
-    .nav-section-header {
-        display: none;
-    }
-
-    .nav-link-admin {
-        justify-content: center;
-        padding: 15px;
-    }
-
-    .main-content {
-        margin-left: 80px;
-    }
-}
 
 /* Mobile Full Height Fix */
 @media (max-width: 768px) {
