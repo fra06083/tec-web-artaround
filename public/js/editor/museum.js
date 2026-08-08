@@ -6,16 +6,16 @@ const POI_TIPI = [
  
 const PIN_TIPI = [
     { tipo: 'sala',      label: 'Sala',             icona: 'bi-door-open' },
-    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right' },
-    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right' },
-    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right' },
-    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing' },
-    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot' },
-    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag' },
-    { tipo: 'scala',     label: 'Scale',            icona: 'bi-ladder' },
-    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up' },
-    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle' }
-]
+    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right',  domanda: "Dov'è l'ingresso?" },
+    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right',     domanda: "Dov'è l'uscita?" },
+    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right',     domanda: "Dove sono le uscite di emergenza?" },
+    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing',     domanda: "Dove sono i servizi igienici?" },
+    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot',             domanda: "Dov'è la caffetteria?" },
+    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag',                 domanda: "Dov'è il bookshop?" },
+    { tipo: 'scala',     label: 'Scale',            icona: 'bi-sort-numeric-up',     domanda: "Dove sono le scale?" },
+    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up',       domanda: "Dov'è l'ascensore?" },
+    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle', domanda: "Ci sono ostacoli all'accessibilità?" }
+];
 
 function museumManager() {
     return {
@@ -258,6 +258,7 @@ function museumManager() {
         pinModePiano: null,       // piano su cui è armata l'azione
         isPinModalOpen: false,
         pinDraft: { tipo: 'sala', nome: '', piano: 0 },
+        
  
         iconaPin(tipo) {
             const t = PIN_TIPI.find(x => x.tipo === tipo);
@@ -267,6 +268,18 @@ function museumManager() {
         labelPin(tipo) {
             const t = PIN_TIPI.find(x => x.tipo === tipo);
             return t ? t.label : tipo;
+        },
+
+        // Un punto per ogni pin che non è una sala
+        get puntiConDomanda() {
+            return (this.currentMuseum.mappa?.sale || [])
+                .map((s, idx) => ({ s, idx }))
+                .filter(o => o.s.tipo !== 'sala');
+        },
+
+        domandaPin(tipo) {
+            const t = PIN_TIPI.find(x => x.tipo === tipo);
+            return t?.domanda || 'Come si raggiunge questo punto?';
         },
  
         // Punti di un piano, con l'indice originale nell'array vero.
@@ -381,16 +394,22 @@ function museumManager() {
 
         // Scarta i piani senza immagine e le domande senza risposta
         buildMuseumPayload() {
-            const mappa = this.currentMuseum.mappa || { piante: [], poi: [] };
-            return {
-                ...this.currentMuseum,
-                mappa: {
-                    piante: (mappa.piante || []).filter(p => p.immagine),
-                    sale: (mappa.sale || []).filter(s => s.nome && s.nome.trim() !== ''),
-                    poi: (mappa.poi || []).filter(p => p.testo && p.testo.trim() !== '')
-                }
-            };
-        },
+        const mappa = this.currentMuseum.mappa || { piante: [], sale: [], poi: [] };
+        const sale = (mappa.sale || []).filter(s => s.nome && s.nome.trim() !== '');
+        return {
+            ...this.currentMuseum,
+            mappa: {
+                piante: (mappa.piante || []).filter(p => p.immagine),
+                sale: sale,
+                // Compatibilità: il Navigator legge ancora mappa.poi per i comandi
+                // vocali. Lo generiamo dai pin, così il curatore compila un posto solo.
+                // Da rimuovere quando VisitDetail.jsx leggerà mappa.sale.
+                poi: sale
+                    .filter(s => s.tipo !== 'sala' && s.risposta && s.risposta.trim())
+                    .map(s => ({ tipo: s.tipo, piano: s.piano, testo: s.risposta }))
+            }
+        };
+    },
 
         // --- UTILITY ---
         getMuseumName(id) {

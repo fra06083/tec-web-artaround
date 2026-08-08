@@ -573,7 +573,7 @@
                                                 :class="pinSelezionato === o.idx
                                                     ? 'bg-orange-subtle'
                                                     : (darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white')"
-                                                :aria-expanded="o.s.tipo === 'sala' ? (pinSelezionato === o.idx) : null"
+                                                :aria-expanded="haDettaglio(o.s) ? (pinSelezionato === o.idx) : null"
                                                 :aria-controls="'dettaglio-' + o.idx">
 
                                                 <span class="btn-icon-32 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
@@ -589,7 +589,7 @@
                                                         x-text="labelPin(o.s.tipo)"></span>
                                                 </span>
 
-                                                <i class="bi flex-shrink-0" x-show="o.s.tipo === 'sala'"
+                                                <i class="bi flex-shrink-0" x-show="haDettaglio(o.s)"
                                                     :class="[
                                                         pinSelezionato === o.idx ? 'bi-chevron-up' : 'bi-chevron-down',
                                                         darkMode ? 'text-white-50' : 'text-secondary'
@@ -597,29 +597,40 @@
                                             </button>
 
                                             <div :id="'dettaglio-' + o.idx"
-                                                x-show="pinSelezionato === o.idx && o.s.tipo === 'sala'" x-collapse
+                                                x-show="pinSelezionato === o.idx && haDettaglio(o.s)" x-collapse
                                                 class="px-3 pb-3 pt-1"
                                                 :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white'">
 
-                                                <ul class="list-unstyled d-flex flex-column gap-2 m-0"
-                                                    x-show="opereDellaSala(o.s.nome).length > 0">
-                                                    <template x-for="op in opereDellaSala(o.s.nome)" :key="op._id">
-                                                        <li class="d-flex align-items-center gap-3">
-                                                            <img :src="op.img_path" alt=""
-                                                                class="rounded-3 object-fit-cover flex-shrink-0 w-h-48">
-                                                            <span class="small fw-medium break-word"
-                                                                :class="darkMode ? 'text-white' : 'text-dark'"
-                                                                x-text="op.item"></span>
-                                                        </li>
-                                                    </template>
-                                                </ul>
+                                                <template x-if="o.s.tipo === 'sala'">
+                                                    <div>
+                                                        <ul class="list-unstyled d-flex flex-column gap-2 m-0"
+                                                            x-show="opereDellaSala(o.s.nome).length > 0">
+                                                            <template x-for="op in opereDellaSala(o.s.nome)" :key="op._id">
+                                                                <li class="d-flex align-items-center gap-3">
+                                                                    <img :src="op.img_path" alt=""
+                                                                        class="rounded-3 object-fit-cover flex-shrink-0 w-h-48">
+                                                                    <span class="small fw-medium break-word"
+                                                                        :class="darkMode ? 'text-white' : 'text-dark'"
+                                                                        x-text="op.item"></span>
+                                                                </li>
+                                                            </template>
+                                                        </ul>
 
-                                                <p x-show="opereDellaSala(o.s.nome).length === 0"
-                                                    class="small fst-italic m-0"
-                                                    :class="darkMode ? 'text-white-50' : 'text-muted'">
-                                                    Nessuna opera catalogata in questa sala.
-                                                </p>
+                                                        <p x-show="opereDellaSala(o.s.nome).length === 0"
+                                                            class="small fst-italic m-0"
+                                                            :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                                            Nessuna opera catalogata in questa sala.
+                                                        </p>
+                                                    </div>
+                                                </template>
+
+                                                <template x-if="o.s.tipo !== 'sala'">
+                                                    <p class="small m-0 break-word"
+                                                        :class="darkMode ? 'text-white' : 'text-dark'"
+                                                        x-text="o.s.risposta"></p>
+                                                </template>
                                             </div>
+
                                         </div>
                                     </template>
 

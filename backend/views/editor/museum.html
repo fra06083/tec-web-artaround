@@ -511,17 +511,33 @@
                                 <div class="museum-section-header">
                                     <i class="bi bi-chat-square-quote-fill fs-5"></i> Risposte ai Visitatori (Punti di Interesse)
                                 </div>
-                                <p class="small text-white-50 mb-3">Compila le domande per fornire indicazioni ai visitatori durante i tour. Le domande lasciate vuote verranno nascoste.</p>
+                                <p class="small text-white-50 mb-3">
+                                    Per ogni punto che non è una sala puoi scrivere l'indicazione da dare ai
+                                    visitatori. Le risposte lasciate vuote non verranno mostrate.
+                                </p>
 
                                 <div class="d-flex flex-column gap-3">
-                                    <template x-for="d in (currentMuseum.mappa ? currentMuseum.mappa.poi : [])" :key="d.tipo">
-                                        <div class="bg-dark bg-opacity-40 p-3 rounded-3 border border-secondary border-opacity-20">
-                                            <label class="form-label text-white small fw-bold mb-1 d-flex align-items-center gap-2"
-                                                x-text="getDomanda(d.tipo)"></label>
-                                            <input type="text" class="form-control bg-dark border-secondary text-white rounded-3 premium-input"
-                                                placeholder="Lascia vuoto per nascondere la domanda..." x-model="d.testo">
+                                    <template x-for="o in puntiConDomanda" :key="o.idx">
+                                        <div class="bg-dark bg-opacity-40 p-3 rounded-3 border border-secondary border-opacity-25">
+                                            <label class="form-label text-white small fw-bold mb-2 d-flex align-items-center gap-2"
+                                                :for="'risposta' + o.idx">
+                                                <span class="btn-icon-32 rounded-circle bg-orange-subtle text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                                                    <i class="bi" :class="iconaPin(o.s.tipo)"></i>
+                                                </span>
+                                                <span x-text="domandaPin(o.s.tipo)"></span>
+                                                <span class="badge bg-slate text-white fw-normal" x-text="o.s.nome"></span>
+                                            </label>
+                                            <input type="text" :id="'risposta' + o.idx"
+                                                class="form-control bg-dark border-secondary text-white rounded-3 premium-input"
+                                                placeholder="Es: in fondo al corridoio, a destra della scala"
+                                                x-model="o.s.risposta">
                                         </div>
                                     </template>
+
+                                    <p x-show="puntiConDomanda.length === 0" class="small text-white-50 m-0 fst-italic">
+                                        Aggiungi dei punti sulla pianta (toilette, bar, uscite…) per poter
+                                        scrivere le indicazioni per i visitatori.
+                                    </p>
                                 </div>
                             </div>
 

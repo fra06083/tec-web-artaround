@@ -1,14 +1,14 @@
 const PIN_TIPI = [
     { tipo: 'sala',      label: 'Sala',             icona: 'bi-door-open' },
-    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right' },
-    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right' },
-    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right' },
-    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing' },
-    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot' },
-    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag' },
-    { tipo: 'scala',     label: 'Scale',            icona: 'bi-sort-numeric-up' },
-    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up' },
-    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle' }
+    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right',  domanda: "Dov'è l'ingresso?" },
+    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right',     domanda: "Dov'è l'uscita?" },
+    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right',     domanda: "Dove sono le uscite di emergenza?" },
+    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing',     domanda: "Dove sono i servizi igienici?" },
+    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot',             domanda: "Dov'è la caffetteria?" },
+    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag',                 domanda: "Dov'è il bookshop?" },
+    { tipo: 'scala',     label: 'Scale',            icona: 'bi-sort-numeric-up',     domanda: "Dove sono le scale?" },
+    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up',       domanda: "Dov'è l'ascensore?" },
+    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle', domanda: "Ci sono ostacoli all'accessibilità?" }
 ];
 
 function marketplaceApp() {
@@ -146,6 +146,10 @@ function marketplaceApp() {
         labelPin(tipo) {
             const t = PIN_TIPI.find(x => x.tipo === tipo);
             return t ? t.label : tipo;
+        },
+
+        haDettaglio(s) {
+            return s.tipo === 'sala' || !!(s.risposta && s.risposta.trim());
         },
  
         get saleMuseo() {
