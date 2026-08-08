@@ -3,6 +3,20 @@ const POI_TIPI = [
     { tipo: 'bar',      domanda: "Dov'è la caffetteria?" },
     { tipo: 'shop',     domanda: "Dov'è il bookshop?" }
 ];
+ 
+const PIN_TIPI = [
+    { tipo: 'sala',      label: 'Sala',             icona: 'bi-door-open' },
+    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right' },
+    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right' },
+    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right' },
+    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing' },
+    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot' },
+    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag' },
+    { tipo: 'scala',     label: 'Scale',            icona: 'bi-ladder' },
+    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up' },
+    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle' }
+]
+
 function museumManager() {
     return {
         // --- STATO SESSIONE & NAVIGAZIONE ---
@@ -103,6 +117,9 @@ function museumManager() {
                 this.currentMuseum = { museum: '', city: '', province: '', region: '', address: '', description: '', image: '' };
             }
             this.currentMuseum.mappa = this.normalizeMappa(this.currentMuseum);
+            this.salaSelezionata = null;
+            this.isPinModalOpen = false;
+            this.annullaPin();
             this.step = 'museum-form';
         },
 
@@ -188,6 +205,7 @@ function museumManager() {
             const mappa = m.mappa || {};
             return {
                 piante: mappa.piante ? [...mappa.piante] : [],
+                sale: mappa.sale ? [...mappa.sale] : [],
                 poi: POI_TIPI.map(t => {
                     const esistente = (mappa.poi || []).find(p => p.tipo === t.tipo);
                     return { tipo: t.tipo, piano: esistente?.piano ?? 0, testo: esistente?.testo || '' };
@@ -233,6 +251,133 @@ function museumManager() {
                 this.showToast('Errore di connessione durante l\'upload', 'error');
             }
         },
+        
+        pinTipi: PIN_TIPI,
+        salaSelezionata: null,    // indice in mappa.sale, oppure null
+        pinMode: null,            // null | 'add' | 'move'
+        pinModePiano: null,       // piano su cui è armata l'azione
+        isPinModalOpen: false,
+        pinDraft: { tipo: 'sala', nome: '', piano: 0 },
+ 
+        iconaPin(tipo) {
+            const t = PIN_TIPI.find(x => x.tipo === tipo);
+            return t ? t.icona : 'bi-geo-alt-fill';
+        },
+ 
+        labelPin(tipo) {
+            const t = PIN_TIPI.find(x => x.tipo === tipo);
+            return t ? t.label : tipo;
+        },
+ 
+        // Punti di un piano, con l'indice originale nell'array vero.
+        salePiano(piano) {
+            const sale = this.currentMuseum.mappa.sale || [];
+            return sale
+                .map((s, idx) => ({ s, idx }))
+                .filter(o => o.s.piano === piano);
+        },
+ 
+        // Nome suggerito: le sale si numerano, gli altri prendono il nome
+        // del tipo. Il curatore lo può sempre riscrivere nella modale.
+        nomeDefault(tipo) {
+            const sale = this.currentMuseum.mappa.sale || [];
+            if (tipo === 'sala') {
+                return `Sala ${sale.filter(s => s.tipo === 'sala').length + 1}`;
+            }
+            const gia = sale.filter(s => s.tipo === tipo).length;
+            return gia === 0 ? this.labelPin(tipo) : `${this.labelPin(tipo)} ${gia + 1}`;
+        },
+ 
+        // --- MODALE NUOVO PUNTO ---
+        apriPinModal(piano) {
+            this.annullaPin();
+            this.pinDraft = { tipo: 'sala', nome: this.nomeDefault('sala'), piano };
+            this.isPinModalOpen = true;
+        },
+ 
+        scegliTipoPin(tipo) {
+            // Se il nome è ancora quello suggerito, lo riallinea al nuovo tipo.
+            const eraSuggerito = this.pinDraft.nome === this.nomeDefault(this.pinDraft.tipo);
+            this.pinDraft.tipo = tipo;
+            if (eraSuggerito || !this.pinDraft.nome.trim()) {
+                this.pinDraft.nome = this.nomeDefault(tipo);
+            }
+        },
+ 
+        chiudiPinModal() {
+            this.isPinModalOpen = false;
+        },
+ 
+        // Conferma la modale e arma il posizionamento sulla pianta.
+        confermaPinDraft() {
+            if (!this.pinDraft.nome.trim()) {
+                this.showToast('Dai un nome al punto', 'error');
+                return;
+            }
+            this.isPinModalOpen = false;
+            this.pinMode = 'add';
+            this.pinModePiano = this.pinDraft.piano;
+            this.salaSelezionata = null;
+        },
+ 
+        // --- POSIZIONAMENTO SULLA PIANTA ---
+        armaSpostamento(idx, piano) {
+            this.pinMode = 'move';
+            this.pinModePiano = piano;
+            this.salaSelezionata = idx;
+        },
+ 
+        annullaPin() {
+            this.pinMode = null;
+            this.pinModePiano = null;
+        },
+ 
+        // La pianta risponde SOLO se c'è un'azione armata su quel piano.
+        // Coordinate normalizzate 0-1: la mappa scala su qualsiasi schermo.
+        mappaClick(event, piano) {
+            if (this.pinMode === null || this.pinModePiano !== piano) return;
+ 
+            const r = event.currentTarget.getBoundingClientRect();
+            const x = (event.clientX - r.left) / r.width;
+            const y = (event.clientY - r.top) / r.height;
+            const sale = this.currentMuseum.mappa.sale;
+ 
+            if (this.pinMode === 'move' && sale[this.salaSelezionata]) {
+                sale[this.salaSelezionata].x = x;
+                sale[this.salaSelezionata].y = y;
+            } else if (this.pinMode === 'add') {
+                sale.push({
+                    nome: this.pinDraft.nome.trim(),
+                    piano, x, y,
+                    tipo: this.pinDraft.tipo
+                });
+                this.salaSelezionata = sale.length - 1;
+            }
+ 
+            this.annullaPin();
+        },
+ 
+        // Click su un pin: lo evidenzia soltanto, non lo sposta.
+        selezionaSala(idx) {
+            this.salaSelezionata = (this.salaSelezionata === idx) ? null : idx;
+        },
+ 
+        removeSala(idx) {
+            this.currentMuseum.mappa.sale.splice(idx, 1);
+            this.salaSelezionata = null;
+            this.annullaPin();
+        },
+ 
+        // Elimina il piano e i punti che ci stavano sopra, così non
+        // restano punti orfani agganciati a una pianta inesistente.
+        removePianoConSale(i) {
+            const piano = this.currentMuseum.mappa.piante[i].piano;
+            this.currentMuseum.mappa.piante.splice(i, 1);
+            this.currentMuseum.mappa.sale =
+                (this.currentMuseum.mappa.sale || []).filter(s => s.piano !== piano);
+            this.salaSelezionata = null;
+            this.annullaPin();
+        },
 
         // Scarta i piani senza immagine e le domande senza risposta
         buildMuseumPayload() {
@@ -241,6 +386,7 @@ function museumManager() {
                 ...this.currentMuseum,
                 mappa: {
                     piante: (mappa.piante || []).filter(p => p.immagine),
+                    sale: (mappa.sale || []).filter(s => s.nome && s.nome.trim() !== ''),
                     poi: (mappa.poi || []).filter(p => p.testo && p.testo.trim() !== '')
                 }
             };

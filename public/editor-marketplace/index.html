@@ -21,6 +21,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/index.js?v=2"></script>
 
@@ -490,46 +491,145 @@
                         </div>
                     </div>
 
-
-
                     <!-- ---------- TAB MAPPA ---------- -->
                     <div x-show="museumView === 'mappa'" x-cloak>
-
+                    
                         <!-- Selettore piano, solo se il museo ha più di una pianta -->
                         <div class="d-flex flex-wrap gap-2 mb-4" x-show="piante.length > 1">
                             <template x-for="p in piante" :key="p.piano">
                                 <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
-                                        :class="(piantaAttiva && piantaAttiva.piano === p.piano) ? 'active bg-orange text-white border-orange' : ''"
-                                        @click="mapFloor = p.piano"
-                                        x-text="p.nome || ('Piano ' + p.piano)"></button>
+                                    :class="(piantaAttiva && piantaAttiva.piano === p.piano) ? 'active bg-orange text-white border-orange' : ''"
+                                    @click="cambiaPiano(p.piano)"
+                                    x-text="p.nome || ('Piano ' + p.piano)"></button>
                             </template>
                         </div>
-
-                        <template x-if="piantaAttiva && piantaAttiva.immagine">
-                            <figure class="mb-0">
-                                <img :src="piantaAttiva.immagine"
-                                    :alt="'Pianta di ' + selectedMuseum.museum + (piantaAttiva.nome ? ' — ' + piantaAttiva.nome : '')"
-                                    class="w-100 rounded-4 shadow-sm">
-                                <figcaption class="small mt-3" :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                    
+                        <div class="row g-4">
+                    
+                            <!-- COLONNA MAPPA -->
+                            <div class="col-12 col-lg-7">
+                    
+                                <template x-if="piantaAttiva && piantaAttiva.immagine">
+                                    <figure class="mb-0">
+                                        <div class="position-relative rounded-4 overflow-hidden shadow-sm"
+                                            :class="darkMode ? 'bg-black bg-opacity-25' : 'bg-light'">
+                    
+                                            <img :src="piantaAttiva.immagine"
+                                                :alt="'Pianta di ' + selectedMuseum.museum + (piantaAttiva.nome ? ' — ' + piantaAttiva.nome : '')"
+                                                class="w-100 d-block">
+                    
+                                            <template x-for="o in salePiano(piantaAttiva.piano)" :key="o.idx">
+                                                <button type="button" @click="selezionaPin(o.idx, true)"
+                                                    class="btn btn-sm btn-icon-32 rounded-circle position-absolute translate-middle d-flex align-items-center justify-content-center shadow p-0"
+                                                    :class="pinSelezionato === o.idx ? 'bg-orange text-white' : 'bg-white text-orange border border-orange'"
+                                                    :style="`left: ${o.s.x * 100}%; top: ${o.s.y * 100}%`"
+                                                    :aria-label="'Apri il dettaglio di ' + o.s.nome"
+                                                    :title="o.s.nome">
+                                                    <i class="bi" :class="iconaPin(o.s.tipo)"></i>
+                                                </button>
+                                            </template>
+                                        </div>
+                    
+                                        <figcaption class="small mt-3" :class="darkMode ? 'text-white-50' : 'text-secondary'"
                                             x-text="piantaAttiva.nome || ('Piano ' + piantaAttiva.piano)"></figcaption>
-                            </figure>
-                        </template>
+                                    </figure>
+                                </template>
 
-                        <template x-if="!piantaAttiva || !piantaAttiva.immagine">
-                            <div class="glass-card rounded-5 p-4 p-md-5 text-center my-4 my-md-5 border border-secondary border-opacity-20 shadow-xl max-w-650 mx-auto">
-                                <div class="rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 d-inline-flex align-items-center justify-content-center p-3 mb-3 shadow-sm" style="width: 80px; height: 80px;">
-                                    <i class="bi bi-map-fill text-orange fs-1"></i>
-                                </div>
-                                <h3 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">Mappa non disponibile</h3>
-                                <p class="fs-6 lh-base mb-4 max-w-500 mx-auto" :class="darkMode ? 'text-white-50' : 'text-muted'">
-                                    Il curatore di questo museo non ha ancora caricato la pianta interattiva delle sale.
-                                </p>
-                                <button type="button" @click="museumView = 'visite'" class="btn btn-outline-orange rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
-                                    <i class="bi bi-ticket-perforated"></i> Esplora i Tour disponibili
-                                </button>
+                                <template x-if="!piantaAttiva || !piantaAttiva.immagine">
+                                    <div class="glass-card rounded-5 p-4 text-center border border-secondary border-opacity-20 shadow-xl">
+                                        <div class="rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 d-inline-flex align-items-center justify-content-center p-3 mb-3 shadow-sm w-h-80">
+                                            <i class="bi bi-map-fill text-orange fs-1"></i>
+                                        </div>
+                                        <h3 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">Planimetria non disponibile</h3>
+                                        <p class="fs-6 lh-base mb-0" :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                            Il curatore non ha ancora caricato la pianta di questo museo.
+                                            Puoi comunque consultare l'elenco dei punti qui accanto.
+                                        </p>
+                                        <button type="button" @click="museumView = 'visite'"
+                                            class="btn btn-outline-orange rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2 mt-3">
+                                            <i class="bi bi-ticket-perforated"></i> Esplora i Tour disponibili
+                                        </button>
+                                    </div>
+                                </template>
                             </div>
-                        </template>
 
+                            <!-- COLONNA ELENCO PUNTI (espandibile) -->
+                            <div class="col-12 col-lg-5">
+                                <h5 class="fw-black mb-3 d-flex align-items-center gap-2"
+                                    :class="darkMode ? 'text-white' : 'text-dark'">
+                                    <i class="bi bi-list-ul text-orange"></i> Punti del museo
+                                </h5>
+
+                                <div class="d-flex flex-column gap-2">
+                                    <template x-for="o in saleVisibili" :key="o.idx">
+                                        <div :id="'punto-' + o.idx"
+                                            class="rounded-3 border overflow-hidden"
+                                            :class="pinSelezionato === o.idx
+                                                ? 'border-orange'
+                                                : (darkMode ? 'border-secondary border-opacity-25' : 'border-light')">
+
+                                            <button type="button" @click="selezionaPin(o.idx)"
+                                                class="btn text-start d-flex align-items-center gap-3 p-3 w-100 border-0 rounded-0"
+                                                :class="pinSelezionato === o.idx
+                                                    ? 'bg-orange-subtle'
+                                                    : (darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white')"
+                                                :aria-expanded="o.s.tipo === 'sala' ? (pinSelezionato === o.idx) : null"
+                                                :aria-controls="'dettaglio-' + o.idx">
+
+                                                <span class="btn-icon-32 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                    :class="pinSelezionato === o.idx ? 'bg-orange text-white' : 'bg-orange-subtle text-orange'">
+                                                    <i class="bi" :class="iconaPin(o.s.tipo)"></i>
+                                                </span>
+
+                                                <span class="min-w-0 flex-grow-1">
+                                                    <span class="d-block fw-bold text-truncate"
+                                                        :class="darkMode ? 'text-white' : 'text-dark'" x-text="o.s.nome"></span>
+                                                    <span class="d-block x-small"
+                                                        :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                                        x-text="labelPin(o.s.tipo)"></span>
+                                                </span>
+
+                                                <i class="bi flex-shrink-0" x-show="o.s.tipo === 'sala'"
+                                                    :class="[
+                                                        pinSelezionato === o.idx ? 'bi-chevron-up' : 'bi-chevron-down',
+                                                        darkMode ? 'text-white-50' : 'text-secondary'
+                                                    ]"></i>
+                                            </button>
+
+                                            <div :id="'dettaglio-' + o.idx"
+                                                x-show="pinSelezionato === o.idx && o.s.tipo === 'sala'" x-collapse
+                                                class="px-3 pb-3 pt-1"
+                                                :class="darkMode ? 'bg-secondary bg-opacity-10' : 'bg-white'">
+
+                                                <ul class="list-unstyled d-flex flex-column gap-2 m-0"
+                                                    x-show="opereDellaSala(o.s.nome).length > 0">
+                                                    <template x-for="op in opereDellaSala(o.s.nome)" :key="op._id">
+                                                        <li class="d-flex align-items-center gap-3">
+                                                            <img :src="op.img_path" alt=""
+                                                                class="rounded-3 object-fit-cover flex-shrink-0 w-h-48">
+                                                            <span class="small fw-medium break-word"
+                                                                :class="darkMode ? 'text-white' : 'text-dark'"
+                                                                x-text="op.item"></span>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+
+                                                <p x-show="opereDellaSala(o.s.nome).length === 0"
+                                                    class="small fst-italic m-0"
+                                                    :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                                    Nessuna opera catalogata in questa sala.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <p x-show="saleVisibili.length === 0" class="small fst-italic m-0"
+                                        :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                        Nessun punto indicato per questo museo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

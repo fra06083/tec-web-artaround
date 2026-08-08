@@ -14,6 +14,19 @@ router.get('/museum/:museumId', auth, canManageTours, hasMuseumAccess, artworkCt
 // GET /api/artworks - Tutte le opere (solo editor)
 router.get('/', auth, isEditor, artworkCtrl.getAllArtworks);
 
+// GET /api/artworks/public/museum/:museumId — solo dati pubblici, per il marketplace
+router.get('/public/museum/:museumId', async (req, res) => {
+    try {
+        const artworks = await Item.find({ museum_id: req.params.museumId })
+            .select('item img_path sala')
+            .lean();
+        res.json(artworks);
+    } catch (error) {
+        console.error('Errore nel recupero delle opere pubbliche:', error);
+        res.status(500).json({ error: 'Errore interno del server' });
+    }
+});
+
 // GET /api/artworks/:id - Opera specifica
 router.get('/:id', auth, isEditor, artworkCtrl.getArtworkById);
 

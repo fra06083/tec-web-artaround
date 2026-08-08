@@ -338,67 +338,170 @@
                                 </template>
                             </div>
 
+                            
                             <!-- Section 3: Interactive Floor Plans -->
                             <div class="museum-section-card">
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+                                <div class="d-flex align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-white border-opacity-10">
                                     <div class="museum-section-header mb-0 pb-0 border-0">
                                         <i class="bi bi-map-fill fs-5"></i> Piante dei Piani del Museo
                                     </div>
                                     <button type="button" @click="addPiano()"
-                                        class="btn btn-sm btn-outline-orange rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 hover-lift">
+                                        class="btn btn-sm btn-outline-orange rounded-pill px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift flex-shrink-0">
                                         <i class="bi bi-plus-circle-fill"></i> Aggiungi Piano
                                     </button>
                                 </div>
-
+                            
                                 <template x-if="!currentMuseum.mappa || !currentMuseum.mappa.piante || currentMuseum.mappa.piante.length === 0">
                                     <div class="bg-dark bg-opacity-40 p-4 rounded-3 border border-secondary border-opacity-25 text-center">
                                         <i class="bi bi-map text-white-50 fs-3 d-block mb-2"></i>
                                         <p class="small text-white-50 m-0">Nessuna pianta inserita. Clicca su "Aggiungi Piano" per definire i livelli del museo.</p>
                                     </div>
                                 </template>
-
+                            
                                 <template x-for="(p, i) in (currentMuseum.mappa ? currentMuseum.mappa.piante : [])" :key="i">
-                                    <div class="bg-dark bg-opacity-60 border border-secondary border-opacity-30 rounded-4 p-3.5 mb-3 shadow-sm">
-                                        <div class="row g-2 align-items-end mb-2">
+                                    <div class="bg-dark bg-opacity-60 border border-secondary border-opacity-25 rounded-4 p-4 mb-4 shadow-sm">
+                            
+                                        <!-- Intestazione del piano -->
+                                        <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                                            <h6 class="fw-bold text-white m-0 d-flex align-items-center gap-2">
+                                                <i class="bi bi-layers-half text-orange"></i>
+                                                <span x-text="p.nome || ('Piano ' + p.piano)"></span>
+                                            </h6>
+                                            <button type="button" @click="removePianoConSale(i)"
+                                                class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina questo piano">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </div>
+                            
+                                        <!-- Dati del piano -->
+                                        <div class="row g-3 mb-4">
                                             <div class="col-4 col-md-2">
-                                                <label class="form-label text-white-50 x-small fw-bold">Piano N°</label>
-                                                <input type="number"
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoNum' + i">Piano N°</label>
+                                                <input type="number" :id="'pianoNum' + i"
                                                     class="form-control bg-dark border-secondary text-white rounded-3 fw-bold text-center"
                                                     x-model.number="p.piano">
                                             </div>
                                             <div class="col-8 col-md-4">
-                                                <label class="form-label text-white-50 x-small fw-bold">Nome Piano</label>
-                                                <input type="text"
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoNome' + i">Nome Piano</label>
+                                                <input type="text" :id="'pianoNome' + i"
                                                     class="form-control bg-dark border-secondary text-white rounded-3"
-                                                    x-model="p.nome" placeholder="Es: Piano Terra / Primo Piano">
+                                                    x-model="p.nome" placeholder="Es: Piano Terra">
                                             </div>
-                                            <div class="col-9 col-md-5">
-                                                <label class="form-label text-white-50 x-small fw-bold">Immagine Piantina</label>
-                                                <div class="input-group input-group-sm">
-                                                    <input type="text"
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoImg' + i">Immagine Piantina</label>
+                                                <div class="input-group">
+                                                    <input type="text" :id="'pianoImg' + i"
                                                         class="form-control bg-dark border-secondary text-white rounded-start-3"
                                                         placeholder="Inserisci URL..." x-model="p.immagine">
-                                                    <label class="btn btn-outline-orange cursor-pointer-label rounded-end-3 px-2.5 d-flex align-items-center"
-                                                        title="Carica dal dispositivo">
-                                                        <i class="bi bi-upload me-1"></i> File
-                                                        <input type="file" class="d-none" accept="image/*"
-                                                            @change="uploadPianta($event, i)">
+                                                    <label class="btn btn-outline-orange cursor-pointer-label rounded-end-3 px-3 d-flex align-items-center gap-2 mb-0">
+                                                        <i class="bi bi-upload"></i> File
+                                                        <input type="file" class="d-none" accept="image/*" @change="uploadPianta($event, i)">
                                                     </label>
                                                 </div>
                                             </div>
-                                            <div class="col-3 col-md-1 text-end">
-                                                <button type="button" @click="removePiano(i)"
-                                                    class="btn btn-outline-danger btn-sm rounded-3 w-100" title="Elimina piano">
-                                                    <i class="bi bi-trash3-fill"></i>
-                                                </button>
-                                            </div>
                                         </div>
-
+                            
+                                        <!-- Pianta + punti -->
                                         <template x-if="p.immagine">
-                                            <div class="mt-2 text-center bg-black bg-opacity-30 p-2 rounded-3 border border-white border-opacity-10">
-                                                <img :src="p.immagine" class="img-fluid rounded-2" style="max-height: 150px; object-fit: contain;">
+                                            <div>
+                                                <!-- Pianta cliccabile con i pin -->
+                                                <div class="position-relative bg-black bg-opacity-30 rounded-3 overflow-hidden border"
+                                                    :class="(pinMode !== null && pinModePiano === p.piano)
+                                                        ? 'border-2 border-orange' : 'border-white border-opacity-10'">
+
+                                                    <img :src="p.immagine" @click="mappaClick($event, p.piano)"
+                                                        :alt="'Pianta di ' + (p.nome || ('piano ' + p.piano))"
+                                                        class="w-100 d-block"
+                                                        :class="(pinMode !== null && pinModePiano === p.piano) ? 'cursor-pointer opacity-50' : ''">
+
+                                                    <!-- Istruzione sovrapposta, solo quando l'azione è armata -->
+                                                    <div x-show="pinMode !== null && pinModePiano === p.piano" x-cloak
+                                                        class="position-absolute top-50 start-50 translate-middle text-center px-4 pe-none">
+                                                        <i class="bi bi-cursor-fill text-orange fs-1 d-block mb-2"></i>
+                                                        <p class="fw-bold text-white m-0" x-show="pinMode === 'add'">
+                                                            Clicca dove si trova "<span x-text="pinDraft.nome"></span>"
+                                                        </p>
+                                                        <p class="fw-bold text-white m-0" x-show="pinMode === 'move'">
+                                                            Clicca la nuova posizione del punto
+                                                        </p>
+                                                    </div>
+
+                                                    <template x-for="o in salePiano(p.piano)" :key="o.idx">
+                                                        <button type="button" @click.stop="selezionaSala(o.idx)"
+                                                            class="btn btn-sm btn-icon-32 rounded-circle position-absolute translate-middle d-flex align-items-center justify-content-center shadow p-0"
+                                                            :class="salaSelezionata === o.idx ? 'bg-orange text-white' : 'bg-dark text-orange border border-orange'"
+                                                            :style="`left: ${o.s.x * 100}%; top: ${o.s.y * 100}%`"
+                                                            :title="o.s.nome">
+                                                            <i class="bi" :class="iconaPin(o.s.tipo)"></i>
+                                                        </button>
+                                                    </template>
+                                                </div>
+
+                                                <!-- Bottoni sotto l'immagine -->
+                                                <div class="d-flex justify-content-center gap-2 my-3">
+                                                    <button type="button" @click="apriPinModal(p.piano)"
+                                                        x-show="pinMode === null || pinModePiano !== p.piano"
+                                                        class="btn btn-orange rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift shadow-sm">
+                                                        <i class="bi bi-pin-map-fill"></i> Aggiungi punto
+                                                    </button>
+                                                    <button type="button" @click="annullaPin()"
+                                                        x-show="pinMode !== null && pinModePiano === p.piano" x-cloak
+                                                        class="btn btn-outline-light rounded-pill px-4 py-2 fw-bold">
+                                                        Annulla
+                                                    </button>
+                                                </div>
+                            
+                                                <!-- Elenco dei punti del piano -->
+                                                <div class="d-flex flex-column gap-2">
+                                                    <template x-for="o in salePiano(p.piano)" :key="o.idx">
+                                                        <div class="d-flex flex-wrap align-items-center gap-2 bg-dark bg-opacity-40 p-3 rounded-3 border"
+                                                            :class="salaSelezionata === o.idx ? 'border-orange' : 'border-secondary border-opacity-25'">
+                            
+                                                            <span class="btn-icon-32 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                                :class="salaSelezionata === o.idx ? 'bg-orange text-white' : 'bg-slate text-white'">
+                                                                <i class="bi" :class="iconaPin(o.s.tipo)"></i>
+                                                            </span>
+                            
+                                                            <label class="visually-hidden" :for="'pinNome' + o.idx">Nome del punto</label>
+                                                            <input type="text" :id="'pinNome' + o.idx"
+                                                                class="form-control form-control-sm bg-dark border-secondary text-white flex-grow-1 min-w-0"
+                                                                x-model="o.s.nome" placeholder="Nome del punto">
+                            
+                                                            <label class="visually-hidden" :for="'pinTipo' + o.idx">Tipo del punto</label>
+                                                            <select :id="'pinTipo' + o.idx"
+                                                                class="form-select form-select-sm bg-dark border-secondary text-white w-auto flex-shrink-0"
+                                                                x-model="o.s.tipo">
+                                                                <template x-for="t in pinTipi" :key="t.tipo">
+                                                                    <option :value="t.tipo" x-text="t.label"></option>
+                                                                </template>
+                                                            </select>
+                            
+                                                            <button type="button" @click="armaSpostamento(o.idx, p.piano)"
+                                                                class="btn btn-sm btn-outline-light rounded-3 flex-shrink-0" title="Sposta sulla pianta">
+                                                                <i class="bi bi-arrows-move"></i>
+                                                            </button>
+                            
+                                                            <button type="button" @click="removeSala(o.idx)"
+                                                                class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina punto">
+                                                                <i class="bi bi-trash3-fill"></i>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                            
+                                                    <p x-show="salePiano(p.piano).length === 0" class="small text-white-50 m-0 fst-italic text-center">
+                                                        Nessun punto posizionato su questo piano.
+                                                    </p>
+                                                </div>
+
                                             </div>
                                         </template>
+                            
+                                        <template x-if="!p.immagine">
+                                            <p class="small text-white-50 m-0 fst-italic text-center py-3">
+                                                Carica l'immagine della piantina per poterci posizionare i punti.
+                                            </p>
+                                        </template>
+                            
                                     </div>
                                 </template>
                             </div>
@@ -444,7 +547,58 @@
     </div>
 
     
+<!-- MODALE NUOVO PUNTO SULLA PIANTA -->
+<div class="modal fade modal-backdrop-dark" tabindex="-1"
+    :class="{ 'show d-block': isPinModalOpen }" x-show="isPinModalOpen" x-cloak x-transition>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg bg-dark text-white">
 
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-pin-map-fill text-orange"></i> Nuovo punto sulla pianta
+                </h5>
+                <button type="button" class="btn-close btn-close-white" @click="chiudiPinModal()"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-white-50 small fw-bold text-uppercase mb-2">1. Che cos'è?</p>
+                <div class="row g-2 mb-4">
+                    <template x-for="t in pinTipi" :key="t.tipo">
+                        <div class="col-6 col-sm-4">
+                            <button type="button" @click="scegliTipoPin(t.tipo)"
+                                class="btn w-100 h-100 rounded-3 py-3 px-2 d-flex flex-column align-items-center justify-content-center gap-2 border"
+                                :class="pinDraft.tipo === t.tipo ? 'bg-orange text-white border-orange' : 'bg-dark text-white-50 border-secondary border-opacity-25'">
+                                <i class="bi fs-4" :class="t.icona"></i>
+                                <span class="small fw-bold lh-sm text-center" x-text="t.label"></span>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <p class="text-white-50 small fw-bold text-uppercase mb-2">2. Come si chiama?</p>
+                <label class="visually-hidden" for="pinDraftNome">Nome del punto</label>
+                <input type="text" id="pinDraftNome"
+                    class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
+                    x-model="pinDraft.nome" placeholder="Es: Sala 1"
+                    @keydown.enter.prevent="confermaPinDraft()">
+                <p class="small text-white-50 mt-2 mb-0 lh-sm">
+                    Per le sale usa lo stesso nome che hai dato alle opere, così il
+                    marketplace può mostrare cosa contiene ogni stanza.
+                </p>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-dark rounded-pill px-4 border border-secondary border-opacity-25"
+                    @click="chiudiPinModal()">Annulla</button>
+                <button type="button" class="btn btn-orange rounded-pill px-4 fw-bold d-inline-flex align-items-center gap-2"
+                    @click="confermaPinDraft()">
+                    <i class="bi bi-cursor-fill"></i> Posiziona sulla pianta
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
     
 
     

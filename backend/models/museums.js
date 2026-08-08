@@ -12,6 +12,7 @@ const museumSchema = new mongoose.Schema({
     // in museumSchema, dopo image
     mappa: {
         piante: [{ piano: Number, nome: String, immagine: String }],
+        sale:   [{ nome: String, piano: Number, x: Number, y: Number, tipo: String }],
         poi:    [{ tipo: String, piano: Number, testo: String }]
     }
 });

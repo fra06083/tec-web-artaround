@@ -164,6 +164,34 @@ function artworkManager() {
             return [...(m?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
         },
 
+        // Solo i punti di tipo 'sala': bagni e bar non contengono opere
+        getSaleMuseo() {
+            const m = this.museums.find(mu => mu._id === this.currentArtwork.museum_id);
+            const sale = (m?.mappa?.sale || []).filter(s => s.tipo === 'sala');
+            return [...sale].sort((a, b) =>
+                (a.piano - b.piano) || (a.nome || '').localeCompare(b.nome || '')
+            );
+        },
+
+        nomePiano(piano) {
+            const p = this.getPianiMuseo().find(x => x.piano === piano);
+            return p?.nome || ('Piano ' + piano);
+        },
+
+        // La sala salvata non esiste (più) tra quelle in mappa
+        get salaFuoriMappa() {
+            const nome = this.currentArtwork.sala?.nome;
+            if (!nome) return false;
+            return !this.getSaleMuseo().some(s => s.nome === nome);
+        },
+
+        // Scegliendo la sala si compila anche il piano
+        aggiornaSala(nome) {
+            this.currentArtwork.sala.nome = nome;
+            const s = this.getSaleMuseo().find(x => x.nome === nome);
+            if (s) this.currentArtwork.sala.piano = s.piano;
+},
+
         // ARTWORK LOGIC
         async fetchArtworks() {
             // load artworks for selected museum

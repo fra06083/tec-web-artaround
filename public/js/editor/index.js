@@ -1,3 +1,16 @@
+const PIN_TIPI = [
+    { tipo: 'sala',      label: 'Sala',             icona: 'bi-door-open' },
+    { tipo: 'ingresso',  label: 'Ingresso',         icona: 'bi-box-arrow-in-right' },
+    { tipo: 'uscita',    label: 'Uscita',           icona: 'bi-box-arrow-right' },
+    { tipo: 'emergenza', label: 'Uscita emergenza', icona: 'bi-sign-turn-right' },
+    { tipo: 'toilette',  label: 'Toilette',         icona: 'bi-person-standing' },
+    { tipo: 'bar',       label: 'Bar',              icona: 'bi-cup-hot' },
+    { tipo: 'shop',      label: 'Shop',             icona: 'bi-bag' },
+    { tipo: 'scala',     label: 'Scale',            icona: 'bi-sort-numeric-up' },
+    { tipo: 'ascensore', label: 'Ascensore',        icona: 'bi-arrow-down-up' },
+    { tipo: 'ostacolo',  label: 'Ostacolo',         icona: 'bi-exclamation-triangle' }
+];
+
 function marketplaceApp() {
     return {
         isLoggedIn: false,
@@ -30,11 +43,12 @@ function marketplaceApp() {
         museumView: 'visite',      // 'visite' | 'mappa'
         mapFloor: null,            // numero del piano scelto, null = primo disponibile
         visibleLimit: 6,
-
+        museumArtworks: [],      // opere del museo selezionato
+        pinSelezionato: null,    // indice in mappa.sale, oppure null
+        
         get displayedItems() {
             return this.filteredItems.slice(0, this.visibleLimit);
         },
-
 
         get filteredSelectionVisits() {
             if (!this.visitSearchQuery || !this.visitSearchQuery.trim()) {
@@ -71,7 +85,9 @@ function marketplaceApp() {
             const query = this.tagSearchQuery.toLowerCase().trim();
             return this.availableTags.filter(t => t.toLowerCase().includes(query));
         },
+        
         selectedTags: [],
+        
         get cartCount() {
             return this.cart.length;
         },
@@ -121,6 +137,80 @@ function marketplaceApp() {
             if (this.mapFloor === null) return this.piante[0];
             return this.piante.find(p => p.piano === this.mapFloor) || this.piante[0];
         },
+
+        iconaPin(tipo) {
+            const t = PIN_TIPI.find(x => x.tipo === tipo);
+            return t ? t.icona : 'bi-geo-alt-fill';
+        },
+ 
+        labelPin(tipo) {
+            const t = PIN_TIPI.find(x => x.tipo === tipo);
+            return t ? t.label : tipo;
+        },
+ 
+        get saleMuseo() {
+            const m = this.selectedMuseum;
+            return (m && m.mappa && m.mappa.sale) ? m.mappa.sale : [];
+        },
+ 
+        // Punti di un piano, con l'indice originale nell'array.
+        salePiano(piano) {
+            return this.saleMuseo
+                .map((s, idx) => ({ s, idx }))
+                .filter(o => o.s.piano === piano);
+        },
+ 
+        // Punti da mostrare nell'elenco testuale: quelli del piano
+        // visualizzato, oppure tutti se il museo non ha planimetrie.
+        get saleVisibili() {
+            if (this.piantaAttiva) return this.salePiano(this.piantaAttiva.piano);
+            return this.saleMuseo.map((s, idx) => ({ s, idx }));
+        },
+ 
+        get salaAttiva() {
+            return this.pinSelezionato !== null
+                ? (this.saleMuseo[this.pinSelezionato] || null)
+                : null;
+        },
+ 
+        // Confronto tollerante su maiuscole e spazi, così un "Sala 1 "
+        // scritto male nell'editor opere non fa sparire il contenuto.
+        opereDellaSala(nomeSala) {
+            const chiave = (nomeSala || '').trim().toLowerCase();
+            if (!chiave) return [];
+            return this.museumArtworks.filter(a =>
+                a.sala && (a.sala.nome || '').trim().toLowerCase() === chiave
+            );
+        },
+ 
+        selezionaPin(idx, dallaMappa = false) {
+            this.pinSelezionato = (this.pinSelezionato === idx) ? null : idx;
+            if (dallaMappa && this.pinSelezionato !== null) {
+                this.$nextTick(() => {
+                    const el = document.getElementById('punto-' + idx);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            }
+        },
+        
+        cambiaPiano(piano) {
+            this.mapFloor = piano;
+            this.pinSelezionato = null;
+        },
+ 
+        async fetchMuseumArtworks() {
+            if (!this.selectedMuseumId) {
+                this.museumArtworks = [];
+                return;
+            }
+            try {
+                const res = await fetch(`/api/artworks/public/museum/${this.selectedMuseumId}`);
+                this.museumArtworks = res.ok ? await res.json() : [];
+            } catch (e) {
+                console.error('Errore nel caricamento delle opere del museo:', e);
+                this.museumArtworks = [];
+            }
+        },
  
         selectMuseum(id) {
             this.selectedMuseumId = id;
@@ -128,6 +218,7 @@ function marketplaceApp() {
             this.selectedTags = [];
             this.mapFloor = null;
             this.visibleLimit = 6;
+            this.pinSelezionato = null;
             this.syncMuseumUrl(true);
             window.scrollTo({ top: 0 });
         },
@@ -137,6 +228,7 @@ function marketplaceApp() {
             this.selectedTags = [];
             this.museumSearchQuery = '';
             this.visibleLimit = 6;
+            this.pinSelezionato = null;
             this.syncMuseumUrl(true);
             window.scrollTo({ top: 0 });
         },
@@ -153,9 +245,13 @@ function marketplaceApp() {
  
         // Da chiamare DOPO che le visite sono state caricate.
         initMuseumFunnel() {
-            // La funzione gira solo nel marketplace: la dashboard usa lo stesso
-            // marketplaceApp() e non deve essere toccata.
             if (!window.location.pathname.includes('/editor-marketplace')) return;
+ 
+            this.$watch('selectedMuseumId', () => {
+                this.pinSelezionato = null;
+                this.mapFloor = null;
+                this.fetchMuseumArtworks();
+            });
  
             const daUrl = new URLSearchParams(window.location.search).get('museo');
             if (daUrl && this.museums.some(m => m._id === daUrl)) {

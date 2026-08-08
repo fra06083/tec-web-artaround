@@ -283,25 +283,40 @@
                                     id="artworkAuthor" x-model="currentArtwork.author" placeholder="Autore" required>
                                 <label for="artworkAuthor">Autore *</label>
                             </div>
-                            <!-- Sala e piano -->
-                            <div class="row mb-3">
-                                <div class="col-7">
-                                    <label class="form-label text-white-50 small">Sala *</label>
-                                    <input type="text" class="form-control bg-dark text-white border-secondary hover-glow"
-                                        x-model="currentArtwork.sala.nome" placeholder="Es. Sala 15" required>
-                                </div>
-                                <div class="col-5">
-                                    <label class="form-label text-white-50 small">Piano</label>
-                                    <select class="form-select bg-dark text-white border-secondary hover-glow"
-                                        x-model.number="currentArtwork.sala.piano">
-                                        <template x-for="p in getPianiMuseo()" :key="p.piano">
-                                            <option :value="p.piano" x-text="p.nome"></option>
-                                        </template>
-                                    </select>
-                                    <template x-if="getPianiMuseo().length === 0">
-                                        <small class="text-warning x-small">Nessun piano definito per questo museo.</small>
+                            <!-- Sala -->
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Sala *</label>
+                                <select class="form-select bg-dark text-white border-secondary hover-glow"
+                                    x-model="currentArtwork.sala.nome"
+                                    @change="aggiornaSala($event.target.value)" required>
+                                    <option value="">Seleziona la sala...</option>
+                                    <template x-if="salaFuoriMappa">
+                                        <option :value="currentArtwork.sala.nome"
+                                            x-text="currentArtwork.sala.nome + ' (non più in mappa)'"></option>
                                     </template>
-                                </div>
+                                    <template x-for="s in getSaleMuseo()" :key="s.nome">
+                                        <option :value="s.nome" x-text="s.nome + ' — ' + nomePiano(s.piano)"></option>
+                                    </template>
+                                </select>
+
+                                <template x-if="currentArtwork.museum_id && getSaleMuseo().length === 0">
+                                    <small class="text-warning x-small d-block mt-1">
+                                        Nessuna sala definita per questo museo. Aggiungi i punti di tipo "Sala"
+                                        nella pianta, in Gestione Musei.
+                                    </small>
+                                </template>
+
+                                <template x-if="salaFuoriMappa">
+                                    <small class="text-warning x-small d-block mt-1">
+                                        Questa sala non esiste più nella pianta del museo: le opere non
+                                        compariranno cliccando i pin nel marketplace.
+                                    </small>
+                                </template>
+
+                                <small x-show="currentArtwork.sala.nome && !salaFuoriMappa"
+                                    class="text-white-50 x-small d-block mt-1">
+                                    Piano: <span class="text-orange fw-bold" x-text="nomePiano(currentArtwork.sala.piano)"></span>
+                                </small>
                             </div>
                             <!-- Image Path -->
                             <div class="mb-3">
