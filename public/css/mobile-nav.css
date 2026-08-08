@@ -514,33 +514,47 @@
     }
 
     .artwork-item-mobile {
-        padding: 6px 8px;
-        margin-bottom: 6px;
-        border-radius: 12px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 14px;
         max-width: 100%;
         box-sizing: border-box;
     }
 
     .artwork-item-mobile img {
-        width: 32px;
-        height: 32px;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
     }
 
     .artwork-item-mobile .artwork-number-sm {
         width: 22px;
         height: 22px;
-        font-size: 0.65rem;
+        font-size: 0.7rem;
     }
 
     .artwork-item-mobile .artwork-title-sm {
-        font-size: 0.82rem;
-        line-height: 1.2;
+        font-size: 0.85rem;
+        font-weight: 600;
+        line-height: 1.25;
+        color: #ffffff;
+        white-space: normal !important;
+        text-overflow: clip !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
     }
 
-    .artwork-item-mobile .artwork-author-sm {
+    .artwork-item-mobile .artwork-author-sm,
+    .artwork-item-mobile .artwork-catalog-author {
         display: block;
-        font-size: 0.7rem;
-        opacity: 0.7;
+        font-size: 0.72rem;
+        opacity: 0.75;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .artwork-item-mobile .btn-artwork-action {
@@ -555,14 +569,9 @@
     }
 
     .artworks-panel-mobile {
-        padding: 10px;
+        padding: 12px 10px;
     }
 
-    .artwork-catalog-author {
-        display: block;
-        font-size: 0.7rem;
-        opacity: 0.7;
-    }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {

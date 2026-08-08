@@ -242,16 +242,25 @@
                                 <div class="d-flex flex-column">
                                     <h2 class="fw-bolder m-0 text-white tracking-tight">Le tue Visite</h2>
                                     
-                                    <!-- Borderless Museum Selector -->
-                                    <div class="position-relative mt-2">
-                                        <select class="form-select form-select-sm bg-transparent border-0 text-white-50 hover-text-white shadow-none cursor-pointer fs-6 fw-bold transition-color p-0" x-model="selectedMuseum">
-                                            <option value="" class="text-dark" disabled selected>Scegli un museo per iniziare...</option>
-                                            <template x-for="m in museums" :key="m._id">
-                                                <option :value="m._id" x-text="m.museum" class="text-dark"></option>
-                                            </template>
-                                        </select>
+                                    <!-- Museum Selector Badge Dropdown -->
+                                    <div class="d-flex align-items-center gap-2 mt-1.5">
+                                        <div class="input-group input-group-sm max-w-300">
+                                            <span class="input-group-text bg-dark border-secondary border-opacity-40 text-orange ps-2.5">
+                                                <i class="bi bi-bank"></i>
+                                            </span>
+                                            <select class="form-select form-select-sm bg-dark border-secondary border-opacity-40 text-white shadow-none cursor-pointer fs-7 fw-bold" x-model="selectedMuseum">
+                                                <option value="" class="text-dark">Tutti i Musei</option>
+                                                <template x-for="m in museums" :key="m._id">
+                                                    <option :value="m._id" x-text="m.museum" class="text-dark"></option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                        <button x-show="selectedMuseum" @click="selectedMuseum = ''" class="btn btn-sm btn-outline-secondary text-white-50 border-0 rounded-circle p-1 d-flex align-items-center justify-content-center" title="Mostra tutti i musei">
+                                            <i class="bi bi-x-circle-fill fs-6"></i>
+                                        </button>
                                     </div>
                                 </div>
+
                             </div>
                             
                             <!-- Right: Actions -->
@@ -309,25 +318,38 @@
                                 </div>
                             </div>
                             
-                            <div class="row g-4">
+                            <div class="row g-3 g-md-4">
                                 <template x-for="m in filteredMuseums" :key="m._id">
-                                    <div class="col-sm-6 col-md-4 col-lg-3">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <div @click="selectedMuseum = m._id"
-                                             class="museum-card rounded-4 p-4 h-100 cursor-pointer d-flex flex-column justify-content-center align-items-center text-center gap-2"
-                                             :class="selectedMuseum === m._id ? 'bg-orange-selected' : ''">
-                                            <div class="icon-box-56 rounded-circle d-flex align-items-center justify-content-center mb-2 transition-all"
-                                                 :class="selectedMuseum === m._id ? 'bg-orange text-white shadow-sm' : 'bg-secondary bg-opacity-25 text-white-50'">
-                                                <i class="bi bi-building fs-3"></i>
+                                             class="museum-card rounded-4 p-4 h-100 cursor-pointer d-flex flex-column align-items-center text-center gap-3"
+                                             :class="selectedMuseum === m._id ? 'bg-orange-selected border-orange' : ''">
+                                            
+                                            <div class="icon-box-64 rounded-circle d-flex align-items-center justify-content-center transition-all shadow-sm"
+                                                 :class="selectedMuseum === m._id ? 'bg-orange text-white' : 'bg-gradient-dark-orange text-orange border border-orange border-opacity-30'">
+                                                <i class="bi bi-bank fs-2"></i>
                                             </div>
-                                            <h6 class="fw-bold m-0 lh-sm transition-color text-white" x-text="m.museum"></h6>
-                                            <span x-show="selectedMuseum === m._id" class="badge bg-orange text-white rounded-pill px-2.5 py-1 fs-caption mt-1">
-                                                <i class="bi bi-check-circle-fill me-1"></i> Selezionato
-                                            </span>
+                                            
+                                            <div class="d-flex flex-column gap-1 w-100">
+                                                <h6 class="fw-bold m-0 lh-sm text-white fs-6" x-text="m.museum"></h6>
+                                                <small class="text-white-50 fs-8 d-flex align-items-center justify-content-center gap-1 mt-0.5" x-show="m.city">
+                                                    <i class="bi bi-geo-alt-fill text-orange"></i> <span x-text="m.city"></span>
+                                                </small>
+                                            </div>
+
+                                            <div class="mt-auto pt-2 w-100">
+                                                <span x-show="selectedMuseum === m._id" class="badge bg-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-check-circle-fill"></i> Selezionato
+                                                </span>
+                                                <span x-show="selectedMuseum !== m._id" class="badge bg-secondary bg-opacity-25 text-white-50 rounded-pill px-3 py-1.5 fs-8 hover-text-white d-inline-flex align-items-center gap-1">
+                                                    Scegli <i class="bi bi-chevron-right"></i>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
-
                             </div>
+
                         </div>
                         
                         <!-- Empty Search Results -->
@@ -430,8 +452,10 @@
                     </div>
 
 
-                    <!-- Segmented Control (Tabs) -->
-                    <div class="d-flex w-100 justify-content-center mb-3 max-w-1200 mx-auto">
+                    <!-- Navigation Tabs: Segmented Control (Tablet/Desktop) & Hamburger Menu (Mobile) -->
+                    
+                    <!-- Desktop & Tablet Navigation -->
+                    <div class="d-none d-sm-flex w-100 justify-content-center mb-3 max-w-1200 mx-auto">
                         <div class="segmented-control shadow-sm">
                             <div class="segmented-slider" :class="{ 'translate-x-0': formTab === 'info', 'translate-x-100': formTab === 'artworks', 'translate-x-200': formTab === 'quiz' }"></div>
                             
@@ -446,6 +470,106 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- Mobile Navigation (Hamburger Menu) -->
+                    <div class="d-flex d-sm-none w-100 flex-column mb-3 max-w-1200 mx-auto position-relative" x-data="{ mobileMenuOpen: false }">
+                        <!-- Hamburger Header Pill Bar -->
+                        <div @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="w-100 glass-card border border-secondary border-opacity-25 rounded-4 p-2.5 d-flex align-items-center justify-content-between text-white shadow-sm cursor-pointer user-select-none active-scale">
+                            
+                            <div class="d-flex align-items-center gap-3 min-w-0">
+                                <!-- Hamburger Icon Pill Box -->
+                                <div class="rounded-3 bg-orange text-white p-2 d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 38px; height: 38px;">
+                                    <i class="bi bi-list fs-4"></i>
+                                </div>
+                                <!-- Section Label -->
+                                <div class="d-flex flex-column text-start min-w-0">
+                                    <span class="text-white-50 text-uppercase tracking-wider font-monospace lh-1" style="font-size: 0.65rem;">Sezione Editor</span>
+                                    <div class="d-flex align-items-center gap-2 fw-bold text-white fs-6 mt-1 text-truncate">
+                                        <i class="bi" :class="{ 'bi-info-circle text-orange': formTab === 'info', 'bi-images text-info': formTab === 'artworks', 'bi-patch-question text-warning': formTab === 'quiz' }"></i>
+                                        <span x-text="formTab === 'info' ? 'Dettagli Visita' : (formTab === 'artworks' ? 'Opere nella Visita' : 'Quiz & Domande')"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-2">
+                                <span class="badge bg-secondary bg-opacity-40 border border-secondary border-opacity-25 text-white-50 rounded-pill px-2.5 py-1.5" style="font-size: 0.75rem;">
+                                    <span x-text="formTab === 'info' ? '1 / 3' : (formTab === 'artworks' ? '2 / 3' : '3 / 3')"></span>
+                                </span>
+                                <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                    <i class="bi bi-chevron-down text-white-50 transition-transform duration-200" :class="{ 'rotate-180': mobileMenuOpen }"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Dropdown Menu -->
+                        <div x-show="mobileMenuOpen" 
+                            @click.outside="mobileMenuOpen = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 transform -translate-y-2 scale-95"
+                            x-transition:enter-end="opacity-100 transform translate-y-0 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
+                            x-transition:leave-end="opacity-0 transform -translate-y-2 scale-95"
+                            class="position-absolute top-100 start-0 end-0 mt-2 p-2 glass-card rounded-4 border border-secondary border-opacity-25 shadow-2xl z-50"
+                            style="z-index: 1050; backdrop-filter: blur(20px); background: rgba(18, 20, 29, 0.98);">
+                            
+                            <div class="d-flex flex-column gap-2">
+                                <!-- Option 1: Dettagli -->
+                                <div @click="formTab = 'info'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'info' ? 'bg-orange bg-opacity-20 text-white border border-orange border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0"
+                                            :class="formTab === 'info' ? 'bg-orange text-white shadow' : 'bg-secondary bg-opacity-25 text-white-50'" style="width: 34px; height: 34px;">
+                                            <i class="bi bi-info-circle fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Dettagli Visita</div>
+                                            <div class="text-white-50" style="font-size: 0.72rem;">Titolo, descrizione e visibilità</div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-orange fs-5" x-show="formTab === 'info'"></i>
+                                </div>
+
+                                <!-- Option 2: Opere -->
+                                <div @click="formTab = 'artworks'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'artworks' ? 'bg-info bg-opacity-20 text-white border border-info border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0"
+                                            :class="formTab === 'artworks' ? 'bg-info text-white shadow' : 'bg-secondary bg-opacity-25 text-white-50'" style="width: 34px; height: 34px;">
+                                            <i class="bi bi-images fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Opere nella Visita</div>
+                                            <div class="text-white-50" style="font-size: 0.72rem;" x-text="selectedArtworks.length ? selectedArtworks.length + ' opere inserite' : 'Seleziona le opere del percorso'"></div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-info fs-5" x-show="formTab === 'artworks'"></i>
+                                </div>
+
+                                <!-- Option 3: Quiz -->
+                                <div @click="formTab = 'quiz'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'quiz' ? 'bg-warning bg-opacity-20 text-white border border-warning border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0"
+                                            :class="formTab === 'quiz' ? 'bg-warning text-dark shadow' : 'bg-secondary bg-opacity-25 text-white-50'" style="width: 34px; height: 34px;">
+                                            <i class="bi bi-patch-question fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Quiz & Domande</div>
+                                            <div class="text-white-50" style="font-size: 0.72rem;" x-text="quizQuestions.length ? quizQuestions.length + ' domande inserite' : 'Domande interattive per studenti'"></div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-warning fs-5" x-show="formTab === 'quiz'"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     <!-- TAB 1: INFO -->
                     <div x-show="formTab === 'info'" x-transition.opacity.duration.200ms>

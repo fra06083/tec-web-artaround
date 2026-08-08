@@ -11,11 +11,17 @@ function VisitList() {
     const [user, setUser] = useState(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [visibleLimit, setVisibleLimit] = useState(6);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [roomPin, setRoomPin] = useState('');
     const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setVisibleLimit(6);
+    }, [searchQuery]);
+
 
     const showToast = (message, type = 'success') => {
         setNotification({ show: true, message, type });
@@ -29,6 +35,7 @@ function VisitList() {
         }
         try {
             const studentName = user ? user.name : 'Studente Anonimo';
+            localStorage.setItem('artaround_student_name', studentName);
             const res = await fetch('/api/rooms/join', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -37,8 +44,13 @@ function VisitList() {
 
             if (res.ok) {
                 const data = await res.json();
+                sessionStorage.setItem('activeRoomPin', roomPin.trim());
+                if (data.visitId) sessionStorage.setItem('activeRoomVisitId', data.visitId);
+
                 if (data.requiresApproval) {
                     navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}&reqId=${data.reqId}&pending=true`);
+                } else if (data.isStarted) {
+                    navigate(`/visit/${data.visitId}?pin=${roomPin.trim()}&index=${data.currentArtworkIndex || 0}`);
                 } else {
                     navigate(`/lobby?pin=${roomPin.trim()}&visitId=${data.visitId}`);
                 }
@@ -342,96 +354,122 @@ function VisitList() {
 
                 <div className={`border-bottom mb-4 d-block d-md-none ${darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'}`}></div>
 
-                {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
-                    <div className="text-center py-5">
-                        <i className={`bi ${!user ? 'bi-person-x' : 'bi-inbox'} ${textMuted} icon-5xl mb-3 d-block`}></i>
-                        <h4 className="fw-bold">{!user ? "Non sei loggato" : "Nessuna visita disponibile"}</h4>
-                        <p className={textMuted}>{!user ? "Effettua l'accesso per visualizzare le visite acquistate." : "Torna più tardi per nuovi contenuti."}</p>
-                        {!user && (
-                            <a href="../login.html" className="btn bg-orange text-white rounded-pill px-4 fw-bold mt-2 shadow-sm hover-lift">
-                                Vai al Login
-                            </a>
-                        )}
-                    </div>
-                ) : (
-                    <div className="row g-4 mt-2 mb-5 pb-5">
-                        {visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase())).map(v => (
-                            <div key={v._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
-                                <div className="card ticket-card h-100 border-0 bg-transparent">
-                                    <div className="ticket-body h-100 d-flex flex-column">
-                                        
-                                        {/* Top part (Image) */}
-                                        <div className="ticket-top position-relative overflow-hidden bg-dark">
-                                            {v.museum_id && v.museum_id.image ? (
-                                                <img src={v.museum_id.image} alt="Museum" className="w-100 h-100 object-fit-cover" />
-                                            ) : (
-                                                <div className="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                                    <i className="bi bi-image fs-1"></i>
-                                                </div>
-                                            )}
-                                            
-                                            {/* Subtle vignette for text readability */}
-                                            <div className="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
-                                            
-                                            <span className="badge bg-white text-orange position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2 fw-bold z-1">
-                                                Tour Guidato
-                                            </span>
+                {(() => {
+                    const filteredVisite = visite.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase()));
+                    const displayedVisite = filteredVisite.slice(0, visibleLimit);
 
-                                            {/* Museum Location overlaid on image */}
-                                            {v.museum_id && (
-                                                <div className="position-absolute bottom-0 start-0 p-3 z-1 w-100">
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <i className="bi bi-geo-alt-fill text-orange"></i>
-                                                        <span className="fw-bold text-truncate text-white text-shadow-strong">
-                                                            {v.museum_id.name || v.museum_id.museum || 'Museo sconosciuto'}
-                                                        </span>
+                    if (filteredVisite.length === 0) {
+                        return (
+                            <div className="text-center py-5">
+                                <i className={`bi ${!user ? 'bi-person-x' : 'bi-inbox'} ${textMuted} icon-5xl mb-3 d-block`}></i>
+                                <h4 className="fw-bold">{!user ? "Non sei loggato" : "Nessuna visita disponibile"}</h4>
+                                <p className={textMuted}>{!user ? "Effettua l'accesso per visualizzare le visite acquistate." : "Torna più tardi per nuovi contenuti."}</p>
+                                {!user && (
+                                    <a href="../login.html" className="btn bg-orange text-white rounded-pill px-4 fw-bold mt-2 shadow-sm hover-lift">
+                                        Vai al Login
+                                    </a>
+                                )}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <>
+                            <div className="row g-4 mt-2 mb-4">
+                                {displayedVisite.map(v => (
+                                    <div key={v._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                                        <div className="card ticket-card h-100 border-0 bg-transparent">
+                                            <div className="ticket-body h-100 d-flex flex-column">
+                                                
+                                                {/* Top part (Image) */}
+                                                <div className="ticket-top position-relative overflow-hidden bg-dark">
+                                                    {v.museum_id && v.museum_id.image ? (
+                                                        <img src={v.museum_id.image} alt="Museum" className="w-100 h-100 object-fit-cover" />
+                                                    ) : (
+                                                        <div className="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                                            <i className="bi bi-image fs-1"></i>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Subtle vignette for text readability */}
+                                                    <div className="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
+                                                    
+                                                    <span className="badge bg-white text-orange position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2 fw-bold z-1">
+                                                        Tour Guidato
+                                                    </span>
+
+                                                    {/* Museum Location overlaid on image */}
+                                                    {v.museum_id && (
+                                                        <div className="position-absolute bottom-0 start-0 p-3 z-1 w-100">
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <i className="bi bi-geo-alt-fill text-orange"></i>
+                                                                <span className="fw-bold text-truncate text-white text-shadow-strong">
+                                                                    {v.museum_id.name || v.museum_id.museum || 'Museo sconosciuto'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Bottom part (Details) */}
+                                                <div className="ticket-bottom p-4 d-flex flex-column flex-grow-1 position-relative">
+                                                    
+                                                    {/* Decorative Barcode Watermark */}
+                                                    <div className="position-absolute top-0 end-0 mt-4 me-3 ticket-barcode-wrapper">
+                                                        <i className={`bi bi-upc ticket-barcode-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
+                                                    </div>
+                                                    
+                                                    <h5 className={`fw-black mb-3 position-relative z-1 pe-4 mt-2 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
+                                                    
+                                                    <p className={`small flex-grow-1 mb-3 position-relative z-1 pe-2 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                                                        {v.description && v.description.length > 100 ? v.description.substring(0, 100) + '...' : v.description || "Nessuna descrizione disponibile."}
+                                                    </p>
+                                                    
+                                                    {/* Tags */}
+                                                    {v.tags && v.tags.length > 0 && (
+                                                        <div className="d-flex flex-wrap gap-1 mb-3">
+                                                            {v.tags.map(tag => (
+                                                                <span key={tag} className="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1">
+                                                                    {tag}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    <div className={`mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
+                                                        <div className="mb-2">
+                                                            <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                                                                <i className="bi bi-geo-fill text-orange me-1"></i> {v.items ? v.items.length : 0} tappe
+                                                            </span>
+                                                        </div>
+                                                        <Link to={`/visit/${v._id}`} className="btn w-100 rounded-pill fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 btn-orange-solid">
+                                                            <i className="bi bi-play-circle-fill"></i> Inizia visita
+                                                        </Link>
                                                     </div>
                                                 </div>
-                                            )}
-                                        </div>
-
-                                        {/* Bottom part (Details) */}
-                                        <div className="ticket-bottom p-4 d-flex flex-column flex-grow-1 position-relative">
-                                            
-                                            {/* Decorative Barcode Watermark */}
-                                            <div className="position-absolute top-0 end-0 mt-4 me-3 ticket-barcode-wrapper">
-                                                <i className={`bi bi-upc ticket-barcode-icon ${darkMode ? 'text-white' : 'text-dark'}`}></i>
-                                            </div>
-                                            
-                                            <h5 className={`fw-black mb-3 position-relative z-1 pe-4 mt-2 ${darkMode ? 'text-white' : 'text-dark'}`}>{v.name}</h5>
-                                            
-                                            <p className={`small flex-grow-1 mb-3 position-relative z-1 pe-2 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
-                                                {v.description && v.description.length > 100 ? v.description.substring(0, 100) + '...' : v.description || "Nessuna descrizione disponibile."}
-                                            </p>
-                                            
-                                            {/* Tags */}
-                                            {v.tags && v.tags.length > 0 && (
-                                                <div className="d-flex flex-wrap gap-1 mb-3">
-                                                    {v.tags.map(tag => (
-                                                        <span key={tag} className="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1">
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className={`mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
-                                                <div className="mb-2">
-                                                    <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
-                                                        <i className="bi bi-geo-fill text-orange me-1"></i> {v.items ? v.items.length : 0} tappe
-                                                    </span>
-                                                </div>
-                                                <Link to={`/visit/${v._id}`} className={`btn w-100 rounded-pill fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 ${darkMode ? 'btn-orange' : 'btn-orange text-white'}`} style={{ backgroundColor: '#fd7e14', color: 'white', border: 'none' }}>
-                                                    <i className="bi bi-play-circle-fill"></i> Inizia visita
-                                                </Link>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                )}
+
+                            {visibleLimit < filteredVisite.length && (
+                                <div className="text-center mt-2 mb-5 pb-4">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setVisibleLimit(prev => prev + 6)}
+                                        className="btn rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2 active-scale btn-orange-solid fs-6"
+                                    >
+                                        <i className="bi bi-arrow-down-circle fs-5"></i>
+                                        <span>Carica altre ({filteredVisite.length - visibleLimit} rimanenti)</span>
+                                    </button>
+                                </div>
+                            )}
+
+                        </>
+                    );
+                })()}
+
             </div>
 
             {/* FOOTER */}

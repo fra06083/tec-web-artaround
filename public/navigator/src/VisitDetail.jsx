@@ -482,7 +482,10 @@ function VisitDetail() {
     useEffect(() => {
         if (!pin) return;
         
-        const eventSource = new EventSource(`/api/rooms/events/${pin}`);
+        const studentName = localStorage.getItem('artaround_student_name') || (user ? user.name : '');
+        const eventUrl = (studentName && role !== 'teacher') ? `/api/rooms/events/${pin}?studentName=${encodeURIComponent(studentName)}` : `/api/rooms/events/${pin}`;
+        const eventSource = new EventSource(eventUrl);
+
         
         if (role !== 'teacher') {
             eventSource.addEventListener('artwork-changed', (e) => {
@@ -918,19 +921,20 @@ function VisitDetail() {
                             
                             <div className="flex-shrink-0">
                                 <h4 className="fw-bold mb-1">{currentItem.item.replace(/\s*\d{10,}$/, '')}</h4>
-                                <div className="d-flex flex-wrap gap-1 mb-2">
+                                <div className="d-flex flex-wrap gap-1.5 mb-2">
                                     {visita.museum_id && (
-                                        <span className="badge rounded-pill text-body bg-body-tertiary border border-secondary-subtle fw-normal px-2 py-1 shadow-sm small">
+                                        <span className={`rounded-pill px-3 py-1 shadow-sm small d-inline-flex align-items-center gap-1 fw-medium border ${darkMode ? 'bg-dark text-white border-secondary border-opacity-25' : 'bg-light text-dark border-light-subtle'}`}>
                                             <i className="bi bi-geo-alt-fill text-orange me-1"></i>
-                                            {visita.museum_id.museum}
-                                            {currentItem.sala?.nome && <> · {currentItem.sala.nome}</>}
+                                            <span>{visita.museum_id.museum}</span>
+                                            {currentItem.sala?.nome && <span>· {currentItem.sala.nome}</span>}
                                         </span>
                                     )}
-                                    <span className="badge rounded-pill text-body bg-body-tertiary border border-secondary-subtle fw-normal px-2 py-1 shadow-sm small">
+                                    <span className={`rounded-pill px-3 py-1 shadow-sm small d-inline-flex align-items-center gap-1 fw-medium border ${darkMode ? 'bg-dark text-white border-secondary border-opacity-25' : 'bg-light text-dark border-light-subtle'}`}>
                                         <i className="bi bi-person-fill text-orange me-1"></i>
-                                        {currentItem.author}
+                                        <span>{currentItem.author}</span>
                                     </span>
                                 </div>
+
 
                                 {/* BARRA DEI COMANDI REIMMAGINATA */}
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
@@ -940,15 +944,17 @@ function VisitDetail() {
                                     <div className="d-flex align-items-center gap-2">
                                         <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
                                             <button onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} disabled={LEVELS.indexOf(selectedType) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
-                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis d-inline-block w-85px">{selectedType}</span>
+                                            <span className="fw-bold fs-085 text-center text-body-emphasis user-select-none pill-level-width">{selectedType}</span>
                                             <button onClick={() => { changeLevelUp(); handleStudentAction('plus'); }} disabled={LEVELS.indexOf(selectedType) === LEVELS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
                                         <div className={`rounded-pill p-1 d-inline-flex align-items-center shadow-sm ${darkMode ? 'bg-dark border border-secondary-subtle' : 'bg-light border border-light-subtle'}`}>
                                             <button onClick={() => { changeLengthDown(); handleStudentAction('minus'); }} disabled={LENGTHS.indexOf(selectedLength) === 0} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-danger bg-opacity-25 btn-icon-32"><i className="bi bi-dash fs-5 text-danger"></i></button>
-                                            <span className="fw-bold mx-2 fs-085 text-center text-body-emphasis d-inline-block w-40px">{selectedLength}</span>
+                                            <span className="fw-bold fs-085 text-center text-body-emphasis user-select-none pill-duration-width">{selectedLength}</span>
+
                                             <button onClick={() => { changeLengthUp(); handleStudentAction('plus'); }} disabled={LENGTHS.indexOf(selectedLength) === LENGTHS.length - 1} className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-0 bg-success bg-opacity-25 btn-icon-32"><i className="bi bi-plus fs-5 text-success"></i></button>
                                         </div>
                                     </div>
+
                                 </div>
                                 
                                 {/* Lato Destro: Azioni Audio/Vocali ed Info */}
@@ -1023,43 +1029,54 @@ function VisitDetail() {
                             </div>
                         </div>
                         
-                        {/* BOTTOM NAVIGATION */}
-                        {(!pin || role === 'teacher') && (
-                            <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-2 px-md-3 mt-auto">
-                                <div className="d-flex justify-content-between align-items-center w-100">
-                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-2 px-md-3 fw-medium shadow-sm d-flex align-items-center gap-1">
-                                        <i className="bi bi-chevron-left small"></i> <span className="d-none d-sm-inline">Precedente</span>
+                        {/* BOTTOM NAVIGATION & PROGRESSION DOTS */}
+                        <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-2 px-md-3 mt-auto">
+                            <div className="d-flex justify-content-between align-items-center w-100">
+                                {(!pin || role === 'teacher') ? (
+                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale">
+                                        <i className="bi bi-chevron-left"></i> <span>Indietro</span>
                                     </button>
-                                    
-                                    <div className="d-flex justify-content-center align-items-center gap-1 mx-1 mx-md-2">
-                                        {items.map((_, index) => (
-                                            <div
-                                                key={index}
-                                                className={`rounded-circle dot-indicator bg-orange ${index === currentIndex ? 'opacity-100' : 'opacity-25'}`}
-                                                onClick={() => handleIndexChange(index)}
-                                                aria-label={`Vai all'opera ${index + 1}`}
-                                            />
-                                        ))}
-                                    </div>
+                                ) : (
+                                    <span className="badge rounded-pill bg-body-tertiary text-body border border-secondary-subtle px-3 py-1.5 small fw-bold">
+                                        {currentIndex + 1} / {items.length}
+                                    </span>
+                                )}
+                                
+                                <div className="d-flex justify-content-center align-items-center gap-1.5 mx-1 mx-md-2 overflow-x-auto py-1">
+                                    {items.map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className={`dot-indicator ${index === currentIndex ? 'active' : ''}`}
+                                            onClick={() => (!pin || role === 'teacher') && handleIndexChange(index)}
+                                            aria-label={`Vai all'opera ${index + 1}`}
+                                        />
+                                    ))}
+                                </div>
 
-                                    {currentIndex === items.length - 1 ? (
+                                {(!pin || role === 'teacher') ? (
+                                    currentIndex === items.length - 1 ? (
                                         (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
-                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-2">
-                                                <span className="d-none d-sm-inline">Avvia Quiz</span> <i className="bi bi-patch-question small"></i>
+                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale">
+                                                <span>Avvia Quiz</span> <i className="bi bi-patch-question"></i>
                                             </button>
                                         ) : (
-                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-2">
-                                                <span className="d-none d-sm-inline">Termina</span> <i className="bi bi-stop-circle small"></i>
+                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale">
+                                                <span>Termina</span> <i className="bi bi-stop-circle"></i>
                                             </button>
                                         )
                                     ) : (
-                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-2 px-md-3 fw-bold shadow-sm d-flex align-items-center gap-1">
-                                            <span className="d-none d-sm-inline">Successiva</span> <i className="bi bi-chevron-right small"></i>
+                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale">
+                                            <span>Avanti</span> <i className="bi bi-chevron-right"></i>
                                         </button>
-                                    )}
-                                </div>
+                                    )
+                                ) : (
+                                    <span className="badge rounded-pill bg-orange-subtle text-orange border border-orange border-opacity-25 px-2.5 py-1.5 small fw-bold">
+                                        <i className="bi bi-broadcast me-1"></i> Live
+                                    </span>
+                                )}
                             </div>
-                        )}
+                        </div>
+
                     </div>
                 </div>
             </main>
@@ -1181,27 +1198,33 @@ function VisitDetail() {
             {/* LIGHTBOX MODAL */}
             {lightboxImage && (
                 <div 
-                    className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-black z-1060 overflow-hidden" 
+                    className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-black bg-opacity-95 overflow-hidden p-3" 
                     onClick={() => setLightboxImage(null)}
+                    style={{ zIndex: 9999, backdropFilter: 'blur(12px)' }}
                 >
                     {/* Pulsante Chiusura Fluttuante Elegante */}
                     <button 
                         type="button" 
-                        className="btn btn-light rounded-circle position-absolute d-flex align-items-center justify-content-center shadow-lg lightbox-close-btn z-1061" 
-                        onClick={() => setLightboxImage(null)}
+                        className="btn btn-light rounded-circle position-fixed d-flex align-items-center justify-content-center shadow-lg lightbox-close-btn" 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxImage(null);
+                        }}
+                        aria-label="Chiudi ingrandimento"
                     >
-                        <i className="bi bi-x-lg fs-5 text-dark"></i>
+                        <i className="bi bi-x-lg fs-5 text-dark fw-bold"></i>
                     </button>
 
-                    <div className="d-flex flex-column align-items-center justify-content-center p-3 w-100 max-h-100" onClick={e => e.stopPropagation()}>
+                    <div className="d-flex flex-column align-items-center justify-content-center w-100 h-100 max-h-100" onClick={e => e.stopPropagation()}>
                         <img 
                             src={lightboxImage} 
                             alt="Ingrandita" 
-                            className="img-fluid rounded-4 shadow-lg lightbox-img-max" 
+                            className="img-fluid rounded-4 shadow-2xl lightbox-img-max" 
                         />
                     </div>
                 </div>
             )}
+
             <ProfileModal 
                 isOpen={isProfileModalOpen} 
                 onClose={() => setIsProfileModalOpen(false)} 

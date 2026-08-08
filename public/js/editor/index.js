@@ -29,6 +29,12 @@ function marketplaceApp() {
         museumSearchQuery: '',
         museumView: 'visite',      // 'visite' | 'mappa'
         mapFloor: null,            // numero del piano scelto, null = primo disponibile
+        visibleLimit: 6,
+
+        get displayedItems() {
+            return this.filteredItems.slice(0, this.visibleLimit);
+        },
+
 
         get filteredSelectionVisits() {
             if (!this.visitSearchQuery || !this.visitSearchQuery.trim()) {
@@ -121,6 +127,7 @@ function marketplaceApp() {
             this.museumView = 'visite';
             this.selectedTags = [];
             this.mapFloor = null;
+            this.visibleLimit = 6;
             this.syncMuseumUrl(true);
             window.scrollTo({ top: 0 });
         },
@@ -129,6 +136,7 @@ function marketplaceApp() {
             this.selectedMuseumId = null;
             this.selectedTags = [];
             this.museumSearchQuery = '';
+            this.visibleLimit = 6;
             this.syncMuseumUrl(true);
             window.scrollTo({ top: 0 });
         },
@@ -152,10 +160,8 @@ function marketplaceApp() {
             const daUrl = new URLSearchParams(window.location.search).get('museo');
             if (daUrl && this.museums.some(m => m._id === daUrl)) {
                 this.selectedMuseumId = daUrl;
-            } else if (this.museums.length === 1) {
-                // Un museo solo: salta il passaggio, ma resta possibile tornare indietro.
-                this.selectedMuseumId = this.museums[0]._id;
-                this.syncMuseumUrl(false);
+            } else {
+                this.selectedMuseumId = null;
             }
  
             window.addEventListener('popstate', () => {
@@ -163,6 +169,7 @@ function marketplaceApp() {
                 this.selectedMuseumId = (id && this.museums.some(m => m._id === id)) ? id : null;
             });
         },
+
  
         get filteredItems() {
             let result = this.items;

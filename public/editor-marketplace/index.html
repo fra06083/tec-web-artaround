@@ -43,16 +43,20 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <span :class="darkMode ? 'text-cream' : 'text-teal'" class="ls-minus-1">ArtAround</span>
-                        <span class="fs-5 text-secondary fw-medium ms-2 opacity-50">| Marketplace</span>
+                        <span class="fs-5 text-secondary fw-medium ms-2 opacity-50 d-none d-sm-inline">| Marketplace</span>
                     </div>
                 </a>
 
                 <!-- 2. MOBILE CONTROLS -->
                 <div class="d-flex d-lg-none align-items-center gap-2 order-2">
+                    <button type="button" class="btn btn-link p-1 shadow-none" :class="darkMode ? 'text-white' : 'text-dark'" @click="mobileSearchOpen = !mobileSearchOpen">
+                        <i class="bi bi-search fs-5"></i>
+                    </button>
                     <button class="btn btn-link p-1 shadow-none theme-btn-mobile" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
                         <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
                     </button>
                 </div>
+
 
                 <!-- 3. DESKTOP SEARCH BAR -->
                 <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4 nav-search-container order-lg-2">
@@ -250,42 +254,57 @@
             <template x-if="selectedMuseumId && selectedMuseum">
                 <div>
 
+                    <!-- Floating Glass Back Button -->
                     <button type="button" @click="clearMuseum()"
-                            class="btn btn-link text-decoration-none fw-bold px-0 mb-3 d-inline-flex align-items-center gap-2"
-                            :class="darkMode ? 'text-white-50' : 'text-secondary'">
-                        <i class="bi bi-arrow-left"></i> Tutti i musei
+                            class="btn glass-card border border-secondary border-opacity-25 rounded-pill px-3.5 py-2 mb-4 d-inline-flex align-items-center gap-2 text-white-50 hover-text-white transition-all shadow-sm active-scale">
+                        <i class="bi bi-arrow-left fs-6"></i> <span>Tutti i musei</span>
                     </button>
 
-                    <div class="mb-4 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-lg">
-                        <div class="row align-items-center position-relative z-1">
+                    <!-- Hero Banner -->
+                    <div class="mb-5 rounded-5 p-4 p-md-5 navigator-hero-gradient overflow-hidden position-relative shadow-xl border border-white border-opacity-10">
+                        <div class="row align-items-center position-relative z-1 g-4">
                             <div class="col-12 col-md-8 text-center text-md-start">
-                                <h1 class="fw-black mb-2 text-white display-6 tracking-tight" x-text="selectedMuseum.museum"></h1>
-                                <p class="text-white-75 mb-0 fw-medium" x-show="selectedMuseum.province"
-                                x-text="selectedMuseum.province"></p>
+                                <h1 class="fw-black mb-3 text-white display-5 tracking-tight lh-sm" x-text="selectedMuseum.museum"></h1>
+                                <div class="d-inline-flex align-items-center gap-2" x-show="selectedMuseum.province || selectedMuseum.city">
+                                    <span class="rounded-pill px-3 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5 shadow-sm fw-medium badge-glass-hero">
+                                        <i class="bi bi-geo-alt-fill text-orange"></i>
+                                        <span x-text="(selectedMuseum.city ? selectedMuseum.city + ' ' : '') + (selectedMuseum.province ? '(' + selectedMuseum.province + ')' : '')"></span>
+                                    </span>
+                                </div>
+
                             </div>
-                            <div class="col-md-4 d-none d-md-block text-end">
-                                <i class="bi bi-bank text-white opacity-50 hero-icon-animated hero-icon-large"></i>
+                            <div class="col-md-4 d-none d-md-flex align-items-center justify-content-end">
+                                <template x-if="selectedMuseum && selectedMuseum.image">
+                                    <div class="rounded-circle overflow-hidden border border-2 border-white border-opacity-30 shadow-lg icon-box-110">
+                                        <img :src="selectedMuseum.image" alt="Logo Museo" class="w-100 h-100 object-fit-cover">
+                                    </div>
+                                </template>
+                                <template x-if="!selectedMuseum || !selectedMuseum.image">
+                                    <div class="rounded-circle bg-white bg-opacity-10 border border-white border-opacity-20 p-4 d-flex align-items-center justify-content-center shadow-lg icon-box-110">
+                                        <i class="bi bi-bank text-white fs-1 opacity-90"></i>
+                                    </div>
+                                </template>
                             </div>
+
                         </div>
                     </div>
 
                     <!-- Tab Visite / Mappa -->
-                    <ul class="nav nav-pills gap-2 mb-4">
-                        <li class="nav-item">
-                            <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
-                                    :class="museumView === 'visite' ? 'active bg-orange text-white border-orange' : ''"
-                                    @click="museumView = 'visite'">
-                                <i class="bi bi-ticket-perforated me-1"></i> Visite
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button type="button" class="btn filter-pill rounded-pill px-4 fw-bold shadow-sm"
-                                    :class="museumView === 'mappa' ? 'active bg-orange text-white border-orange' : ''"
-                                    @click="museumView = 'mappa'">
-                                <i class="bi bi-map me-1"></i> Mappa
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <button type="button" class="btn rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 transition-all shadow-sm"
+                                :class="museumView === 'visite' ? 'bg-orange text-white border-orange shadow-lg' : 'glass-card text-white-50 border border-secondary border-opacity-25 hover-text-white'"
+                                @click="museumView = 'visite'">
+                            <i class="bi bi-ticket-perforated fs-6"></i> <span>Visite</span>
+                        </button>
+                        <button type="button" class="btn rounded-pill px-4 py-2.5 fw-bold d-inline-flex align-items-center gap-2 transition-all shadow-sm"
+                                :class="museumView === 'mappa' ? 'bg-orange text-white border-orange shadow-lg' : 'glass-card text-white-50 border border-secondary border-opacity-25 hover-text-white'"
+                                @click="museumView = 'mappa'">
+                            <i class="bi bi-map fs-6"></i> <span>Mappa</span>
+                        </button>
+                    </div>
+
+
+
 
 
                     <!-- ---------- TAB VISITE ---------- -->
@@ -385,7 +404,7 @@
                                 </div>
                             </template>
 
-                            <template x-for="tour in filteredItems" :key="tour._id">
+                            <template x-for="tour in displayedItems" :key="tour._id">
                                 <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                                     <div class="card ticket-card h-100 border-0 bg-transparent">
                                         <div class="ticket-body h-100 d-flex flex-column">
@@ -459,7 +478,18 @@
                                 </div>
                             </template>
                         </div>
+
+                        <!-- Pulsante CARICA ALTRE -->
+                        <div x-show="visibleLimit < filteredItems.length" class="text-center mt-4 mb-5 pb-3">
+                            <button type="button" 
+                                    @click="visibleLimit += 6"
+                                    class="btn bg-orange text-white rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2 active-scale fs-6">
+                                <i class="bi bi-arrow-down-circle fs-5"></i>
+                                <span>Carica altre (<span x-text="filteredItems.length - visibleLimit"></span> rimanenti)</span>
+                            </button>
+                        </div>
                     </div>
+
 
 
                     <!-- ---------- TAB MAPPA ---------- -->
@@ -486,16 +516,20 @@
                         </template>
 
                         <template x-if="!piantaAttiva || !piantaAttiva.immagine">
-                            <div class="text-center py-5">
-                                <div class="d-inline-block rounded-circle bg-secondary bg-opacity-10 p-4 mb-4">
-                                    <i class="bi bi-map text-orange fs-1"></i>
+                            <div class="glass-card rounded-5 p-4 p-md-5 text-center my-4 my-md-5 border border-secondary border-opacity-20 shadow-xl max-w-650 mx-auto">
+                                <div class="rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 d-inline-flex align-items-center justify-content-center p-3 mb-3 shadow-sm" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-map-fill text-orange fs-1"></i>
                                 </div>
-                                <h4 class="fw-bold" :class="darkMode ? 'text-white' : 'text-dark'">Mappa non disponibile</h4>
-                                <p :class="darkMode ? 'text-white-50' : 'text-muted'">
-                                    Il curatore di questo museo non ha ancora caricato una pianta delle sale.
+                                <h3 class="fw-bold mb-2" :class="darkMode ? 'text-white' : 'text-dark'">Mappa non disponibile</h3>
+                                <p class="fs-6 lh-base mb-4 max-w-500 mx-auto" :class="darkMode ? 'text-white-50' : 'text-muted'">
+                                    Il curatore di questo museo non ha ancora caricato la pianta interattiva delle sale.
                                 </p>
+                                <button type="button" @click="museumView = 'visite'" class="btn btn-outline-orange rounded-pill px-4 py-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-ticket-perforated"></i> Esplora i Tour disponibili
+                                </button>
                             </div>
                         </template>
+
                     </div>
 
                 </div>

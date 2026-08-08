@@ -2077,6 +2077,86 @@ html.dark-mode body {
     animation: bounceVertical 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Reusable Utility Classes for Clean Code */
+.badge-glass-hero {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+}
+
+.btn-orange-solid {
+    background-color: #fd7e14 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.btn-orange-solid:hover {
+    background-color: #e86b05 !important;
+    color: #ffffff !important;
+}
+
+.max-w-600 {
+    max-width: 600px !important;
+}
+
+.max-w-450 {
+    max-width: 450px !important;
+}
+
+.min-w-150 {
+    min-width: 150px !important;
+}
+
+.max-w-100-pct {
+    max-width: 100% !important;
+}
+
+.icon-box-80 {
+    width: 80px !important;
+    height: 80px !important;
+}
+
+.icon-box-110 {
+    width: 110px !important;
+    height: 110px !important;
+    flex-shrink: 0 !important;
+}
+
+.pill-level-width {
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.pill-duration-width {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
+.cursor-zoom {
+    cursor: zoom-in !important;
+}
+
+.section-label {
+    letter-spacing: 1px !important;
+    font-size: 0.75rem !important;
+}
+
+.propic-fade-in {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.propic-fade-in.loaded {
+    opacity: 1;
+}
+
+
 
 
 

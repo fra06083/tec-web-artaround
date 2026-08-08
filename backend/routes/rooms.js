@@ -75,16 +75,14 @@ router.post('/join', async (req, res) => {
 
     pin = pin.trim();
 
-    // Gli studenti non possono creare la stanza se non è stata avviata dal docente.
-    // La stanza DEVE essere già in activeRooms per permettere l'accesso.
-
     if (!activeRooms.has(pin)) {
         return res.status(404).json({ error: "Stanza o Codice non trovato. Verifica il codice e riprova." });
     }
 
     const room = activeRooms.get(pin);
+    const isAlreadyMember = studentName && room.students.includes(studentName);
     
-    if (room.isStarted) {
+    if (room.isStarted && !isAlreadyMember) {
         if (!room.allowLateJoins) {
             return res.status(403).json({ error: "La visita è già iniziata e non sono ammessi nuovi ingressi." });
         }
@@ -105,30 +103,36 @@ router.post('/join', async (req, res) => {
         broadcastToRoom(pin, 'chat-message', { sender: 'Sistema', message: `${studentName} si è unito alla stanza.`, type: 'system', timestamp: new Date().toISOString() });
     }
 
-    res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex });
+    res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex, isStarted: room.isStarted });
 });
 
 // Verifica esistenza stanza o codice mnemonic
 router.get('/check/:pin', async (req, res) => {
     const pin = (req.params.pin || '').trim();
     if (activeRooms.has(pin)) {
-        return res.json({ exists: true });
+        const room = activeRooms.get(pin);
+        return res.json({ 
+            exists: true, 
+            visitId: room.visitId, 
+            isStarted: room.isStarted, 
+            currentArtworkIndex: room.currentArtworkIndex 
+        });
     }
     try {
         const matchedVisit = await Visit.findOne({ 
             mnemonicCode: { $regex: new RegExp('^' + pin + '$', 'i') } 
         });
         if (matchedVisit) {
-            return res.json({ exists: true, visitId: matchedVisit._id });
+            return res.json({ exists: true, visitId: matchedVisit._id, isStarted: false });
         }
     } catch (e) {}
     res.json({ exists: false });
 });
 
-
 // Connessione SSE per ascoltare gli eventi della stanza
 router.get('/events/:pin', (req, res) => {
     const { pin } = req.params;
+    const studentName = req.query.studentName;
 
     if (!activeRooms.has(pin)) {
         return res.status(404).json({ error: "Stanza non trovata" });
@@ -138,32 +142,60 @@ router.get('/events/:pin', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no'); // Fondamentale per evitare che Nginx blocchi/bafferizzi l'SSE
-    // flush headers
+    res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
     const room = activeRooms.get(pin);
+
+    if (studentName && studentName.trim()) {
+        const name = studentName.trim();
+        if (!room.students.includes(name)) {
+            room.students.push(name);
+            broadcastToRoom(pin, 'student-joined', { students: room.students });
+        }
+    }
     
     // Identificativo client
     const clientId = crypto.randomUUID();
-    const newClient = { id: clientId, res };
+    const newClient = { id: clientId, res, studentName };
     room.clients.push(newClient);
 
-    // Invia lo stato iniziale
-    res.write(`event: connected\ndata: ${JSON.stringify({ message: "Connesso alla stanza", students: room.students, currentArtworkIndex: room.currentArtworkIndex })}\n\n`);
+    // Invia lo stato iniziale COMPLETO
+    res.write(`event: connected\ndata: ${JSON.stringify({ 
+        message: "Connesso alla stanza", 
+        students: room.students, 
+        currentArtworkIndex: room.currentArtworkIndex,
+        isStarted: room.isStarted,
+        visitId: room.visitId
+    })}\n\n`);
 
-    // Ping periodico per tenere viva la connessione dietro al reverse proxy (evita ERR_HTTP2_PROTOCOL_ERROR)
+    // Ping periodico per tenere viva la connessione dietro al reverse proxy
     const pingInterval = setInterval(() => {
-        res.write(':\n\n'); // SSE comment, ignorato dal client ma tiene viva la socket TCP
+        res.write(':\n\n');
     }, 25000);
 
     // Gestione disconnessione
     req.on('close', () => {
         clearInterval(pingInterval);
         room.clients = room.clients.filter(c => c.id !== clientId);
-        // Se non ci sono più client, e la visita è finita? Potremmo rimuovere la stanza dopo tot tempo
     });
 });
+
+// Studente o docente lascia la stanza
+router.post('/leave', (req, res) => {
+    const { pin, studentName } = req.body;
+    if (!activeRooms.has(pin)) {
+        return res.json({ success: true });
+    }
+    const room = activeRooms.get(pin);
+    if (studentName) {
+        room.students = room.students.filter(s => s !== studentName);
+        broadcastToRoom(pin, 'student-joined', { students: room.students });
+        broadcastToRoom(pin, 'chat-message', { sender: 'Sistema', message: `${studentName} ha lasciato la stanza.`, type: 'system', timestamp: new Date().toISOString() });
+    }
+    res.json({ success: true });
+});
+
 
 // Docente cambia opera
 router.post('/change-artwork', (req, res) => {

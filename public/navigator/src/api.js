@@ -13,6 +13,13 @@ export async function fetchVisite() {
     return res.json();
 }
 
+export async function fetchMuseums() {
+    const res = await fetch(`${API_BASE}/musei`);
+    if (!res.ok) return [];
+    return res.json();
+}
+
+
 export async function fetchVisita(id, pin = '') {
     const token = localStorage.getItem('artaround_token');
     const url = pin ? `${API_BASE}/visite/${id}?pin=${encodeURIComponent(pin)}` : `${API_BASE}/visite/${id}`;
