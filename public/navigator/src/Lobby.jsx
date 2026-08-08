@@ -76,8 +76,8 @@ export default function Lobby() {
                     return;
                 }
 
-                const eventUrl = studentName ? `/api/rooms/events/${pin}?studentName=${encodeURIComponent(studentName)}` : `/api/rooms/events/${pin}`;
-                eventSource = new EventSource(eventUrl);
+                const studentName = sessionStorage.getItem('studentName') || '';
+                eventSource = new EventSource(`/api/rooms/events/${pin}?studentName=${encodeURIComponent(studentName)}`);
 
                 eventSource.addEventListener('connected', (e) => {
                     const parsed = JSON.parse(e.data);

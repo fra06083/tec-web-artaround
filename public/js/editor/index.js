@@ -740,6 +740,11 @@ function marketplaceApp() {
                     }
                     this.roomState.eventSource = new EventSource(`/api/rooms/events/${data.pin}`);
                     
+                    this.roomState.eventSource.addEventListener('connected', (e) => {
+                        const eventData = JSON.parse(e.data);
+                        this.roomState.students = eventData.students || [];
+                    });
+
                     this.roomState.eventSource.addEventListener('student-joined', (e) => {
                         const eventData = JSON.parse(e.data);
                         this.roomState.students = eventData.students;

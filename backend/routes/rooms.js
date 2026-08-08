@@ -31,12 +31,45 @@ router.post('/create', async (req, res) => {
         const visit = await Visit.findById(visitId);
         if (visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '') {
             pin = visit.mnemonicCode.trim();
-            if (activeRooms.has(pin)) {
-                return res.status(409).json({ error: "Questo codice è già in uso, scegline uno diverso." });
-            }
         }
     } catch (err) {
         console.error("Errore nel recupero della visita per mnemonicCode:", err);
+    }
+
+    // Controlla se esiste già una stanza attiva per questa visita (sia con mnemonicCode che con PIN generato)
+    let existingPin = pin;
+    if (!existingPin) {
+        for (const [p, r] of activeRooms.entries()) {
+            if (r.visitId.toString() === visitId.toString()) {
+                existingPin = p;
+                break;
+            }
+        }
+    }
+
+    if (existingPin && activeRooms.has(existingPin)) {
+        const existingRoom = activeRooms.get(existingPin);
+        if (existingRoom.visitId.toString() === visitId.toString()) {
+            // Se la stanza era già stata avviata o se non ci sono utenti rimasti connessi,
+            // resettiamo lo stato per permettere l'avvio di una nuova sessione pulita.
+            if (existingRoom.isStarted || existingRoom.clients.length === 0) {
+                existingRoom.isStarted = false;
+                existingRoom.currentArtworkIndex = 0;
+                existingRoom.quizActive = false;
+                existingRoom.quizQuestions = [];
+                existingRoom.quizAnswers = {};
+                existingRoom.quizResults = null;
+                if (existingRoom.clients.length === 0) {
+                    existingRoom.students = [];
+                }
+            }
+            if (teacherId) {
+                existingRoom.teacherId = teacherId;
+            }
+            return res.json({ pin: existingPin, visitId: existingRoom.visitId });
+        } else {
+            return res.status(409).json({ error: "Questo codice è già in uso da un'altra stanza attiva." });
+        }
     }
 
     if (!pin) {
@@ -132,7 +165,6 @@ router.get('/check/:pin', async (req, res) => {
 // Connessione SSE per ascoltare gli eventi della stanza
 router.get('/events/:pin', (req, res) => {
     const { pin } = req.params;
-    const studentName = req.query.studentName;
 
     if (!activeRooms.has(pin)) {
         return res.status(404).json({ error: "Stanza non trovata" });
@@ -147,18 +179,19 @@ router.get('/events/:pin', (req, res) => {
 
     const room = activeRooms.get(pin);
 
-    if (studentName && studentName.trim()) {
+    // Identificativo client
+    const clientId = crypto.randomUUID();
+    const studentName = req.query.studentName;
+    const newClient = { id: clientId, res, studentName };
+    room.clients.push(newClient);
+
+    if (studentName && studentName.trim() !== '') {
         const name = studentName.trim();
         if (!room.students.includes(name)) {
             room.students.push(name);
             broadcastToRoom(pin, 'student-joined', { students: room.students });
         }
     }
-    
-    // Identificativo client
-    const clientId = crypto.randomUUID();
-    const newClient = { id: clientId, res, studentName };
-    room.clients.push(newClient);
 
     // Invia lo stato iniziale COMPLETO
     res.write(`event: connected\ndata: ${JSON.stringify({ 
@@ -177,7 +210,19 @@ router.get('/events/:pin', (req, res) => {
     // Gestione disconnessione
     req.on('close', () => {
         clearInterval(pingInterval);
-        room.clients = room.clients.filter(c => c.id !== clientId);
+        const clientIndex = room.clients.findIndex(c => c.id === clientId);
+        if (clientIndex !== -1) {
+            const client = room.clients[clientIndex];
+            room.clients.splice(clientIndex, 1);
+            if (client.studentName) {
+                // Remove student from room.students if no other active connection has the same name
+                const hasOtherConnections = room.clients.some(c => c.studentName === client.studentName);
+                if (!hasOtherConnections) {
+                    room.students = room.students.filter(s => s !== client.studentName);
+                    broadcastToRoom(pin, 'student-joined', { students: room.students });
+                }
+            }
+        }
     });
 });
 
