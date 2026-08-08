@@ -502,29 +502,39 @@
     <!-- Modale Profilo Utente -->
     <div class="modal fade profile-modal-backdrop" tabindex="-1" :class="{ 'show d-block': isProfileModalOpen }"
         x-show="isProfileModalOpen" x-transition>
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" :class="darkMode ? 'bg-dark text-white' : 'bg-white'">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Modifica Profilo</h5>
+
+        <div class="modal-dialog modal-dialog-centered max-w-500">
+            <div class="modal-content border-0 rounded-4 shadow-xl overflow-hidden" :class="darkMode ? 'bg-dark text-white border border-secondary border-opacity-25' : 'bg-white text-dark'">
+                <div class="modal-header border-0 p-4 pb-2 d-flex align-items-center justify-content-between">
+                    <h4 class="fw-black mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-gear text-orange fs-4"></i> Modifica Profilo
+                    </h4>
                     <button type="button" class="btn-close" @click="isProfileModalOpen = false"
                         :class="darkMode ? 'btn-close-white' : ''"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3 text-center">
-                        <div class="mx-auto position-relative rounded-circle bg-secondary overflow-hidden mb-3 profile-modal-avatar d-flex align-items-center justify-content-center text-white display-5 fw-bold">
-                            <span x-text="profileForm.name ? profileForm.name.charAt(0).toUpperCase() : (username ? username.charAt(0).toUpperCase() : 'U')"></span>
-                            <template x-if="profileForm.propic">
-                                <img :src="profileForm.propic" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style="opacity: 0; transition: opacity 0.3s;" onload="this.style.opacity='1'" onerror="this.style.opacity='0'">
-                            </template>
+                <div class="modal-body p-4 pt-2">
+                    <div class="mb-4 text-center">
+                        <div class="position-relative d-inline-block">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center text-white display-5 fw-black shadow-lg position-relative border border-4 border-white profile-avatar-xl">
+                                <span x-text="profileForm.name ? profileForm.name.charAt(0).toUpperCase() : (username ? username.charAt(0).toUpperCase() : 'U')"></span>
+                                <template x-if="profileForm.propic">
+                                    <img :src="profileForm.propic" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover propic-fade-in" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
+                                </template>
+                            </div>
+                            <label class="position-absolute bottom-0 end-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center shadow-md cursor-pointer border border-2 border-white hover-scale camera-badge-btn" title="Carica nuova foto">
+                                <i class="bi bi-camera-fill fs-6"></i>
+                                <input type="file" class="d-none" accept="image/*" @change="uploadProfileImage">
+                            </label>
                         </div>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Username</label>
+                        <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75">Username</label>
                         <div class="input-group has-validation">
-                            <span class="input-group-text bg-light text-secondary border-end-0 fw-bold">@</span>
-                            <input type="text" class="form-control"
+                            <span class="input-group-text border-end-0 fw-bold rounded-start-3" :class="darkMode ? 'bg-secondary bg-opacity-25 text-white border-secondary border-opacity-50' : 'bg-light text-secondary'">@</span>
+                            <input type="text" class="form-control rounded-end-3"
                                    x-model="profileForm.name" @input="profileForm.nameError = validateUsername(profileForm.name)"
-                                   :class="profileForm.nameError ? 'is-invalid border-danger' : ''"
+                                   :class="[profileForm.nameError ? 'is-invalid border-danger' : '', darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : '']"
                                    placeholder="tuo_username">
                             <template x-if="profileForm.nameError">
                                 <div class="invalid-feedback d-flex align-items-center gap-1 mt-1 text-danger fw-medium">
@@ -534,19 +544,34 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">URL Immagine Profilo</label>
+                        <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75">URL Immagine Profilo</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" x-model="profileForm.propic" placeholder="https://... o data:image/...">
-                            <label class="btn btn-outline-secondary mb-0">
+                            <input type="text" class="form-control rounded-start-3" :class="darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : ''" x-model="profileForm.propic" placeholder="https://... o data:image/...">
+                            <label class="btn btn-outline-secondary rounded-end-3 mb-0 d-flex align-items-center gap-1.5 fw-bold">
                                 <i class="bi bi-upload"></i> Carica
                                 <input type="file" class="d-none" accept="image/*" @change="uploadProfileImage">
                             </label>
                         </div>
                     </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75 d-flex align-items-center gap-1.5">
+                            <i class="bi bi-sliders text-orange"></i> Livello di Testo Preferito
+                        </label>
+                        <select class="form-select rounded-3 py-2.5 fw-medium" :class="darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : 'bg-white text-dark'" x-model="profileForm.preferredLevel">
+                            <option value="infantile">Infantile (Semplificato per bambini)</option>
+                            <option value="semplice">Semplice (Linguaggio intuitivo)</option>
+                            <option value="medio">Medio (Standard bilanciato)</option>
+                            <option value="dettagliato">Dettagliato (Approfondito completo)</option>
+
+                        </select>
+                        <div class="form-text small opacity-75 mt-1.5">
+                            Impostato come default automatico per tutte le visite guidate e la riproduzione audio.
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary" @click="isProfileModalOpen = false">Annulla</button>
-                    <button type="button" class="btn bg-orange text-white" @click="updateProfile()">Salva</button>
+                <div class="modal-footer border-0 p-4 pt-0 d-flex gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold" @click="isProfileModalOpen = false">Annulla</button>
+                    <button type="button" class="btn btn-orange text-white rounded-pill px-4.5 py-2 fw-bold shadow-sm active-scale" @click="updateProfile()">Salva Modifiche</button>
                 </div>
             </div>
         </div>
@@ -555,3 +580,4 @@
 </body>
 
 </html>
+

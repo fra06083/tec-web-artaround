@@ -140,40 +140,97 @@ export default function Lobby() {
         };
     }, [pin, visitId, pending, reqId, navigate]);
 
+    const [preferredLevel, setPreferredLevel] = useState(() => localStorage.getItem('artaround_preferred_level') || 'medio');
+
+    const handleLevelChange = (e) => {
+        const newLevel = e.target.value;
+        setPreferredLevel(newLevel);
+        localStorage.setItem('artaround_preferred_level', newLevel);
+    };
+
     return (
-        <div className={`container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center p-3 transition-theme ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
-            <div className="text-center w-100 max-w-600">
-                <div className="badge bg-orange text-white px-3 py-2 rounded-pill mb-3 fw-bold text-uppercase tracking-wider fs-075 shadow-sm">
-                    Lobby d'Attesa
+        <div className={`container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center p-3 p-md-5 transition-theme position-relative overflow-hidden ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
+            
+            {/* Ambient Background Glow for PC */}
+            <div className="position-absolute top-50 start-50 translate-middle w-100 h-100 d-none d-md-block opacity-10 pointer-events-none ambient-glow-orange"></div>
+
+
+            <div className="text-center w-100 max-w-600 position-relative z-1">
+                
+                {/* Live Room Badge */}
+                <div className="d-inline-flex align-items-center gap-2 bg-orange bg-opacity-15 text-orange px-3.5 py-2 rounded-pill mb-4 fw-bold text-uppercase tracking-wider fs-075 border border-orange border-opacity-25 shadow-sm">
+                    <span className="spinner-grow spinner-grow-sm text-orange" role="status" aria-hidden="true"></span>
+                    <span>Sala d'Attesa Live</span>
                 </div>
-                <h1 className="fw-black mb-3">Sei nella Sala d'Attesa</h1>
-                <p className={`lead mb-4 ${darkMode ? 'opacity-75 text-white' : 'text-secondary'}`}>
-                    Stanza Live: <span className="fw-bold text-orange">{pin}</span>
+
+                <h1 className="fw-black mb-2 display-6 tracking-tight">Sei nella Sala d'Attesa</h1>
+                <p className={`lead mb-4 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                    Codice Stanza: <span className="fw-black text-orange border-bottom border-orange border-opacity-50 pb-0.5 px-1">{pin}</span>
                 </p>
                 
-                <div className={`p-4 rounded-4 mb-4 shadow-sm border ${darkMode ? 'bg-dark border-secondary border-opacity-25 text-white' : 'bg-white border-light-subtle text-dark'}`}>
-                    <h4 className="fw-bold mb-0">{status}</h4>
+                {/* Status Alert Box */}
+                <div className={`p-4 rounded-4 mb-4 shadow-md border position-relative overflow-hidden ${darkMode ? 'bg-dark bg-opacity-80 border-secondary border-opacity-25 text-white' : 'bg-white border-light-subtle text-dark'}`}>
+                    <div className="d-flex align-items-center justify-content-center gap-3">
+                        {!rejected && (
+                            <div className="spinner-border text-orange spinner-border-sm flex-shrink-0" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        )}
+                        <h5 className="fw-bold mb-0 lh-base">{status}</h5>
+                    </div>
                 </div>
+
+                {/* Card Selezione Livello di Testo in Lobby */}
+                {!rejected && (
+                    <div className={`card shadow-sm border rounded-4 w-100 max-w-450 mx-auto mb-4 ${darkMode ? 'border-secondary border-opacity-25 bg-dark text-white' : 'border-light-subtle bg-white text-dark'}`}>
+                        <div className="card-body p-4 text-start">
+                            <label className="form-label fw-bold text-uppercase text-orange tracking-wider fs-075 d-flex align-items-center gap-2 mb-2">
+                                <i className="bi bi-sliders text-orange fs-6"></i> Livello di Testo Preferito
+                            </label>
+                            <select 
+                                className={`form-select rounded-3 py-2.5 fw-bold ${darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : 'bg-light text-dark border-light-subtle'}`}
+                                value={preferredLevel}
+                                onChange={handleLevelChange}
+                            >
+                                <option value="infantile">Infantile (Semplificato per bambini)</option>
+                                <option value="semplice">Semplice (Linguaggio intuitivo)</option>
+                                <option value="medio">Medio (Standard bilanciato)</option>
+                                <option value="dettagliato">Dettagliato (Approfondito completo)</option>
+                            </select>
+                            <div className="form-text small opacity-75 mt-2">
+                                Puoi personalizzare il tuo livello di spiegazione direttamente qui prima dell'avvio della visita.
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {rejected ? (
                     <button onClick={() => navigate('/')} className="btn bg-orange text-white rounded-pill px-4 py-2.5 fw-bold shadow-sm active-scale">
-                        Torna alla Home Navigator
+                        <i className="bi bi-house-door-fill me-2"></i> Torna alla Home Navigator
                     </button>
                 ) : (
                     <div className="d-flex flex-column align-items-center gap-4">
                         {!pending && (
                             <div className={`card shadow-sm border rounded-4 w-100 max-w-450 ${darkMode ? 'border-secondary border-opacity-25 bg-dark text-white' : 'border-light-subtle bg-white text-dark'}`}>
-
                                 <div className="card-body p-4">
-                                    <h6 className="fw-bold mb-3 text-uppercase text-orange tracking-wider fs-075">
-                                        <i className="bi bi-people-fill me-2"></i>Partecipanti Connessi ({students.length})
-                                    </h6>
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 className="fw-bold mb-0 text-uppercase text-orange tracking-wider fs-075 d-flex align-items-center gap-2">
+                                            <i className="bi bi-people-fill fs-6"></i> Partecipanti Connessi
+                                        </h6>
+                                        <span className="badge rounded-pill bg-orange bg-opacity-15 text-orange fw-bold fs-7 px-2.5 py-1">
+                                            {students.length} {students.length === 1 ? 'studente' : 'studenti'}
+                                        </span>
+                                    </div>
                                     <div className="d-flex flex-wrap justify-content-center gap-2 max-h-200 overflow-y-auto p-1">
-                                        {students.map((s, idx) => (
-                                            <span key={idx} className={`badge px-3 py-2 rounded-pill fs-6 fw-medium d-flex align-items-center gap-1.5 ${darkMode ? 'bg-secondary bg-opacity-50 text-white border border-secondary border-opacity-25' : 'bg-light text-dark border border-light-subtle shadow-sm'}`}>
-                                                <i className="bi bi-person-circle small text-orange"></i> {s}
-                                            </span>
-                                        ))}
+                                        {students.length === 0 ? (
+                                            <p className={`small my-2 ${darkMode ? 'text-white-50' : 'text-muted'}`}>In attesa che si colleghino altri studenti...</p>
+                                        ) : (
+                                            students.map((s, idx) => (
+                                                <span key={idx} className={`badge px-3 py-2 rounded-pill fs-6 fw-medium d-flex align-items-center gap-1.5 ${darkMode ? 'bg-secondary bg-opacity-40 text-white border border-secondary border-opacity-25' : 'bg-light text-dark border border-light-subtle shadow-sm'}`}>
+                                                    <i className="bi bi-person-fill small text-orange"></i> {s}
+                                                </span>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -181,7 +238,7 @@ export default function Lobby() {
 
                         <button 
                             onClick={handleLeaveRoom}
-                            className="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold small opacity-75 hover-opacity-100 transition-all"
+                            className="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold small opacity-75 hover-opacity-100 transition-all shadow-sm"
                         >
                             <i className="bi bi-box-arrow-left me-1.5"></i> Esci dalla Stanza
                         </button>
@@ -190,6 +247,8 @@ export default function Lobby() {
             </div>
         </div>
     );
+
+
 }
 
 

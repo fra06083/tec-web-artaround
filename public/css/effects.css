@@ -597,38 +597,100 @@ html.dark-mode body {
 ========================================================= */
 
 .auth-dropdown-menu {
-    background-color: white;
-    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 1.25rem !important;
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.12), 0 5px 15px rgba(0, 0, 0, 0.05);
+    min-width: 250px;
+    overflow: hidden;
+    padding: 0.65rem;
     z-index: 1050;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark-mode .auth-dropdown-menu {
+    background: #1e2024 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6) !important;
 }
 
 .dropdown-header-info {
-    background-color: rgba(253, 126, 20, 0.05);
+    background: rgba(253, 126, 20, 0.08);
+    border-radius: 0.875rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.35rem;
+}
+
+.dark-mode .dropdown-header-info {
+    background: rgba(253, 126, 20, 0.15);
 }
 
 .dropdown-link-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.85rem;
     padding: 0.75rem 1rem;
-    color: #212529;
+    color: #2b303a;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0.75rem;
     text-decoration: none;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.dark-mode .dropdown-link-item {
+    color: #e9ecef !important;
 }
 
 .dropdown-link-item:hover {
-    background-color: rgba(253, 126, 20, 0.1);
+    background-color: rgba(253, 126, 20, 0.12);
+    color: #fd7e14 !important;
+    transform: translateX(3px);
+}
+
+.dark-mode .dropdown-link-item:hover {
+    background-color: rgba(253, 126, 20, 0.2);
+    color: #ff922b !important;
 }
 
 .dropdown-link-item i {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-link-item:hover i {
+    transform: scale(1.15);
 }
 
 .dropdown-divider-custom {
     height: 1px;
-    background-color: rgba(0, 0, 0, 0.1);
-    margin: 0.5rem 0;
+    background-color: rgba(0, 0, 0, 0.08);
+    margin: 0.4rem 0;
 }
+
+.dark-mode .dropdown-divider-custom {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Offcanvas Mobile Side Menu Visual Upgrade */
+.offcanvas.offcanvas-end {
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+    overflow: hidden;
+}
+
+.offcanvas-side-header {
+    background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+    padding: 2.25rem 1.5rem 1.75rem;
+    color: white;
+    position: relative;
+}
+
+.dark-mode .offcanvas-side-header {
+    background: linear-gradient(135deg, #2c2f33 0%, #17191c 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 
 .logout-item:hover {
     background-color: rgba(220, 53, 69, 0.1) !important;
@@ -2155,6 +2217,77 @@ html.dark-mode body {
 .propic-fade-in.loaded {
     opacity: 1;
 }
+
+/* Tour Dot Indicator Progression Styles */
+.dot-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.marketplace-light .dot-indicator {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dot-indicator.completed {
+    background-color: #fd7e14;
+    opacity: 0.65;
+    width: 8px;
+    height: 8px;
+}
+
+.dot-indicator.active {
+    width: 26px;
+    height: 8px;
+    border-radius: 50px;
+    background-color: #fd7e14;
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(253, 126, 20, 0.6);
+}
+
+.dot-indicator.remaining {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 0.5;
+}
+
+.marketplace-light .dot-indicator.remaining {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.dot-indicator.mini {
+    width: 5px;
+    height: 5px;
+    opacity: 0.4;
+}
+
+/* Helper Utility Classes for Refactored Components */
+.profile-avatar-xl {
+    width: 105px;
+    height: 105px;
+    background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+}
+
+.camera-badge-btn {
+    width: 34px;
+    height: 34px;
+}
+
+.fade-img-load {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ambient-glow-orange {
+    background: radial-gradient(circle, rgba(253, 126, 20, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+    filter: blur(60px);
+}
+
+
 
 
 

@@ -236,33 +236,40 @@ function VisitList() {
 
                                 {/* Dropdown Menu Professionale */}
                                 {userMenuOpen && (
-                                    <div className="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 dropdown-animate-enter z-1050">
-                                        <div className={`dropdown-header-info px-4 py-2 border-bottom ${darkMode ? 'border-secondary border-opacity-25' : 'border-light'}`}>
-                                            <div className="fw-bold user-name-text">{user.name}</div>
-                                            <div className="x-small text-uppercase text-orange fw-bold">{user.permissions}</div>
+                                    <div className="auth-dropdown-menu position-absolute end-0 mt-2 z-1050">
+                                        <div className="dropdown-header-info mb-2">
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <span className="fw-black fs-6 text-truncate" style={{ maxWidth: '140px' }}>{user.name}</span>
+                                                <span className="badge bg-orange text-white text-uppercase px-2 py-1 fs-065 rounded-pill">{user.permissions || 'utente'}</span>
+                                            </div>
+                                            <div className="d-flex align-items-center gap-1 mt-1 text-orange small fw-bold">
+                                                <i className="bi bi-sliders"></i>
+                                                <span className="text-capitalize">{localStorage.getItem('artaround_preferred_level') || 'medio'}</span>
+                                            </div>
                                         </div>
 
                                         {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
-                                                <i className="bi bi-grid-1x2 text-orange"></i>
+                                                <i className="bi bi-grid-1x2-fill text-orange"></i>
                                                 <span>Dashboard Personale</span>
                                             </a>
                                         )}
                                         
                                         <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-circle text-orange"></i>
-                                            <span>Profilo</span>
+                                            <i className="bi bi-person-bounding-box text-orange"></i>
+                                            <span>Modifica Profilo & Livello</span>
                                         </a>
 
-                                        <div className="dropdown-divider-custom"></div>
+                                        <div className="dropdown-divider-custom my-1"></div>
 
-                                        <button onClick={handleLogout} className="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">
-                                            Logout
+                                        <button onClick={handleLogout} className="btn btn-outline-danger w-100 fw-bold rounded-3 py-2 border-0 d-flex align-items-center justify-content-center gap-2 mt-1">
+                                            <i className="bi bi-box-arrow-right"></i> Logout
                                         </button>
                                     </div>
                                 )}
                             </div>
                         )}
+
 
 
                     </div>
@@ -531,7 +538,7 @@ function VisitList() {
                                     )}
                                 </div>
                                 <h4 className="fw-bold mb-1 text-white">{user.name}</h4>
-                                <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.permissions}</span>
+                                <span className="badge bg-white bg-opacity-25 border border-white border-opacity-25 text-white mt-1 text-uppercase px-3 py-2 rounded-pill shadow-sm">{user.permissions || 'visitatore'}</span>
                             </div>
                         )}
                     </div>
@@ -560,6 +567,8 @@ function VisitList() {
                     </div>
                 </div>
             </div>
+
+
             <ProfileModal 
                 isOpen={isProfileModalOpen} 
                 onClose={() => setIsProfileModalOpen(false)} 

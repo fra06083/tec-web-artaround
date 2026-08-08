@@ -88,6 +88,7 @@ function homeApp() {
         openProfileModal() {
             this.profileForm.name = this.username;
             this.profileForm.propic = this.propic;
+            this.profileForm.preferredLevel = localStorage.getItem('artaround_preferred_level') || 'medio';
             this.isProfileModalOpen = true;
         },
 
@@ -103,6 +104,9 @@ function homeApp() {
             if (this.profileForm.nameError) return;
 
             try {
+                if (this.profileForm.preferredLevel) {
+                    localStorage.setItem('artaround_preferred_level', this.profileForm.preferredLevel);
+                }
                 const token = localStorage.getItem('artaround_token');
                 const response = await fetch('/api/profile', {
                     method: 'PUT',
@@ -116,7 +120,8 @@ function homeApp() {
                     const data = await response.json();
                     this.username = data.user.name;
                     this.propic = data.user.propic;
-                    localStorage.setItem('artaround_user', JSON.stringify(data.user));
+                    const updatedUser = { ...data.user, preferredLevel: this.profileForm.preferredLevel };
+                    localStorage.setItem('artaround_user', JSON.stringify(updatedUser));
                     this.isProfileModalOpen = false;
                     alert('Profilo aggiornato con successo');
                 } else {

@@ -33,7 +33,7 @@ function VisitDetail() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [descriptions, setDescriptions] = useState([]);
-    const [selectedType, setSelectedType] = useState('medio');
+    const [selectedType, setSelectedType] = useState(() => localStorage.getItem('artaround_preferred_level') || 'medio');
     const [selectedLength, setSelectedLength] = useState('15s');
     const [isSpeaking, setIsSpeaking] = useState(false);
 
@@ -51,10 +51,21 @@ function VisitDetail() {
     const [lightboxImage, setLightboxImage] = useState(null);
     const messagesEndRef = useRef(null);
     const currentIndexRef = useRef(currentIndex);
+    const descriptionsRef = useRef(descriptions);
+    const selectedTypeRef = useRef(selectedType);
 
     useEffect(() => {
         currentIndexRef.current = currentIndex;
     }, [currentIndex]);
+
+    useEffect(() => {
+        descriptionsRef.current = descriptions;
+    }, [descriptions]);
+
+    useEffect(() => {
+        selectedTypeRef.current = selectedType;
+    }, [selectedType]);
+
 
     // Stati per il Quiz di fine visita
     const [hasQuiz, setHasQuiz] = useState(false);
@@ -556,6 +567,8 @@ function VisitDetail() {
             }
         });
 
+
+
         eventSource.addEventListener('join-request', (e) => {
             if (role === 'teacher') {
                 const data = JSON.parse(e.data);
@@ -1030,52 +1043,113 @@ function VisitDetail() {
                         </div>
                         
                         {/* BOTTOM NAVIGATION & PROGRESSION DOTS */}
-                        <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle pt-2 pb-2 px-2 px-md-3 mt-auto">
-                            <div className="d-flex justify-content-between align-items-center w-100">
+                        <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle py-2.5 px-3 px-md-4 mt-auto">
+                            <div className="d-flex justify-content-between align-items-center w-100 gap-2 flex-nowrap">
                                 {(!pin || role === 'teacher') ? (
-                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale">
+                                    <button onClick={() => handleIndexChange(currentIndex - 1)} disabled={currentIndex === 0} className="btn btn-outline-secondary rounded-pill px-3.5 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale flex-shrink-0">
                                         <i className="bi bi-chevron-left"></i> <span>Indietro</span>
                                     </button>
                                 ) : (
-                                    <span className="badge rounded-pill bg-body-tertiary text-body border border-secondary-subtle px-3 py-1.5 small fw-bold">
-                                        {currentIndex + 1} / {items.length}
-                                    </span>
+                                    <div className="flex-shrink-0 max-w-100" style={{ width: '70px' }}></div>
                                 )}
+
                                 
-                                <div className="d-flex justify-content-center align-items-center gap-1.5 mx-1 mx-md-2 overflow-x-auto py-1">
-                                    {items.map((_, index) => (
-                                        <div
-                                            key={index}
-                                            className={`dot-indicator ${index === currentIndex ? 'active' : ''}`}
-                                            onClick={() => (!pin || role === 'teacher') && handleIndexChange(index)}
-                                            aria-label={`Vai all'opera ${index + 1}`}
-                                        />
-                                    ))}
+                                {/* PROGRESSIONE SMART CON PALLINI ADATTIVI E PERCENTUALE */}
+                                <div className="d-flex align-items-center justify-content-center gap-2 flex-grow-1 mx-2">
+                                    <span className={`rounded-pill px-3 py-1.5 small fw-bold d-inline-flex align-items-center gap-1 border shadow-sm flex-shrink-0 ${darkMode ? 'bg-dark text-white border-secondary border-opacity-25' : 'bg-light text-dark border-light-subtle'}`}>
+                                        <span className="text-orange">{currentIndex + 1}</span>
+                                        <span className="opacity-50">/</span>
+                                        <span>{items.length}</span>
+                                        <span className="d-none d-md-inline opacity-50 ms-1">· {Math.round(((currentIndex + 1) / items.length) * 100)}%</span>
+                                    </span>
+
+                                    <div className="d-flex align-items-center justify-content-center gap-2 py-1 flex-shrink-0">
+                                        {(() => {
+                                            const total = items.length;
+                                            const maxVisible = 5;
+
+                                            if (total <= maxVisible) {
+                                                return items.map((_, index) => {
+                                                    let dotClass = 'remaining';
+                                                    if (index < currentIndex) dotClass = 'completed';
+                                                    if (index === currentIndex) dotClass = 'active';
+
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className={`dot-indicator ${dotClass}`}
+                                                            onClick={() => (!pin || role === 'teacher') && handleIndexChange(index)}
+                                                            title={`Tappa ${index + 1}`}
+                                                        />
+                                                    );
+                                                });
+                                            } else {
+                                                let start = Math.max(0, currentIndex - Math.floor(maxVisible / 2));
+                                                let end = start + maxVisible;
+                                                if (end > total) {
+                                                    end = total;
+                                                    start = Math.max(0, end - maxVisible);
+                                                }
+
+                                                const visibleDots = [];
+                                                if (start > 0) {
+                                                    visibleDots.push(
+                                                        <div key="start-mini" className="dot-indicator mini completed" title="Tappe precedenti" />
+                                                    );
+                                                }
+
+                                                for (let i = start; i < end; i++) {
+                                                    let dotClass = 'remaining';
+                                                    if (i < currentIndex) dotClass = 'completed';
+                                                    if (i === currentIndex) dotClass = 'active';
+
+                                                    visibleDots.push(
+                                                        <div
+                                                            key={i}
+                                                            className={`dot-indicator ${dotClass}`}
+                                                            onClick={() => (!pin || role === 'teacher') && handleIndexChange(i)}
+                                                            title={`Tappa ${i + 1}`}
+                                                        />
+                                                    );
+                                                }
+
+                                                if (end < total) {
+                                                    visibleDots.push(
+                                                        <div key="end-mini" className="dot-indicator mini remaining" title="Tappe successive" />
+                                                    );
+                                                }
+
+                                                return visibleDots;
+                                            }
+                                        })()}
+                                    </div>
                                 </div>
 
                                 {(!pin || role === 'teacher') ? (
                                     currentIndex === items.length - 1 ? (
                                         (pin && hasQuiz && role === 'teacher' && quizPhase === 'none') ? (
-                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale">
+                                            <button onClick={startQuiz} className="btn btn-orange text-white rounded-pill px-3.5 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale flex-shrink-0">
                                                 <span>Avvia Quiz</span> <i className="bi bi-patch-question"></i>
                                             </button>
                                         ) : (
-                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale">
+                                            <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-3.5 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1.5 active-scale flex-shrink-0">
                                                 <span>Termina</span> <i className="bi bi-stop-circle"></i>
                                             </button>
                                         )
                                     ) : (
-                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale">
+                                        <button onClick={() => handleIndexChange(currentIndex + 1)} className="btn btn-orange text-white rounded-pill px-3.5 py-1.5 fs-7 fw-bold shadow-sm d-flex align-items-center gap-1 active-scale flex-shrink-0">
                                             <span>Avanti</span> <i className="bi bi-chevron-right"></i>
                                         </button>
                                     )
                                 ) : (
-                                    <span className="badge rounded-pill bg-orange-subtle text-orange border border-orange border-opacity-25 px-2.5 py-1.5 small fw-bold">
+                                    <span className="badge rounded-pill bg-orange-subtle text-orange border border-orange border-opacity-25 px-3 py-1.5 small fw-bold flex-shrink-0">
                                         <i className="bi bi-broadcast me-1"></i> Live
                                     </span>
                                 )}
                             </div>
                         </div>
+
+
 
                     </div>
                 </div>

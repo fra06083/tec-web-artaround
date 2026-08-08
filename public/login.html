@@ -111,17 +111,26 @@
                 isLoading: false,
                 errorMessage: '',
                 successMessage: '',
-                darkMode: localStorage.getItem('artaround_theme') === 'dark' || (!localStorage.getItem('artaround_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches),
+                darkMode: localStorage.getItem('artaround_darkmode') === 'true',
 
                 init() {
                     this.$watch('darkMode', val => {
-                        localStorage.setItem('artaround_theme', val ? 'dark' : 'light');
+                        localStorage.setItem('artaround_darkmode', val ? 'true' : 'false');
+                        if (val) {
+                            document.documentElement.classList.add('dark-mode');
+                        } else {
+                            document.documentElement.classList.remove('dark-mode');
+                        }
                     });
+                    if (this.darkMode) {
+                        document.documentElement.classList.add('dark-mode');
+                    }
                 },
                 
                 toggleTheme() {
                     this.darkMode = !this.darkMode;
                 },
+
 
                 toggleView() {
                     this.isLogin = !this.isLogin;
