@@ -682,9 +682,9 @@
                                         <label class="tracking-wide form-label small text-uppercase fw-bold text-white-50 mb-2 d-flex align-items-center gap-2">
                                             <i class="bi bi-upc-scan text-info fs-5"></i> Codice Stanza
                                         </label>
-                                        <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input text-center fw-bolder fs-5 text-info"
-                                            x-model="tour.mnemonicCode" placeholder="Es: CLASSE5A">
-                                        <p class="text-white-50 small mt-2 mb-0 lh-sm">Crea un codice facile da ricordare. Gli studenti lo useranno per accedere senza login.</p>
+                                        <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input text-center fw-bolder fs-5 text-info text-truncate"
+                                            x-model="tour.mnemonicCode" maxlength="6" @input="tour.mnemonicCode = tour.mnemonicCode ? tour.mnemonicCode.slice(0, 6) : ''" placeholder="Es: 5A">
+                                        <p class="text-white-50 small mt-2 mb-0 lh-sm">Crea un codice facile da ricordare (max 6 caratteri). Gli studenti lo useranno per accedere senza login.</p>
                                     </div>
                                     
                                     <!-- Private Visit Card -->

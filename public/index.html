@@ -148,40 +148,37 @@
                     </p>
 
                     <!-- Stats Row -->
-                    <div class="d-flex flex-wrap justify-content-center gap-4 gap-md-5 mb-5">
-                        <div class="d-flex align-items-center gap-3">
-                            <div
-                                class="bg-bronze-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated shadow">
-                                <i class="bi bi-building text-white fs-3"></i>
+                    <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 gap-sm-3 mb-5 max-w-700 mx-auto px-2">
+                        <div class="d-flex align-items-center gap-2 p-2 pe-3.5 rounded-pill backdrop-blur border shadow-sm transition-all"
+                            :class="darkMode ? 'bg-dark bg-opacity-60 border-secondary border-opacity-25 text-white' : 'bg-white bg-opacity-90 border-white text-teal'">
+                            <div class="bg-bronze-metallic rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
+                                <i class="bi bi-building text-white fs-6"></i>
                             </div>
                             <div class="text-start">
-                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">500+
-                                </div>
-                                <div class="small text-uppercase fw-bold"
-                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Musei Disponibili</div>
+                                <div class="fw-black fs-6 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">500+</div>
+                                <div class="fw-bold opacity-75" style="font-size: 0.68rem; letter-spacing: 0.5px; text-transform: uppercase;">Musei Disponibili</div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div
-                                class="bg-copper-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated anim-delay-200 shadow">
-                                <i class="bi bi-people-fill text-white fs-3"></i>
+
+                        <div class="d-flex align-items-center gap-2 p-2 pe-3.5 rounded-pill backdrop-blur border shadow-sm transition-all"
+                            :class="darkMode ? 'bg-dark bg-opacity-60 border-secondary border-opacity-25 text-white' : 'bg-white bg-opacity-90 border-white text-teal'">
+                            <div class="bg-copper-metallic rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
+                                <i class="bi bi-people-fill text-white fs-6"></i>
                             </div>
                             <div class="text-start">
-                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">50K+
-                                </div>
-                                <div class="small text-uppercase fw-bold"
-                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Visitatori</div>
+                                <div class="fw-black fs-6 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">50K+</div>
+                                <div class="fw-bold opacity-75" style="font-size: 0.68rem; letter-spacing: 0.5px; text-transform: uppercase;">Visitatori</div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div
-                                class="bg-gold-metallic rounded-circle d-inline-flex align-items-center justify-content-center stat-icon icon-box-animated anim-delay-400 shadow">
-                                <i class="bi bi-star-fill text-white fs-3"></i>
+
+                        <div class="d-flex align-items-center gap-2 p-2 pe-3.5 rounded-pill backdrop-blur border shadow-sm transition-all"
+                            :class="darkMode ? 'bg-dark bg-opacity-60 border-secondary border-opacity-25 text-white' : 'bg-white bg-opacity-90 border-white text-teal'">
+                            <div class="bg-gold-metallic rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
+                                <i class="bi bi-star-fill text-white fs-6"></i>
                             </div>
                             <div class="text-start">
-                                <div class="fw-black fs-3 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">4.9</div>
-                                <div class="small text-uppercase fw-bold"
-                                    :class="darkMode ? 'text-white-50' : 'text-darkgrey'">Valutazione Media</div>
+                                <div class="fw-black fs-6 lh-1" :class="darkMode ? 'text-cream' : 'text-teal'">4.9</div>
+                                <div class="fw-bold opacity-75" style="font-size: 0.68rem; letter-spacing: 0.5px; text-transform: uppercase;">Valutazione Media</div>
                             </div>
                         </div>
                     </div>

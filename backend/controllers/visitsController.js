@@ -63,6 +63,7 @@ const createVisit = async (req, res) => {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
         }
 
+        const codeToSave = mnemonicCode ? String(mnemonicCode).trim().slice(0, 6) : '';
         const newVisit = new Visit({
             name,
             description,
@@ -71,7 +72,7 @@ const createVisit = async (req, res) => {
             logistic_info: logistic_info || [],
             items: items || [],
             tags: tags || [],
-            mnemonicCode: mnemonicCode || '',
+            mnemonicCode: codeToSave,
             isPrivate: isPrivate || false,
             createdBy: req.user ? req.user._id : (createdBy || null)
         });
@@ -97,9 +98,14 @@ const updateVisit = async (req, res) => {
             }
         }
 
+        const updateData = { ...req.body };
+        if (updateData.mnemonicCode !== undefined) {
+            updateData.mnemonicCode = String(updateData.mnemonicCode).trim().slice(0, 6);
+        }
+
         const updated = await Visit.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
+            { $set: updateData },
             { returnDocument: 'after', runValidators: true }
         );
         res.json({ message: 'Visita aggiornata', visit: updated });
