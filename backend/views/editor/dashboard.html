@@ -123,7 +123,8 @@
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <div class="text-end me-2">
                             <span class="d-block text-white-50 text-uppercase fw-bold fs-065 tracking-wide-1px">Ruolo</span>
-                            <span class="text-orange fw-bold text-uppercase" x-text="permissions"></span>
+                            <span class="text-orange fw-bold text-capitalize" x-text="permissions"></span>
+
                         </div>
                     </div>
                 </div>
@@ -264,15 +265,15 @@
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center gap-2 justify-content-end mt-2 mt-md-0">
-                                                <button @click="createRoom(item._id)" class="btn btn-sm bg-orange text-white rounded-pill px-3 py-1.5 fw-bold shadow-sm transform hover-lift d-inline-flex align-items-center gap-1.5">
-                                                    <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia Live</span>
-                                                </button>
-                                                <button @click="editTour(item._id)" class="btn btn-sm btn-info text-white rounded-pill px-3 py-1.5 fw-bold shadow-sm transform hover-lift d-inline-flex align-items-center gap-1.5">
-                                                    <i class="bi bi-arrow-right-circle fs-6"></i> <span>Modifica</span>
-                                                </button>
-                                                <button @click="deleteTour(item._id)" class="btn btn-sm btn-outline-danger rounded-circle p-2 d-inline-flex align-items-center justify-content-center shadow-sm hover-lift" style="width: 34px; height: 34px;" title="Elimina">
-                                                    <i class="bi bi-trash3-fill"></i>
-                                                </button>
+                                                 <button @click="editTour(item._id)" class="btn btn-sm bg-orange text-white rounded-pill px-3 py-1.5 fw-bold shadow-sm transform hover-lift d-inline-flex align-items-center gap-1.5">
+                                                     <i class="bi bi-pencil-fill fs-6"></i> <span>Modifica</span>
+                                                 </button>
+                                                 <button @click="deleteTour(item._id)" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm transform hover-lift d-inline-flex align-items-center gap-1.5">
+                                                     <i class="bi bi-trash3-fill fs-6"></i> <span>Elimina</span>
+                                                 </button>
+                                                 <button @click="createRoom(item._id)" class="btn btn-sm bg-orange text-white rounded-circle p-1.5 d-inline-flex align-items-center justify-content-center shadow-sm hover-lift" style="width: 32px; height: 32px;" title="Avvia Sessione Live / Presenta">
+                                                     <i class="bi bi-broadcast fs-6"></i>
+                                                 </button>
                                             </div>
                                         </div>
                                     </template>
@@ -418,35 +419,76 @@
 
 
 
-                    <!-- Quick Start List for Live Classes -->
+                    <!-- Menu Rapido Docente: Visite & Presentazione Live -->
                     <div x-show="items && items.length > 0" class="w-100 mw-780">
-
-                        <div class="glass-card rounded-4 p-4 border border-secondary border-opacity-25">
-                            <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom border-secondary border-opacity-25">
-                                <h5 class="fw-bold m-0 text-white d-flex align-items-center gap-2">
-                                    <i class="bi bi-lightning-charge-fill text-orange"></i>
-                                    Visite Pronte per il Lancio
-                                </h5>
-                                <span class="badge bg-secondary rounded-pill" x-text="items.length + ' disponibili'"></span>
+                        <div class="glass-card rounded-4 p-3 p-md-4 border border-secondary border-opacity-25 shadow-lg">
+                            <!-- Header -->
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="icon-box-30 rounded-circle bg-orange bg-opacity-20 text-orange d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-lightning-charge-fill fs-6"></i>
+                                    </div>
+                                    <h5 class="fw-bold m-0 text-white fs-6 fs-md-5">Menu Rapido Visite</h5>
+                                    <span class="badge bg-secondary bg-opacity-30 border border-secondary border-opacity-25 text-white-50 rounded-pill px-2.5 py-1 fs-075"
+                                          x-text="'Max ' + Math.min(items.length, 3) + ' di ' + items.length"></span>
+                                </div>
+                                <a href="/editor/tours?mode=create" class="btn btn-sm btn-outline-orange rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 hover-lift">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span>Crea Visita</span>
+                                </a>
                             </div>
 
-                            <div class="list-group list-group-flush bg-transparent gap-2">
+                            <!-- Visite List (Max 3 Items) -->
+                            <div class="d-flex flex-column gap-2">
                                 <template x-for="tour in items.slice(0, 3)" :key="tour._id">
-                                    <div class="list-group-item bg-dark bg-opacity-40 border border-secondary border-opacity-25 rounded-3 p-3 d-flex align-items-center justify-content-between gap-3">
-                                        <div class="min-w-0">
-                                            <h6 class="fw-bold text-white mb-1 text-truncate" x-text="tour.name || 'Visita senza titolo'"></h6>
-                                            <small class="text-white-50 d-block text-truncate">
-                                                <i class="bi bi-images me-1"></i> <span x-text="(tour.items ? tour.items.length : 0) + ' opere inserite'"></span>
-                                            </small>
+                                    <div class="bg-dark bg-opacity-50 border border-secondary border-opacity-25 rounded-3 p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 transform hover-lift">
+                                        <div class="min-w-0 flex-grow-1">
+                                            <h6 class="fw-bold text-white mb-1 text-truncate fs-6" x-text="tour.name || 'Visita senza titolo'"></h6>
+                                            <div class="d-flex align-items-center gap-3 text-white-50 small">
+                                                <span class="d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-images text-orange"></i>
+                                                    <span x-text="(tour.items ? tour.items.length : 0) + ' opere'"></span>
+                                                </span>
+                                                <template x-if="tour.mnemonicCode && String(tour.mnemonicCode).trim().length > 0">
+                                                    <span class="d-inline-flex align-items-center gap-1">
+                                                        <i class="bi bi-key text-info"></i>
+                                                        <span class="font-monospace text-info" x-text="tour.mnemonicCode"></span>
+                                                    </span>
+                                                </template>
+                                                <template x-if="!tour.mnemonicCode || String(tour.mnemonicCode).trim().length === 0">
+                                                    <span class="d-inline-flex align-items-center gap-1 text-white-50 opacity-75 fs-7">
+                                                        <i class="bi bi-shuffle"></i>
+                                                        <span>PIN generato casualmente</span>
+                                                    </span>
+                                                </template>
+
+
+                                            </div>
                                         </div>
-                                        <button @click="createRoom(tour._id)" class="btn btn-sm bg-orange text-white rounded-pill px-3 py-2 fw-bold flex-shrink-0 shadow-sm d-flex align-items-center gap-1">
-                                            <i class="bi bi-play-fill fs-6"></i> Avvia
-                                        </button>
+                                        <div class="d-flex align-items-center gap-2 justify-content-end flex-shrink-0">
+                                            <a :href="'/editor/tours?id=' + tour._id" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1.5 fw-bold d-inline-flex align-items-center gap-1" title="Modifica Visita">
+                                                <i class="bi bi-pencil-fill fs-7"></i>
+                                                <span class="d-none d-sm-inline">Modifica</span>
+                                            </a>
+                                            <button @click="createRoom(tour._id)" class="btn btn-sm bg-orange text-white rounded-pill px-3 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" title="Avvia Presentazione Live">
+                                                <i class="bi bi-broadcast fs-6"></i>
+                                                <span>Presenta</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
+
+                            <!-- Footer link if more than 3 tours -->
+                            <div x-show="items.length > 3" class="mt-3 pt-2 text-center border-top border-secondary border-opacity-15">
+                                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="text-orange small fw-bold text-decoration-none d-inline-flex align-items-center gap-1 hover-underline">
+                                    <span>Vedi tutte le <span x-text="items.length"></span> visite</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
+
 
                 </div>
             </template>

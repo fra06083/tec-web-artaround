@@ -732,9 +732,11 @@ function marketplaceApp() {
                     const data = await response.json();
                     this.roomState.pin = data.pin;
                     this.roomState.visitId = visitId;
+                    this.roomState.isCustomPassword = data.isCustomPassword;
                     this.roomState.students = [];
                     this.isVisitSelectionModalOpen = false;
                     this.isLobbyModalOpen = true;
+
 
                     sessionStorage.setItem('activeRoomPin', data.pin);
                     sessionStorage.setItem('activeRoomVisitId', visitId);

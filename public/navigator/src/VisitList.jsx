@@ -256,8 +256,8 @@ function VisitList() {
                                         )}
                                         
                                         <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-gear text-orange"></i>
-                                            <span>Modifica Profilo & Livello</span>
+                                            <i className="bi bi-person-circle text-primary"></i>
+                                            <span>Profilo</span>
                                         </a>
 
                                         <div className="dropdown-divider-custom my-1"></div>

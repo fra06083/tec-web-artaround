@@ -1507,14 +1507,17 @@ html.dark-mode body {
 }
 
 .card-hero-dark-orange {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(253, 126, 20, 0.25);
     border-left: 4px solid #fd7e14;
 }
 
 .card-hero-dark-blue {
-    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(99, 179, 237, 0.2);
     border-left: 4px solid #63b3ed;
 }
+
 
 
 .btn-outline-info-subtle {
@@ -1548,38 +1551,25 @@ html.dark-mode body {
 .animation-delay-600 { animation-delay: 0.6s; }
 
 .card-create-tour {
-    background: linear-gradient(135deg, #1a1a2e 0%, #2d1810 60%, #3d200a 100%);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(253, 126, 20, 0.25);
     min-height: 220px;
 }
 
 .card-edit-tour {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(99, 179, 237, 0.2);
     min-height: 220px;
 }
 
 .blob-decorative-orange {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(253, 126, 20, 0.18) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(30%, -30%);
-    pointer-events: none;
+    display: none;
 }
 
 .blob-decorative-blue {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(99, 179, 237, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(30%, -30%);
-    pointer-events: none;
+    display: none;
 }
+
 
 .circle-icon-orange {
     width: 80px;
@@ -2286,6 +2276,135 @@ html.dark-mode body {
     background: radial-gradient(circle, rgba(253, 126, 20, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
     filter: blur(60px);
 }
+
+/* Master Orange Button Hover Styling & Micro-Animation */
+.btn-orange,
+.btn-orange-solid,
+.bg-orange,
+.btn.bg-orange,
+a.btn.bg-orange,
+button.btn.bg-orange {
+    background-color: #fd7e14 !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.25s ease !important;
+}
+
+.btn-orange:hover,
+.btn-orange-solid:hover,
+.btn.bg-orange:hover,
+a.btn.bg-orange:hover,
+button.btn.bg-orange:hover,
+.btn-orange:focus,
+.btn-orange-solid:focus,
+.btn.bg-orange:focus,
+a.btn.bg-orange:focus,
+button.btn.bg-orange:focus,
+.btn-orange:active,
+.btn-orange-solid:active,
+.btn.bg-orange:active,
+a.btn.bg-orange:active,
+button.btn.bg-orange:active {
+    background-color: #fd7e14 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 6px 20px rgba(253, 126, 20, 0.45) !important;
+    filter: brightness(1.08) !important;
+}
+
+/* Button Illumination Glow Effect (Identical to Docente Dashboard) */
+.bg-orange.shadow-lg,
+.btn-orange.shadow-lg,
+button.bg-orange.shadow-lg {
+    box-shadow: 0 6px 22px rgba(253, 126, 20, 0.5) !important;
+}
+
+.bg-orange.shadow-lg:hover,
+.btn-orange.shadow-lg:hover,
+button.bg-orange.shadow-lg:hover {
+    box-shadow: 0 8px 30px rgba(253, 126, 20, 0.7) !important;
+    transform: translateY(-3px) !important;
+}
+
+.btn-info.shadow-lg,
+button.btn-info.shadow-lg {
+    box-shadow: 0 6px 22px rgba(99, 179, 237, 0.45) !important;
+}
+
+.btn-info.shadow-lg:hover,
+button.btn-info.shadow-lg:hover {
+    box-shadow: 0 8px 30px rgba(99, 179, 237, 0.65) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* Helper Utility Classes for Editor UI */
+.btn-action-circle-md { width: 42px; height: 42px; min-width: 42px; min-height: 42px; flex-shrink: 0; }
+.icon-box-38 { width: 38px; height: 38px; min-width: 38px; min-height: 38px; flex-shrink: 0; }
+.icon-box-34 { width: 34px; height: 34px; min-width: 34px; min-height: 34px; flex-shrink: 0; }
+.icon-box-30 { width: 30px; height: 30px; min-width: 30px; min-height: 30px; flex-shrink: 0; }
+.fs-065 { font-size: 0.65rem !important; }
+.fs-072 { font-size: 0.72rem !important; }
+.fs-075 { font-size: 0.75rem !important; }
+.editor-top-nav {
+    z-index: 1050;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(18, 20, 29, 0.98);
+}
+
+/* Lightbox Close Button Top-Right Pin for Mobile & Desktop */
+.lightbox-close-btn {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    z-index: 10005 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+
+@media (min-width: 576px) {
+    .lightbox-close-btn {
+        top: 24px !important;
+        right: 24px !important;
+    }
+}
+
+/* Global Spacing Between Button Icons and Text */
+.btn i,
+.btn svg,
+button i,
+button svg,
+a.btn i,
+a.btn svg {
+    margin-right: 0.5rem;
+}
+
+.btn.d-flex,
+.btn.d-inline-flex,
+button.d-flex,
+button.d-inline-flex,
+a.btn.d-flex,
+a.btn.d-inline-flex {
+    gap: 0.55rem !important;
+}
+
+.btn.d-flex i,
+.btn.d-inline-flex i,
+button.d-flex i,
+button.d-inline-flex i,
+a.btn.d-flex i,
+a.btn.d-inline-flex i {
+    margin-right: 0 !important;
+}
+
+
+
+
+
 
 
 

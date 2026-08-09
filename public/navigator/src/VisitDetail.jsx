@@ -1272,14 +1272,14 @@ function VisitDetail() {
             {/* LIGHTBOX MODAL */}
             {lightboxImage && (
                 <div 
-                    className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-black bg-opacity-95 overflow-hidden p-3" 
+                    className="position-fixed top-0 start-0 w-100 h-100 bg-black bg-opacity-95 overflow-hidden p-3 d-flex align-items-center justify-content-center" 
                     onClick={() => setLightboxImage(null)}
-                    style={{ zIndex: 9999, backdropFilter: 'blur(12px)' }}
+                    style={{ zIndex: 10000, backdropFilter: 'blur(12px)' }}
                 >
-                    {/* Pulsante Chiusura Fluttuante Elegante */}
+                    {/* Pulsante Chiusura in alto a destra */}
                     <button 
                         type="button" 
-                        className="btn btn-light rounded-circle position-fixed d-flex align-items-center justify-content-center shadow-lg lightbox-close-btn" 
+                        className="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-lg lightbox-close-btn" 
                         onClick={(e) => {
                             e.stopPropagation();
                             setLightboxImage(null);
@@ -1289,7 +1289,7 @@ function VisitDetail() {
                         <i className="bi bi-x-lg fs-5 text-dark fw-bold"></i>
                     </button>
 
-                    <div className="d-flex flex-column align-items-center justify-content-center w-100 h-100 max-h-100" onClick={e => e.stopPropagation()}>
+                    <div className="d-flex align-items-center justify-content-center w-100 h-100" onClick={e => e.stopPropagation()}>
                         <img 
                             src={lightboxImage} 
                             alt="Ingrandita" 
@@ -1298,6 +1298,7 @@ function VisitDetail() {
                     </div>
                 </div>
             )}
+
 
             <ProfileModal 
                 isOpen={isProfileModalOpen} 

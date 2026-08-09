@@ -66,7 +66,11 @@ router.post('/create', async (req, res) => {
             if (teacherId) {
                 existingRoom.teacherId = teacherId;
             }
-            return res.json({ pin: existingPin, visitId: existingRoom.visitId });
+            return res.json({ 
+                pin: existingPin, 
+                visitId: existingRoom.visitId,
+                isCustomPassword: Boolean(visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '')
+            });
         } else {
             return res.status(409).json({ error: "Questo codice è già in uso da un'altra stanza attiva." });
         }
@@ -95,8 +99,12 @@ router.post('/create', async (req, res) => {
         quizResults: null    // array dei risultati calcolati a fine quiz
     });
 
-    console.log(`Stanza creata: ${pin} per visita ${visitId}`);
-    res.json({ pin, visitId });
+    console.log(`[ROOM] Stanza creata con PIN: ${pin} per visita: ${visitId}`);
+    res.json({ 
+        pin, 
+        visitId, 
+        isCustomPassword: Boolean(visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '')
+    });
 });
 
 // Studente si unisce a una stanza (chiamata REST iniziale)
