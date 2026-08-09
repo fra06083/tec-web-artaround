@@ -12,7 +12,9 @@ function homeApp() {
         permissions: savedUser ? savedUser.permissions : '',
         propic: savedUser ? savedUser.propic : '',
         darkMode: false,
+        preferredLevel: localStorage.getItem('artaround_preferred_level') || 'medio',
         isProfileModalOpen: false,
+
         profileForm: { name: '', propic: '', nameError: '' },
 
         async init() {

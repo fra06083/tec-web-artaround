@@ -250,13 +250,13 @@ function VisitList() {
 
                                         {(user.permissions === 'admin' || user.permissions === 'editor' || user.permissions === 'docente') && (
                                             <a href="/editor/dashboard" className="dropdown-link-item">
-                                                <i className="bi bi-grid-1x2-fill text-orange"></i>
+                                                <i className="bi bi-grid-1x2 text-orange"></i>
                                                 <span>Dashboard Personale</span>
                                             </a>
                                         )}
                                         
                                         <a href="#" onClick={(e) => { e.preventDefault(); setIsProfileModalOpen(true); setUserMenuOpen(false); }} className="dropdown-link-item">
-                                            <i className="bi bi-person-bounding-box text-orange"></i>
+                                            <i className="bi bi-person-gear text-orange"></i>
                                             <span>Modifica Profilo & Livello</span>
                                         </a>
 

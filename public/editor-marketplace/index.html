@@ -119,11 +119,17 @@
                                 x-transition:leave="transition ease-in duration-150"
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95"
-                                class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0"
+                                class="auth-dropdown-menu rounded-4 py-2 mt-2 position-absolute end-0 text-start"
                                 :class="darkMode ? 'bg-dark' : 'bg-white'">
-                                <div class="dropdown-header-info px-4 py-2 border-bottom" :class="darkMode ? 'border-secondary border-opacity-25' : 'border-light'">
-                                    <div class="fw-bold user-name-text" :class="darkMode ? 'text-white' : 'text-dark'" x-text="username"></div>
-                                    <div class="x-small text-uppercase text-orange fw-bold" x-text="permissions"></div>
+                                <div class="dropdown-header-info mb-2">
+                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                        <span class="fw-black fs-6 text-truncate" style="max-width: 140px;" x-text="username"></span>
+                                        <span class="badge bg-orange text-white text-uppercase px-2 py-1 fs-065 rounded-pill" x-text="permissions"></span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1 mt-1 text-orange small fw-bold">
+                                        <i class="bi bi-sliders"></i>
+                                        <span class="text-capitalize" x-text="localStorage.getItem('artaround_preferred_level') || 'medio'"></span>
+                                    </div>
                                 </div>
 
                                 <template x-if="permissions === 'admin' || permissions === 'editor' || permissions === 'docente'">
@@ -133,15 +139,18 @@
                                     </a>
                                 </template>
 
-                                <button @click="openProfileModal(); open = false" class="btn w-100 text-start dropdown-link-item border-0 bg-transparent">
-                                    <i class="bi bi-person-circle text-orange"></i>
-                                    <span class="fw-bold">Profilo</span>
+                                <a href="#" @click.prevent="openProfileModal(); open = false" class="dropdown-link-item cursor-pointer">
+                                    <i class="bi bi-person-gear text-orange"></i>
+                                    <span>Modifica Profilo & Livello</span>
+                                </a>
+
+                                <div class="dropdown-divider-custom my-1"></div>
+
+                                <button @click="logout()" class="btn btn-outline-danger w-100 fw-bold rounded-3 py-2 border-0 d-flex align-items-center justify-content-center gap-2 mt-1">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
                                 </button>
-
-                                <div class="dropdown-divider-custom"></div>
-
-                                    <button @click="logout()" class="btn btn-danger w-100 fw-bold text-white mt-2 rounded-3 border-0">Logout</button>
                             </div>
+
                         </div>
                     </template>
                 </div>
