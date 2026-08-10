@@ -26,9 +26,10 @@ router.post('/create', async (req, res) => {
     }
 
     let pin;
+    let visit = null;
     
     try {
-        const visit = await Visit.findById(visitId);
+        visit = await Visit.findById(visitId);
         if (visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '') {
             pin = visit.mnemonicCode.trim();
         }
@@ -50,18 +51,10 @@ router.post('/create', async (req, res) => {
     if (existingPin && activeRooms.has(existingPin)) {
         const existingRoom = activeRooms.get(existingPin);
         if (existingRoom.visitId.toString() === visitId.toString()) {
-            // Se la stanza era già stata avviata o se non ci sono utenti rimasti connessi,
-            // resettiamo lo stato per permettere l'avvio di una nuova sessione pulita.
-            if (existingRoom.isStarted || existingRoom.clients.length === 0) {
-                existingRoom.isStarted = false;
+            // Se non ci sono più utenti collegati E la stanza non era iniziata, resettiamo gli studenti
+            if (existingRoom.clients.length === 0 && !existingRoom.isStarted) {
+                existingRoom.students = [];
                 existingRoom.currentArtworkIndex = 0;
-                existingRoom.quizActive = false;
-                existingRoom.quizQuestions = [];
-                existingRoom.quizAnswers = {};
-                existingRoom.quizResults = null;
-                if (existingRoom.clients.length === 0) {
-                    existingRoom.students = [];
-                }
             }
             if (teacherId) {
                 existingRoom.teacherId = teacherId;
@@ -69,6 +62,8 @@ router.post('/create', async (req, res) => {
             return res.json({ 
                 pin: existingPin, 
                 visitId: existingRoom.visitId,
+                isStarted: existingRoom.isStarted,
+                currentArtworkIndex: existingRoom.currentArtworkIndex || 0,
                 isCustomPassword: Boolean(visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '')
             });
         } else {
@@ -145,6 +140,22 @@ router.post('/join', async (req, res) => {
     }
 
     res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex, isStarted: room.isStarted });
+});
+
+// Restituisce la mappa delle stanze attive (visitId -> info stanza)
+router.get('/active', (req, res) => {
+    const activeMap = {};
+    for (const [pin, room] of activeRooms.entries()) {
+        if (room.visitId) {
+            activeMap[room.visitId.toString()] = {
+                pin: pin,
+                isStarted: room.isStarted,
+                studentsCount: room.students ? room.students.length : 0,
+                currentArtworkIndex: room.currentArtworkIndex || 0
+            };
+        }
+    }
+    res.json(activeMap);
 });
 
 // Verifica esistenza stanza o codice mnemonic
@@ -352,16 +363,37 @@ router.post('/broadcast-audio', (req, res) => {
 
 // Termina la visita e chiude la stanza
 router.post('/end', (req, res) => {
-    const { pin } = req.body;
-    if (!activeRooms.has(pin)) {
+    const { pin, visitId } = req.body;
+    let targetPin = null;
+
+    if (pin && String(pin).trim()) {
+        const cleanPin = String(pin).trim().toLowerCase();
+        for (const [p, r] of activeRooms.entries()) {
+            if (p.toLowerCase() === cleanPin || (visitId && r.visitId.toString() === visitId.toString())) {
+                targetPin = p;
+                break;
+            }
+        }
+    } else if (visitId) {
+        for (const [p, r] of activeRooms.entries()) {
+            if (r.visitId.toString() === visitId.toString()) {
+                targetPin = p;
+                break;
+            }
+        }
+    }
+
+    if (!targetPin || !activeRooms.has(targetPin)) {
         return res.status(404).json({ error: "Stanza non trovata" });
     }
     
     // Avvisa tutti i client che la stanza è chiusa
-    broadcastToRoom(pin, 'room-ended', { message: "La visita è terminata." });
+    broadcastToRoom(targetPin, 'room-ended', { message: "La visita è terminata." });
+    broadcastToRoom(targetPin, 'room-closed', { message: "Il docente ha terminato la visita." });
     
     // Elimina la stanza dalla memoria
-    activeRooms.delete(pin);
+    activeRooms.delete(targetPin);
+    console.log(`Stanza terminata ed eliminata: ${targetPin}`);
     
     res.json({ success: true });
 });

@@ -668,7 +668,7 @@ function VisitDetail() {
             await fetch('/api/rooms/end', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pin })
+                body: JSON.stringify({ pin, visitId: id })
             });
             navigate('/');
         } catch (err) {

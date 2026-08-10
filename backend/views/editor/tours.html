@@ -390,8 +390,11 @@
                                                     <i class="bi bi-trash3-fill fs-6"></i> <span>Elimina</span>
                                                 </button>
 
-                                                <button type="button" @click.prevent.stop="createRoom(t._id)" class="btn bg-orange text-white rounded-circle p-2 d-inline-flex align-items-center justify-content-center btn-action-circle-md shadow-lg transform hover-lift" title="Avvia Sessione Live / Presenta">
-                                                    <i class="bi bi-broadcast fs-5"></i>
+                                                <button type="button" @click.prevent.stop="createRoom(t._id)"
+                                                        :class="isRoomActive(t._id) ? 'btn-warning text-dark' : 'bg-orange text-white'"
+                                                        class="btn rounded-circle p-2 d-inline-flex align-items-center justify-content-center btn-action-circle-md shadow-lg transform hover-lift"
+                                                        :title="isRoomActive(t._id) ? 'Riprendi Sessione Live' : 'Avvia Sessione Live / Presenta'">
+                                                    <i :class="isRoomActive(t._id) ? 'bi bi-arrow-repeat fs-4' : 'bi bi-broadcast fs-5'"></i>
                                                 </button>
 
                                             </div>

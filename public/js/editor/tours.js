@@ -64,6 +64,20 @@ document.addEventListener('alpine:init', () => {
             type: 'success'
         },
 
+        // ROOMS ACTIVE STATE
+        activeRoomsMap: {},
+        isRoomActive(visitId) {
+            return Boolean(this.activeRoomsMap && this.activeRoomsMap[visitId]);
+        },
+        async fetchActiveRooms() {
+            try {
+                const res = await fetch('/api/rooms/active');
+                if (res.ok) {
+                    this.activeRoomsMap = await res.json();
+                }
+            } catch (e) {}
+        },
+
         // TAGS MANAGEMENT
         addCustomTag() {
             const tag = this.newCustomTag.trim();
@@ -451,6 +465,7 @@ document.addEventListener('alpine:init', () => {
                 if (res.ok) {
                     this.availableTours = await res.json();
                 }
+                await this.fetchActiveRooms();
             } catch (e) {
                 this.showToast("Errore nel caricamento delle visite", "error");
             }
@@ -849,6 +864,14 @@ document.addEventListener('alpine:init', () => {
 
                 if (response.ok) {
                     const data = await response.json();
+                    await this.fetchActiveRooms();
+
+                    if (data.isStarted) {
+                        const teacherLink = `/navigator/visit/${visitId}?role=teacher&pin=${data.pin}&index=${data.currentArtworkIndex || 0}`;
+                        window.location.href = teacherLink;
+                        return;
+                    }
+
                     this.roomState.pin = data.pin;
                     this.roomState.visitId = visitId;
                     this.roomState.students = [];
@@ -873,7 +896,12 @@ document.addEventListener('alpine:init', () => {
                         this.roomState.students = eventData.students;
                     });
                 } else {
-                    this.showToast('Errore creazione stanza', 'error');
+                    let errMsg = 'Errore creazione stanza';
+                    try {
+                        const err = await response.json();
+                        errMsg = err.error || errMsg;
+                    } catch (e) {}
+                    this.showToast(errMsg, 'error');
                 }
             } catch (error) {
                 console.error("Errore creazione stanza:", error);
@@ -903,8 +931,17 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        closeLobby() {
+        async closeLobby() {
             this.isLobbyModalOpen = false;
+            if (this.roomState.pin) {
+                try {
+                    await fetch('/api/rooms/end', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pin: this.roomState.pin, visitId: this.roomState.visitId })
+                    });
+                } catch (e) {}
+            }
             if (this.roomState.eventSource) {
                 this.roomState.eventSource.close();
                 this.roomState.eventSource = null;
@@ -912,6 +949,7 @@ document.addEventListener('alpine:init', () => {
             this.roomState.pin = null;
             sessionStorage.removeItem('activeRoomPin');
             sessionStorage.removeItem('activeRoomVisitId');
+            await this.fetchActiveRooms();
         }
     }));
 });
