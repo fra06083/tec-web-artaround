@@ -108,6 +108,7 @@ document.addEventListener('alpine:init', () => {
                 
                 const urlParams = new URLSearchParams(window.location.search);
                 const editId = urlParams.get('id');
+                const modeParam = urlParams.get('mode');
 
                 if (editId) {
                     // Deep-link via URL parameter
@@ -122,6 +123,27 @@ document.addEventListener('alpine:init', () => {
                     } else {
                         this.resetToSelection();
                     }
+                } else if (modeParam === 'create') {
+                    // Forced creation mode from URL query ?mode=create
+                    localStorage.removeItem('artaround_tours_state');
+                    this.mode = 'create';
+                    this.selectedTourId = '';
+                    this.selectedMuseum = '';
+                    this.step = 'selection';
+                    this.formTab = 'info';
+                    this.tour = {
+                        _id: '',
+                        name: '',
+                        description: '',
+                        image: '',
+                        museum_id: '',
+                        items: [],
+                        logistic_info: [],
+                        pre_visit: [],
+                        tags: [],
+                        mnemonicCode: '',
+                        isPrivate: false
+                    };
                 } else {
                     // Restore saved navigation position on page refresh (F5)
                     const savedState = localStorage.getItem('artaround_tours_state');
@@ -138,13 +160,15 @@ document.addEventListener('alpine:init', () => {
                                     this.step = 'form';
                                     if (this.mode === 'create' && this.selectedMuseum) {
                                         await this.goToForm();
-                                    } else if (this.selectedTourId) {
+                                    } else if (this.mode === 'edit' && this.selectedTourId) {
                                         const success = await this.loadTour(this.selectedTourId);
                                         if (success) {
                                             await this.fetchAvailableArtworks();
                                         } else {
                                             this.resetToSelection();
                                         }
+                                    } else {
+                                        this.resetToSelection();
                                     }
                                 } else if (state.step === 'marketplace') {
                                     this.step = 'marketplace';
