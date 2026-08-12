@@ -77,14 +77,23 @@
 
         <!-- Main Workspace -->
         <main class="main-content flex-grow-1">
-            <!-- Mobile Header -->
+            <!-- Mobile Header (Premium Dark Glassmorphic) -->
             <header class="mobile-header">
-                <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center btn-icon-38">
-                        <i class="bi bi-gear-fill fs-5"></i>
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <div class="mobile-logo-icon-box">
+                        <i class="bi bi-gear-fill"></i>
                     </div>
-                    <span class="fw-bold text-white fs-4 m-0 tracking-tight-sm">ArtAround</span>
+                    <span class="mobile-brand-title">ArtAround<span class="brand-dot"></span></span>
                 </a>
+                <div class="mobile-user-badge" x-show="username">
+                    <div class="mini-avatar position-relative">
+                        <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                        <template x-if="propic">
+                            <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                        </template>
+                    </div>
+                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                </div>
             </header>
 
             <!-- Desktop Header -->
@@ -106,151 +115,382 @@
 
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <div class="text-end me-2">
-                            <span class="d-block text-white-50 text-uppercase fw-bold fs-065 tracking-wide-1px">Ruolo</span>
-                            <span class="text-orange fw-bold text-capitalize" x-text="permissions"></span>
+                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-3 py-1.5 fs-7 fw-bold text-capitalize" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : permissions)"></span>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div class="p-4 p-lg-5">
-                <!-- Museum Selection -->
-                <div x-show="step === 'artwork-museum-select'" class="museum-select-state fade-in">
-                    <i class="bi bi-search text-orange float"></i>
-                    <h3 class="fw-bold gradient-text">Gestione Catalogo</h3>
-                    <p>Seleziona un museo per visualizzare e gestire le sue opere.</p>
-                    <select class="form-select form-select-lg bg-dark text-white border-secondary hover-glow"
-                        x-model="selectedMuseumId" @change="fetchArtworks()">
-                        <option value="">Scegli un museo...</option>
-                        <template x-for="m in museums" :key="m._id">
-                            <option :value="m._id" x-text="m.museum"></option>
-                        </template>
-                    </select>
-                </div>
+            <div class="p-3 p-sm-4 p-lg-5">
 
-                <!-- Artwork List -->
-                <div x-show="step === 'artwork-list'">
-                    <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
-                        <div class="d-flex align-items-center gap-3">
-                            <button @click="step = 'artwork-museum-select'"
-                                class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                                <i class="bi bi-arrow-left"></i> Cambia Museo
+                <div x-show="step === 'artwork-museum-select' || step === 'artwork-list'" class="py-2" x-transition.opacity>
+
+                    <!-- Mobile Header (Streamlined, direct on background, generous gap & breathing room) -->
+                    <div class="d-md-none mb-4 pt-1">
+                        <div class="d-flex align-items-center mb-3" style="gap: 16px;">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm" style="width:44px; height:44px; background: linear-gradient(135deg, rgba(255,107,0,0.18) 0%, rgba(255,107,0,0.05) 100%); border: 1px solid rgba(255,107,0,0.3);">
+                                <i class="bi bi-palette text-orange fs-4"></i>
+                            </div>
+                            <div class="d-flex align-items-center flex-grow-1" style="gap: 10px;">
+                                <h2 class="fw-bolder m-0 text-white tracking-tight fs-3">Gestione Opere</h2>
+                                <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-2.5 py-1 fs-7 fw-bold" :class="isLoaded && selectedMuseumId ? 'd-inline-block' : 'd-none'" x-text="filteredArtworks().length + ' opere'"></span>
+                            </div>
+
+                            <!-- Back button icon TO THE RIGHT (Visible ONLY when museum selected) -->
+                            <button type="button" 
+                                    :class="selectedMuseumId ? 'd-inline-flex' : 'd-none'"
+                                    @click="selectedMuseumId = ''; artworks = []; step = 'artwork-museum-select'; artworkSearch = '';" 
+                                    class="btn p-0 border-0 align-items-center justify-content-center flex-shrink-0 hover-lift ms-auto"
+                                    title="Torna ai musei">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:34px; height:34px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);">
+                                    <i class="bi bi-chevron-left text-orange fw-bold" style="font-size:0.85rem;"></i>
+                                </div>
                             </button>
-                            <span class="text-white-50 small d-none d-md-inline">
-                                Opere di: <strong class="text-white" x-text="getMuseumName(selectedMuseumId)"></strong>
+                        </div>
+
+                        <!-- Selected Museum Info Card (Visible on mobile ONLY when museum selected) -->
+                        <div :class="selectedMuseumId ? 'd-flex' : 'd-none'" class="align-items-center justify-content-between gap-2 mb-3 p-2.5 rounded-3" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);">
+                            <div class="d-flex align-items-center gap-2.5 min-w-0">
+                                <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width:34px; height:34px; background: linear-gradient(135deg, rgba(255,107,0,0.2) 0%, rgba(255,107,0,0.05) 100%); border: 1px solid rgba(255,107,0,0.3);">
+                                    <i class="bi bi-bank text-orange fs-6"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-white-50 fs-8 fw-semibold m-0 text-uppercase" style="letter-spacing: .06em;">Museo selezionato</p>
+                                    <h6 class="fw-bold text-white m-0 text-truncate fs-7" x-text="museums.find(m => m._id === selectedMuseumId)?.museum || ''"></h6>
+                                </div>
+                            </div>
+                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-2.5 py-1 fs-7 fw-bold flex-shrink-0"
+                                  :class="isLoaded && selectedMuseumId ? 'd-inline-block' : 'd-none'"
+                                  x-text="filteredArtworks().length + ' opere'"></span>
+                        </div>
+
+                        <!-- Full-width Unified Search & Location Bar -->
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-60 w-100 p-1">
+                            <span class="input-group-text bg-transparent border-0 text-white-50 ps-3 me-0">
+                                <i class="bi bi-search fs-6"></i>
                             </span>
-                        </div>
-                        <span class="badge bg-orange" x-text="artworks.length + ' opere'"></span>
-                    </div>
+                            
+                            <!-- Search when NO museum selected: Cerca museo... -->
+                            <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 ps-1 py-2"
+                                   x-show="!selectedMuseumId"
+                                   placeholder="Cerca museo..."
+                                   x-model="museumSearch">
+                            
+                            <!-- Search when museum IS selected: Cerca opera... -->
+                            <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 ps-1 py-2"
+                                   x-show="selectedMuseumId"
+                                   placeholder="Cerca opera..."
+                                   x-model="artworkSearch">
 
-                    <!-- Empty State -->
-                    <div x-show="artworks.length === 0" class="empty-state fade-in">
-                        <i class="bi bi-palette"></i>
-                        <h4 class="fw-bold mb-2">Nessuna opera presente</h4>
-                        <p>Inizia aggiungendo la prima opera al catalogo.</p>
-                        <button @click="openArtworkForm()" class="btn btn-orange rounded-pill px-4 py-2 d-inline-flex align-items-center justify-content-center btn-glow hover-lift lh-1">
-                            <i class="bi bi-plus-lg fs-5 text-white fw-bold my-auto"></i>
-                            <span class="ms-2 fw-semibold text-white">Aggiungi Opera</span>
-                        </button>
-                    </div>
-
-                    <!-- Desktop Table -->
-                    <div x-show="artworks.length > 0" class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg overflow-hidden d-none d-md-block card-hover">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle m-0">
-                                <thead class="thead-custom">
-                                    <tr>
-                                        <th class="ps-4 py-3 fw-bold text-uppercase">Opera</th>
-                                        <th class="py-3 fw-bold text-uppercase">Autore</th>
-                                        <th class="py-3 fw-bold text-uppercase">Licenza</th>
-                                        <th class="text-end pe-4 py-3 fw-bold text-uppercase">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="art in artworks" :key="art._id">
-                                        <tr class="table-row-custom">
-                                            <td class="ps-4 py-3">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="artwork-preview artwork-preview-sm">
-                                                         <template x-if="art.img_path">
-                                                             <img :src="art.img_path"
-                                                                 @error="$el.classList.add('d-none'); $el.nextElementSibling.classList.replace('d-none', 'd-flex')"
-                                                                 class="rounded-3">
-                                                         </template>
-                                                         <div class="artwork-placeholder rounded-3"
-                                                             :class="art.img_path ? 'd-none' : 'd-flex'">
-                                                             IMG
-                                                         </div>
-                                                    </div>
-                                                    <span class="fw-bold text-white" x-text="art.item"></span>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <span class="text-orange fw-medium" x-text="art.author || 'Autore Ignoto'"></span>
-                                            </td>
-                                            <td class="py-3">
-                                                <span class="license-badge" x-text="art.license || 'N/A'"></span>
-                                            </td>
-                                            <td class="text-end pe-4 py-3">
-                                                <div class="btn-group rounded-3 overflow-hidden shadow-sm">
-                                                    <button @click="openArtworkForm(art)"
-                                                        class="btn btn-action bg-slate hover-lift"><i
-                                                            class="bi bi-pencil-square"></i></button>
-                                                    <button @click="deleteArtwork(art._id)"
-                                                        class="btn btn-action btn-outline-danger border-0 border-start border-secondary border-opacity-25 hover-lift"><i
-                                                            class="bi bi-trash3-fill"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                            <button type="button" x-show="museumSearch || artworkSearch" @click="museumSearch = ''; artworkSearch = '';" class="btn border-0 text-white-50 pe-2 me-1">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                            
+                            <!-- Integrated Location Pin Select -->
+                            <div class="d-flex align-items-center bg-orange bg-opacity-15 rounded-pill border border-orange border-opacity-30 px-2 py-1 ms-1 me-1" x-show="!selectedMuseumId">
+                                <i class="bi bi-geo-alt-fill text-orange me-1 fs-7"></i>
+                                <select class="form-select border-0 bg-transparent text-orange shadow-none cursor-pointer fs-7 fw-bold p-0 pe-3" style="width: auto; max-width: 105px;" x-model="selectedCity">
+                                    <option value="" class="text-dark">Tutti</option>
+                                    <template x-for="city in availableCities()" :key="city">
+                                        <option :value="city" x-text="city" class="text-dark"></option>
                                     </template>
-                                </tbody>
-                            </table>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Mobile Cards -->
-                    <div x-show="artworks.length > 0" class="d-md-none">
-                        <template x-for="art in artworks" :key="art._id">
-                            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 shadow-lg artwork-card card-hover">
-                                <div class="card-body p-3">
-                                    <div class="d-flex gap-3">
-                                        <div class="artwork-preview artwork-preview-md">
-                                             <template x-if="art.img_path">
-                                                 <img :src="art.img_path"
-                                                     @error="$el.classList.add('d-none'); $el.nextElementSibling.classList.replace('d-none', 'd-flex')"
-                                                     class="rounded-3">
-                                             </template>
-                                             <div class="artwork-placeholder rounded-3"
-                                                 :class="art.img_path ? 'd-none' : 'd-flex'">
-                                                 IMG
-                                             </div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="fw-bold mb-1" x-text="art.item"></h6>
-                                            <p class="text-orange small mb-1" x-text="art.author || 'Autore Ignoto'"></p>
-                                            <span class="license-badge" x-text="art.license || 'N/A'"></span>
-                                        </div>
+                    <!-- Desktop Glassmorphic Control Deck Header -->
+                    <div class="glass-card rounded-4 p-3 p-md-4 mb-4 border border-white border-opacity-10 shadow-lg position-relative overflow-hidden d-none d-sm-block" style="background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); backdrop-filter: blur(16px);">
+                        
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 gap-lg-4">
+                            
+                            <!-- Left: Back Button, Title & Subtitle / Museum Selector -->
+                            <div class="d-flex flex-column gap-1.5" style="max-width: 520px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm" style="width:46px; height:46px; background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, rgba(249,115,22,0.05) 100%); border: 1px solid rgba(249,115,22,0.3);">
+                                        <i class="bi bi-palette text-orange fs-4"></i>
                                     </div>
-                                    <div class="d-flex gap-2 mt-3">
-                                        <button @click="openArtworkForm(art)"
-                                            class="btn btn-slate btn-sm flex-grow-1 rounded-pill hover-lift">
-                                            <i class="bi bi-pencil-square me-1"></i> Modifica
-                                        </button>
-                                        <button @click="deleteArtwork(art._id)"
-                                            class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill hover-lift">
-                                            <i class="bi bi-trash3-fill me-1"></i> Elimina
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h2 class="fw-bolder m-0 text-white tracking-tight fs-4 fs-md-3">Gestione Opere</h2>
+                                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-2.5 py-1 fs-7 fw-bold" :class="isLoaded && selectedMuseumId ? 'd-inline-block' : 'd-none'" x-text="filteredArtworks().length + ' opere'"></span>
+                                        </div>
+                                        <p class="text-white-50 fs-7 m-0 mt-0.5 d-none d-sm-block">Crea, modifica e gestisci le opere d'arte del catalogo.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Museum Selector Badge Dropdown when museum IS selected -->
+                                <div :class="selectedMuseumId ? 'd-flex align-items-center gap-2 mt-1' : 'd-none'">
+                                    <div class="input-group input-group-sm rounded-pill overflow-hidden border border-orange border-opacity-30 bg-dark bg-opacity-60 shadow-sm" style="max-width:280px;">
+                                        <span class="input-group-text bg-transparent border-0 text-orange ps-2.5">
+                                            <i class="bi bi-bank"></i>
+                                        </span>
+                                        <select class="form-select form-select-sm bg-transparent border-0 text-white shadow-none cursor-pointer fs-7 fw-bold text-truncate ps-1 pe-4" x-model="selectedMuseumId" @change="fetchArtworks()">
+                                            <option value="" class="text-dark">Tutti i Musei</option>
+                                            <template x-for="m in museums" :key="m._id">
+                                                <option :value="m._id" x-text="m.museum" class="text-dark"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <button @click="selectedMuseumId = ''; artworks = []; step = 'artwork-museum-select';" class="btn btn-sm text-white-50 p-1 hover-text-white" title="Mostra tutti i musei">
+                                        <i class="bi bi-x-circle-fill fs-6"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Controls & Actions Deck -->
+                            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 gap-md-3 flex-shrink-0">
+                                <!-- City & Search Filters Container -->
+                                <div class="align-items-center gap-2 gap-md-3 w-100 w-lg-auto" :class="!selectedMuseumId ? 'd-flex' : 'd-none'">
+                                    <!-- City / Location Filter -->
+                                    <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-40 editor-header-city-select">
+                                        <span class="input-group-text bg-transparent border-0 text-orange ps-2.5 ps-md-3 pe-1">
+                                            <i class="bi bi-geo-alt-fill fs-6"></i>
+                                        </span>
+                                        <select class="form-select bg-transparent border-0 text-white shadow-none cursor-pointer fs-7 fw-bold ps-1 pe-4 py-2" x-model="selectedCity">
+                                            <option value="" class="text-dark">Tutti i luoghi</option>
+                                            <template x-for="city in availableCities()" :key="city">
+                                                <option :value="city" x-text="city" class="text-dark"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+
+                                    <!-- Search Museum Input -->
+                                    <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-40 editor-header-search-input">
+                                        <span class="input-group-text bg-transparent border-0 text-white-50 ps-2.5 ps-md-3 pe-1">
+                                            <i class="bi bi-search fs-6"></i>
+                                        </span>
+                                        <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 ps-1 py-2" placeholder="Cerca museo..." x-model="museumSearch">
+                                        <button type="button" x-show="museumSearch" @click="museumSearch = ''" class="btn border-0 text-white-50 pe-3">
+                                            <i class="bi bi-x-circle-fill"></i>
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Search Artwork Input (Shown when museum IS selected) -->
+                                <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-40 editor-header-search-input" :class="selectedMuseumId ? 'd-flex' : 'd-none'">
+                                    <span class="input-group-text bg-transparent border-0 text-white-50 ps-3">
+                                        <i class="bi bi-search fs-6"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 py-2" placeholder="Cerca opera..." x-model="artworkSearch">
+                                    <button type="button" x-show="artworkSearch" @click="artworkSearch = ''" class="btn border-0 text-white-50 pe-3">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Button Nuova Opera -->
+                                <button :class="selectedMuseumId ? 'd-inline-flex' : 'd-none'" @click="openArtworkForm()" class="btn text-white rounded-pill px-4 py-2.5 fs-6 fw-bold shadow-lg align-items-center justify-content-center gap-2 hover-lift text-nowrap flex-grow-1 flex-lg-grow-0" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: 1px solid rgba(255,255,255,0.25);" x-transition.opacity>
+                                    <i class="bi bi-plus-circle-fill fs-5"></i> <span>Nuova Opera</span>
+                                </button>
                             </div>
-                        </template>
+                        </div>
+                    </div>
+
+                    <!-- Marketplace Content: Grid or Empty State -->
+                    <div class="position-relative min-vh-50">
+
+                        <!-- Initial Loading Spinner -->
+                        <div x-show="!isLoaded" class="py-5 text-center" x-transition.opacity>
+                            <div class="spinner-border text-orange" role="status" style="width:2rem;height:2rem;border-width:3px;">
+                                <span class="visually-hidden">Caricamento...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Museum Grid (When No Museum Selected) -->
+                        <div x-show="isLoaded && !selectedMuseumId" class="mt-2" x-transition.opacity>
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                                <h4 class="fw-bold text-white m-0 d-flex align-items-center gap-2">
+                                    <i class="bi bi-bank text-orange"></i> Seleziona un Museo
+                                </h4>
+                            </div>
+                            
+                            <div x-show="isLoaded && museums.length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
+                                    <i class="bi bi-bank text-orange" style="font-size:1.4rem;"></i>
+                                </div>
+                                <h5 class="fw-bold text-white mb-2">Nessun museo disponibile</h5>
+                                <p class="small mb-4" style="color:rgba(255,255,255,0.45);">Crea prima un museo in Gestione Musei, poi potrai aggiungere le opere.</p>
+                                <a href="/editor/museum" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
+                                    <i class="bi bi-bank"></i> Vai a Gestione Musei
+                                </a>
+                            </div>
+
+                            <div class="row g-3 g-md-4" x-show="isLoaded && filteredMuseumList().length > 0">
+                                <template x-for="m in filteredMuseumList()" :key="m._id">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div @click="selectedMuseumId = m._id; fetchArtworks();"
+                                             class="museum-card rounded-4 p-4 h-100 cursor-pointer d-flex flex-column align-items-center text-center gap-3">
+                                            
+                                            <div class="mb-2">
+                                                <i class="bi bi-bank fs-1 text-orange"></i>
+                                            </div>
+
+                                            <div class="d-flex flex-column gap-1 w-100">
+                                                <h6 class="fw-bold m-0 lh-sm text-white fs-6" x-text="m.museum"></h6>
+                                                <small class="text-white-50 fs-8 d-flex align-items-center justify-content-center gap-1 mt-0.5" x-show="m.city">
+                                                    <i class="bi bi-geo-alt-fill text-orange"></i> <span x-text="m.city"></span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                </template>
+                            </div>
+
+                            <div x-show="isLoaded && museums.length > 0 && filteredMuseumList().length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
+                                    <i class="bi bi-search text-orange" style="font-size:1.4rem;"></i>
+                                </div>
+                                <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
+                                <p class="small mb-0" style="color:rgba(255,255,255,0.45);">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                            </div>
+                        </div>
+
+                        <!-- Artwork Grid (When Museum IS Selected) -->
+                        <div x-show="isLoaded && selectedMuseumId" x-transition.opacity>
+
+                            <!-- Artworks Loading Spinner -->
+                            <div x-show="isLoadingArtworks" class="py-5 text-center" x-transition.opacity>
+                                <div class="spinner-border text-orange" role="status" style="width:2rem;height:2rem;border-width:3px;">
+                                    <span class="visually-hidden">Caricamento opere...</span>
+                                </div>
+                            </div>
+
+                            <!-- Empty Search Results -->
+                            <div x-show="!isLoadingArtworks && artworks.length > 0 && artworkSearch && filteredArtworks().length === 0" class="text-center py-5 mt-5" x-transition.opacity>
+                                <i class="bi bi-search fs-1 text-white-50 mb-3 d-block opacity-50"></i>
+                                <p class="text-white-50">Nessuna opera trovata con questi criteri.</p>
+                            </div>
+
+                            <!-- Empty State (No Artworks in Museum) -->
+                            <div x-show="!isLoadingArtworks && artworks.length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
+                                    <i class="bi bi-palette text-orange" style="font-size:1.4rem;"></i>
+                                </div>
+                                <h5 class="fw-bold text-white mb-2">Nessuna opera presente</h5>
+                                <p class="small mb-4" style="color:rgba(255,255,255,0.45);">Aggiungi la prima opera al catalogo di questo museo.</p>
+                                <button @click="openArtworkForm()" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
+                                    <i class="bi bi-plus-lg"></i> Aggiungi Opera
+                                </button>
+                            </div>
+
+                            <!-- Desktop Table -->
+                            <div x-show="!isLoadingArtworks && filteredArtworks().length > 0" class="d-none d-md-block">
+                                <div class="table-responsive rounded-4 shadow-lg overflow-hidden border border-secondary border-opacity-25">
+                                    <table class="table table-dark table-hover align-middle m-0">
+                                        <thead class="thead-custom">
+                                            <tr>
+                                                <th class="ps-4 py-3 text-uppercase">Opera</th>
+                                                <th class="py-3 text-uppercase">Autore</th>
+                                                <th class="py-3 text-uppercase">Ubicazione / Sala</th>
+                                                <th class="py-3 text-uppercase">Licenza</th>
+                                                <th class="text-end pe-4 py-3 text-uppercase">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template x-for="art in filteredArtworks()" :key="art._id">
+                                                <tr class="table-row-custom">
+                                                    <td class="ps-4 py-3">
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="position-relative overflow-hidden rounded-3 flex-shrink-0 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
+                                                                <i class="bi bi-palette text-white" style="font-size:1.2rem;opacity:0.3;"></i>
+                                                                <img x-show="art.img_path"
+                                                                     :src="art.img_path || ''"
+                                                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                                                     style="z-index:1;" alt=""
+                                                                     @error="$el.style.display='none'">
+                                                            </div>
+                                                            <span class="fw-bold text-white fs-6" x-text="art.item"></span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3">
+                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1"
+                                                              style="background:rgba(249,115,22,.18);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                                            <i class="bi bi-person-fill"></i>
+                                                            <span x-text="art.author || 'Autore ignoto'"></span>
+                                                        </span>
+                                                    </td>
+                                                    <td class="py-3">
+                                                         <span class="text-white-50 fs-7 d-inline-flex align-items-center gap-1.5" x-show="hasSala(art)">
+                                                             <i class="bi bi-door-open-fill text-orange"></i>
+                                                             <span class="text-white fw-semibold" x-text="hasSala(art) ? ('Sala: ' + getSalaName(art)) : ''"></span>
+                                                         </span>
+                                                         <span class="text-white-50 opacity-50 fs-7" x-show="!hasSala(art)">—</span>
+                                                    </td>
+                                                    <td class="py-3">
+                                                        <span class="badge bg-secondary bg-opacity-50 text-white-50 font-monospace fs-7 px-2" x-show="art.license" x-text="art.license"></span>
+                                                    </td>
+                                                    <td class="text-end pe-4 py-3">
+                                                        <div class="d-inline-flex gap-2">
+                                                            <button type="button" @click="openArtworkForm(art)"
+                                                                    class="btn bg-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift" title="Modifica">
+                                                                <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
+                                                            </button>
+                                                            <button type="button" @click="deleteArtwork(art._id)"
+                                                                    class="btn btn-outline-danger rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift" title="Elimina">
+                                                                <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Artwork Cards (Matching Gestione Musei Layout) -->
+                            <div x-show="!isLoadingArtworks && filteredArtworks().length > 0" class="d-md-none d-flex flex-column gap-3">
+                                <template x-for="art in filteredArtworks()" :key="art._id">
+                                    <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3 card-mobile-glass">
+                                        
+                                        <div class="d-flex gap-3 align-items-start mb-2.5">
+                                            <!-- Thumbnail -->
+                                            <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm card-mobile-thumb">
+                                                <i class="bi bi-palette text-white icon-ghost-sm"></i>
+                                                <img x-show="art.img_path"
+                                                     :src="art.img_path || ''"
+                                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1" alt=""
+                                                     @error="$el.style.display='none'">
+                                            </div>
+
+                                            <!-- Content -->
+                                            <div class="d-flex flex-column flex-grow-1 min-w-0">
+                                                <h6 class="fw-bold text-white mb-1 tracking-tight text-truncate fs-6" x-text="art.item"></h6>
+                                                <div class="d-flex flex-wrap align-items-center gap-2 mb-1.5">
+                                                    <span class="badge rounded-pill px-2.5 py-1 fw-bold d-inline-flex align-items-center gap-1 badge-author">
+                                                        <i class="bi bi-person-fill"></i>
+                                                        <span x-text="art.author || 'Autore ignoto'"></span>
+                                                    </span>
+                                                    <span class="badge rounded-pill px-2.5 py-1 fw-bold text-white d-inline-flex align-items-center gap-1 badge-room" x-show="hasSala(art)">
+                                                        <i class="bi bi-door-open-fill text-orange fw-bold"></i>
+                                                        <span x-text="hasSala(art) ? ('Sala: ' + getSalaName(art)) : ''"></span>
+                                                    </span>
+                                                </div>
+                                                <p class="text-white-50 mb-0 line-clamp-1 fs-75" x-text="art.description || 'Opera del catalogo artistico.'"></p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Soft Actions Pill Buttons -->
+                                        <div class="d-flex align-items-center gap-2 pt-2.5 card-mobile-divider">
+                                            <button type="button" @click="openArtworkForm(art)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-soft-orange">
+                                                <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
+                                            </button>
+                                            <button type="button" @click="deleteArtwork(art._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-soft-red">
+                                                <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- Artwork Form -->
                 <div x-show="step === 'artwork-form'" class="max-w-550 mx-auto fade-in">
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <button @click="step = 'artwork-list'"
+                        <button type="button" @click="step = selectedMuseumId ? 'artwork-list' : 'artwork-museum-select'"
                             class="btn btn-outline-secondary btn-sm rounded-pill px-3 hover-lift">
                             <i class="bi bi-arrow-left"></i> Torna alla lista
                         </button>
@@ -429,6 +669,15 @@
 
     
 
+
+    <!-- Floating Action Button (FAB) for Mobile (Nuova Opera) -->
+    <button type="button" @click="openArtworkForm()" 
+            x-show="selectedMuseumId && (step === 'artwork-museum-select' || step === 'artwork-list')"
+            :class="selectedMuseumId && (step === 'artwork-museum-select' || step === 'artwork-list') ? 'd-flex' : 'd-none'"
+            class="d-md-none position-fixed rounded-circle text-white border-0 fab-btn-mobile align-items-center justify-content-center"
+            title="Nuova Opera">
+        <i class="bi bi-plus-lg fs-3"></i>
+    </button>
 
     <!-- Mobile Navigation -->
     <nav class="mobile-nav">

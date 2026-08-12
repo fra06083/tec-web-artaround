@@ -92,15 +92,23 @@
             </div>
         </aside>
         <main class="main-content">
-            <!-- Mobile Header -->
+            <!-- Mobile Header (Premium Dark Glassmorphic) -->
             <header class="mobile-header">
-                <a href="/editor-marketplace/index.html"
-                    class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center avatar-sm">
-                        <i class="bi bi-gear-fill fs-5"></i>
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <div class="mobile-logo-icon-box">
+                        <i class="bi bi-gear-fill"></i>
                     </div>
-                    <span class="ls-minus-1 fw-bold text-white fs-4 m-0">ArtAround</span>
+                    <span class="mobile-brand-title">ArtAround<span class="brand-dot"></span></span>
                 </a>
+                <div class="mobile-user-badge" x-show="username">
+                    <div class="mini-avatar position-relative">
+                        <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                        <template x-if="propic">
+                            <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                        </template>
+                    </div>
+                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                </div>
             </header>
 
             <!-- Desktop Header -->
@@ -122,9 +130,7 @@
 
                     <div class="ms-auto d-flex align-items-center gap-3">
                         <div class="text-end me-2">
-                            <span class="d-block text-white-50 text-uppercase fw-bold fs-065 tracking-wide-1px">Ruolo</span>
-                            <span class="text-orange fw-bold text-capitalize" x-text="permissions"></span>
-
+                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-3 py-1.5 fs-7 fw-bold text-capitalize" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : permissions)"></span>
                         </div>
                     </div>
                 </div>

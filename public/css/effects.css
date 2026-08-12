@@ -2,6 +2,105 @@
    VISUAL EFFECTS & ANIMATIONS - Minimal & Clean
 ========================================================= */
 
+/* Dark Mode Glass Override for Bootstrap bg-secondary */
+.bg-secondary,
+.badge.bg-secondary,
+.bg-secondary.bg-opacity-10,
+.bg-secondary.bg-opacity-25,
+.bg-secondary.bg-opacity-30,
+.bg-secondary.bg-opacity-40,
+.bg-secondary.bg-opacity-50 {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+/* Reusable Component Classes (No inline styles) */
+.mobile-header-title-box { gap: 16px; }
+.mobile-header-icon-square {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(255,107,0,0.18) 0%, rgba(255,107,0,0.05) 100%);
+    border: 1px solid rgba(255,107,0,0.3);
+}
+.mobile-header-text-group { gap: 10px; }
+
+.badge-author {
+    font-size: 0.68rem;
+    background: rgba(249,115,22,0.15);
+    color: #f97316;
+    border: 1px solid rgba(249,115,22,0.28);
+}
+
+.badge-room {
+    font-size: 0.68rem;
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.22);
+}
+
+.badge-mnemonic {
+    font-size: 0.68rem;
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.22);
+}
+
+.fab-btn-mobile {
+    bottom: 85px;
+    right: 20px;
+    width: 58px;
+    height: 58px;
+    z-index: 1045;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.5) !important;
+}
+
+.card-mobile-glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-mobile-thumb {
+    width: 62px;
+    height: 62px;
+    background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+}
+
+.btn-soft-orange {
+    background: rgba(249,115,22,0.15);
+    color: #f97316;
+    border: 1px solid rgba(249,115,22,0.3);
+}
+
+.btn-soft-red {
+    background: rgba(239,68,68,0.12);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.25);
+}
+
+.card-mobile-divider {
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.empty-state-box {
+    max-width: 380px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.empty-state-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(249,115,22,0.12);
+    border: 1px solid rgba(249,115,22,0.22);
+}
+
+.empty-state-text {
+    color: rgba(255,255,255,0.45);
+}
+
 /* Hover Lift Effect */
 .hover-lift {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -1320,7 +1419,7 @@ html.dark-mode body {
     border-radius: 50px;
     padding: 4px;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
 }
 
 .segmented-slider {
@@ -1343,13 +1442,14 @@ html.dark-mode body {
     align-items: center;
     justify-content: center;
     gap: 8px; /* Spacing between icon and text */
-    padding: 10px 20px; /* Touch target on the button itself */
+    padding: 10px 16px; /* Touch target on the button itself */
     margin: 0;
     border: none;
     background: transparent;
     color: rgba(255, 255, 255, 0.5);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
     z-index: 2;
     transition: color 0.3s ease;
     cursor: pointer; /* Pointer on the whole button */
@@ -2160,9 +2260,28 @@ html.dark-mode body {
     max-width: 100% !important;
 }
 
+.icon-box-48 {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    flex-shrink: 0 !important;
+}
+
+.icon-box-64 {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    flex-shrink: 0 !important;
+}
+
 .icon-box-80 {
     width: 80px !important;
     height: 80px !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
+    flex-shrink: 0 !important;
 }
 
 .icon-box-110 {

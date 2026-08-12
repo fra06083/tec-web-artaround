@@ -6,8 +6,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Musei - ArtAround</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/sidebar.css">
@@ -16,33 +19,33 @@
     <link rel="stylesheet" href="/css/tables.css">
     <link rel="stylesheet" href="/css/toasts.css">
     <link rel="stylesheet" href="/css/effects.css">
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="/js/editor/museum.js"></script>
 </head>
 
-<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="museumManager()">
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="{ ...museumManager(), museumSearch: '', formTab: 'info' }" x-cloak>
 
-    <div x-show="isReady && isLoggedIn" x-cloak x-transition.opacity class="d-flex">
+    <div x-show="isReady && isLoggedIn" x-cloak class="d-flex">
 
+        <!-- Toasts Notification Container -->
         <div class="toast-container">
             <template x-if="notification.show">
                 <div class="custom-toast" :class="notification.type === 'success' ? 'toast-success' : 'toast-error'">
-                    <i
-                        :class="notification.type === 'success' ? 'bi bi-check-circle-fill text-success' : 'bi bi-exclamation-triangle-fill text-danger'"></i>
+                    <i :class="notification.type === 'success' ? 'bi bi-check-circle-fill text-success' : 'bi bi-exclamation-triangle-fill text-danger'"></i>
                     <div class="toast-content">
-                        <span class="toast-title"
-                            x-text="notification.type === 'success' ? 'Operazione riuscita' : 'Attenzione'"></span>
+                        <span class="toast-title" x-text="notification.type === 'success' ? 'Operazione riuscita' : 'Attenzione'"></span>
                         <span class="toast-msg" x-text="notification.message"></span>
                     </div>
                 </div>
             </template>
         </div>
 
+        <!-- Sidebar Navigation -->
         <aside class="sidebar bg-dark shadow d-flex flex-column">
             <div class="p-4 mb-2">
-                <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2"
-                    href="/editor-marketplace/index.html">
+                <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2" href="/editor-marketplace/index.html">
                     <i class="bi bi-gear-fill text-orange"></i>
                     <span class="d-none d-lg-inline">ArtAround</span>
                 </a>
@@ -82,20 +85,31 @@
             </nav>
 
             <div class="p-3 mt-auto">
-                                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
+                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
-        <main class="main-content flex-grow-1">
-            <!-- Mobile Header -->
-            <header class="mobile-header">
-                <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center btn-icon-38">
-                        <i class="bi bi-gear-fill fs-5"></i>
-                    </div>
-                    <span class="fw-bold text-white fs-4 m-0 tracking-tight-sm">ArtAround</span>
-                </a>
-            </header>
 
+        <!-- Main Content Area -->
+        <main class="main-content flex-grow-1">
+            
+            <!-- Mobile Header (Premium Dark Glassmorphic) -->
+            <header class="mobile-header">
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <div class="mobile-logo-icon-box">
+                        <i class="bi bi-gear-fill"></i>
+                    </div>
+                    <span class="mobile-brand-title">ArtAround<span class="brand-dot"></span></span>
+                </a>
+                <div class="mobile-user-badge" x-show="username">
+                    <div class="mini-avatar position-relative">
+                        <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                        <template x-if="propic">
+                            <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                        </template>
+                    </div>
+                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                </div>
+            </header>
 
             <!-- Desktop Header -->
             <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
@@ -108,218 +122,503 @@
                             </template>
                         </div>
                         <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold ls-1">
-                                Bentornato</p>
+                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold ls-1">Bentornato</p>
                             <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
                         </div>
                     </div>
 
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <button x-show="step === 'museum-list'" @click="openMuseumForm()"
-                            class="btn btn-orange rounded-pill btn-sm px-3 btn-glow hover-lift">
-                            <i class="bi bi-plus-lg me-1"></i> Nuovo Museo
-                        </button>
+                        <div class="text-end me-2">
+                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-3 py-1.5 fs-7 fw-bold text-capitalize" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : permissions)"></span>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <div class="p-4 p-lg-5">
+            <div class="p-3 p-sm-4 p-lg-5">
 
-                <div x-show="step === 'museum-list'" class="animate__animated animate__fadeIn">
-                    <!-- Desktop Table -->
-                    <div class="card bg-gradient-dark-blue border-0 rounded-4 shadow-lg overflow-hidden d-none d-md-block">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover table-borderless align-middle m-0">
-                                <thead class="thead-custom">
-                                    <tr>
-                                        <th class="ps-4 py-3 fw-bold text-uppercase">Museo</th>
-                                        <th class="py-3 fw-bold text-uppercase">Posizione</th>
-                                        <th class="py-3 fw-bold text-uppercase">Regione</th>
-                                        <th class="text-end pe-4 py-3 fw-bold text-uppercase">Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="m in museums" :key="m._id">
-                                        <tr class="table-row-custom">
-                                            <td class="ps-4 py-3">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <template x-if="m.image">
-                                                        <img :src="m.image"
-                                                            class="rounded-3 object-fit-cover img-thumbnail-custom shadow-sm"
-                                                            alt="Museum">
-                                                    </template>
+                <div x-show="step === 'museum-list'" class="py-2" x-transition.opacity>
 
-                                                    <template x-if="!m.image">
-                                                        <div
-                                                            class="rounded-3 d-flex align-items-center justify-content-center bg-orange-subtle border border-orange border-opacity-25 img-thumbnail-custom shadow-sm">
-                                                            <i class="bi bi-bank text-orange fs-5"></i>
-                                                        </div>
-                                                    </template>
+                    <!-- Mobile Header (Streamlined, direct on background, generous gap & breathing room) -->
+                    <div class="d-md-none mb-4 pt-1">
+                        <div class="d-flex align-items-center mb-3" style="gap: 16px;">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm" style="width:44px; height:44px; background: linear-gradient(135deg, rgba(255,107,0,0.18) 0%, rgba(255,107,0,0.05) 100%); border: 1px solid rgba(255,107,0,0.3);">
+                                <i class="bi bi-bank text-orange fs-4"></i>
+                            </div>
+                            <div class="d-flex align-items-center flex-grow-1" style="gap: 10px;">
+                                <h2 class="fw-bolder m-0 text-white tracking-tight fs-3">Gestione Musei</h2>
+                                <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-2.5 py-1 fs-7 fw-bold" :class="isLoaded ? 'd-inline-block' : 'd-none'" x-text="filteredMuseumList().length + ' musei'"></span>
+                            </div>
+                        </div>
 
-                                                    <div>
-                                                        <span class="d-block fw-bold text-white mb-0"
-                                                            x-text="m.museum"></span>
-                                                        <code class="text-orange opacity-75 x-small"
-                                                            x-text="m._id"></code>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3">
-                                                <div class="d-flex flex-column gap-1">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="bi bi-geo-alt-fill text-orange small"></i>
-                                                        <span class="text-white fw-medium" x-text="m.city"></span>
-                                                        <span class="badge badge-province" x-show="m.province"
-                                                            x-text="m.province"></span>
-                                                    </div>
-                                                    <div class="ps-4 small text-white-50 fst-italic" x-text="m.address">
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3"><span class="text-white-50 fw-medium"
-                                                    x-text="m.region || '—'"></span></td>
-                                            <td class="text-end pe-4 py-3">
-                                                <div class="btn-group rounded-3 overflow-hidden shadow-sm">
-                                                    <button @click="openMuseumForm(m)"
-                                                        class="btn btn-action bg-slate"><i
-                                                            class="bi bi-pencil-square"></i></button>
-                                                    <button @click="deleteMuseum(m._id)"
-                                                        class="btn btn-action btn-outline-danger border-0 border-start border-secondary border-opacity-25"><i
-                                                            class="bi bi-trash3-fill"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                        <!-- Full-width Unified Search & Location Bar -->
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-60 w-100 p-1">
+                            <span class="input-group-text bg-transparent border-0 text-white-50 ps-3 me-0">
+                                <i class="bi bi-search fs-6"></i>
+                            </span>
+                            <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 ps-1 py-2" placeholder="Cerca museo..." x-model="museumSearch">
+                            <button type="button" x-show="museumSearch" @click="museumSearch = ''" class="btn border-0 text-white-50 pe-2 me-1">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                            
+                            <!-- Integrated Location Pin Select -->
+                            <div class="d-flex align-items-center bg-orange bg-opacity-15 rounded-pill border border-orange border-opacity-30 px-2 py-1 ms-1 me-1">
+                                <i class="bi bi-geo-alt-fill text-orange me-1 fs-7"></i>
+                                <select class="form-select border-0 bg-transparent text-orange shadow-none cursor-pointer fs-7 fw-bold p-0 pe-3" style="width: auto; max-width: 105px;" x-model="selectedCity">
+                                    <option value="" class="text-dark">Tutti</option>
+                                    <template x-for="city in availableCities()" :key="city">
+                                        <option :value="city" x-text="city" class="text-dark"></option>
                                     </template>
-                                </tbody>
-                            </table>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Mobile Cards -->
-                    <div class="d-md-none">
-                        <template x-for="m in museums" :key="m._id">
-                            <div class="card bg-gradient-dark-blue border-0 shadow-lg rounded-4 p-4 mb-4">
-                                <div class="d-flex gap-3 mb-3">
-                                    <template x-if="m.image">
-                                        <img :src="m.image"
-                                            class="rounded-3 object-fit-cover shadow-sm w-h-80" 
-                                            alt="Museum">
-                                    </template>
-                                    <template x-if="!m.image">
-                                        <div class="d-flex align-items-center justify-content-center bg-orange-subtle border border-orange border-opacity-25 rounded-3 shadow-sm w-h-80">
-                                            <i class="bi bi-bank text-orange fs-2"></i>
-                                        </div>
-                                    </template>
-                                    <div class="museum-info">
-                                        <h5 class="fw-bold mb-1 text-white" x-text="m.museum"></h5>
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <i class="bi bi-geo-alt-fill text-orange small"></i>
-                                            <span class="text-white-50 small fw-medium" x-text="m.city"></span>
-                                            <span class="badge bg-slate border border-secondary shadow-sm" x-show="m.province" x-text="m.province"></span>
-                                        </div>
-                                        <p class="text-white-50 small mb-0 text-truncate" x-text="m.address"></p>
+                    <!-- Desktop Glassmorphic Control Deck Header -->
+                    <div class="glass-card rounded-4 p-3.5 p-md-4 mb-4 border border-white border-opacity-10 shadow-lg position-relative overflow-hidden d-none d-sm-block" style="background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); backdrop-filter: blur(16px);">
+                        
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 gap-lg-4">
+                            
+                            <!-- Title & Icon Block -->
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm" style="width:46px; height:46px; background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, rgba(249,115,22,0.05) 100%); border: 1px solid rgba(249,115,22,0.3);">
+                                    <i class="bi bi-bank text-orange fs-4"></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h2 class="fw-bolder m-0 text-white tracking-tight fs-4 fs-md-3">Gestione Musei</h2>
+                                        <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-2.5 py-1 fs-7 fw-bold" :class="isLoaded ? 'd-inline-block' : 'd-none'" x-text="filteredMuseumList().length + ' musei'"></span>
+                                    </div>
+                                    <p class="m-0 text-white-50 fs-7 mt-0.5 d-none d-sm-block">Crea, modifica e gestisci le strutture, le piantine ed i punti d'interesse.</p>
+                                </div>
+                            </div>
+
+                            <!-- Right Controls & Actions Deck -->
+                            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 gap-md-3 flex-shrink-0">
+                                
+                                <!-- Filters Group -->
+                                <div class="d-flex align-items-center gap-2 w-100 w-sm-auto flex-grow-1 flex-lg-grow-0">
+                                    <!-- Location Select -->
+                                    <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-40 editor-header-city-select">
+                                        <span class="input-group-text bg-transparent border-0 text-orange ps-2.5 ps-md-3 pe-1">
+                                            <i class="bi bi-geo-alt-fill fs-6"></i>
+                                        </span>
+                                        <select class="form-select bg-transparent border-0 text-white shadow-none cursor-pointer fs-7 fw-bold ps-1 pe-4 py-2" x-model="selectedCity">
+                                            <option value="" class="text-dark">Tutti i luoghi</option>
+                                            <template x-for="city in availableCities()" :key="city">
+                                                <option :value="city" x-text="city" class="text-dark"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+
+                                    <!-- Search Input -->
+                                    <div class="input-group shadow-sm rounded-pill overflow-hidden border border-white border-opacity-15 bg-dark bg-opacity-40 editor-header-search-input">
+                                        <span class="input-group-text bg-transparent border-0 text-white-50 ps-2.5 ps-md-3 pe-1">
+                                            <i class="bi bi-search fs-6"></i>
+                                        </span>
+                                        <input type="text" class="form-control bg-transparent border-0 text-white shadow-none fs-7 ps-1 py-2" placeholder="Cerca museo..." x-model="museumSearch">
+                                        <button type="button" x-show="museumSearch" @click="museumSearch = ''" class="btn border-0 text-white-50 pe-3">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <button @click="openMuseumForm(m)"
-                                        class="btn bg-slate text-white btn-sm flex-grow-1 rounded-pill hover-lift shadow-sm">
-                                        <i class="bi bi-pencil-square me-1"></i> Modifica
-                                    </button>
-                                    <button @click="deleteMuseum(m._id)"
-                                        class="btn btn-outline-danger btn-sm flex-grow-1 rounded-pill hover-lift shadow-sm">
-                                        <i class="bi bi-trash3-fill me-1"></i> Elimina
+
+                                <!-- Action Buttons Group -->
+                                <div class="d-flex align-items-center gap-2 w-100 w-sm-auto flex-grow-1 flex-lg-grow-0">
+                                    <button @click="formTab = 'info'; openMuseumForm();" class="btn text-white rounded-pill px-4 py-2.5 fs-6 fw-bold shadow-lg d-inline-flex align-items-center justify-content-center gap-2 hover-lift text-nowrap flex-grow-1 flex-sm-grow-0" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: 1px solid rgba(255,255,255,0.25);">
+                                        <i class="bi bi-plus-circle-fill fs-5"></i> <span>Nuovo Museo</span>
                                     </button>
                                 </div>
+
                             </div>
-                        </template>
+
+                        </div>
                     </div>
 
-                    <!-- Mobile Import Prompt -->
-                    <div class="d-md-none mt-4">
-                        <a href="/editor/import" class="card bg-orange bg-opacity-10 border border-orange border-opacity-25 rounded-4 p-4 text-center text-decoration-none transition-all transform hover-lift d-block">
-                            <i class="bi bi-file-earmark-arrow-up text-orange fs-2 mb-2 d-block"></i>
-                            <p class="mb-2 fw-bold text-white fs-6">Vuoi importare un museo tramite file configurazione?</p>
-                            <span class="badge bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-arrow-right-circle-fill"></i> Importa Dati
-                            </span>
-                        </a>
+                    <div x-show="!isLoaded" class="py-5 text-center" x-transition.opacity>
+                        <div class="spinner-border text-orange" role="status" style="width:2rem;height:2rem;border-width:3px;">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
                     </div>
-                </div>
 
-                <div x-show="step === 'museum-form'" class="max-w-900 mx-auto">
+                    <div x-show="isLoaded && museums.length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
+                            <i class="bi bi-bank text-orange" style="font-size:1.4rem;"></i>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2">Nessun museo</h5>
+                        <p class="small mb-4" style="color:rgba(255,255,255,0.45);">Crea il primo museo o importa una configurazione JSON.</p>
+                        <button @click="formTab = 'info'; openMuseumForm();" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
+                            <i class="bi bi-plus-lg"></i> Crea Museo
+                        </button>
+                    </div>
 
-                    <div class="museum-editor-card p-4 p-md-5">
-                        
-                        <!-- Header Banner -->
-                        <div class="d-flex align-items-center justify-content-between gap-3 mb-4 pb-4 border-bottom border-white border-opacity-10">
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="button" @click="step = 'museum-list'" class="btn btn-dark rounded-circle btn-icon-40 d-flex align-items-center justify-content-center border border-secondary border-opacity-25 shadow-sm hover-lift">
-                                    <i class="bi bi-arrow-left fs-5"></i>
-                                </button>
-                                <div>
-                                    <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill px-3 py-1 text-uppercase fw-bold fs-caption mb-1 d-inline-block">
-                                        <i class="bi bi-bank me-1"></i> Editor Museo
-                                    </span>
-                                    <h3 class="fw-black m-0 text-white tracking-tight" x-text="currentMuseum._id ? 'Modifica Museo' : 'Nuovo Museo'"></h3>
+                    <div x-show="isLoaded && museums.length > 0 && filteredMuseumList().length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
+                            <i class="bi bi-search text-orange" style="font-size:1.4rem;"></i>
+                        </div>
+                        <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
+                        <p class="small mb-0" style="color:rgba(255,255,255,0.45);">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                    </div>
+
+                    <div x-show="isLoaded && filteredMuseumList().length > 0">
+
+                        <div class="d-none d-sm-block">
+                            <div class="row g-4">
+                                <template x-for="m in visibleMuseums()" :key="m._id">
+                                    <div class="col-12 col-md-6 col-xl-4">
+                                        <div class="glass-card h-100 rounded-4 overflow-hidden position-relative group transition-all transform hover-lift border-start border-4 border-orange">
+
+                                            <div class="position-relative overflow-hidden d-flex align-items-center justify-content-center" style="height:140px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
+                                                <i class="bi bi-bank text-white" style="font-size:3.5rem;opacity:0.22;"></i>
+                                                <img x-show="m.image || m.immagine"
+                                                     :src="m.image || m.immagine || ''"
+                                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                                     style="z-index:1;"
+                                                     alt=""
+                                                     @error="$el.style.display='none'">
+                                            </div>
+
+                                            <div class="p-4 d-flex flex-column" style="flex:1;">
+
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1" x-show="m.region || m.city"
+                                                          style="background:rgba(249,115,22,.18);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                                        <i class="bi bi-geo-alt-fill"></i>
+                                                        <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
+                                                    </span>
+                                                    <span class="badge bg-secondary bg-opacity-50 text-white-50 fs-7 px-2.5 py-1 d-inline-flex align-items-center gap-1" x-show="m.mappa && (m.mappa.piante || m.mappa.sale)">
+                                                        <i class="bi bi-layers text-orange opacity-75"></i>
+                                                        <span x-text="(m.mappa&&m.mappa.piante?m.mappa.piante.length:0)+' piani · '+(m.mappa&&m.mappa.sale?m.mappa.sale.length:0)+' sale'"></span>
+                                                    </span>
+                                                </div>
+
+                                                <div class="mb-4 flex-grow-1">
+                                                    <h4 class="fw-bold text-white mb-2 tracking-tight line-clamp-2" x-text="m.museum"></h4>
+                                                    <p class="text-white-50 fs-7 line-clamp-3 mb-0" x-text="m.description || 'Nessuna descrizione.'"></p>
+                                                </div>
+
+                                                <div class="mt-auto pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center gap-2">
+                                                    <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn bg-orange text-white rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
+                                                        <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
+                                                    </button>
+                                                    <button type="button" @click="deleteMuseum(m._id)" class="btn btn-outline-danger rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
+                                                        <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Museum Cards (Sleek Glassmorphic Layout) -->
+                        <div class="d-sm-none d-flex flex-column gap-3">
+                            <template x-for="m in visibleMuseums()" :key="m._id">
+                                <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+                                    
+                                    <div class="d-flex gap-3 align-items-start mb-2.5">
+                                        <!-- Thumbnail -->
+                                        <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm" style="width:62px;height:62px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
+                                            <i class="bi bi-bank text-white" style="font-size:1.6rem;opacity:0.35;"></i>
+                                            <img x-show="m.image || m.immagine"
+                                                 :src="m.image || m.immagine || ''"
+                                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                                 style="z-index:1;"
+                                                 alt=""
+                                                 @error="$el.style.display='none'">
+                                        </div>
+
+                                        <!-- Content -->
+                                        <div class="d-flex flex-column flex-grow-1 min-w-0">
+                                            <h6 class="fw-bold text-white mb-1 tracking-tight text-truncate fs-6" x-text="m.museum"></h6>
+                                            <div class="d-flex flex-wrap align-items-center gap-1.5 mb-1">
+                                                <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1" style="font-size:0.65rem;background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.28);" x-show="m.city || m.region">
+                                                    <i class="bi bi-geo-alt-fill"></i>
+                                                    <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
+                                                </span>
+                                                <span class="badge bg-secondary bg-opacity-40 text-white-50 px-2 py-0.5 d-inline-flex align-items-center gap-1" style="font-size:0.65rem;" x-show="m.mappa">
+                                                    <i class="bi bi-layers text-orange opacity-75"></i>
+                                                    <span x-text="(m.mappa&&m.mappa.piante?m.mappa.piante.length:0)+' piani · '+(m.mappa&&m.mappa.sale?m.mappa.sale.length:0)+' sale'"></span>
+                                                </span>
+                                            </div>
+                                            <p class="text-white-50 mb-0 line-clamp-1" style="font-size:0.75rem;" x-text="m.description || 'Nessuna descrizione.'"></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Soft Actions Pill Buttons -->
+                                    <div class="d-flex align-items-center gap-2 pt-2.5" style="border-top:1px solid rgba(255,255,255,0.07);">
+                                        <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                            <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
+                                        </button>
+                                        <button type="button" @click="deleteMuseum(m._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);">
+                                            <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
+                                        </button>
+                                    </div>
+
                                 </div>
-                            </div>
-                            
-                            <button type="button" @click="saveMuseum()" class="btn bg-orange text-white px-4 py-2 rounded-pill fw-bold shadow-lg d-none d-sm-inline-flex align-items-center gap-2 hover-lift">
-                                <i class="bi bi-cloud-arrow-up-fill"></i> Salva Museo
+                            </template>
+                        </div>
+
+                        <div x-show="hasMore()" class="text-center mt-4">
+                            <button @click="loadMore()" class="d-inline-flex align-items-center gap-2 rounded-pill px-4 py-2 hover-lift" style="font-size:0.79rem;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);transition:all .2s;">
+                                <i class="bi bi-chevron-down" style="font-size:0.73rem;"></i>
+                                <span>Carica altri <span x-text="Math.min(_pageSize, filteredMuseumList().length - visibleCount)"></span></span>
+                                <span style="font-size:0.66rem;background:rgba(249,115,22,.18);color:#f97316;border-radius:999px;padding:.1rem .5rem;" x-text="filteredMuseumList().length - visibleCount + ' rimasti'"></span>
                             </button>
                         </div>
 
-                        <form @submit.prevent="saveMuseum()" class="d-flex flex-column gap-4">
-                            
-                            <!-- Section 1: General Info -->
-                            <div class="museum-section-card">
-                                <div class="museum-section-header">
-                                    <i class="bi bi-info-circle-fill fs-5"></i> Informazioni Generali
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label text-white-50 small fw-bold">Nome del Museo *</label>
-                                    <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
-                                        x-model="currentMuseum.museum" required placeholder="Es: Galleria degli Uffizi">
-                                </div>
-                                
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label text-white-50 small fw-bold">Città</label>
-                                        <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
-                                            x-model="currentMuseum.city" placeholder="Es: Firenze">
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <label class="form-label text-white-50 small fw-bold">Provincia</label>
-                                        <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input text-uppercase"
-                                            x-model="currentMuseum.province" maxlength="2" placeholder="FI">
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <label class="form-label text-white-50 small fw-bold">Regione</label>
-                                        <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
-                                            x-model="currentMuseum.region" placeholder="Toscana">
-                                    </div>
-                                </div>
+                    </div>
 
+                </div>
+
+                <!-- STEP 2: MUSEUM EDITOR FORM VIEW -->
+                <div x-show="step === 'museum-form'">
+                    
+                    <!-- Page Header Bar -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-4 max-w-1200 mx-auto w-100">
+                        
+                        <!-- Left: Back Button & Title -->
+                        <div class="d-flex align-items-center gap-3 min-w-0">
+                            <button type="button" @click="step = 'museum-list'" class="btn btn-dark rounded-circle btn-icon-46 d-flex justify-content-center align-items-center flex-shrink-0 shadow-sm border border-secondary border-opacity-25 transition-transform transform hover-scale" title="Torna ai Musei">
+                                <i class="bi bi-arrow-left fs-5"></i>
+                            </button>
+                            <div class="min-w-0">
+                                <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill px-3 py-1 text-uppercase fw-bold fs-caption mb-1 d-inline-block">
+                                    <i class="bi bi-bank me-1"></i> Editor Museo
+                                </span>
+                                <h2 class="fw-bolder m-0 text-white tracking-tight text-truncate" x-text="currentMuseum._id ? currentMuseum.museum : 'Nuovo Museo'"></h2>
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Save Button -->
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            <button type="button" @click="saveMuseum()" class="btn bg-orange text-white px-4 py-2.5 rounded-pill fw-bold shadow-lg d-inline-flex align-items-center gap-2 transition-transform transform hover-scale">
+                                <i class="bi bi-cloud-arrow-up-fill fs-5"></i> <span>Salva Museo</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Museum Hero Cover Banner -->
+                    <div class="glass-card rounded-4 overflow-hidden mb-4 border border-secondary border-opacity-25 max-w-1200 mx-auto position-relative shadow-lg" style="min-height: 180px;">
+                        <template x-if="currentMuseum.image || currentMuseum.immagine">
+                            <div class="position-relative w-100 hero-image-container" style="height: 180px;">
+                                <img :src="currentMuseum.image || currentMuseum.immagine" alt="Cover Museo" class="w-100 h-100 object-fit-cover"
+                                     @error="$event.target.closest('.glass-card').querySelector('.hero-image-container').style.display='none'; $event.target.closest('.glass-card').querySelector('.hero-fallback-banner').classList.remove('d-none'); $event.target.closest('.glass-card').querySelector('.hero-fallback-banner').classList.add('d-flex');">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 60%, transparent 100%);">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-orange text-white p-3 d-flex align-items-center justify-content-center shadow-lg icon-box-48 flex-shrink-0">
+                                            <i class="bi bi-bank fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="fw-bold text-white mb-0" x-text="currentMuseum.museum || 'Nuovo Museo'"></h3>
+                                            <p class="text-white-50 small mb-0 d-flex align-items-center gap-1.5">
+                                                <i class="bi bi-geo-alt-fill text-orange"></i>
+                                                <span x-text="(currentMuseum.city || 'Città non specificata') + (currentMuseum.province ? ' (' + currentMuseum.province + ')' : '') + (currentMuseum.region ? ' • ' + currentMuseum.region : '')"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Standard Orange Hero Fallback -->
+                        <div class="hero-fallback-banner position-relative w-100 bg-gradient-orange p-4 text-center flex-column align-items-center justify-content-center card-glow-orange overflow-hidden"
+                             style="min-height: 140px;"
+                             :class="(currentMuseum.image || currentMuseum.immagine) ? 'd-none' : 'd-flex'">
+                            <div class="position-absolute top-50 start-50 translate-middle opacity-15 pe-none">
+                                <i class="bi bi-bank text-white" style="font-size: 7rem;"></i>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 position-relative z-1 text-start w-100 max-w-1000 px-md-3">
+                                <div class="rounded-circle bg-white bg-opacity-20 text-white p-3 d-flex align-items-center justify-content-center shadow-lg flex-shrink-0 icon-box-48">
+                                    <i class="bi bi-bank fs-3 text-white"></i>
+                                </div>
                                 <div>
-                                    <label class="form-label text-white-50 small fw-bold">Descrizione</label>
-                                    <textarea class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
-                                        x-model="currentMuseum.description" rows="3" placeholder="Scrivi una breve presentazione del museo per i visitatori..."></textarea>
+                                    <h3 class="fw-black text-white m-0 tracking-tight" x-text="currentMuseum.museum || 'Nuovo Museo'"></h3>
+                                    <p class="text-white opacity-90 small m-0 mt-0.5 d-flex align-items-center gap-1">
+                                        <i class="bi bi-geo-alt-fill text-white opacity-75"></i>
+                                        <span x-text="(currentMuseum.city || 'Città non specificata') + (currentMuseum.province ? ' (' + currentMuseum.province + ')' : '') + (currentMuseum.region ? ' • ' + currentMuseum.region : '')"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs: Segmented Control (PC Desktop) & Mobile Hamburger Dropdown Bar (Smartphones/Android/Tablets) -->
+                    
+                    <!-- PC Desktop Navigation -->
+                    <div class="d-none d-lg-flex w-100 justify-content-center mb-4 max-w-1200 mx-auto">
+                        <div class="segmented-control shadow-sm">
+                            <div class="segmented-slider" :class="{ 'translate-x-0': formTab === 'info', 'translate-x-100': formTab === 'map', 'translate-x-200': formTab === 'poi' }"></div>
+                            
+                            <button type="button" class="segmented-tab" :class="{'active': formTab === 'info'}" @click="formTab = 'info'">
+                                <i class="bi bi-info-circle me-2"></i><span>Informazioni Generali</span>
+                            </button>
+                            <button type="button" class="segmented-tab" :class="{'active': formTab === 'map'}" @click="formTab = 'map'">
+                                <i class="bi bi-map me-2"></i><span>Piantine & Piani</span>
+                            </button>
+                            <button type="button" class="segmented-tab" :class="{'active': formTab === 'poi'}" @click="formTab = 'poi'">
+                                <i class="bi bi-chat-square-quote me-2"></i><span>Indicazioni (POI)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Navigation (Hamburger Dropdown Bar for Smartphones & Android) -->
+                    <div class="d-flex d-lg-none w-100 flex-column mb-4 max-w-1200 mx-auto position-relative" x-data="{ mobileMenuOpen: false }">
+                        <div @click="mobileMenuOpen = !mobileMenuOpen" 
+                            class="w-100 glass-card border border-secondary border-opacity-25 rounded-4 p-2.5 d-flex align-items-center justify-content-between text-white shadow-sm cursor-pointer user-select-none active-scale">
+                            
+                            <div class="d-flex align-items-center gap-3 min-w-0">
+                                <div class="rounded-3 bg-orange text-white p-2 d-flex align-items-center justify-content-center icon-box-38 shadow-sm">
+                                    <i class="bi bi-list fs-4"></i>
+                                </div>
+                                <div class="d-flex flex-column text-start min-w-0">
+                                    <span class="text-white-50 text-uppercase tracking-wider font-monospace lh-1 fs-065">Sezione Editor</span>
+                                    <div class="d-flex align-items-center gap-2 fw-bold text-white fs-6 mt-1 text-truncate">
+                                        <i class="bi" :class="{ 'bi-info-circle text-orange': formTab === 'info', 'bi-map text-info': formTab === 'map', 'bi-chat-square-quote text-warning': formTab === 'poi' }"></i>
+                                        <span x-text="formTab === 'info' ? 'Informazioni Generali' : (formTab === 'map' ? 'Piantine & Piani' : 'Indicazioni Visitatori (POI)')"></span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Section 2: Media & Image Cover -->
-                            <div class="museum-section-card">
-                                <div class="museum-section-header">
-                                    <i class="bi bi-image-fill fs-5"></i> Immagine di Copertina
+                            <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-2">
+                                <span class="badge bg-secondary bg-opacity-40 border border-secondary border-opacity-25 text-white-50 rounded-pill px-2.5 py-1.5 fs-075">
+                                    <span x-text="formTab === 'info' ? '1 / 3' : (formTab === 'map' ? '2 / 3' : '3 / 3')"></span>
+                                </span>
+                                <div class="rounded-circle bg-white bg-opacity-10 d-flex align-items-center justify-content-center icon-box-30">
+                                    <i class="bi bi-chevron-down text-white-50 transition-transform duration-200" :class="{ 'rotate-180': mobileMenuOpen }"></i>
                                 </div>
-                                
+                            </div>
+                        </div>
+
+                        <!-- Mobile Dropdown Menu -->
+                        <div x-show="mobileMenuOpen" 
+                            @click.outside="mobileMenuOpen = false"
+                            x-transition
+                            class="position-absolute top-100 start-0 end-0 mt-2 p-2 glass-card rounded-4 border border-secondary border-opacity-25 shadow-2xl z-50 editor-top-nav">
+                            
+                            <div class="d-flex flex-column gap-2">
+                                <div @click="formTab = 'info'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'info' ? 'bg-orange bg-opacity-20 text-white border border-orange border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center icon-box-34"
+                                            :class="formTab === 'info' ? 'bg-orange text-white shadow' : 'bg-secondary bg-opacity-25 text-white-50'">
+                                            <i class="bi bi-info-circle fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Informazioni Generali</div>
+                                            <div class="text-white-50 fs-072">Nome, città, indirizzo e descrizione</div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-orange fs-5" x-show="formTab === 'info'"></i>
+                                </div>
+
+                                <div @click="formTab = 'map'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'map' ? 'bg-info bg-opacity-20 text-white border border-info border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center icon-box-34"
+                                            :class="formTab === 'map' ? 'bg-info text-white shadow' : 'bg-secondary bg-opacity-25 text-white-50'">
+                                            <i class="bi bi-map fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Piantine & Piani</div>
+                                            <div class="text-white-50 fs-072">Copertina, mappe e posizionamento pin</div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-info fs-5" x-show="formTab === 'map'"></i>
+                                </div>
+
+                                <div @click="formTab = 'poi'; mobileMenuOpen = false" 
+                                    class="w-100 rounded-3 p-2.5 d-flex align-items-center justify-content-between cursor-pointer transition-all user-select-none"
+                                    :class="formTab === 'poi' ? 'bg-warning bg-opacity-20 text-white border border-warning border-opacity-40 fw-bold' : 'text-white-50 hover-bg-dark-light'">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center icon-box-34"
+                                            :class="formTab === 'poi' ? 'bg-warning text-dark shadow' : 'bg-secondary bg-opacity-25 text-white-50'">
+                                            <i class="bi bi-chat-square-quote fs-6"></i>
+                                        </div>
+                                        <div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">Indicazioni (POI)</div>
+                                            <div class="text-white-50 fs-072">Risposte ai visitatori per toilette, bar...</div>
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill text-warning fs-5" x-show="formTab === 'poi'"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FORM CONTENT AREA -->
+                    <form @submit.prevent="saveMuseum()" class="max-w-1200 mx-auto">
+                        
+                        <!-- TAB 1: INFORMAZIONI GENERALI -->
+                        <div x-show="formTab === 'info'">
+                            <div class="glass-card rounded-4 p-4 p-md-5">
+                                <div class="museum-section-header mb-4 pb-3 border-bottom border-white border-opacity-10">
+                                    <i class="bi bi-info-circle-fill fs-5 text-orange me-2"></i> Dati del Museo
+                                </div>
+
+                                <div class="d-flex flex-column gap-4">
+                                    <!-- Nome Museo -->
+                                    <div>
+                                        <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Nome del Museo *</label>
+                                        <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
+                                            x-model="currentMuseum.museum" required placeholder="Es: Galleria degli Uffizi">
+                                    </div>
+                                    
+                                    <!-- Location details -->
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-6">
+                                            <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Città</label>
+                                            <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
+                                                x-model="currentMuseum.city" placeholder="Es: Firenze">
+                                        </div>
+                                        <div class="col-6 col-md-3">
+                                            <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Provincia</label>
+                                            <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input text-uppercase"
+                                                x-model="currentMuseum.province" maxlength="2" placeholder="FI">
+                                        </div>
+                                        <div class="col-6 col-md-3">
+                                            <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Regione</label>
+                                            <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
+                                                x-model="currentMuseum.region" placeholder="Toscana">
+                                        </div>
+                                    </div>
+
+                                    <!-- Indirizzo -->
+                                    <div>
+                                        <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Indirizzo Completo</label>
+                                        <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
+                                            x-model="currentMuseum.address" placeholder="Es: Piazzale degli Uffizi, 6, 50122 Firenze FI">
+                                    </div>
+
+                                    <!-- Descrizione -->
+                                    <div>
+                                        <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">Descrizione Presentazione</label>
+                                        <textarea class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-4 shadow-none premium-input"
+                                            x-model="currentMuseum.description" rows="4" placeholder="Scrivi una presentazione accattivante del museo per i visitatori..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: PIANTINE & PIANI -->
+                        <div x-show="formTab === 'map'">
+                            
+                            <!-- Immagine di Copertina -->
+                            <div class="glass-card rounded-4 p-4 p-md-5 mb-4">
+                                <div class="museum-section-header mb-4 pb-3 border-bottom border-white border-opacity-10">
+                                    <i class="bi bi-image-fill fs-5 text-orange me-2"></i> Copertina Museo
+                                </div>
+
                                 <div class="mb-3">
-                                    <label class="form-label text-white-50 small fw-bold">URL Immagine o Caricamento File</label>
+                                    <label class="form-label tracking-wide small text-uppercase fw-bold text-white-50 mb-2">URL Immagine o Caricamento File</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-start-3 premium-input" 
+                                        <input type="text" class="form-control bg-dark border border-secondary border-opacity-25 text-white p-3 rounded-start-4 shadow-none premium-input" 
                                             placeholder="https://..." x-model="currentMuseum.image">
-                                        <label class="btn btn-outline-orange px-4 cursor-pointer-label rounded-end-3 d-flex align-items-center gap-2 fw-bold">
+                                        <label class="btn bg-orange text-white px-4 cursor-pointer-label rounded-end-4 d-flex align-items-center gap-2 fw-bold shadow-sm">
                                             <i class="bi bi-cloud-upload-fill"></i> Carica File
                                             <input type="file" class="d-none" accept="image/*" @change="uploadImage">
                                         </label>
@@ -327,9 +626,10 @@
                                 </div>
 
                                 <template x-if="currentMuseum.image || currentMuseum.immagine">
-                                    <div class="museum-image-preview-container mt-3">
-                                        <img :src="currentMuseum.image || currentMuseum.immagine" alt="Anteprima Museo">
-                                        <div class="museum-image-overlay">
+                                    <div class="museum-image-preview-container tab-image-preview-box mt-3 overflow-hidden rounded-4 border border-secondary border-opacity-25 position-relative">
+                                        <img :src="currentMuseum.image || currentMuseum.immagine" alt="Anteprima Museo" class="w-100 object-fit-cover" style="max-height: 320px;"
+                                             @error="$event.target.closest('.museum-image-preview-container').style.display='none'; $event.target.closest('.glass-card').querySelector('.tab-fallback-banner').classList.remove('d-none'); $event.target.closest('.glass-card').querySelector('.tab-fallback-banner').classList.add('d-flex');">
+                                        <div class="museum-image-overlay p-3 position-absolute top-0 end-0">
                                             <button type="button" @click="currentMuseum.image = ''; if(currentMuseum.immagine) currentMuseum.immagine = '';" 
                                                 class="btn btn-danger btn-sm rounded-circle shadow-lg" title="Rimuovi immagine">
                                                 <i class="bi bi-trash3-fill"></i>
@@ -337,63 +637,71 @@
                                         </div>
                                     </div>
                                 </template>
+
+                                <div class="tab-fallback-banner museum-image-preview-container mt-3 overflow-hidden rounded-4 border border-orange border-opacity-30 position-relative bg-gradient-orange p-4 text-center flex-column align-items-center justify-content-center shadow-lg card-glow-orange"
+                                     style="min-height: 140px;"
+                                     :class="(currentMuseum.image || currentMuseum.immagine) ? 'd-none' : 'd-flex'">
+                                    <div class="position-absolute top-50 start-50 translate-middle opacity-15 pe-none">
+                                        <i class="bi bi-bank text-white" style="font-size: 6rem;"></i>
+                                    </div>
+                                    <div class="rounded-circle bg-white bg-opacity-20 text-white p-2.5 mb-1 d-flex align-items-center justify-content-center shadow-lg icon-box-44 position-relative z-1">
+                                        <i class="bi bi-bank fs-4 text-white"></i>
+                                    </div>
+                                </div>
                             </div>
 
-                            
-                            <!-- Section 3: Interactive Floor Plans -->
-                            <div class="museum-section-card">
+                            <!-- Interactive Floor Plans -->
+                            <div class="glass-card rounded-4 p-4 p-md-5">
                                 <div class="d-flex align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-white border-opacity-10">
                                     <div class="museum-section-header mb-0 pb-0 border-0">
-                                        <i class="bi bi-map-fill fs-5"></i> Piante dei Piani del Museo
+                                        <i class="bi bi-map-fill fs-5 text-orange me-2"></i> Piante dei Piani del Museo
                                     </div>
-                                    <button type="button" @click="addPiano()"
-                                        class="btn btn-sm btn-outline-orange rounded-pill px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift flex-shrink-0">
+                                    <button type="button" @click="addPiano()" class="btn btn-sm bg-orange text-white rounded-pill px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift flex-shrink-0">
                                         <i class="bi bi-plus-circle-fill"></i> Aggiungi Piano
                                     </button>
                                 </div>
-                            
+
+                                <!-- Empty Floor Plans State -->
                                 <template x-if="!currentMuseum.mappa || !currentMuseum.mappa.piante || currentMuseum.mappa.piante.length === 0">
-                                    <div class="bg-dark bg-opacity-40 p-4 rounded-3 border border-secondary border-opacity-25 text-center">
-                                        <i class="bi bi-map text-white-50 fs-3 d-block mb-2"></i>
-                                        <p class="small text-white-50 m-0">Nessuna pianta inserita. Clicca su "Aggiungi Piano" per definire i livelli del museo.</p>
+                                    <div class="bg-dark bg-opacity-40 p-5 rounded-4 border border-secondary border-opacity-25 text-center my-3">
+                                        <i class="bi bi-map text-white-50 fs-1 d-block mb-3 opacity-50"></i>
+                                        <h5 class="fw-bold text-white mb-1">Nessuna pianta inserita</h5>
+                                        <p class="small text-white-50 m-0 mb-3">Clicca su "Aggiungi Piano" per creare il primo livello del museo e caricare la piantina.</p>
+                                        <button type="button" @click="addPiano()" class="btn btn-sm btn-outline-orange rounded-pill px-4 py-2 fw-bold">
+                                            <i class="bi bi-plus-circle-fill me-1"></i> Aggiungi Piano Ora
+                                        </button>
                                     </div>
                                 </template>
-                            
+
+                                <!-- Floor Plans Loop -->
                                 <template x-for="(p, i) in (currentMuseum.mappa ? currentMuseum.mappa.piante : [])" :key="i">
                                     <div class="bg-dark bg-opacity-60 border border-secondary border-opacity-25 rounded-4 p-4 mb-4 shadow-sm">
-                            
-                                        <!-- Intestazione del piano -->
+                                        
+                                        <!-- Intestazione Piano -->
                                         <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
-                                            <h6 class="fw-bold text-white m-0 d-flex align-items-center gap-2">
+                                            <h5 class="fw-bold text-white m-0 d-flex align-items-center gap-2">
                                                 <i class="bi bi-layers-half text-orange"></i>
                                                 <span x-text="p.nome || ('Piano ' + p.piano)"></span>
-                                            </h6>
-                                            <button type="button" @click="removePianoConSale(i)"
-                                                class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina questo piano">
+                                            </h5>
+                                            <button type="button" @click="removePianoConSale(i)" class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina questo piano">
                                                 <i class="bi bi-trash3-fill"></i>
                                             </button>
                                         </div>
-                            
-                                        <!-- Dati del piano -->
+
+                                        <!-- Dati Piano -->
                                         <div class="row g-3 mb-4">
                                             <div class="col-4 col-md-2">
-                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoNum' + i">Piano N°</label>
-                                                <input type="number" :id="'pianoNum' + i"
-                                                    class="form-control bg-dark border-secondary text-white rounded-3 fw-bold text-center"
-                                                    x-model.number="p.piano">
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2">Piano N°</label>
+                                                <input type="number" class="form-control bg-dark border-secondary text-white rounded-3 fw-bold text-center" x-model.number="p.piano">
                                             </div>
                                             <div class="col-8 col-md-4">
-                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoNome' + i">Nome Piano</label>
-                                                <input type="text" :id="'pianoNome' + i"
-                                                    class="form-control bg-dark border-secondary text-white rounded-3"
-                                                    x-model="p.nome" placeholder="Es: Piano Terra">
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2">Nome Piano</label>
+                                                <input type="text" class="form-control bg-dark border-secondary text-white rounded-3" x-model="p.nome" placeholder="Es: Piano Terra">
                                             </div>
                                             <div class="col-12 col-md-6">
-                                                <label class="form-label text-white-50 x-small fw-bold mb-2" :for="'pianoImg' + i">Immagine Piantina</label>
+                                                <label class="form-label text-white-50 x-small fw-bold mb-2">Immagine Piantina</label>
                                                 <div class="input-group">
-                                                    <input type="text" :id="'pianoImg' + i"
-                                                        class="form-control bg-dark border-secondary text-white rounded-start-3"
-                                                        placeholder="Inserisci URL..." x-model="p.immagine">
+                                                    <input type="text" class="form-control bg-dark border-secondary text-white rounded-start-3" placeholder="Inserisci URL..." x-model="p.immagine">
                                                     <label class="btn btn-outline-orange cursor-pointer-label rounded-end-3 px-3 d-flex align-items-center gap-2 mb-0">
                                                         <i class="bi bi-upload"></i> File
                                                         <input type="file" class="d-none" accept="image/*" @change="uploadPianta($event, i)">
@@ -401,21 +709,20 @@
                                                 </div>
                                             </div>
                                         </div>
-                            
-                                        <!-- Pianta + punti -->
+
+                                        <!-- Pianta + Pins Interattivi -->
                                         <template x-if="p.immagine">
                                             <div>
-                                                <!-- Pianta cliccabile con i pin -->
+                                                <!-- Canvas / Immagine Mappa Cliccabile -->
                                                 <div class="position-relative bg-black bg-opacity-30 rounded-3 overflow-hidden border"
-                                                    :class="(pinMode !== null && pinModePiano === p.piano)
-                                                        ? 'border-2 border-orange' : 'border-white border-opacity-10'">
+                                                    :class="(pinMode !== null && pinModePiano === p.piano) ? 'border-2 border-orange' : 'border-white border-opacity-10'">
 
                                                     <img :src="p.immagine" @click="mappaClick($event, p.piano)"
                                                         :alt="'Pianta di ' + (p.nome || ('piano ' + p.piano))"
                                                         class="w-100 d-block"
                                                         :class="(pinMode !== null && pinModePiano === p.piano) ? 'cursor-pointer opacity-50' : ''">
 
-                                                    <!-- Istruzione sovrapposta, solo quando l'azione è armata -->
+                                                    <!-- Istruzione armamento azione -->
                                                     <div x-show="pinMode !== null && pinModePiano === p.piano" x-cloak
                                                         class="position-absolute top-50 start-50 translate-middle text-center px-4 pe-none">
                                                         <i class="bi bi-cursor-fill text-orange fs-1 d-block mb-2"></i>
@@ -427,6 +734,7 @@
                                                         </p>
                                                     </div>
 
+                                                    <!-- Pin Marker Posizionati -->
                                                     <template x-for="o in salePiano(p.piano)" :key="o.idx">
                                                         <button type="button" @click.stop="selezionaSala(o.idx)"
                                                             class="btn btn-sm btn-icon-32 rounded-circle position-absolute translate-middle d-flex align-items-center justify-content-center shadow p-0"
@@ -438,11 +746,11 @@
                                                     </template>
                                                 </div>
 
-                                                <!-- Bottoni sotto l'immagine -->
+                                                <!-- Controls Pin -->
                                                 <div class="d-flex justify-content-center gap-2 my-3">
                                                     <button type="button" @click="apriPinModal(p.piano)"
                                                         x-show="pinMode === null || pinModePiano !== p.piano"
-                                                        class="btn btn-orange rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift shadow-sm">
+                                                        class="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center gap-2 hover-lift shadow-sm">
                                                         <i class="bi bi-pin-map-fill"></i> Aggiungi punto
                                                     </button>
                                                     <button type="button" @click="annullaPin()"
@@ -451,177 +759,167 @@
                                                         Annulla
                                                     </button>
                                                 </div>
-                            
+
                                                 <!-- Elenco dei punti del piano -->
-                                                <div class="d-flex flex-column gap-2">
+                                                <div class="d-flex flex-column gap-2 mt-3">
                                                     <template x-for="o in salePiano(p.piano)" :key="o.idx">
                                                         <div class="d-flex flex-wrap align-items-center gap-2 bg-dark bg-opacity-40 p-3 rounded-3 border"
                                                             :class="salaSelezionata === o.idx ? 'border-orange' : 'border-secondary border-opacity-25'">
-                            
+
                                                             <span class="btn-icon-32 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                                                 :class="salaSelezionata === o.idx ? 'bg-orange text-white' : 'bg-slate text-white'">
                                                                 <i class="bi" :class="iconaPin(o.s.tipo)"></i>
                                                             </span>
-                            
-                                                            <label class="visually-hidden" :for="'pinNome' + o.idx">Nome del punto</label>
-                                                            <input type="text" :id="'pinNome' + o.idx"
-                                                                class="form-control form-control-sm bg-dark border-secondary text-white flex-grow-1 min-w-0"
+
+                                                            <input type="text" class="form-control form-control-sm bg-dark border-secondary text-white flex-grow-1 min-w-0"
                                                                 x-model="o.s.nome" placeholder="Nome del punto">
-                            
-                                                            <label class="visually-hidden" :for="'pinTipo' + o.idx">Tipo del punto</label>
-                                                            <select :id="'pinTipo' + o.idx"
-                                                                class="form-select form-select-sm bg-dark border-secondary text-white w-auto flex-shrink-0"
+
+                                                            <select class="form-select form-select-sm bg-dark border-secondary text-white w-auto flex-shrink-0"
                                                                 x-model="o.s.tipo">
                                                                 <template x-for="t in pinTipi" :key="t.tipo">
                                                                     <option :value="t.tipo" x-text="t.label"></option>
                                                                 </template>
                                                             </select>
-                            
+
                                                             <button type="button" @click="armaSpostamento(o.idx, p.piano)"
                                                                 class="btn btn-sm btn-outline-light rounded-3 flex-shrink-0" title="Sposta sulla pianta">
                                                                 <i class="bi bi-arrows-move"></i>
                                                             </button>
-                            
+
                                                             <button type="button" @click="removeSala(o.idx)"
                                                                 class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina punto">
                                                                 <i class="bi bi-trash3-fill"></i>
                                                             </button>
                                                         </div>
                                                     </template>
-                            
-                                                    <p x-show="salePiano(p.piano).length === 0" class="small text-white-50 m-0 fst-italic text-center">
-                                                        Nessun punto posizionato su questo piano.
+
+                                                    <p x-show="salePiano(p.piano).length === 0" class="small text-white-50 m-0 fst-italic text-center py-2">
+                                                        Nessun punto posizionato su questo piano. Clicca su "Aggiungi punto" in alto.
                                                     </p>
                                                 </div>
 
                                             </div>
                                         </template>
-                            
+
                                         <template x-if="!p.immagine">
                                             <p class="small text-white-50 m-0 fst-italic text-center py-3">
-                                                Carica l'immagine della piantina per poterci posizionare i punti.
+                                                Carica l'immagine della piantina per poterci posizionare i punti e le sale.
                                             </p>
                                         </template>
-                            
+
                                     </div>
                                 </template>
-                            </div>
 
-                            <!-- Section 4: POI Visitor Questions -->
-                            <div class="museum-section-card">
-                                <div class="museum-section-header">
-                                    <i class="bi bi-chat-square-quote-fill fs-5"></i> Risposte ai Visitatori (Punti di Interesse)
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: INDICAZIONI VISITATORI (POI) -->
+                        <div x-show="formTab === 'poi'">
+                            <div class="glass-card rounded-4 p-4 p-md-5">
+                                <div class="museum-section-header mb-2">
+                                    <i class="bi bi-chat-square-quote-fill fs-5 text-orange me-2"></i> Risposte ai Visitatori (Punti di Interesse)
                                 </div>
-                                <p class="small text-white-50 mb-3">
-                                    Per ogni punto che non è una sala puoi scrivere l'indicazione da dare ai
-                                    visitatori. Le risposte lasciate vuote non verranno mostrate.
+                                <p class="small text-white-50 mb-4 pb-2 border-bottom border-white border-opacity-10">
+                                    Per ogni punto d'interesse che non è una semplice sala (es: servizi igienici, bar, uscite) puoi indicare la risposta guidata da mostrare ai visitatori nell'app. Le risposte lasciate vuote non verranno mostrate.
                                 </p>
 
                                 <div class="d-flex flex-column gap-3">
                                     <template x-for="o in puntiConDomanda" :key="o.idx">
-                                        <div class="bg-dark bg-opacity-40 p-3 rounded-3 border border-secondary border-opacity-25">
-                                            <label class="form-label text-white small fw-bold mb-2 d-flex align-items-center gap-2"
-                                                :for="'risposta' + o.idx">
+                                        <div class="bg-dark bg-opacity-40 p-3 rounded-4 border border-secondary border-opacity-25">
+                                            <label class="form-label text-white small fw-bold mb-2 d-flex align-items-center gap-2">
                                                 <span class="btn-icon-32 rounded-circle bg-orange-subtle text-orange d-flex align-items-center justify-content-center flex-shrink-0">
                                                     <i class="bi" :class="iconaPin(o.s.tipo)"></i>
                                                 </span>
                                                 <span x-text="domandaPin(o.s.tipo)"></span>
-                                                <span class="badge bg-slate text-white fw-normal" x-text="o.s.nome"></span>
+                                                <span class="badge bg-secondary bg-opacity-40 text-white fw-normal" x-text="o.s.nome"></span>
                                             </label>
-                                            <input type="text" :id="'risposta' + o.idx"
-                                                class="form-control bg-dark border-secondary text-white rounded-3 premium-input"
-                                                placeholder="Es: in fondo al corridoio, a destra della scala"
+                                            <input type="text" class="form-control bg-dark border-secondary text-white rounded-3 premium-input"
+                                                placeholder="Es: in fondo al corridoio principale, a destra della scalinata"
                                                 x-model="o.s.risposta">
                                         </div>
                                     </template>
 
-                                    <p x-show="puntiConDomanda.length === 0" class="small text-white-50 m-0 fst-italic">
-                                        Aggiungi dei punti sulla pianta (toilette, bar, uscite…) per poter
-                                        scrivere le indicazioni per i visitatori.
-                                    </p>
+                                    <div x-show="puntiConDomanda.length === 0" class="text-center py-4">
+                                        <i class="bi bi-info-circle fs-3 text-white-50 d-block mb-2 opacity-50"></i>
+                                        <p class="small text-white-50 m-0">Aggiungi dei punti specifici sulla pianta (toilette, bar, uscite, ascensori…) per poter scrivere le indicazioni dirette ai visitatori.</p>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Action Buttons -->
-                            <div class="d-flex align-items-center gap-3 pt-3">
-                                <button type="button" @click="step = 'museum-list'"
-                                    class="btn btn-dark btn-lg rounded-pill px-4 fw-bold flex-grow-1 border border-secondary border-opacity-25">
-                                    <i class="bi bi-x-circle me-1"></i> Annulla
-                                </button>
-                                <button type="submit" 
-                                    class="btn bg-orange text-white btn-lg rounded-pill px-5 fw-bold flex-grow-2 shadow-lg hover-lift d-flex align-items-center justify-content-center gap-2">
-                                    <i class="bi bi-check-circle-fill"></i> Salva Museo
-                                </button>
-                            </div>
+                        <!-- Form Bottom Actions Footer -->
+                        <div class="d-flex align-items-center justify-content-end gap-3 pt-4 border-top border-secondary border-opacity-25 max-w-1200 mx-auto mt-4">
+                            <button type="button" @click="step = 'museum-list'" class="btn btn-dark rounded-pill px-4 py-2.5 fw-bold border border-secondary border-opacity-25 hover-lift">
+                                <i class="bi bi-x-circle me-1.5"></i> Annulla
+                            </button>
+                            <button type="submit" class="btn bg-orange text-white rounded-pill px-5 py-2.5 fw-bold shadow-lg hover-lift d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-cloud-arrow-up-fill fs-5"></i> Salva Museo
+                            </button>
+                        </div>
 
-                        </form>
-                    </div>
+                    </form>
                 </div>
-
 
             </div>
         </main>
     </div>
 
-    
-<!-- MODALE NUOVO PUNTO SULLA PIANTA -->
-<div class="modal fade modal-backdrop-dark" tabindex="-1"
-    :class="{ 'show d-block': isPinModalOpen }" x-show="isPinModalOpen" x-cloak x-transition>
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow-lg bg-dark text-white">
+    <!-- MODALE NUOVO PUNTO SULLA PIANTA -->
+    <div class="modal fade modal-backdrop-dark" tabindex="-1" :class="{ 'show d-block': isPinModalOpen }" x-show="isPinModalOpen" x-cloak x-transition>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="glass-card bg-dark text-white rounded-4 border border-secondary border-opacity-25 shadow-2xl modal-content">
 
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                    <i class="bi bi-pin-map-fill text-orange"></i> Nuovo punto sulla pianta
-                </h5>
-                <button type="button" class="btn-close btn-close-white" @click="chiudiPinModal()"></button>
-            </div>
-
-            <div class="modal-body">
-                <p class="text-white-50 small fw-bold text-uppercase mb-2">1. Che cos'è?</p>
-                <div class="row g-2 mb-4">
-                    <template x-for="t in pinTipi" :key="t.tipo">
-                        <div class="col-6 col-sm-4">
-                            <button type="button" @click="scegliTipoPin(t.tipo)"
-                                class="btn w-100 h-100 rounded-3 py-3 px-2 d-flex flex-column align-items-center justify-content-center gap-2 border"
-                                :class="pinDraft.tipo === t.tipo ? 'bg-orange text-white border-orange' : 'bg-dark text-white-50 border-secondary border-opacity-25'">
-                                <i class="bi fs-4" :class="t.icona"></i>
-                                <span class="small fw-bold lh-sm text-center" x-text="t.label"></span>
-                            </button>
-                        </div>
-                    </template>
+                <div class="modal-header border-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                        <i class="bi bi-pin-map-fill text-orange"></i> Nuovo punto sulla pianta
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @click="chiudiPinModal()"></button>
                 </div>
 
-                <p class="text-white-50 small fw-bold text-uppercase mb-2">2. Come si chiama?</p>
-                <label class="visually-hidden" for="pinDraftNome">Nome del punto</label>
-                <input type="text" id="pinDraftNome"
-                    class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
-                    x-model="pinDraft.nome" placeholder="Es: Sala 1"
-                    @keydown.enter.prevent="confermaPinDraft()">
-                <p class="small text-white-50 mt-2 mb-0 lh-sm">
-                    Per le sale usa lo stesso nome che hai dato alle opere, così il
-                    marketplace può mostrare cosa contiene ogni stanza.
-                </p>
-            </div>
+                <div class="modal-body p-4">
+                    <p class="text-white-50 small fw-bold text-uppercase mb-2 tracking-wide">1. Seleziona Tipologia</p>
+                    <div class="row g-2 mb-4">
+                        <template x-for="t in pinTipi" :key="t.tipo">
+                            <div class="col-6 col-sm-4">
+                                <button type="button" @click="scegliTipoPin(t.tipo)"
+                                    class="btn w-100 h-100 rounded-3 py-3 px-2 d-flex flex-column align-items-center justify-content-center gap-2 border transition-all"
+                                    :class="pinDraft.tipo === t.tipo ? 'bg-orange text-white border-orange shadow' : 'bg-dark text-white-50 border-secondary border-opacity-25 hover-bg-dark-light'">
+                                    <i class="bi fs-4" :class="t.icona"></i>
+                                    <span class="small fw-bold lh-sm text-center" x-text="t.label"></span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
 
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-dark rounded-pill px-4 border border-secondary border-opacity-25"
-                    @click="chiudiPinModal()">Annulla</button>
-                <button type="button" class="btn btn-orange rounded-pill px-4 fw-bold d-inline-flex align-items-center gap-2"
-                    @click="confermaPinDraft()">
-                    <i class="bi bi-cursor-fill"></i> Posiziona sulla pianta
-                </button>
-            </div>
+                    <p class="text-white-50 small fw-bold text-uppercase mb-2 tracking-wide">2. Nome del Punto</p>
+                    <input type="text" class="form-control bg-dark border-secondary text-white p-3 rounded-3 premium-input"
+                        x-model="pinDraft.nome" placeholder="Es: Sala 1" @keydown.enter.prevent="confermaPinDraft()">
+                    <p class="small text-white-50 mt-2 mb-0 lh-sm">
+                        Per le sale usa lo stesso nome che hai assegnato alle opere, per la corretta associazione nel catalogo.
+                    </p>
+                </div>
 
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-dark rounded-pill px-4 border border-secondary border-opacity-25" @click="chiudiPinModal()">Annulla</button>
+                    <button type="button" class="btn bg-orange text-white rounded-pill px-4 fw-bold d-inline-flex align-items-center gap-2 shadow-lg" @click="confermaPinDraft()">
+                        <i class="bi bi-cursor-fill"></i> Posiziona sulla pianta
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
-    
 
-    
+    <!-- Floating Action Button (FAB) for Mobile (Nuovo Museo) -->
+    <button type="button" @click="formTab = 'info'; openMuseumForm();" 
+            x-show="step === 'museum-list'"
+            :class="step === 'museum-list' ? 'd-flex' : 'd-none'"
+            class="d-md-none position-fixed rounded-circle text-white border-0 fab-btn-mobile align-items-center justify-content-center"
+            title="Nuovo Museo">
+        <i class="bi bi-plus-lg fs-3"></i>
+    </button>
 
-
-    <!-- Mobile Navigation -->
+    <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-nav">
         <a href="/editor/dashboard" class="mobile-nav-item">
             <i class="bi bi-grid-fill"></i>

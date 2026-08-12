@@ -3,6 +3,8 @@ function artworkManager() {
         // UI STATE
         isReady: false,
         isLoggedIn: false,
+        isLoaded: false,
+        isLoadingArtworks: false,
         permissions: '',
         propic: '',
         username: '',
@@ -12,6 +14,72 @@ function artworkManager() {
         museums: [],
         artworks: [],
         selectedMuseumId: '',
+        artworkSearch: '',
+
+        museumSearch: '',
+        selectedCity: '',
+
+        availableCities() {
+            if (!this.museums || !Array.isArray(this.museums)) return [];
+            const cities = this.museums
+                .map(m => m.city)
+                .filter(c => c && c.trim() !== '')
+                .map(c => c.trim());
+            return [...new Set(cities)].sort();
+        },
+
+        filteredMuseumList() {
+            let list = this.museums || [];
+            if (this.selectedCity) {
+                list = list.filter(m => m.city && m.city.toLowerCase() === this.selectedCity.toLowerCase());
+            }
+            if (this.museumSearch) {
+                const q = this.museumSearch.toLowerCase();
+                list = list.filter(m => 
+                    (m.museum && m.museum.toLowerCase().includes(q)) ||
+                    (m.city && m.city.toLowerCase().includes(q)) ||
+                    (m.address && m.address.toLowerCase().includes(q)) ||
+                    (m.region && m.region.toLowerCase().includes(q))
+                );
+            }
+            return list;
+        },
+
+        filteredArtworks() {
+            const q = (this.artworkSearch || '').toLowerCase();
+            if (!q) return this.artworks;
+            return this.artworks.filter(a => 
+                (a.item && a.item.toLowerCase().includes(q)) ||
+                (a.author && a.author.toLowerCase().includes(q)) ||
+                (a.description && a.description.toLowerCase().includes(q)) ||
+                (a.sala && a.sala.nome && a.sala.nome.toLowerCase().includes(q))
+            );
+        },
+
+        getSalaName(art) {
+            if (!art || !art.sala || art.sala === false) return '';
+            let name = '';
+            if (typeof art.sala === 'string') {
+                name = art.sala;
+            } else if (typeof art.sala === 'object' && art.sala !== null) {
+                name = art.sala.nome || art.sala.name || art.sala.title || '';
+            }
+            if (typeof name !== 'string') {
+                name = String(name || '');
+            }
+            name = name.trim();
+            const check = name.toLowerCase();
+            if (!check || check === 'null' || check === 'undefined' || check === 'false' || check === '0' || check === '—' || check === '-') {
+                return '';
+            }
+            return name;
+        },
+
+        hasSala(art) {
+            const val = this.getSalaName(art);
+            return typeof val === 'string' && val.length > 0;
+        },
+
         activeDescType: 'medio',
         activeDescLength: '15s',
         descriptions: { 
@@ -44,9 +112,31 @@ function artworkManager() {
 
         // INITIALIZATION
         async init() {
+            if (typeof this.$watch === 'function') {
+                this.$watch('step', (val) => {
+                    console.log('step:', val, 'selectedMuseumId:', this.selectedMuseumId);
+                    if (val === 'artwork-museum-select') {
+                        this.selectedMuseumId = '';
+                        this.artworks = [];
+                    } else if (val === 'artwork-list' && (!this.selectedMuseumId || this.selectedMuseumId.trim() === '')) {
+                        this.step = 'artwork-museum-select';
+                    }
+                });
+                this.$watch('selectedMuseumId', (val) => {
+                    console.log('step:', this.step, 'selectedMuseumId:', val);
+                    if (!val || val.trim() === '') {
+                        this.selectedMuseumId = '';
+                        this.artworks = [];
+                        if (this.step === 'artwork-list') {
+                            this.step = 'artwork-museum-select';
+                        }
+                    }
+                });
+            }
             await this.checkAuth();
             if (this.isLoggedIn) {
                 await this.fetchMuseums();
+                this.isLoaded = true;
             } else {
                 this.logout();
             }
@@ -137,18 +227,19 @@ function artworkManager() {
             }, 3000);
         },
 
-        // MUSEUM LOGIC (For Select)
         async fetchMuseums() {
             // load available museums for dropdown
             try {
+                const token = localStorage.getItem('artaround_token');
+                if (!token) return;
                 const res = await fetch('/api/museums', {
-                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                    headers: { 'Authorization': token }
                 });
                 if (res.ok) {
                     this.museums = await res.json();
                 }
             } catch (e) {
-                this.showToast("Errore nel caricamento dei musei", "error");
+                console.error('Errore durante il recupero dei musei:', e);
             }
         },
 
@@ -195,8 +286,13 @@ function artworkManager() {
         // ARTWORK LOGIC
         async fetchArtworks() {
             // load artworks for selected museum
-            if (!this.selectedMuseumId) return;
+            if (!this.selectedMuseumId) {
+                this.artworks = [];
+                this.step = 'artwork-museum-select';
+                return;
+            }
 
+            this.isLoadingArtworks = true;
             try {
                 const res = await fetch(`/api/artworks/museum/${this.selectedMuseumId}`, {
                     headers: { 'Authorization': localStorage.getItem('artaround_token') }
@@ -211,6 +307,7 @@ function artworkManager() {
             } catch (e) {
                 this.showToast("Errore di connessione", "error");
             }
+            this.isLoadingArtworks = false;
         },
 
         async openArtworkForm(artwork = null) {

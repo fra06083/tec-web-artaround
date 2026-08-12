@@ -92,14 +92,23 @@
         </aside>
 
         <main class="main-content flex-grow-1">
-            <!-- Mobile Header -->
+            <!-- Mobile Header (Premium Dark Glassmorphic) -->
             <header class="mobile-header">
-                <a href="/editor-marketplace/index.html" class="mobile-logo d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="bg-orange-subtle text-orange p-2 rounded-3 d-flex align-items-center justify-content-center btn-icon-38">
-                        <i class="bi bi-gear-fill fs-5"></i>
+                <a href="/editor-marketplace/index.html" class="mobile-logo">
+                    <div class="mobile-logo-icon-box">
+                        <i class="bi bi-gear-fill"></i>
                     </div>
-                    <span class="fw-bold text-white fs-4 m-0 tracking-tight-sm">ArtAround</span>
+                    <span class="mobile-brand-title">ArtAround<span class="brand-dot"></span></span>
                 </a>
+                <div class="mobile-user-badge" x-show="username">
+                    <div class="mini-avatar position-relative">
+                        <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                        <template x-if="propic">
+                            <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                        </template>
+                    </div>
+                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                </div>
             </header>
 
 
@@ -128,56 +137,70 @@
                 </div>
             </header>
 
-            <div class="p-4 p-lg-5">
+            <div class="p-3 p-sm-4 p-lg-5">
 
                 <!-- LISTA IMPORTAZIONE -->
                 <div x-show="!showPreview && !showResults" class="animate__animated animate__fadeIn">
+                    
+                    <!-- Mobile Section Title Header -->
+                    <div class="d-sm-none mb-3 text-center">
+                        <h2 class="fw-bolder m-0 text-white tracking-tight fs-3">IMPORTA DATI</h2>
+                    </div>
+
                     <div class="row justify-content-center">
-                        <div class="col-md-8 col-lg-6">
-                            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-5 shadow-lg text-center">
+                        <div class="col-12 col-md-8 col-lg-6">
+                            <div class="card glass-card border border-white border-opacity-10 rounded-4 p-4 p-sm-5 shadow-lg text-center" style="background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); backdrop-filter: blur(16px);">
+                                
                                 <div class="mb-4">
-                                    <div class="bg-orange-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
+                                    <div class="d-inline-flex align-items-center justify-content-center mb-3 rounded-circle shadow-sm" style="width:72px; height:72px; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.4);">
                                         <i class="bi bi-file-earmark-arrow-up text-orange fs-2"></i>
                                     </div>
-                                    <h3 class="fw-bold mb-2">Importa Musei e Opere</h3>
-                                    <p class="text-white-50">Carica un file JSON per importare musei e opere nel sistema.</p>
+                                    <h3 class="fw-bold mb-2 text-white fs-4 fs-sm-3">Importa Musei e Opere</h3>
+                                    <p class="text-white-50 fs-7">Carica un file JSON per importare musei e opere nel sistema.</p>
                                 </div>
 
-                                <div class="upload-zone rounded-4 p-5 mb-4"
-                                    :class="{ 'border-orange': selectedFile, 'border-secondary': !selectedFile }"
+                                <!-- Mobile Upload Zone -->
+                                <div class="upload-zone rounded-4 p-4 p-sm-5 mb-4 border-2 transition-all cursor-pointer"
+                                    :class="{ 'border-orange bg-orange bg-opacity-10': selectedFile, 'border-secondary border-opacity-25 bg-dark bg-opacity-40': !selectedFile }"
+                                    style="border-style: dashed;"
                                     @click="$refs.fileInput.click()"
                                     @dragover.prevent
                                     @drop.prevent="handleFileSelect({ target: { files: $event.dataTransfer.files } })">
                                     <input type="file" x-ref="fileInput" @change="handleFileSelect" accept=".json" class="d-none">
                                     <template x-if="!selectedFile">
                                         <div>
-                                            <div class="bg-orange-subtle rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
-                                                <i class="bi bi-cloud-upload text-orange fs-2"></i>
+                                            <div class="bg-orange bg-opacity-15 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; border:1px solid rgba(249,115,22,0.3);">
+                                                <i class="bi bi-cloud-upload text-orange fs-3"></i>
                                             </div>
-                                            <p class="mb-0">Trascina qui il file JSON o <span class="text-orange fw-bold">clicca per selezionare</span></p>
+                                            <p class="mb-0 text-white fs-6">
+                                                <span class="text-orange fw-bold">Tocca per selezionare</span> il file JSON
+                                            </p>
                                         </div>
                                     </template>
                                     <template x-if="selectedFile">
                                         <div>
-                                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 w-h-80">
-                                                <i class="bi bi-file-earmark-text text-success fs-2"></i>
+                                            <div class="bg-success bg-opacity-15 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; border:1px solid rgba(34,197,94,0.3);">
+                                                <i class="bi bi-file-earmark-text text-success fs-3"></i>
                                             </div>
-                                            <p class="fw-bold mb-0" x-text="selectedFile.name"></p>
+                                            <p class="fw-bold mb-0 text-white fs-6" x-text="selectedFile.name"></p>
                                             <p class="text-white-50 small mb-0" x-text="(selectedFile.size / 1024).toFixed(2) + ' KB'"></p>
                                         </div>
                                     </template>
                                 </div>
 
-                                <div class="d-flex gap-2">
-                                    <button @click="downloadExample()" class="btn btn-slate flex-grow-1">
-                                        <i class="bi bi-download me-1"></i> Esempio JSON
-                                    </button>
-                                    <button @click="importData()" class="btn btn-orange flex-grow-1" :disabled="!selectedFile || isUploading">
-                                        <span x-show="!isUploading">Avvia Importazione</span>
-                                        <span x-show="isUploading">
-                                            <span class="spinner-border spinner-border-sm me-2"></span>
-                                            Importazione in corso...
+                                <!-- Vertically Stacked Touch Buttons -->
+                                <div class="d-flex flex-column gap-2.5">
+                                    <button @click="importData()" class="btn text-white w-100 py-3 rounded-pill fw-bold fs-6 shadow-lg hover-lift transition-all" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); min-height: 50px;" :disabled="!selectedFile || isUploading">
+                                        <span x-show="!isUploading" class="d-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-cloud-arrow-up-fill fs-5"></i> <span>Avvia Importazione</span>
                                         </span>
+                                        <span x-show="isUploading" class="d-flex align-items-center justify-content-center gap-2">
+                                            <span class="spinner-border spinner-border-sm"></span>
+                                            <span>Importazione in corso...</span>
+                                        </span>
+                                    </button>
+                                    <button @click="downloadExample()" class="btn btn-dark border border-secondary border-opacity-25 text-white-50 w-100 py-3 rounded-pill fw-bold fs-7 hover-lift transition-all" style="min-height: 48px;">
+                                        <i class="bi bi-download text-orange me-2"></i> <span>Esempio JSON</span>
                                     </button>
                                 </div>
                             </div>

@@ -26,11 +26,56 @@ function museumManager() {
         propic: '',
         step: 'museum-list',
         isReady: false,
+        isLoaded: false,
 
         // --- DATI ---
         museums: [],
         selectedMuseumId: '',
         artworks: [],
+
+        // --- PAGINAZIONE LISTA MUSEI ---
+        museumSearch: '',
+        selectedCity: '',
+        visibleCount: window.innerWidth < 768 ? 5 : 9,
+        _pageSize: window.innerWidth < 768 ? 5 : 9,
+
+        availableCities() {
+            if (!this.museums || !Array.isArray(this.museums)) return [];
+            const cities = this.museums
+                .map(m => m.city)
+                .filter(c => c && c.trim() !== '')
+                .map(c => c.trim());
+            return [...new Set(cities)].sort();
+        },
+
+        filteredMuseumList() {
+            let list = this.museums || [];
+            if (this.selectedCity) {
+                list = list.filter(m => m.city && m.city.toLowerCase() === this.selectedCity.toLowerCase());
+            }
+            if (this.museumSearch) {
+                const q = this.museumSearch.toLowerCase();
+                list = list.filter(m => 
+                    (m.museum && m.museum.toLowerCase().includes(q)) ||
+                    (m.city && m.city.toLowerCase().includes(q)) ||
+                    (m.address && m.address.toLowerCase().includes(q)) ||
+                    (m.region && m.region.toLowerCase().includes(q))
+                );
+            }
+            return list;
+        },
+
+        visibleMuseums() {
+            return this.filteredMuseumList().slice(0, this.visibleCount);
+        },
+
+        hasMore() {
+            return this.filteredMuseumList().length > this.visibleCount;
+        },
+
+        loadMore() {
+            this.visibleCount += this._pageSize;
+        },
 
         // --- OGGETTI PER FORM (Sincronizzati con il Backend) ---
         currentMuseum: {
@@ -64,10 +109,15 @@ function museumManager() {
             await this.checkAuth();
             if (this.isLoggedIn) {
                 await this.fetchMuseums();
+                this.isLoaded = true;
             } else {
                 this.logout();
             }
             this.isReady = true;
+
+            this.$watch('museumSearch', () => {
+                this.visibleCount = this._pageSize;
+            });
         },
 
         getPageTitle() {
@@ -101,10 +151,12 @@ function museumManager() {
                     if (response.status === 401 || response.status === 403) {
                         this.logout();
                     } else {
-                        this.showToast("Impossibile caricare i musei", "error");
+                        console.error("Impossibile caricare i musei:", response.status);
                     }
                 }
-            } catch (e) { console.error("Errore fetch musei:", e); }
+            } catch (error) {
+                console.error("Errore durante il caricamento dei musei:", error);
+            }
         },
 
         openMuseumForm(museum = null) {

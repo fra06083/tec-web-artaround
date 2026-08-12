@@ -776,3 +776,22 @@ body.dark-mode .form-control::placeholder {
 
 .transition-opacity { transition: opacity 0.3s ease; }
 
+/* Responsive Editor Header Controls */
+.editor-header-city-select {
+    width: 50% !important;
+    min-width: 0 !important;
+}
+
+.editor-header-search-input {
+    width: 50% !important;
+    min-width: 0 !important;
+}
+
+@media (min-width: 992px) {
+    .editor-header-city-select {
+        width: 220px !important;
+    }
+    .editor-header-search-input {
+        width: 260px !important;
+    }
+}

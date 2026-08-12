@@ -2,12 +2,13 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('toursManager', () => ({
         // UI STATE
         isReady: false,
+        isLoaded: false,
         isLoggedIn: false,
         permissions: '',
         propic: '',
         username: '',
-        step: 'selection',
-            mode: null, // selection, form
+        step: 'marketplace',
+        mode: null, // selection, form
          // create, edit, null (non selezionato)
         formTab: 'info', // info, artworks, quiz
 
@@ -26,8 +27,9 @@ document.addEventListener('alpine:init', () => {
         museums: [],
         availableTours: [],
         selectedMuseum: '',
-            museumSearch: '',
-                    selectedTourId: '',
+        museumSearch: '',
+        selectedCity: '',
+        selectedTourId: '',
 
         // TOUR DATA
         tour: {
@@ -100,11 +102,14 @@ document.addEventListener('alpine:init', () => {
         // INITIALIZATION
         async init() {
             this._restoringState = true;
+            this.isLoaded = false;
 
             await this.checkAuth();
             if (this.isLoggedIn) {
-                await this.fetchMuseums();
-                await this.fetchAllTours();
+                await Promise.all([
+                    this.fetchMuseums(),
+                    this.fetchAllTours()
+                ]);
                 
                 const urlParams = new URLSearchParams(window.location.search);
                 const editId = urlParams.get('id');
@@ -129,7 +134,7 @@ document.addEventListener('alpine:init', () => {
                     this.mode = 'create';
                     this.selectedTourId = '';
                     this.selectedMuseum = '';
-                    this.step = 'selection';
+                    this.step = 'marketplace';
                     this.formTab = 'info';
                     this.tour = {
                         _id: '',
@@ -145,42 +150,9 @@ document.addEventListener('alpine:init', () => {
                         isPrivate: false
                     };
                 } else {
-                    // Restore saved navigation position on page refresh (F5)
-                    const savedState = localStorage.getItem('artaround_tours_state');
-                    if (savedState) {
-                        try {
-                            const state = JSON.parse(savedState);
-                            if (state.step && state.step !== 'selection') {
-                                this.mode = state.mode || null;
-                                this.selectedMuseum = state.selectedMuseum || '';
-                                this.selectedTourId = state.selectedTourId || '';
-                                this.formTab = state.formTab || 'info';
-
-                                if (state.step === 'form') {
-                                    this.step = 'form';
-                                    if (this.mode === 'create' && this.selectedMuseum) {
-                                        await this.goToForm();
-                                    } else if (this.mode === 'edit' && this.selectedTourId) {
-                                        const success = await this.loadTour(this.selectedTourId);
-                                        if (success) {
-                                            await this.fetchAvailableArtworks();
-                                        } else {
-                                            this.resetToSelection();
-                                        }
-                                    } else {
-                                        this.resetToSelection();
-                                    }
-                                } else if (state.step === 'marketplace') {
-                                    this.step = 'marketplace';
-                                    if (this.selectedMuseum) {
-                                        await this.fetchAvailableArtworks();
-                                    }
-                                }
-                            }
-                        } catch (e) {
-                            localStorage.removeItem('artaround_tours_state');
-                        }
-                    }
+                    localStorage.removeItem('artaround_tours_state');
+                    this.selectedMuseum = '';
+                    this.step = 'marketplace';
                 }
 
                 // Restoration complete, safe to attach state watchers
@@ -193,6 +165,7 @@ document.addEventListener('alpine:init', () => {
                 this.$watch('formTab', () => this._saveNavState());
             } else {
                 this.logout();
+                return;
             }
 
             const activePin = sessionStorage.getItem('activeRoomPin');
@@ -213,11 +186,12 @@ document.addEventListener('alpine:init', () => {
                 });
             }
 
+            this.isLoaded = true;
             this.isReady = true;
         },
 
         resetToSelection() {
-            this.step = 'selection';
+            this.step = 'marketplace';
             this.mode = null;
             this.selectedMuseum = '';
             this.selectedTourId = '';
@@ -368,14 +342,16 @@ document.addEventListener('alpine:init', () => {
         // MUSEUMS
         async fetchMuseums() {
             try {
+                const token = localStorage.getItem('artaround_token');
+                if (!token) return;
                 const res = await fetch('/api/museums', {
-                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                    headers: { 'Authorization': token }
                 });
                 if (res.ok) {
                     this.museums = await res.json();
                 }
             } catch (e) {
-                this.showToast("Errore nel caricamento dei musei", "error");
+                console.error("Errore nel caricamento dei musei:", e);
             }
         },
 
@@ -412,13 +388,9 @@ document.addEventListener('alpine:init', () => {
         
 
         goBackFromForm() {
-            if (this.mode === 'edit') {
-                this.step = 'marketplace';
-                this.selectedTourId = '';
-            } else {
-                this.step = 'selection';
-                this.mode = null;
-            }
+            this.step = 'marketplace';
+            this.selectedTourId = '';
+            this.mode = null;
         },
         proceed() {
             if (!this.canProceed) return;
@@ -483,15 +455,17 @@ document.addEventListener('alpine:init', () => {
 
         async fetchAllTours() {
             try {
+                const token = localStorage.getItem('artaround_token');
+                if (!token) return;
                 const res = await fetch('/api/visite?manage=true', {
-                    headers: { 'Authorization': localStorage.getItem('artaround_token') }
+                    headers: { 'Authorization': token }
                 });
                 if (res.ok) {
                     this.availableTours = await res.json();
                 }
                 await this.fetchActiveRooms();
             } catch (e) {
-                this.showToast("Errore nel caricamento delle visite", "error");
+                console.error("Errore nel caricamento delle visite:", e);
             }
         },
 
@@ -599,9 +573,30 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
-                get filteredMuseums() {
-            if (!this.museumSearch) return this.museums;
-            return this.museums.filter(m => m.museum.toLowerCase().includes(this.museumSearch.toLowerCase()));
+        availableCities() {
+            if (!this.museums || !Array.isArray(this.museums)) return [];
+            const cities = this.museums
+                .map(m => m.city)
+                .filter(c => c && c.trim() !== '')
+                .map(c => c.trim());
+            return [...new Set(cities)].sort();
+        },
+
+        filteredMuseums() {
+            let list = this.museums || [];
+            if (this.selectedCity) {
+                list = list.filter(m => m.city && m.city.toLowerCase() === this.selectedCity.toLowerCase());
+            }
+            if (this.museumSearch) {
+                const q = this.museumSearch.toLowerCase();
+                list = list.filter(m => 
+                    (m.museum && m.museum.toLowerCase().includes(q)) ||
+                    (m.city && m.city.toLowerCase().includes(q)) ||
+                    (m.address && m.address.toLowerCase().includes(q)) ||
+                    (m.region && m.region.toLowerCase().includes(q))
+                );
+            }
+            return list;
         },
 
         get filteredTours() {
