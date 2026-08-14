@@ -16,6 +16,13 @@ function marketplaceApp() {
         isLoggedIn: false,
         username: '',
         permissions: '',
+        getRole() {
+            const p = (this.permissions || '').toLowerCase().trim();
+            if (p === 'admin') return 'admin';
+            if (p === 'docente') return 'docente';
+            if (p === 'editor' || p === 'autore') return 'editor';
+            return 'user';
+        },
         propic: '',
         isProfileModalOpen: false,
         profileForm: { name: '', propic: '', nameError: '' },
@@ -326,90 +333,95 @@ function marketplaceApp() {
             }
         },
         async init() {
-            // Load dark mode preference
-            const savedDarkMode = localStorage.getItem('artaround_darkmode');
-            this.darkMode = savedDarkMode === 'true';
+            try {
+                // Load dark mode preference
+                const savedDarkMode = localStorage.getItem('artaround_darkmode');
+                this.darkMode = savedDarkMode === 'true';
 
-            const savedCart = localStorage.getItem('artaround_cart');
-            if (savedCart) {
-                try {
-                    this.cart = JSON.parse(savedCart);
-                } catch (e) {
-                    console.error('Errore parsing carrello salvato', e);
+                const savedCart = localStorage.getItem('artaround_cart');
+                if (savedCart) {
+                    try {
+                        this.cart = JSON.parse(savedCart);
+                    } catch (e) {
+                        console.error('Errore parsing carrello salvato', e);
+                    }
                 }
-            }
 
-            // Watch for dark mode changes
-            this.$watch('darkMode', (value) => {
-                localStorage.setItem('artaround_darkmode', value);
-            });
-            
-            // Set active sidebar link
-            setTimeout(() => {
-                const path = window.location.pathname;
-                document.querySelectorAll('.nav-link-admin, .mobile-nav-item').forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (!href || href.startsWith('#')) return; // ignore offcanvas toggles
-
-                    let isActive = href === path || (path === '/editor/' && href === '/editor/dashboard');
-                    
-                    if (path.startsWith('/editor-marketplace/') && (href === 'index.html' || href === './' || href === '/editor-marketplace/')) {
-                        isActive = true;
-                    }
-
-                    if (isActive) {
-                        link.classList.add('active');
-                    } else {
-                        link.classList.remove('active');
-                    }
+                // Watch for dark mode changes
+                this.$watch('darkMode', (value) => {
+                    localStorage.setItem('artaround_darkmode', value);
                 });
-            }, 100);
-
-            const promises = [this.checkAuth(), this.fetchTours()];
-            
-            // Check cache to immediately decide if we should load admin stats in parallel
-            const savedUserDataStr = localStorage.getItem('artaround_user_data');
-            let cachedAdmin = false;
-            if (savedUserDataStr) {
-                try {
-                    const savedUserData = JSON.parse(savedUserDataStr);
-                    cachedAdmin = (savedUserData.permissions === 'admin');
-                } catch(e) {}
-            }
-            if (cachedAdmin) {
-                promises.push(this.refreshStats());
-            }
-
-            await Promise.all(promises);
- 
-            this.initMuseumFunnel();
-
-            this.isLoading = false;
-            
-            // Fallback in case cache was wrong or empty, but auth yielded admin
-            if (this.permissions === 'admin' && !cachedAdmin) {
-                this.refreshStats();
-            }
-
-            const activePin = sessionStorage.getItem('activeRoomPin');
-            if (activePin) {
-                this.roomState.pin = activePin;
-                this.roomState.visitId = sessionStorage.getItem('activeRoomVisitId');
-                this.roomState.students = [];
-                this.isLobbyModalOpen = true;
-
-                if (this.roomState.eventSource) {
-                    this.roomState.eventSource.close();
-                }
-                this.roomState.eventSource = new EventSource(`/api/rooms/events/${activePin}`);
                 
-                this.roomState.eventSource.addEventListener('student-joined', (e) => {
-                    const eventData = JSON.parse(e.data);
-                    this.roomState.students = eventData.students;
-                });
+                // Set active sidebar link
+                setTimeout(() => {
+                    const path = window.location.pathname;
+                    document.querySelectorAll('.nav-link-admin, .mobile-nav-item').forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (!href || href.startsWith('#')) return; // ignore offcanvas toggles
+
+                        let isActive = href === path || (path === '/editor/' && href === '/editor/dashboard');
+                        
+                        if (path.startsWith('/editor-marketplace/') && (href === 'index.html' || href === './' || href === '/editor-marketplace/')) {
+                            isActive = true;
+                        }
+
+                        if (isActive) {
+                            link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
+                        }
+                    });
+                }, 100);
+
+                const promises = [this.checkAuth(), this.fetchTours()];
+                // Check cache to immediately decide if we should load staff stats in parallel
+                const savedUserDataStr = localStorage.getItem('artaround_user_data');
+                let cachedStaff = false;
+                if (savedUserDataStr) {
+                    try {
+                        const savedUserData = JSON.parse(savedUserDataStr);
+                        const perm = (savedUserData.permissions || '').toLowerCase();
+                        cachedStaff = (perm === 'admin' || perm === 'editor' || perm === 'docente');
+                    } catch(e) {}
+                }
+                if (cachedStaff) {
+                    promises.push(this.refreshStats());
+                }
+
+                await Promise.all(promises);
+
+                this.initMuseumFunnel();
+
+                this.isLoading = false;
+                
+                // Fallback in case cache was wrong or empty, but auth yielded staff permissions
+                const currentPerm = (this.permissions || '').toLowerCase();
+                if ((currentPerm === 'admin' || currentPerm === 'editor' || currentPerm === 'docente') && !cachedStaff) {
+                    this.refreshStats();
+                }
+
+                const activePin = sessionStorage.getItem('activeRoomPin');
+                if (activePin) {
+                    this.roomState.pin = activePin;
+                    this.roomState.visitId = sessionStorage.getItem('activeRoomVisitId');
+                    this.roomState.students = [];
+                    this.isLobbyModalOpen = true;
+
+                    if (this.roomState.eventSource) {
+                        this.roomState.eventSource.close();
+                    }
+                    this.roomState.eventSource = new EventSource(`/api/rooms/events/${activePin}`);
+                    
+                    this.roomState.eventSource.addEventListener('student-joined', (e) => {
+                        const eventData = JSON.parse(e.data);
+                        this.roomState.students = eventData.students;
+                    });
+                }
+            } catch (error) {
+                console.error("Errore durante l'inizializzazione della Dashboard:", error);
+            } finally {
+                this.isReady = true;
             }
-            
-            this.isReady = true;
         },
 
                 async checkAuth() {
@@ -432,7 +444,7 @@ function marketplaceApp() {
                 if (savedUserDataStr) {
                     try {
                         const savedUserData = JSON.parse(savedUserDataStr);
-                        this.permissions = savedUserData.permissions || '';
+                        this.permissions = (savedUserData.permissions || '').toLowerCase();
                         this.propic = savedUserData.propic || '';
                         if (this.purchasedVisits !== undefined) {
                             this.purchasedVisits = savedUserData.purchased_visits || [];
@@ -454,7 +466,7 @@ function marketplaceApp() {
                 if (response.ok) {
                     const data = await response.json();
                     this.username = data.user?.name || savedUsername;
-                    this.permissions = data.user?.permissions;
+                    this.permissions = (data.user?.permissions || '').toLowerCase();
                     this.propic = data.user?.propic || '';
                     if (this.purchasedVisits !== undefined) {
                         this.purchasedVisits = data.user?.purchased_visits || [];
@@ -479,10 +491,12 @@ function marketplaceApp() {
         },
         async refreshStats() {
             try {
-                const token = localStorage.getItem('artaround_token'); // Recupera il token
+                const token = localStorage.getItem('artaround_token');
                 const response = await fetch('/editor/stats', {
                     method: "GET",
-                    'Authorization': token
+                    headers: {
+                        'Authorization': token
+                    }
                 });
                 if (response.ok) {
                     this.stats = await response.json();
@@ -613,6 +627,15 @@ function marketplaceApp() {
             this.profileForm.propic = this.propic;
             this.profileForm.preferredLevel = localStorage.getItem('artaround_preferred_level') || 'medio';
             this.isProfileModalOpen = true;
+
+            // Chiude automaticamente qualsiasi offcanvas aperto (es. cartOffcanvas, mobileProfileOffcanvas)
+            const openOffcanvasList = document.querySelectorAll('.offcanvas.show');
+            openOffcanvasList.forEach(el => {
+                if (typeof bootstrap !== 'undefined') {
+                    const instance = bootstrap.Offcanvas.getInstance(el) || new bootstrap.Offcanvas(el);
+                    if (instance) instance.hide();
+                }
+            });
         },
 
         validateUsername(val) {

@@ -1,29 +1,60 @@
 const User = require('../models/user'); // Il tuo modello ibrido
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 module.exports = {
 
-    // Cerca utenti per nome o ID
+    // Cerca utenti per nome, ruolo (permissions) o ID
     searchUsers: async (req, res) => {
         try {
             const q = (req.query.q || '').trim();
+            const mongoose = require('mongoose');
 
-            // Se la query è vuota, restituisci tutti gli utenti (limitati a 50)
-            if (!q) {
-                const users = await User.find({})
-                    .select('name permissions museums')
-                    .sort({ name: 1 })
-                    .limit(50);
-                return res.json(users);
+            let query = {};
+            if (q) {
+                const isId = mongoose.Types.ObjectId.isValid(q);
+                const searchRegex = new RegExp(q, 'i');
+                const lowerQ = q.toLowerCase();
+
+                // Mappatura flessibile italiano/inglese per i ruoli
+                const roleMatches = [];
+                if (/^(editor|autore|autori|scrittore|creatore)/i.test(lowerQ)) {
+                    roleMatches.push('editor');
+                }
+                if (/^(docente|docenti|prof|professore|professoressa|insegnante)/i.test(lowerQ)) {
+                    roleMatches.push('docente');
+                }
+                if (/^(admin|amministratore|amministratori)/i.test(lowerQ)) {
+                    roleMatches.push('admin');
+                }
+                if (/^(visitatore|visitatori|utente|utenti|guest)/i.test(lowerQ)) {
+                    roleMatches.push('visitatore');
+                }
+
+                const orConditions = [
+                    { name: searchRegex },
+                    { permissions: searchRegex }
+                ];
+
+                if (roleMatches.length > 0) {
+                    orConditions.push({ permissions: { $in: roleMatches } });
+                }
+
+                if (isId) {
+                    orConditions.push({ _id: q });
+                }
+
+                query = { $or: orConditions };
             }
 
-            // Cerca nel campo 'name'
-            const users = await User.find({
-                name: { $regex: q, $options: 'i' }
-            }).select('name permissions museums').limit(10);
+            const users = await User.find(query)
+                .select('name permissions museums propic')
+                .sort({ name: 1 })
+                .limit(50);
 
             res.json(users);
         } catch (error) {
+            console.error("Errore nella ricerca utenti:", error);
             res.status(500).json({ error: "Errore nella ricerca" });
         }
     },
@@ -120,8 +151,6 @@ module.exports = {
             const user = await User.findById(id);
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-
-
             const updatedUser = await User.findByIdAndUpdate(
                 id,
                 { $set: { permissions: permissions } },
@@ -164,6 +193,37 @@ module.exports = {
         } catch (error) {
             if (error.code === 11000) return res.status(400).json({ error: "Questo username è già in uso" });
             res.status(500).json({ error: "Errore aggiornamento nome utente" });
+        }
+    },
+
+    // update user password (forzata da parte dell'admin)
+    updateUserPassword: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { newPassword } = req.body;
+
+            if (!newPassword || newPassword.trim().length < 4) {
+                return res.status(400).json({ error: "La nuova password deve contenere almeno 4 caratteri" });
+            }
+
+            const user = await User.findById(id);
+            if (!user) return res.status(404).json({ error: "Utente non trovato" });
+
+            // Solo admin master o admin può cambiare la password ad un altro utente
+            if (user.permissions === 'admin' && req.user._id.toString() !== user._id.toString() && req.user.permissions !== 'admin') {
+                return res.status(403).json({ error: "Permessi insufficienti per modificare questo utente" });
+            }
+
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(newPassword.trim(), saltRounds);
+
+            user.password = hashedPassword;
+            await user.save();
+
+            res.json({ message: `Password dell'utente "${user.name}" aggiornata con successo.` });
+        } catch (error) {
+            console.error("Errore modifica password utente:", error);
+            res.status(500).json({ error: "Errore durante l'aggiornamento della password" });
         }
     }
 };

@@ -3,7 +3,12 @@ const { item: Item, language: Language } = require('../models/museums.js');
 // GET /api/artworks
 const getAllArtworks = async (req, res) => {
     try {
-        const artworks = await Item.find().populate('museum_id', 'museum city').lean();
+        let query = {};
+        if (req.user && req.user.permissions !== 'admin') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            query = { museum_id: { $in: userMuseums } };
+        }
+        const artworks = await Item.find(query).populate('museum_id', 'museum city').lean();
         res.json(artworks);
     } catch (error) {
         console.error('Errore nel recupero delle opere:', error);
@@ -62,6 +67,13 @@ const createArtwork = async (req, res) => {
             });
         }
 
+        if (req.user && req.user.permissions !== 'admin') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            if (!userMuseums.includes(museum_id ? museum_id.toString() : '')) {
+                return res.status(403).json({ error: 'Non hai i permessi per aggiungere opere a questo museo' });
+            }
+        }
+
         const newArtwork = new Item({
             item,
             img_path,
@@ -93,6 +105,16 @@ const createArtwork = async (req, res) => {
 // PUT /api/artworks/:id
 const updateArtwork = async (req, res) => {
     try {
+        const existingItem = await Item.findById(req.params.id);
+        if (!existingItem) return res.status(404).json({ error: 'Opera non trovata' });
+
+        if (req.user && req.user.permissions !== 'admin') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            if (!userMuseums.includes(existingItem.museum_id.toString())) {
+                return res.status(403).json({ error: 'Non hai i permessi per modificare questa opera' });
+            }
+        }
+
         const { item, img_path, museum_id, author, license, sala, description, desc_type, desc_length } = req.body;
 
         const updated = await Item.findByIdAndUpdate(
@@ -111,7 +133,6 @@ const updateArtwork = async (req, res) => {
             { upsert: true }
         );
 
-        if (!updated) return res.status(404).json({ error: 'Opera non trovata' });
         res.json({ message: 'Opera aggiornata', artwork: updated });
     } catch (error) {
         console.error('Errore nell\'aggiornamento dell\'opera:', error);
@@ -125,8 +146,17 @@ const updateArtwork = async (req, res) => {
 // DELETE /api/artworks/:id
 const deleteArtwork = async (req, res) => {
     try {
-        const deleted = await Item.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ error: 'Opera non trovata' });
+        const existingItem = await Item.findById(req.params.id);
+        if (!existingItem) return res.status(404).json({ error: 'Opera non trovata' });
+
+        if (req.user && req.user.permissions !== 'admin') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            if (!userMuseums.includes(existingItem.museum_id.toString())) {
+                return res.status(403).json({ error: 'Non hai i permessi per eliminare questa opera' });
+            }
+        }
+
+        await Item.findByIdAndDelete(req.params.id);
         res.json({ message: 'Opera eliminata con successo' });
     } catch (error) {
         console.error('Errore nell\'eliminazione dell\'opera:', error);

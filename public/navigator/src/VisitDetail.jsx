@@ -266,7 +266,7 @@ function VisitDetail() {
             // Autore / Opera (Match avanzato tramite Regex)
             if (/(autore|chi (ha dipinto|ha creato|è l'autore)|come si chiama l'opera|quest'opera)/i.test(transcript)) {
                  const author = currentItem?.author || "Autore sconosciuto";
-                 const title = currentItem?.title || "Opera senza titolo";
+                 const title = (currentItem?.item || currentItem?.title || currentItem?.name || "Opera").replace(/\s*\d{10,}$/, '');
                  speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`);
                  return;
             }
@@ -1506,7 +1506,7 @@ function VisitDetail() {
                                 {/* CATEGORIA ESPLORAZIONE */}
                                 <h6 className="text-uppercase fw-bold text-primary mt-3 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Esplorazione</h6>
                                 
-                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; const title = currentItem?.title || "Opera senza titolo"; speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`); }} data-bs-dismiss="modal">
+                                <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; const title = (currentItem?.item || currentItem?.title || currentItem?.name || "Opera").replace(/\s*\d{10,}$/, ''); speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`); }} data-bs-dismiss="modal">
                                     <i className="bi bi-person-badge fs-3 text-primary opacity-75"></i>
                                     <div>
                                         <div className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>"Chi è l'autore?", "Quest'opera..."</div>

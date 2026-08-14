@@ -92,6 +92,15 @@ function homeApp() {
             this.profileForm.propic = this.propic;
             this.profileForm.preferredLevel = localStorage.getItem('artaround_preferred_level') || 'medio';
             this.isProfileModalOpen = true;
+
+            // Chiude automaticamente qualsiasi offcanvas aperto (es. cartOffcanvas, mobileProfileOffcanvas)
+            const openOffcanvasList = document.querySelectorAll('.offcanvas.show');
+            openOffcanvasList.forEach(el => {
+                if (typeof bootstrap !== 'undefined') {
+                    const instance = bootstrap.Offcanvas.getInstance(el) || new bootstrap.Offcanvas(el);
+                    if (instance) instance.hide();
+                }
+            });
         },
 
         validateUsername(val) {

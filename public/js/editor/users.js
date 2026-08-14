@@ -9,7 +9,6 @@ document.addEventListener('alpine:init', () => {
         allMuseums: [],
         selectedUser: null,
         selectedMuseumId: '',
-        pendingRequests: [],
         isEditingName: false,
         editNameValue: '',
 
@@ -57,14 +56,12 @@ document.addEventListener('alpine:init', () => {
 
                 // 2. Caricamento dati iniziali per la gestione
                 await this.loadMuseums();
-                await this.loadPendingRequests();
 
-                // Carica inizialmente tutti gli editor
+                // Carica inizialmente tutti gli utenti
                 const usersRes = await fetch('/editor/user-management/search?q=', {
                     headers: { 'Authorization': token }
                 });
-                const fetchedUsersInit = await usersRes.json();
-                this.users = fetchedUsersInit.filter(u => u.name !== this.username);
+                this.users = usersRes.ok ? await usersRes.json() : [];
 
                 // Close user menu when clicking outside
                 document.addEventListener('click', (e) => {
@@ -87,11 +84,6 @@ document.addEventListener('alpine:init', () => {
             this.allMuseums = res.ok ? await res.json() : [];
         },
 
-        async loadPendingRequests() {
-            // not implemented yet
-            this.pendingRequests = [];
-        },
-
         // Ricerca dinamica
         async searchUsers() {
             const token = localStorage.getItem('artaround_token');
@@ -99,8 +91,7 @@ document.addEventListener('alpine:init', () => {
             const res = await fetch(`/editor/user-management/search?q=${encodeURIComponent(query)}`, {
                 headers: { 'Authorization': token }
             });
-            const fetchedUsersSearch = res.ok ? await res.json() : [];
-            this.users = fetchedUsersSearch.filter(u => u.name !== this.username);
+            this.users = res.ok ? await res.json() : [];
         },
 
         // Seleziona un utente specifico per vederne i dettagli

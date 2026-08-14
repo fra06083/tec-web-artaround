@@ -4,9 +4,9 @@ const { museum: Museum, item: Item, visit: Visit } = require('../models/museums'
 const getAllMuseums = async (req, res) => {
     try {
         let museums;
-        if (req.user.permissions === 'docente') {
+        if (req.user.permissions === 'docente' || req.user.permissions === 'editor') {
             const userWithMuseums = await require('../models/user.js').findById(req.user._id).populate('museums').lean();
-            museums = userWithMuseums.museums || [];
+            museums = userWithMuseums ? (userWithMuseums.museums || []) : [];
         } else {
             museums = await Museum.find().lean();
         }
@@ -30,7 +30,7 @@ const getMuseumById = async (req, res) => {
 };
 
 // POST /api/museums
-// Richiede Auth (il middleware va nella rotta)
+// Richiede Auth (il middleware va nella rotta - solo admin)
 const createMuseum = async (req, res) => {
     try {
         const { museum, city, province, region, address, description, image,mappa } = req.body;
@@ -72,6 +72,13 @@ const createMuseum = async (req, res) => {
 // PUT /api/museums/:id
 const updateMuseum = async (req, res) => {
     try {
+        if (req.user.permissions !== 'admin') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            if (!userMuseums.includes(req.params.id.toString())) {
+                return res.status(403).json({ error: 'Non hai i permessi per modificare questo museo' });
+            }
+        }
+
         const { museum, city, province, region, address, description, image, mappa } = req.body;
 
         if (museum) {

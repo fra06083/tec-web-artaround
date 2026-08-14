@@ -37,10 +37,10 @@
     </script>
 </head>
 
-<body class="bg-body-tertiary text-body font-sans" x-data="marketplaceApp()">
+<body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
 
-    <div x-show="isReady && isLoggedIn && (permissions === 'admin' || permissions === 'editor' || permissions === 'docente')"
-        x-transition.opacity
+    <div x-show="isReady && isLoggedIn && ['admin', 'editor', 'docente'].includes(getRole())"
+        class="d-flex min-vh-100"
         x-cloak>
 
         <aside class="sidebar bg-dark shadow d-flex flex-column">
@@ -60,38 +60,40 @@
                     <i class="bi bi-pencil-square"></i> <span>Gestione Visite</span>
                 </a>
 
-                <div x-show="permissions !== 'docente'" class="nav-section-header mt-4 mb-2">
+                <div x-show="getRole() !== 'docente'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Catalogo Artistico</span>
                     <div class="flex-grow-1 border-top border-secondary opacity-25 ms-2"></div>
                 </div>
 
-                <a href="/editor/museum" x-show="permissions !== 'docente'" class="nav-link-admin">
+                <a href="/editor/museum" x-show="getRole() !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-bank"></i> <span>Gestione Musei</span>
                 </a>
-                <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
+                <a href="/editor/artworks" x-show="getRole() !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
-                <a href="/editor/import" x-show="permissions !== 'docente'" class="nav-link-admin">
+                <a href="/editor/import" x-show="getRole() === 'admin'" class="nav-link-admin">
                     <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
                 </a>
 
 
-                <div x-show="permissions === 'admin'" class="nav-section-header mt-4 mb-2">
+                <div x-show="getRole() === 'admin'" class="nav-section-header mt-4 mb-2">
                     <span class="text-uppercase small fw-bold text-white-50 opacity-50 px-2">Sistema</span>
                     <div class="flex-grow-1 border-top border-secondary opacity-25 ms-2"></div>
                 </div>
 
-                <a href="/editor/user-management" x-show="permissions === 'admin'" class="nav-link-admin">
+                <a href="/editor/user-management" x-show="getRole() === 'admin'" class="nav-link-admin">
                     <i class="bi bi-people"></i> <span>Gestione Utenti</span>
                 </a>
             </nav>
 
             <div class="p-3 mt-auto">
-                <button @click.prevent="logout()"
-                    class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
+                <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
-        <main class="main-content">
+
+        <!-- Main Content Area -->
+        <main class="main-content flex-grow-1">
+            
             <!-- Mobile Header (Premium Dark Glassmorphic) -->
             <header class="mobile-header">
                 <a href="/editor-marketplace/index.html" class="mobile-logo">
@@ -107,32 +109,55 @@
                             <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                         </template>
                     </div>
-                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                    <div class="mobile-user-role-box">
+                        <span class="mobile-role-label">RUOLO</span>
+                        <span class="mini-role" x-text="permissions"></span>
+                    </div>
                 </div>
             </header>
 
             <!-- Desktop Header -->
-            <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
-                <div class="container-fluid">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
-                            <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
-                            <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
-                            </template>
-                        </div>
-                        <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold ls-1">
-                                Bentornato</p>
-                            <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
+            <header class="navbar navbar-expand sticky-top py-2.5 px-4 d-none d-md-flex desktop-navbar">
+                <div class="container-fluid px-0">
+                    
+                    <!-- Left: Dynamic Section Badge -->
+                    <div class="d-flex align-items-center">
+                        <div class="desktop-section-badge">
+                            <div class="desktop-section-icon">
+                                <i class="bi bi-speedometer2 text-orange fs-5"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="desktop-section-subtitle">PANNELLO DI CONTROLLO</span>
+                                <h5 class="desktop-section-title">Dashboard Catalogo</h5>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="text-end me-2">
-                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-3 py-1.5 fs-7 fw-bold text-capitalize" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : permissions)"></span>
+                    <!-- Right: Dynamic User & Role Profile Capsule -->
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="desktop-user-profile-bar shadow-lg">
+                            <div class="user-avatar-wrapper">
+                                <div class="user-avatar position-relative bg-orange text-white rounded-circle d-flex align-items-center justify-content-center overflow-hidden">
+                                    <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                                    <template x-if="propic">
+                                        <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
+                                    </template>
+                                </div>
+                                <span class="user-online-dot"></span>
+                            </div>
+
+                            <div class="desktop-user-info-group">
+                                <span class="desktop-user-name-line" x-text="username || 'Utente'"></span>
+                                <div>
+                                    <span class="desktop-role-pill-badge">
+                                        <i class="bi bi-shield-lock-fill text-orange fs-065 me-1"></i>
+                                        RUOLO: <span x-text="permissions"></span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </header>
 
@@ -140,8 +165,7 @@
 
 
                 <!-- ADMIN DASHBOARD -->
-                <template x-if="permissions === 'admin'">
-                    <div>
+                <div x-show="getRole() === 'admin'">
                         <h4 class="fw-bold mb-1">Panoramica Globale Sistema</h4>
                         <p class="text-body-secondary mb-4">Tutti i dati in tempo reale dal database e gestione sessione live.</p>
 
@@ -277,7 +301,7 @@
                                                  <button @click="deleteTour(item._id)" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm transform hover-lift d-inline-flex align-items-center gap-1.5">
                                                      <i class="bi bi-trash3-fill fs-6"></i> <span>Elimina</span>
                                                  </button>
-                                                 <button @click="createRoom(item._id)" class="btn btn-sm bg-orange text-white rounded-circle p-1.5 d-inline-flex align-items-center justify-content-center shadow-sm hover-lift" style="width: 32px; height: 32px;" title="Avvia Sessione Live / Presenta">
+                                                 <button @click="createRoom(item._id)" class="btn btn-sm bg-orange text-white rounded-circle btn-icon-32 p-1.5 d-inline-flex align-items-center justify-content-center shadow-sm hover-lift" title="Avvia Sessione Live / Presenta">
                                                      <i class="bi bi-broadcast fs-6"></i>
                                                  </button>
                                             </div>
@@ -293,77 +317,175 @@
                             </div>
                         </div>
                     </div>
-                </template>
+                </div>
 
                 <!-- EDITOR DASHBOARD -->
-                <template x-if="permissions === 'editor'">
-                    <div>
-                        <h4 class="fw-bold mb-2 text-body">Il Mio Spazio di Lavoro</h4>
-                        <p class="text-body-secondary mb-4">Benvenuto nel tuo pannello di amministrazione museale.</p>
+                <div x-show="getRole() === 'editor'" class="d-flex flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
 
-                        <div class="row g-4 mb-4">
-                            <!-- Action 1: Inizia Visita -->
-                            <div class="col-12 col-md-4 d-flex">
-                                <div @click="openVisitSelection()" class="hero-start-visit card-glow-orange rounded-4 cursor-pointer d-flex flex-column w-100 h-100 transform hover-lift">
-                                    <div class="card-body p-4 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
-                                        <div class="play-circle icon-float mb-3 flex-shrink-0">
-                                            <i class="bi bi-broadcast"></i>
-                                        </div>
-                                        <h4 class="fw-black text-white mb-2">Inizia Visita</h4>
-                                        <p class="text-white mb-0 opacity-85 small flex-grow-1">Avvia una sessione live proiettata o con PIN per la classe.</p>
-                                        <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center gap-2">
-                                            <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
-                                        </div>
+                    <!-- Greeting -->
+                    <div class="text-center mb-3 mb-md-4">
+                        <h2 class="fw-black mb-1 hero-greeting-title text-white fs-3 fs-md-1">
+                            Bentornato, <span class="text-orange" x-text="username"></span>
+                        </h2>
+                        <p class="text-white-50 mb-0 mw-480-center small">Gestisci i musei a te assegnati, le collezioni d'arte ed i percorsi di visita.</p>
+                    </div>
+
+                    <!-- Action Cards (2x2 Grid) -->
+                    <div class="row g-3 g-md-4 w-100 mw-780 mb-3 mb-md-4 align-items-stretch">
+
+                        <!-- Card 1: Inizia Visita -->
+                        <div class="col-md-6 d-flex">
+                            <div @click="openVisitSelection()"
+                                 class="hero-start-visit card-glow-orange rounded-4 rounded-sm-5 cursor-pointer d-flex flex-column w-100 h-100 transform hover-lift">
+                                <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                    <div class="play-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
+                                        <i class="bi bi-broadcast"></i>
+                                    </div>
+                                    <h3 class="fw-black text-white mb-1 fs-card-title">Inizia Visita</h3>
+                                    <p class="text-white mb-0 opacity-85 small flex-grow-1 d-flex align-items-center justify-content-center">
+                                        Avvia una sessione live con la password della visita o un PIN automatico.
+                                    </p>
+                                    <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Action 2: Gestisci Visite -->
-                            <div class="col-12 col-md-4 d-flex">
-                                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="text-decoration-none d-flex flex-column w-100 h-100">
-                                    <div class="hero-manage card-glow-blue rounded-4 d-flex flex-column w-100 h-100 transform hover-lift">
-                                        <div class="card-body p-4 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
-                                            <div class="pencil-circle icon-float mb-3 flex-shrink-0">
-                                                <i class="bi bi-easel2-fill"></i>
-                                            </div>
-                                            <h4 class="fw-black text-white mb-2">Gestisci Visite</h4>
-                                            <p class="text-white-50 mb-0 small flex-grow-1">Crea nuovi tour guidati o modifica i percorsi esistenti.</p>
-                                            <div class="mt-3 btn btn-info text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center gap-2">
-                                                <i class="bi bi-arrow-right-circle fs-6"></i> <span>Vai alle visite</span>
-                                            </div>
+                        <!-- Card 2: Gestisci Visite -->
+                        <div class="col-md-6 d-flex">
+                            <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="text-decoration-none d-flex flex-column w-100 h-100">
+                                <div class="hero-manage card-glow-blue rounded-4 rounded-sm-5 d-flex flex-column w-100 h-100 transform hover-lift">
+                                    <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                        <div class="pencil-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
+                                            <i class="bi bi-easel2-fill"></i>
+                                        </div>
+                                        <h3 class="fw-black text-white mb-1 fs-card-title">Gestisci Visite</h3>
+                                        <p class="text-white-50 mb-0 small flex-grow-1 d-flex align-items-center justify-content-center">
+                                            Crea nuovi percorsi ed edita le visite guidate nei tuoi musei.
+                                        </p>
+                                        <div class="mt-3 btn btn-info text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-arrow-right-circle fs-6"></i> <span>Vai alle visite</span>
                                         </div>
                                     </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Card 3: I Miei Musei -->
+                        <div class="col-md-6 d-flex">
+                            <a href="/editor/museum" class="text-decoration-none d-flex flex-column w-100 h-100">
+                                <div class="hero-start-visit card-glow-orange rounded-4 rounded-sm-5 d-flex flex-column w-100 h-100 transform hover-lift">
+                                    <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                        <div class="play-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
+                                            <i class="bi bi-bank"></i>
+                                        </div>
+                                        <h3 class="fw-black text-white mb-1 fs-card-title">I Miei Musei</h3>
+                                        <p class="text-white-50 mb-0 small flex-grow-1 d-flex align-items-center justify-content-center">
+                                            Visualizza e gestisci le piantine e i punti d'interesse dei tuoi musei.
+                                        </p>
+                                        <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-bank fs-6"></i> <span>Vai ai musei</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Card 4: Gestisci Opere -->
+                        <div class="col-md-6 d-flex">
+                            <a href="/editor/artworks" class="text-decoration-none d-flex flex-column w-100 h-100">
+                                <div class="hero-manage card-glow-blue rounded-4 rounded-sm-5 d-flex flex-column w-100 h-100 transform hover-lift">
+                                    <div class="card-body p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center position-relative z-1 h-100">
+                                        <div class="pencil-circle icon-float mb-2 mb-sm-3 flex-shrink-0">
+                                            <i class="bi bi-palette-fill"></i>
+                                        </div>
+                                        <h3 class="fw-black text-white mb-1 fs-card-title">Gestisci Opere</h3>
+                                        <p class="text-white-50 mb-0 small flex-grow-1 d-flex align-items-center justify-content-center">
+                                            Crea e modifica le schede delle opere d'arte per i tuoi musei.
+                                        </p>
+                                        <div class="mt-3 btn btn-info text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-palette-fill fs-6"></i> <span>Vai alle opere</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <!-- Menu Rapido Editor: Visite -->
+                    <div x-show="items && items.length > 0" class="w-100 mw-780">
+                        <div class="glass-card rounded-4 p-3 p-md-4 border border-secondary border-opacity-25 shadow-lg">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="icon-box-30 rounded-circle bg-orange bg-opacity-20 text-orange d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-lightning-charge-fill fs-6"></i>
+                                    </div>
+                                    <h5 class="fw-bold m-0 text-white fs-6 fs-md-5">Menu Rapido Visite</h5>
+                                    <span class="badge bg-secondary bg-opacity-30 border border-secondary border-opacity-25 text-white-50 rounded-pill px-2.5 py-1 fs-075"
+                                          x-text="'Max ' + Math.min(items.length, 3) + ' di ' + items.length"></span>
+                                </div>
+                                <a href="/editor/tours?mode=create" class="btn btn-sm btn-outline-orange rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 hover-lift">
+                                    <i class="bi bi-plus-lg"></i>
+                                    <span>Crea Visita</span>
                                 </a>
                             </div>
 
-                            <!-- Action 3: I Miei Musei -->
-                            <div class="col-12 col-md-4 d-flex">
-                                <a href="/editor/museum" class="text-decoration-none d-flex flex-column w-100 h-100">
-                                    <div class="card stat-card card-hero-dark-orange border-0 rounded-4 p-4 shadow d-flex flex-column h-100 transform hover-lift">
-                                        <div class="d-flex align-items-center gap-3 mb-3">
-                                            <div class="stat-icon-bg stat-icon-orange">
-                                                <i class="bi bi-bank"></i>
+                            <div class="d-flex flex-column gap-2">
+                                <template x-for="tour in items.slice(0, 3)" :key="tour._id">
+                                    <div class="bg-dark bg-opacity-50 border border-secondary border-opacity-25 rounded-3 p-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 transform hover-lift">
+                                        <div class="min-w-0 flex-grow-1">
+                                            <h6 class="fw-bold text-white mb-1 text-truncate fs-6" x-text="tour.name || 'Visita senza titolo'"></h6>
+                                            <div class="d-flex align-items-center gap-3 text-white-50 small">
+                                                <span class="d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-images text-orange"></i>
+                                                    <span x-text="(tour.items ? tour.items.length : 0) + ' opere'"></span>
+                                                </span>
+                                                <template x-if="tour.mnemonicCode && String(tour.mnemonicCode).trim().length > 0">
+                                                    <span class="d-inline-flex align-items-center gap-1">
+                                                        <i class="bi bi-key text-info"></i>
+                                                        <span class="font-monospace text-info" x-text="tour.mnemonicCode"></span>
+                                                    </span>
+                                                </template>
+                                                <template x-if="!tour.mnemonicCode || String(tour.mnemonicCode).trim().length === 0">
+                                                    <span class="d-inline-flex align-items-center gap-1 text-white-50 opacity-75 fs-7">
+                                                        <i class="bi bi-shuffle"></i>
+                                                        <span>PIN generato casualmente</span>
+                                                    </span>
+                                                </template>
                                             </div>
-                                            <h4 class="fw-black m-0 text-white">I Miei Musei</h4>
                                         </div>
-                                        <p class="text-white-50 small mb-4 flex-grow-1">Gestisci i musei a te assegnati ed inserisci le collezioni d'arte.</p>
-                                        <div class="mt-auto">
-                                            <span class="btn btn-orange fw-bold px-4 py-2 w-100 rounded-pill d-inline-flex align-items-center justify-content-center gap-2">
-                                                <span>Vai ai Musei</span> <i class="bi bi-arrow-right"></i>
-                                            </span>
-                                        </div>
-                                    </div>
+                                        <div class="d-flex align-items-center gap-2 justify-content-end flex-shrink-0">
+                                            <a :href="'/editor/tours?id=' + tour._id" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1.5 fw-bold d-inline-flex align-items-center gap-1" title="Modifica Visita">
+                                                <i class="bi bi-pencil-fill fs-7"></i>
+                                                <span class="d-none d-sm-inline">Modifica</span>
+                                            </a>
+                                            <button @click="createRoom(tour._id)"
+                                                     :class="isRoomActive(tour._id) ? 'btn-warning text-dark' : 'bg-orange text-white'"
+                                                     class="btn btn-sm rounded-pill px-3 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5"
+                                                     :title="isRoomActive(tour._id) ? 'Riprendi Presentazione Live' : 'Avvia Presentazione Live'">
+                                                 <i :class="isRoomActive(tour._id) ? 'bi bi-arrow-repeat' : 'bi bi-broadcast'" class="fs-6"></i>
+                                                 <span x-text="isRoomActive(tour._id) ? 'Riprendi' : 'Presenta'"></span>
+                                             </button>
+                                         </div>
+                                     </div>
+                                </template>
+                            </div>
+
+                            <div x-show="items.length > 3" class="mt-3 pt-2 text-center border-top border-secondary border-opacity-15">
+                                <a href="/editor/tours" onclick="localStorage.removeItem('artaround_tours_state')" class="text-orange small fw-bold text-decoration-none d-inline-flex align-items-center gap-1 hover-underline">
+                                    <span>Vedi tutte le <span x-text="items.length"></span> visite</span>
+                                    <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
-                </template>
 
-            </div>
+                </div>
 
-            <!-- DOCENTE DASHBOARD -->
-            <template x-if="permissions === 'docente'">
-                <div class="d-flex flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
+                <!-- DOCENTE DASHBOARD -->
+                <div x-show="getRole() === 'docente'" class="d-flex flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
 
                     <!-- Greeting -->
                     <div class="text-center mb-3 mb-md-4">
@@ -495,7 +617,7 @@
 
 
                  </div>
-             </template>
+             </div>
 
     </div>
     </main>
@@ -505,7 +627,7 @@
 
 
 
-    <div x-show="isReady && (!isLoggedIn || (permissions !== 'admin' && permissions !== 'editor' && permissions !== 'docente'))"
+    <div x-show="isReady && (!isLoggedIn || !['admin', 'editor', 'docente'].includes(getRole()))"
         x-cloak>
         <div class="vh-100 d-flex align-items-center justify-content-center text-center px-4">
             <div class="max-w-450">

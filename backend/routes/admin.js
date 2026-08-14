@@ -10,7 +10,7 @@ const isAdmin = authorize(['admin']);
 router.get('/dashboard', auth, isStaff, adminCtrl.serveDashboard);
 
 // GET /editor/stats -> used for fetching dashboard numbers
-router.get('/stats', auth, isAdmin, adminCtrl.getStats);
+router.get('/stats', auth, isStaff, adminCtrl.getStats);
 
 // GET /editor/tours -> used for fetching the list of tours
 router.get('/getTours', auth, isEditor, adminCtrl.getAllTours);

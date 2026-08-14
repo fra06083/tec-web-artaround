@@ -69,7 +69,7 @@
                 <a href="/editor/artworks" x-show="permissions !== 'docente'" class="nav-link-admin">
                     <i class="bi bi-palette"></i> <span>Gestione Opere</span>
                 </a>
-                <a href="/editor/import" x-show="permissions !== 'docente'" class="nav-link-admin">
+                <a href="/editor/import" x-show="permissions === 'admin'" class="nav-link-admin">
                     <i class="bi bi-file-earmark-arrow-up"></i> <span>Importa Dati</span>
                 </a>
 
@@ -107,32 +107,56 @@
                             <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                         </template>
                     </div>
-                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                    <div class="mobile-user-role-box">
+                        <span class="mobile-role-label">RUOLO</span>
+                        <span class="mini-role" x-text="permissions"></span>
+                    </div>
                 </div>
             </header>
 
 
             <!-- Desktop Header -->
-            <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
-                <div class="container-fluid">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
-                            <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
-                            <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
-                            </template>
-                        </div>
-                        <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold tracking-wide-1px">Bentornato</p>
-                            <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
+            <header class="navbar navbar-expand sticky-top py-2.5 px-4 d-none d-md-flex desktop-navbar">
+                <div class="container-fluid px-0">
+                    
+                    <!-- Left: Dynamic Section Badge -->
+                    <div class="d-flex align-items-center">
+                        <div class="desktop-section-badge">
+                            <div class="desktop-section-icon">
+                                <i class="bi bi-people text-orange fs-5"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="desktop-section-subtitle">PANNELLO DI CONTROLLO</span>
+                                <h5 class="desktop-section-title">Gestione Utenti</h5>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="text-end me-2">
-                            <span class="badge rounded-pill bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 px-3 py-1.5 fs-7 fw-bold text-capitalize" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : permissions)"></span>
+                    <!-- Right: Dynamic User & Role Profile Capsule -->
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="desktop-user-profile-bar shadow-lg">
+                            <div class="user-avatar-wrapper">
+                                <div class="user-avatar position-relative bg-orange text-white rounded-circle d-flex align-items-center justify-content-center overflow-hidden">
+                                    <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                                    <template x-if="propic">
+                                        <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
+                                    </template>
+                                </div>
+                                <span class="user-online-dot"></span>
+                            </div>
+
+                            <div class="desktop-user-info-group">
+                                <span class="desktop-user-name-line" x-text="username || 'Utente'"></span>
+                                <div>
+                                    <span class="desktop-role-pill-badge">
+                                        <i class="bi bi-shield-lock-fill text-orange fs-065 me-1"></i>
+                                        RUOLO: <span x-text="permissions"></span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </header>
 
@@ -144,30 +168,16 @@
                     <!-- Left Column -->
                     <div class="col-md-4">
 
-                        <div class="card bg-body border border-secondary-subtle rounded-4 p-3 mb-4 shadow-sm">
-                            <h6 class="text-orange fw-bold mb-3 d-flex align-items-center">
-                                <i class="bi bi-bell-fill me-2"></i> Richieste Utenti
-                                <span class="badge bg-orange ms-auto" x-text="pendingRequests.length"></span>
-                            </h6>
-                            <div class="list-group list-group-flush bg-transparent">
-                                <template x-for="req in pendingRequests" :key="req._id">
-                                    <div class="list-group-item bg-transparent border-secondary-subtle px-0 py-2">
-                                        <div class="small fw-bold text-body" x-text="req.user_name"></div>
-                                        <div class="text-body-secondary small">Vorrebbe gestire: <span class="text-body fw-medium" x-text="req.title"></span></div>
-                                    </div>
-                                </template>
-                                <div x-show="pendingRequests.length === 0" class="text-body-secondary small py-2">Nessuna richiesta da gestire.</div>
-                            </div>
-                        </div>
-
                         <div class="card bg-body border border-secondary-subtle rounded-4 p-4 shadow-sm">
-                            <h5 class="fw-bold mb-3">Cerca Autore</h5>
+                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-people-fill text-orange"></i> Cerca Utente / Autore
+                            </h5>
                             <div class="input-group mb-3">
                                 <input type="text" x-model="search" @input.debounce.300ms="searchUsers()"
                                        class="form-control bg-body-tertiary border-secondary-subtle text-body shadow-none"
-                                       placeholder="Cerca per nome o ID...">
+                                       placeholder="Cerca per nome, ruolo (es. editor) o ID...">
                                 <span class="input-group-text bg-body-tertiary border-secondary-subtle text-body-secondary">
-                                    <i class="bi bi-search"></i>
+                                    <i class="bi bi-search text-orange"></i>
                                 </span>
                             </div>
 

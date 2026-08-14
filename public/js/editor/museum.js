@@ -401,12 +401,21 @@ function museumManager() {
         // Coordinate normalizzate 0-1: la mappa scala su qualsiasi schermo.
         mappaClick(event, piano) {
             if (this.pinMode === null || this.pinModePiano !== piano) return;
- 
+
             const r = event.currentTarget.getBoundingClientRect();
-            const x = (event.clientX - r.left) / r.width;
-            const y = (event.clientY - r.top) / r.height;
+            if (!r || r.width === 0 || r.height === 0) return;
+
+            const x = Math.max(0, Math.min(1, (event.clientX - r.left) / r.width));
+            const y = Math.max(0, Math.min(1, (event.clientY - r.top) / r.height));
+
+            if (!this.currentMuseum.mappa) {
+                this.currentMuseum.mappa = { piante: [], sale: [], poi: [] };
+            }
+            if (!this.currentMuseum.mappa.sale) {
+                this.currentMuseum.mappa.sale = [];
+            }
             const sale = this.currentMuseum.mappa.sale;
- 
+
             if (this.pinMode === 'move' && sale[this.salaSelezionata]) {
                 sale[this.salaSelezionata].x = x;
                 sale[this.salaSelezionata].y = y;
@@ -418,7 +427,7 @@ function museumManager() {
                 });
                 this.salaSelezionata = sale.length - 1;
             }
- 
+
             this.annullaPin();
         },
  

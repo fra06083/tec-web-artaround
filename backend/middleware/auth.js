@@ -45,7 +45,9 @@ const optionalAuth = async (req, res, next) => {
 // Middleware per controllare i ruoli di admin e editor
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
-        if (!req.user || !allowedRoles.includes(req.user.permissions)) {
+        const userRole = (req.user?.permissions || '').toLowerCase();
+        const allowed = allowedRoles.map(r => r.toLowerCase());
+        if (!req.user || !allowed.includes(userRole)) {
             return res.status(403).send("Accesso negato: permessi insufficienti.");
         }
         next();

@@ -8,7 +8,7 @@ const getAllVisits = async (req, res) => {
         if (req.query.manage === 'true' && req.user) {
             if (req.user.permissions === 'docente') {
                 query = { createdBy: req.user._id };
-            } else if (req.user.permissions === 'admin') {
+            } else if (req.user.permissions === 'admin' || req.user.permissions === 'editor') {
                 query = {};
             } else {
                 query = { isPrivate: { $ne: true } };

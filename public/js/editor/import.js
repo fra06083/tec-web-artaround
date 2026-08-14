@@ -121,11 +121,12 @@ function importManager() {
 
         // --- GESTIONE FILE ---
         handleFileSelect(event) {
-            const file = event.target.files[0];
+            const file = event.target?.files?.[0] || event.dataTransfer?.files?.[0];
             if (!file) return;
 
             if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
                 this.showToast('Seleziona un file JSON valido', 'error');
+                this.selectedFile = null;
                 return;
             }
 
@@ -142,22 +143,13 @@ function importManager() {
                 } catch (error) {
                     this.showToast('Errore nel parsing del file JSON', 'error');
                     this.selectedFile = null;
+                    this.showPreview = false;
                 }
             };
             reader.readAsText(file);
         },
 
         validateAndPreview(data) {
-            // Struttura attesa:
-            // {
-            //   "museums": [
-            //     { "museum": "Nome", "city": "Città", "province": "PR", "region": "Regione", "address": "Indirizzo", "description": "Desc", "image": "URL" }
-            //   ],
-            //   "artworks": [
-            //     { "item": "Nome opera", "img_path": "URL", "museum_name": "Nome museo", "author": "Autore", "license": "Licenza" }
-            //   ]
-            // }
-
             const errors = [];
 
             if (!data.museums && !data.artworks) {
@@ -175,6 +167,7 @@ function importManager() {
             if (errors.length > 0) {
                 this.showToast(errors.join(', '), 'error');
                 this.selectedFile = null;
+                this.showPreview = false;
                 return;
             }
 
@@ -184,7 +177,16 @@ function importManager() {
 
         // --- IMPORTAZIONE ---
         async importData() {
-            if (!this.importedData) return;
+            if (!this.selectedFile || !this.importedData) {
+                this.showToast('Seleziona prima un file JSON da importare', 'error');
+                return;
+            }
+
+            if ((!this.importedData.museums || this.importedData.museums.length === 0) &&
+                (!this.importedData.artworks || this.importedData.artworks.length === 0)) {
+                this.showToast('Il file JSON non contiene musei o opere da importare', 'error');
+                return;
+            }
 
             this.isUploading = true;
             this.importResults = {

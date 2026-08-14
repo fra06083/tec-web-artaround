@@ -107,33 +107,56 @@
                             <img :src="propic" alt="" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                         </template>
                     </div>
-                    <span class="mini-role" x-text="permissions === 'admin' ? 'Amministratore' : (permissions === 'docente' ? 'Docente' : (permissions || 'Editor'))"></span>
+                    <div class="mobile-user-role-box">
+                        <span class="mobile-role-label">RUOLO</span>
+                        <span class="mini-role" x-text="permissions"></span>
+                    </div>
                 </div>
             </header>
 
 
             <!-- Desktop Header -->
-            <header class="navbar navbar-expand glass-header sticky-top py-3 px-4 d-none d-md-flex desktop-navbar">
-                <div class="container-fluid">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar position-relative bg-orange rounded-circle d-flex align-items-center justify-content-center avatar-hover-glow cursor-pointer overflow-hidden">
-                            <span x-text="username ? username.charAt(0).toUpperCase() : ''" class="text-white fw-bold"></span>
-                            <template x-if="propic">
-                                <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
-                            </template>
-                        </div>
-                        <div>
-                            <p class="m-0 x-small text-white-50 text-uppercase fw-bold ls-1">
-                                Bentornato</p>
-                            <h5 class="m-0 fw-bold text-white" x-text="username"></h5>
+            <header class="navbar navbar-expand sticky-top py-2.5 px-4 d-none d-md-flex desktop-navbar">
+                <div class="container-fluid px-0">
+                    
+                    <!-- Left: Dynamic Section Badge -->
+                    <div class="d-flex align-items-center">
+                        <div class="desktop-section-badge">
+                            <div class="desktop-section-icon">
+                                <i class="bi bi-cloud-arrow-up text-orange fs-5"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="desktop-section-subtitle">PANNELLO DI CONTROLLO</span>
+                                <h5 class="desktop-section-title">Importa Dati</h5>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Right: Dynamic User & Role Profile Capsule -->
                     <div class="ms-auto d-flex align-items-center gap-3">
-                        <button @click="downloadExample()" class="btn btn-outline-orange btn-sm rounded-pill px-3">
-                            <i class="bi bi-download me-1"></i> Scarica Esempio
-                        </button>
+                        <div class="desktop-user-profile-bar shadow-lg">
+                            <div class="user-avatar-wrapper">
+                                <div class="user-avatar position-relative bg-orange text-white rounded-circle d-flex align-items-center justify-content-center overflow-hidden">
+                                    <span x-text="username ? username.charAt(0).toUpperCase() : 'U'"></span>
+                                    <template x-if="propic">
+                                        <img :src="propic" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover img-avatar-fade" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
+                                    </template>
+                                </div>
+                                <span class="user-online-dot"></span>
+                            </div>
+
+                            <div class="desktop-user-info-group">
+                                <span class="desktop-user-name-line" x-text="username || 'Utente'"></span>
+                                <div>
+                                    <span class="desktop-role-pill-badge">
+                                        <i class="bi bi-shield-lock-fill text-orange fs-065 me-1"></i>
+                                        RUOLO: <span x-text="permissions"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </header>
 
@@ -149,10 +172,10 @@
 
                     <div class="row justify-content-center">
                         <div class="col-12 col-md-8 col-lg-6">
-                            <div class="card glass-card border border-white border-opacity-10 rounded-4 p-4 p-sm-5 shadow-lg text-center" style="background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); backdrop-filter: blur(16px);">
+                            <div class="card glass-card border border-white border-opacity-10 rounded-4 p-4 p-sm-5 shadow-lg text-center">
                                 
                                 <div class="mb-4">
-                                    <div class="d-inline-flex align-items-center justify-content-center mb-3 rounded-circle shadow-sm" style="width:72px; height:72px; background: rgba(249,115,22,0.15); border: 2px solid rgba(249,115,22,0.4);">
+                                    <div class="d-inline-flex align-items-center justify-content-center mb-3 rounded-circle shadow-sm icon-box-72 bg-orange-subtle-box">
                                         <i class="bi bi-file-earmark-arrow-up text-orange fs-2"></i>
                                     </div>
                                     <h3 class="fw-bold mb-2 text-white fs-4 fs-sm-3">Importa Musei e Opere</h3>
@@ -160,17 +183,16 @@
                                 </div>
 
                                 <!-- Mobile Upload Zone -->
-                                <div class="upload-zone rounded-4 p-4 p-sm-5 mb-4 border-2 transition-all cursor-pointer"
+                                <div class="upload-zone rounded-4 p-4 p-sm-5 mb-4 border-2 transition-all cursor-pointer border-dashed"
                                     :class="{ 'border-orange bg-orange bg-opacity-10': selectedFile, 'border-secondary border-opacity-25 bg-dark bg-opacity-40': !selectedFile }"
-                                    style="border-style: dashed;"
                                     @click="$refs.fileInput.click()"
                                     @dragover.prevent
                                     @drop.prevent="handleFileSelect({ target: { files: $event.dataTransfer.files } })">
                                     <input type="file" x-ref="fileInput" @change="handleFileSelect" accept=".json" class="d-none">
                                     <template x-if="!selectedFile">
                                         <div>
-                                            <div class="bg-orange bg-opacity-15 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; border:1px solid rgba(249,115,22,0.3);">
-                                                <i class="bi bi-cloud-upload text-orange fs-3"></i>
+                                            <div class="bg-orange-circle-box rounded-circle d-inline-flex align-items-center justify-content-center mb-3 icon-box-60">
+                                                <i class="bi bi-cloud-upload text-white fs-3"></i>
                                             </div>
                                             <p class="mb-0 text-white fs-6">
                                                 <span class="text-orange fw-bold">Tocca per selezionare</span> il file JSON
@@ -179,7 +201,7 @@
                                     </template>
                                     <template x-if="selectedFile">
                                         <div>
-                                            <div class="bg-success bg-opacity-15 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; border:1px solid rgba(34,197,94,0.3);">
+                                            <div class="bg-success-circle-box rounded-circle d-inline-flex align-items-center justify-content-center mb-3 icon-box-60">
                                                 <i class="bi bi-file-earmark-text text-success fs-3"></i>
                                             </div>
                                             <p class="fw-bold mb-0 text-white fs-6" x-text="selectedFile.name"></p>
@@ -188,18 +210,25 @@
                                     </template>
                                 </div>
 
-                                <!-- Vertically Stacked Touch Buttons -->
-                                <div class="d-flex flex-column gap-2.5">
-                                    <button @click="importData()" class="btn text-white w-100 py-3 rounded-pill fw-bold fs-6 shadow-lg hover-lift transition-all" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); min-height: 50px;" :disabled="!selectedFile || isUploading">
-                                        <span x-show="!isUploading" class="d-flex align-items-center justify-content-center gap-2">
-                                            <i class="bi bi-cloud-arrow-up-fill fs-5"></i> <span>Avvia Importazione</span>
-                                        </span>
-                                        <span x-show="isUploading" class="d-flex align-items-center justify-content-center gap-2">
-                                            <span class="spinner-border spinner-border-sm"></span>
-                                            <span>Importazione in corso...</span>
-                                        </span>
+                                <!-- Vertically Stacked Touch Buttons with generous margin & gap -->
+                                <div class="d-flex flex-column gap-3 my-2">
+                                    <button @click="importData()" 
+                                            class="btn btn-orange-solid text-white w-100 py-3 rounded-pill fw-bold fs-6 shadow-lg transition-all min-h-50"
+                                            :class="(!selectedFile || isUploading) ? 'opacity-50 pe-none' : 'hover-lift'"
+                                            :disabled="!selectedFile || isUploading">
+                                        <template x-if="!isUploading">
+                                            <span class="d-flex align-items-center justify-content-center gap-2">
+                                                <i class="bi bi-cloud-arrow-up-fill fs-5"></i> <span>Avvia Importazione</span>
+                                            </span>
+                                        </template>
+                                        <template x-if="isUploading">
+                                            <span class="d-flex align-items-center justify-content-center gap-2">
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                                <span>Importazione in corso...</span>
+                                            </span>
+                                        </template>
                                     </button>
-                                    <button @click="downloadExample()" class="btn btn-dark border border-secondary border-opacity-25 text-white-50 w-100 py-3 rounded-pill fw-bold fs-7 hover-lift transition-all" style="min-height: 48px;">
+                                    <button @click="downloadExample()" class="btn btn-dark border border-secondary border-opacity-25 text-white-50 w-100 py-3 rounded-pill fw-bold fs-7 hover-lift transition-all min-h-48 mt-1">
                                         <i class="bi bi-download text-orange me-2"></i> <span>Esempio JSON</span>
                                     </button>
                                 </div>
@@ -291,14 +320,18 @@
                     </div>
 
                     <div class="mt-4 text-end">
-                        <button @click="importData()" class="btn btn-orange btn-lg px-5" :disabled="isUploading">
-                            <span x-show="!isUploading">
-                                <i class="bi bi-check-circle me-2"></i> Conferma Importazione
-                            </span>
-                            <span x-show="isUploading">
-                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                Importazione in corso...
-                            </span>
+                        <button @click="importData()" class="btn btn-orange btn-lg px-5" :disabled="!selectedFile || isUploading">
+                            <template x-if="!isUploading">
+                                <span class="d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-check-circle me-1"></i> <span>Conferma Importazione</span>
+                                </span>
+                            </template>
+                            <template x-if="isUploading">
+                                <span class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
+                                    <span>Importazione in corso...</span>
+                                </span>
+                            </template>
                         </button>
                     </div>
                 </div>
