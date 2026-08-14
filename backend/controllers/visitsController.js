@@ -1,14 +1,18 @@
 const { visit: Visit, museum: Museum, quizQuestion: QuizQuestion } = require('../models/museums');
 
 // GET /api/visite
-// Ritorna le visite. Se l'utente loggato è un docente e manage=true, ritorna solo le sue. Altrimenti nasconde le visite private.
+// Ritorna le visite. Se l'utente loggato è un docente e manage=true, ritorna solo le sue.
+// Se l'utente è un editor e manage=true, ritorna solo quelle dei musei assegnati.
 const getAllVisits = async (req, res) => {
     try {
         let query = {};
         if (req.query.manage === 'true' && req.user) {
             if (req.user.permissions === 'docente') {
                 query = { createdBy: req.user._id };
-            } else if (req.user.permissions === 'admin' || req.user.permissions === 'editor') {
+            } else if (req.user.permissions === 'editor') {
+                const userMuseums = (req.user.museums || []).map(id => id.toString());
+                query = { museum_id: { $in: userMuseums } };
+            } else if (req.user.permissions === 'admin') {
                 query = {};
             } else {
                 query = { isPrivate: { $ne: true } };
@@ -41,6 +45,15 @@ const getVisitById = async (req, res) => {
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
+        // Controllo permessi editor
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? (visit.museum_id._id ? visit.museum_id._id.toString() : visit.museum_id.toString()) : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non disponi dei permessi per accedere alla visita di questo museo' });
+            }
+        }
+
         // Se la visita è privata, vieta la fruizione individuale diretta senza PIN o permessi
         if (visit.isPrivate && !req.query.pin && (!req.user || req.user.permissions === 'studente')) {
             return res.status(403).json({ error: 'Questa visita è privata. Puoi accedervi solo tramite il codice PIN fornito dal docente.' });
@@ -61,6 +74,14 @@ const createVisit = async (req, res) => {
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
+        }
+
+        // Controllo permessi editor
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            if (!userMuseums.includes(museum_id ? museum_id.toString() : '')) {
+                return res.status(403).json({ error: 'Non disponi dei permessi per creare visite per questo museo' });
+            }
         }
 
         const codeToSave = mnemonicCode ? String(mnemonicCode).trim().slice(0, 6) : '';
@@ -92,9 +113,21 @@ const updateVisit = async (req, res) => {
         if (!visitToUpdate) return res.status(404).json({ error: 'Visita non trovata' });
 
         // Controllo permessi docente
-        if (req.user.permissions === 'docente') {
+        if (req.user && req.user.permissions === 'docente') {
             if (!visitToUpdate.createdBy || visitToUpdate.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        // Controllo permessi editor
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visitToUpdate.museum_id ? visitToUpdate.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
+            }
+            if (req.body.museum_id && !userMuseums.includes(req.body.museum_id.toString())) {
+                return res.status(403).json({ error: 'Non puoi spostare la visita in un museo a cui non hai accesso' });
             }
         }
 
@@ -122,9 +155,18 @@ const deleteVisit = async (req, res) => {
         if (!visitToDelete) return res.status(404).json({ error: 'Visita non trovata' });
 
         // Controllo permessi docente
-        if (req.user.permissions === 'docente') {
+        if (req.user && req.user.permissions === 'docente') {
             if (!visitToDelete.createdBy || visitToDelete.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a eliminare questa visita' });
+            }
+        }
+
+        // Controllo permessi editor
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visitToDelete.museum_id ? visitToDelete.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a eliminare la visita di questo museo' });
             }
         }
 
@@ -159,6 +201,14 @@ const addItemToVisit = async (req, res) => {
         const visit = await Visit.findById(req.params.id);
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? visit.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
+            }
+        }
+
         // Evita duplicati
         if (visit.items.map(id => id.toString()).includes(item_id)) {
             return res.status(400).json({ error: 'Item già presente nella visita' });
@@ -178,6 +228,14 @@ const removeItemFromVisit = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id);
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
+
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? visit.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
+            }
+        }
 
         visit.items = visit.items.filter(
             id => id.toString() !== req.params.itemId
@@ -219,9 +277,17 @@ const addQuizQuestion = async (req, res) => {
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
         // Controllo permessi docente (stesso pattern di updateVisit)
-        if (req.user.permissions === 'docente') {
+        if (req.user && req.user.permissions === 'docente') {
             if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? visit.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
             }
         }
 
@@ -252,9 +318,17 @@ const updateQuizQuestion = async (req, res) => {
         const visit = await Visit.findById(req.params.id);
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
-        if (req.user.permissions === 'docente') {
+        if (req.user && req.user.permissions === 'docente') {
             if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? visit.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
             }
         }
 
@@ -277,9 +351,17 @@ const removeQuizQuestion = async (req, res) => {
         const visit = await Visit.findById(req.params.id);
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
-        if (req.user.permissions === 'docente') {
+        if (req.user && req.user.permissions === 'docente') {
             if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
+            }
+        }
+
+        if (req.user && req.user.permissions === 'editor') {
+            const userMuseums = (req.user.museums || []).map(id => id.toString());
+            const visitMuseumId = visit.museum_id ? visit.museum_id.toString() : '';
+            if (!userMuseums.includes(visitMuseumId)) {
+                return res.status(403).json({ error: 'Non sei autorizzato a modificare la visita di questo museo' });
             }
         }
 

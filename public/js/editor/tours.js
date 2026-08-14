@@ -501,7 +501,12 @@ document.addEventListener('alpine:init', () => {
                     await this.fetchQuizQuestions();
                     return true;
                 } else {
-                    this.showToast("Errore nel caricamento della visita", "error");
+                    let errMsg = "Errore nel caricamento della visita";
+                    try {
+                        const errData = await res.json();
+                        errMsg = errData.error || errMsg;
+                    } catch (e) {}
+                    this.showToast(errMsg, "error");
                     return false;
                 }
             } catch (e) {
