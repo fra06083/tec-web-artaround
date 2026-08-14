@@ -39,8 +39,7 @@
 
 <body class="bg-dark text-white font-sans" data-bs-theme="dark" x-data="marketplaceApp()">
 
-    <div x-show="isReady && isLoggedIn && ['admin', 'editor', 'docente'].includes(getRole())"
-        class="d-flex min-vh-100"
+    <div :class="isReady && isLoggedIn && ['admin', 'editor', 'docente'].includes(getRole()) ? 'd-flex min-vh-100' : 'd-none'"
         x-cloak>
 
         <aside class="sidebar bg-dark shadow d-flex flex-column">
@@ -165,7 +164,7 @@
 
 
                 <!-- ADMIN DASHBOARD -->
-                <div x-show="getRole() === 'admin'">
+                <div :class="getRole() === 'admin' ? '' : 'd-none'">
                         <h4 class="fw-bold mb-1">Panoramica Globale Sistema</h4>
                         <p class="text-body-secondary mb-4">Tutti i dati in tempo reale dal database e gestione sessione live.</p>
 
@@ -320,7 +319,7 @@
                 </div>
 
                 <!-- EDITOR DASHBOARD -->
-                <div x-show="getRole() === 'editor'" class="d-flex flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
+                <div :class="getRole() === 'editor' ? 'd-flex' : 'd-none'" class="flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
 
                     <!-- Greeting -->
                     <div class="text-center mb-3 mb-md-4">
@@ -485,7 +484,7 @@
                 </div>
 
                 <!-- DOCENTE DASHBOARD -->
-                <div x-show="getRole() === 'docente'" class="d-flex flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
+                <div :class="getRole() === 'docente' ? 'd-flex' : 'd-none'" class="flex-column align-items-center px-2 px-sm-3 px-lg-5 py-2 py-md-4">
 
                     <!-- Greeting -->
                     <div class="text-center mb-3 mb-md-4">
@@ -627,7 +626,7 @@
 
 
 
-    <div x-show="isReady && (!isLoggedIn || !['admin', 'editor', 'docente'].includes(getRole()))"
+    <div :class="isReady && (!isLoggedIn || !['admin', 'editor', 'docente'].includes(getRole())) ? '' : 'd-none'"
         x-cloak>
         <div class="vh-100 d-flex align-items-center justify-content-center text-center px-4">
             <div class="max-w-450">

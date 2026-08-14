@@ -184,10 +184,8 @@
     font-family: var(--bs-font-monospace);
 }
 
-/* Alpine.js Utility & display:none override for Bootstrap !important flex classes */
-[x-cloak],
-[style*="display: none"],
-[style*="display:none"] {
+/* Alpine.js Utility */
+[x-cloak] {
     display: none !important;
 }
 
