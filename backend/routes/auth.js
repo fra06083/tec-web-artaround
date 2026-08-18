@@ -141,7 +141,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
         const user = await User.findByIdAndUpdate(
             userId,
             { name, propic: propic || "" },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         res.json({ message: 'Profilo aggiornato con successo', user: {

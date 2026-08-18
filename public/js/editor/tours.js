@@ -476,7 +476,6 @@ document.addEventListener('alpine:init', () => {
                 });
                 if (res.ok) {
                     const tourData = await res.json();
-                    // Handle museum_id that might be an object (populated) or ObjectId
                     const museumId = tourData.museum_id ? (typeof tourData.museum_id === 'object' ? tourData.museum_id._id : tourData.museum_id) : '';
 
                     // Sostituisco l'intero oggetto tour in una sola operazione per garantire

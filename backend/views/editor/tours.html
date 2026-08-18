@@ -76,7 +76,7 @@
                 <button @click.prevent="logout()" class="btn btn-danger w-100 fw-bold text-white border-0 shadow-sm rounded-3 py-2 mt-2">Logout</button>
             </div>
         </aside>
-        <main class="main-content flex-grow-1">
+        <main class="main-content flex-grow-1 min-w-0 overflow-x-hidden">
             <!-- Mobile Header (Premium Dark Glassmorphic) -->
             <header class="mobile-header">
                 <a href="/editor-marketplace/index.html" class="mobile-logo">
@@ -171,7 +171,7 @@
                                         @click="selectedMuseum = null; tours = []; tourSearch = '';" 
                                         class="btn p-0 border-0 d-inline-flex align-items-center justify-content-center flex-shrink-0 hover-lift ms-auto"
                                         title="Torna ai musei">
-                                    <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18);">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle icon-box-36 bg-white bg-opacity-10 border border-white border-opacity-20">
                                         <i class="bi bi-chevron-left text-orange fw-bold fs-6"></i>
                                     </div>
                                 </button>
@@ -180,9 +180,9 @@
 
                         <!-- Selected Museum Info Card (Visible on mobile ONLY when museum selected) -->
                         <template x-if="selectedMuseum">
-                            <div class="d-flex align-items-center justify-content-between gap-3 my-3 p-3 rounded-4 glass-card border border-orange border-opacity-30 shadow-sm" style="background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.04) 100%);">
+                            <div class="d-flex align-items-center justify-content-between gap-3 my-3 p-3 rounded-4 glass-card border border-orange border-opacity-30 shadow-sm bg-gradient-orange-subtle">
                                 <div class="d-flex align-items-center gap-3 min-w-0">
-                                    <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 icon-box-38 border border-orange border-opacity-30" style="background: rgba(249,115,22,0.2);">
+                                    <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 icon-box-38 border border-orange border-opacity-30 bg-orange bg-opacity-20">
                                         <i class="bi bi-bank text-orange fs-6"></i>
                                     </div>
                                     <div class="min-w-0 flex-grow-1">
@@ -233,14 +233,14 @@
                     </div>
 
                     <!-- Desktop Glassmorphic Control Deck Header -->
-                    <div class="glass-card rounded-4 p-3.5 p-md-4 mb-4 border border-white border-opacity-10 shadow-lg position-relative overflow-hidden d-none d-sm-block" style="background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%); backdrop-filter: blur(16px);">
+                    <div class="glass-card rounded-4 p-3.5 p-md-4 mb-4 border border-white border-opacity-10 shadow-lg position-relative overflow-hidden d-none d-sm-block bg-gradient-orange-header">
                         
                         <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 gap-lg-4">
                             
                             <!-- Left: Title & Subtitle / Museum Selector -->
-                            <div class="d-flex flex-column gap-1.5" style="max-width: 520px;">
+                            <div class="d-flex flex-column gap-1.5 max-w-520">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm" style="width:46px; height:46px; background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, rgba(249,115,22,0.05) 100%); border: 1px solid rgba(249,115,22,0.3);">
+                                    <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 shadow-sm icon-box-46 icon-box-orange-soft">
                                         <i class="bi bi-pencil-square text-orange fs-4"></i>
                                     </div>
                                     <div class="d-flex flex-column">
@@ -254,7 +254,7 @@
 
                                 <!-- Museum Selector Badge Dropdown when museum IS selected -->
                                 <div :class="selectedMuseum ? 'd-flex align-items-center gap-2 mt-1' : 'd-none'">
-                                    <div class="input-group input-group-sm rounded-pill overflow-hidden border border-orange border-opacity-30 bg-dark bg-opacity-60 shadow-sm" style="max-width:280px;">
+                                    <div class="input-group input-group-sm rounded-pill overflow-hidden border border-orange border-opacity-30 bg-dark bg-opacity-60 shadow-sm max-w-280">
                                         <span class="input-group-text bg-transparent border-0 text-orange ps-2.5">
                                             <i class="bi bi-bank"></i>
                                         </span>
@@ -272,7 +272,7 @@
                             </div>
                             
                             <!-- Right Controls & Actions Deck -->
-                            <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 gap-md-3 flex-shrink-0">
+                            <div class="d-flex flex-wrap flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 gap-md-3 min-w-0">
                                 <!-- City & Search Filters Container -->
                                 <div class="d-flex align-items-center gap-2 gap-md-3 w-100 w-lg-auto" :class="!selectedMuseum ? 'd-flex' : 'd-none'">
                                     <!-- City / Location Filter -->
@@ -311,30 +311,8 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Visibility Filter (Tutte / Pubbliche / Private) -->
-                                <div class="segmented-filter-control" :class="selectedMuseum ? 'd-inline-flex' : 'd-none'">
-                                    <button type="button" 
-                                        @click="visibilityFilter = 'all'" 
-                                        class="filter-pill"
-                                        :class="{ 'active-all': visibilityFilter === 'all' }">
-                                        Tutte
-                                    </button>
-                                    <button type="button" 
-                                        @click="visibilityFilter = 'public'" 
-                                        class="filter-pill"
-                                        :class="{ 'active-public': visibilityFilter === 'public' }">
-                                        <i class="bi bi-globe"></i> Pubbliche
-                                    </button>
-                                    <button type="button" 
-                                        @click="visibilityFilter = 'private'" 
-                                        class="filter-pill"
-                                        :class="{ 'active-private': visibilityFilter === 'private' }">
-                                        <i class="bi bi-lock-fill"></i> Private
-                                    </button>
-                                </div>
-
                                 <!-- Button Nuova Visita -->
-                                <button :class="selectedMuseum ? 'd-inline-flex' : 'd-none'" @click="createNewTour()" class="btn text-white rounded-pill px-4 py-2.5 fs-6 fw-bold shadow-lg align-items-center justify-content-center gap-2 hover-lift text-nowrap flex-grow-1 flex-lg-grow-0" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: 1px solid rgba(255,255,255,0.25);" x-transition.opacity>
+                                <button :class="selectedMuseum ? 'd-inline-flex' : 'd-none'" @click="createNewTour()" class="btn text-white rounded-pill px-4 py-2.5 fs-6 fw-bold shadow-lg align-items-center justify-content-center gap-2 hover-lift text-nowrap flex-grow-1 flex-lg-grow-0 btn-orange-solid" x-transition.opacity>
                                     <i class="bi bi-plus-circle-fill fs-5"></i> <span>Nuova Visita</span>
                                 </button>
                             </div>
@@ -343,7 +321,7 @@
 
                     <!-- Initial Loading Spinner -->
                     <div x-show="!isLoaded" class="py-5 text-center my-5" x-transition.opacity>
-                        <div class="spinner-border text-orange" role="status" style="width:2.5rem;height:2.5rem;border-width:3px;">
+                        <div class="spinner-border text-orange spinner-orange-sm" role="status">
                             <span class="visually-hidden">Caricamento...</span>
                         </div>
                     </div>
@@ -383,12 +361,12 @@
                                 </template>
                             </div>
 
-                            <div x-show="!selectedMuseum && filteredMuseums().length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
-                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
-                                    <i class="bi bi-search text-orange" style="font-size:1.4rem;"></i>
+                            <div x-show="!selectedMuseum && filteredMuseums().length === 0" class="rounded-4 p-5 text-center mx-auto my-4 glass-card-subtle max-w-400" x-transition.opacity>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 icon-box-52">
+                                    <i class="bi bi-search text-orange fs-5"></i>
                                 </div>
                                 <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
-                                <p class="small mb-0" style="color:rgba(255,255,255,0.45);">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                                <p class="small mb-0 text-white-50">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
                             </div>
                         </div>
                         
@@ -418,7 +396,7 @@
                                                         </span>
                                                     </div>
                                                      <div class="text-end" x-show="t.mnemonicCode">
-                                                        <span class="badge rounded-pill px-2.5 py-1 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1.5" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.22);"><i class="bi bi-upc-scan text-orange fw-bold"></i><span x-text="t.mnemonicCode"></span></span>
+                                                        <span class="badge rounded-pill px-2.5 py-1 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1.5 bg-white bg-opacity-10 border border-white border-opacity-20"><i class="bi bi-upc-scan text-orange fw-bold"></i><span x-text="t.mnemonicCode"></span></span>
                                                      </div>
                                                 </div>
 
@@ -456,16 +434,15 @@
                         <!-- Mobile Tour Cards (Matching Gestione Musei Layout) -->
                         <div x-show="filteredTours.length > 0" class="d-sm-none d-flex flex-column gap-3">
                             <template x-for="t in filteredTours" :key="t._id">
-                                <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+                                <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3 glass-card-subtle">
                                     
                                     <div class="d-flex gap-3 align-items-start mb-2.5">
                                         <!-- Thumbnail -->
-                                        <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm" style="width:62px;height:62px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
-                                            <i class="bi bi-pencil-square text-white" style="font-size:1.6rem;opacity:0.35;"></i>
+                                        <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm icon-box-62 icon-box-orange-grad">
+                                            <i class="bi bi-pencil-square text-white fs-3 opacity-35"></i>
                                             <img x-show="t.cover_image || t.image || t.immagine"
                                                  :src="t.cover_image || t.image || t.immagine || ''"
-                                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
-                                                 style="z-index:1;" alt=""
+                                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1" alt=""
                                                  @error="$el.style.display='none'">
                                         </div>
 
@@ -473,30 +450,30 @@
                                         <div class="d-flex flex-column flex-grow-1 min-w-0">
                                             <h6 class="fw-bold text-white mb-1 tracking-tight text-truncate fs-6" x-text="t.name"></h6>
                                             <div class="d-flex flex-wrap align-items-center gap-1.5 mb-1">
-                                                <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1" style="font-size:0.65rem;background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.28);">
+                                                <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 badge-orange-subtle fs-065">
                                                     <i class="bi" :class="t.isPrivate ? 'bi-lock-fill' : 'bi-globe'"></i>
                                                     <span x-text="t.isPrivate ? 'Privata' : 'Pubblica'"></span>
                                                 </span>
-                                                <span class="badge rounded-pill px-2.5 py-0.5 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1" style="font-size:0.68rem; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.22);" x-show="t.mnemonicCode">
+                                                <span class="badge rounded-pill px-2.5 py-0.5 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1 bg-white bg-opacity-10 border border-white border-opacity-20 fs-068" x-show="t.mnemonicCode">
                                                     <i class="bi bi-upc-scan text-orange fw-bold"></i>
                                                     <span x-text="t.mnemonicCode"></span>
                                                 </span>
                                             </div>
-                                            <p class="text-white-50 mb-0 line-clamp-1" style="font-size:0.75rem;" x-text="t.description || 'Nessuna descrizione.'"></p>
+                                            <p class="text-white-50 mb-0 line-clamp-1 fs-075" x-text="t.description || 'Nessuna descrizione.'"></p>
                                         </div>
                                     </div>
 
                                     <!-- Soft Actions Pill Buttons -->
-                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5" style="border-top:1px solid rgba(255,255,255,0.07);">
-                                        <button type="button" @click.prevent.stop="editTour(t._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5 border-top-subtle">
+                                        <button type="button" @click.prevent.stop="editTour(t._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-orange-subtle">
                                             <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                         </button>
-                                        <button type="button" @click.prevent.stop="deleteTourFromList(t._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);">
+                                        <button type="button" @click.prevent.stop="deleteTourFromList(t._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-danger-subtle">
                                             <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
                                         </button>
                                         <button type="button" @click.prevent.stop="createRoom(t._id)"
                                                 :class="isRoomActive(t._id) ? 'btn-warning text-dark' : 'bg-orange text-white'"
-                                                class="btn rounded-circle p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width:36px;height:36px;"
+                                                class="btn btn-icon-36 rounded-circle p-0 d-inline-flex align-items-center justify-content-center flex-shrink-0 shadow-sm"
                                                 :title="isRoomActive(t._id) ? 'Riprendi Sessione Live' : 'Avvia Sessione Live'">
                                             <i :class="isRoomActive(t._id) ? 'bi bi-arrow-repeat fs-6' : 'bi bi-broadcast fs-6'"></i>
                                         </button>

@@ -278,10 +278,15 @@ function artworkManager() {
 
         // Scegliendo la sala si compila anche il piano
         aggiornaSala(nome) {
-            this.currentArtwork.sala.nome = nome;
+            if (!this.currentArtwork.sala) this.currentArtwork.sala = { nome: '', piano: null };
+            this.currentArtwork.sala.nome = nome || '';
+            if (!nome) {
+                this.currentArtwork.sala.piano = null;
+                return;
+            }
             const s = this.getSaleMuseo().find(x => x.nome === nome);
             if (s) this.currentArtwork.sala.piano = s.piano;
-},
+        },
 
         // ARTWORK LOGIC
         async fetchArtworks() {
@@ -330,7 +335,7 @@ function artworkManager() {
                     museum_id: artwork.museum_id || this.selectedMuseumId,
                     author: artwork.author || '',
                     license: artwork.license || '',
-                    sala: { nome: artwork.sala?.nome || '', piano: artwork.sala?.piano ?? 0 },
+                    sala: { nome: artwork.sala?.nome || '', piano: artwork.sala?.piano ?? null },
                     description: artwork.description || '',
                     desc_type: artwork.desc_type || 'medio'
                 };
@@ -351,7 +356,7 @@ function artworkManager() {
                     museum_id: this.selectedMuseumId,
                     author: '',
                     license: '',
-                    sala: { nome: '', piano: 0 },
+                    sala: { nome: '', piano: null },
                     description: '',
                     desc_type: 'medio'
                 };
@@ -368,10 +373,10 @@ function artworkManager() {
                 this.showToast("Compila tutti i campi obbligatori", "error");
                 return;
             }
-            if (!this.currentArtwork.sala?.nome) {
-                this.showToast("Indica in quale sala si trova l'opera", "error");
-                return;
+            if (!this.currentArtwork.sala || !this.currentArtwork.sala.nome) {
+                this.currentArtwork.sala = { nome: '', piano: null };
             }
+
             const allDescriptions = [];
             for (const type of Object.keys(this.descriptions)) {
                 for (const len of Object.keys(this.descriptions[type])) {

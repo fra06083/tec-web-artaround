@@ -561,11 +561,12 @@
 
 
 
-/* Prevent body horizontal overflow on mobile viewports */
+/* Prevent body horizontal overflow across all viewports */
+.main-content {
+    overflow-x: hidden;
+}
+
 @media (max-width: 575.98px) {
-    .main-content {
-        overflow-x: hidden;
-    }
 
     /* Segmented nav control mobile responsive width */
     .segmented-control {

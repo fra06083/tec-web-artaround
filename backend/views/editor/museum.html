@@ -198,9 +198,9 @@
                         </div>
 
                         <!-- Mobile Only: Mini Orange Import Card Below Search Bar -->
-                        <div class="rounded-4 p-3 mb-4 border border-orange border-opacity-40 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, rgba(234,88,12,0.08) 100%);">
+                        <div class="rounded-4 p-3 mb-4 border border-orange border-opacity-40 shadow-sm position-relative overflow-hidden bg-gradient-orange-card">
                             <div class="d-flex align-items-center gap-2.5">
-                                <div class="rounded-circle bg-orange text-white p-2 d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width:36px; height:36px;">
+                                <div class="rounded-circle bg-orange text-white p-2 d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm icon-box-36">
                                     <i class="bi bi-cloud-arrow-up-fill fs-6"></i>
                                 </div>
                                 <div class="min-w-0 flex-grow-1">
@@ -263,7 +263,7 @@
                                 </div>
 
                                 <!-- Action Buttons Group (Visible ONLY to Admin) -->
-                                <div x-show="permissions === 'admin'" class="d-flex align-items-center gap-2 w-100 w-sm-auto flex-grow-1 flex-lg-grow-0">
+                                <div :class="permissions === 'admin' ? 'd-flex' : 'd-none'" class="align-items-center gap-2 w-100 w-sm-auto flex-grow-1 flex-lg-grow-0">
                                     <button @click="formTab = 'info'; openMuseumForm();" class="btn text-white rounded-pill px-4 py-2.5 fs-6 fw-bold shadow-lg d-inline-flex align-items-center justify-content-center gap-2 hover-lift text-nowrap flex-grow-1 flex-sm-grow-0 btn-orange-solid">
                                         <i class="bi bi-plus-circle-fill fs-5"></i> <span>Nuovo Museo</span>
                                     </button>
@@ -275,18 +275,18 @@
                     </div>
 
                     <div x-show="!isLoaded" class="py-5 text-center" x-transition.opacity>
-                        <div class="spinner-border text-orange" role="status" style="width:2rem;height:2rem;border-width:3px;">
+                        <div class="spinner-border text-orange loader-spinner-lg" role="status">
                             <span class="visually-hidden">Caricamento...</span>
                         </div>
                     </div>
 
-                    <div x-show="isLoaded && museums.length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
-                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
-                            <i class="bi bi-bank text-orange" style="font-size:1.4rem;"></i>
+                    <div x-show="isLoaded && museums.length === 0" class="rounded-4 p-5 text-center mx-auto my-4 empty-state-box" x-transition.opacity>
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3 empty-state-icon-circle">
+                            <i class="bi bi-bank text-orange fs-4"></i>
                         </div>
                         <h5 class="fw-bold text-white mb-2">Nessun museo</h5>
                         <div x-show="permissions === 'admin'">
-                            <p class="small mb-4" style="color:rgba(255,255,255,0.45);">Crea il primo museo o importa una configurazione JSON.</p>
+                            <p class="small mb-4 empty-state-text">Crea il primo museo o importa una configurazione JSON.</p>
                             <button @click="formTab = 'info'; openMuseumForm();" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
                                 <i class="bi bi-plus-lg"></i> Crea Museo
                             </button>
@@ -296,12 +296,12 @@
                         </div>
                     </div>
 
-                    <div x-show="isLoaded && museums.length > 0 && filteredMuseumList().length === 0" class="rounded-4 p-5 text-center mx-auto my-4" style="max-width:380px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);" x-transition.opacity>
-                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3" style="width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.22);">
-                            <i class="bi bi-search text-orange" style="font-size:1.4rem;"></i>
+                    <div x-show="isLoaded && museums.length > 0 && filteredMuseumList().length === 0" class="rounded-4 p-5 text-center mx-auto my-4 empty-state-box" x-transition.opacity>
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-3 empty-state-icon-circle">
+                            <i class="bi bi-search text-orange fs-4"></i>
                         </div>
                         <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
-                        <p class="small mb-0" style="color:rgba(255,255,255,0.45);">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                        <p class="small mb-0 empty-state-text">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
                     </div>
 
                     <div x-show="isLoaded && filteredMuseumList().length > 0">
@@ -312,22 +312,20 @@
                                     <div class="col-12 col-md-6 col-xl-4">
                                         <div class="glass-card h-100 rounded-4 overflow-hidden position-relative group transition-all transform hover-lift border-start border-4 border-orange">
 
-                                            <div class="position-relative overflow-hidden d-flex align-items-center justify-content-center" style="height:140px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
-                                                <i class="bi bi-bank text-white" style="font-size:3.5rem;opacity:0.22;"></i>
+                                            <div class="position-relative overflow-hidden d-flex align-items-center justify-content-center h-140 icon-box-orange-grad">
+                                                <i class="bi bi-bank text-white display-1 opacity-22"></i>
                                                 <img x-show="m.image || m.immagine"
                                                      :src="m.image || m.immagine || ''"
-                                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
-                                                     style="z-index:1;"
+                                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1"
                                                      alt=""
                                                      @error="$el.style.display='none'">
                                             </div>
 
-                                            <div class="p-4 d-flex flex-column" style="flex:1;">
+                                            <div class="p-4 d-flex flex-column flex-grow-1">
 
                                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                                     <template x-if="m.region || m.city">
-                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1"
-                                                              style="background:rgba(249,115,22,.18);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1 badge-orange-subtle">
                                                             <i class="bi bi-geo-alt-fill"></i>
                                                             <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
                                                         </span>
@@ -349,7 +347,7 @@
                                                     <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn bg-orange text-white rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
                                                         <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                                     </button>
-                                                    <button type="button" x-show="permissions === 'admin'" @click="deleteMuseum(m._id)" class="btn btn-outline-danger rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
+                                                    <button type="button" :class="permissions === 'admin' ? 'd-inline-flex' : 'd-none'" @click="deleteMuseum(m._id)" class="btn btn-outline-danger rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
                                                         <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
                                                     </button>
                                                 </div>
@@ -364,16 +362,15 @@
                         <!-- Mobile Museum Cards (Sleek Glassmorphic Layout) -->
                         <div class="d-sm-none d-flex flex-column gap-3">
                             <template x-for="m in visibleMuseums()" :key="m._id">
-                                <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">
+                                <div class="glass-card rounded-4 overflow-hidden transition-all border-start border-4 border-orange p-3 glass-card-subtle">
                                     
                                     <div class="d-flex gap-3 align-items-start mb-2.5">
                                         <!-- Thumbnail -->
-                                        <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm" style="width:62px;height:62px;background:linear-gradient(135deg,#f97316 0%,#c2410c 100%);">
-                                            <i class="bi bi-bank text-white" style="font-size:1.6rem;opacity:0.35;"></i>
+                                        <div class="position-relative flex-shrink-0 rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-sm icon-box-62 icon-box-orange-grad">
+                                            <i class="bi bi-bank text-white fs-3 opacity-35"></i>
                                             <img x-show="m.image || m.immagine"
                                                  :src="m.image || m.immagine || ''"
-                                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
-                                                 style="z-index:1;"
+                                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1"
                                                  alt=""
                                                  @error="$el.style.display='none'">
                                         </div>
@@ -383,28 +380,28 @@
                                             <h6 class="fw-bold text-white mb-1 tracking-tight text-truncate fs-6" x-text="m.museum"></h6>
                                             <div class="d-flex flex-wrap align-items-center gap-1.5 mb-1">
                                                 <template x-if="m.city || m.region">
-                                                    <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1" style="font-size:0.65rem;background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.28);">
+                                                    <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 badge-orange-subtle fs-065">
                                                         <i class="bi bi-geo-alt-fill"></i>
                                                         <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
                                                     </span>
                                                 </template>
                                                 <template x-if="m.mappa">
-                                                    <span class="badge bg-secondary bg-opacity-40 text-white-50 px-2 py-0.5 d-inline-flex align-items-center gap-1" style="font-size:0.65rem;">
+                                                    <span class="badge bg-secondary bg-opacity-40 text-white-50 px-2 py-0.5 d-inline-flex align-items-center gap-1 fs-065">
                                                         <i class="bi bi-layers text-orange opacity-75"></i>
                                                         <span x-text="(m.mappa&&m.mappa.piante?m.mappa.piante.length:0)+' piani · '+(m.mappa&&m.mappa.sale?m.mappa.sale.length:0)+' sale'"></span>
                                                     </span>
                                                 </template>
                                             </div>
-                                            <p class="text-white-50 mb-0 line-clamp-1" style="font-size:0.75rem;" x-text="m.description || 'Nessuna descrizione.'"></p>
+                                            <p class="text-white-50 mb-0 line-clamp-1 fs-075" x-text="m.description || 'Nessuna descrizione.'"></p>
                                         </div>
                                     </div>
 
                                     <!-- Soft Actions Pill Buttons -->
-                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5" style="border-top:1px solid rgba(255,255,255,0.07);">
-                                        <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.3);">
+                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5 border-top-subtle">
+                                        <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-orange-subtle">
                                             <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                         </button>
-                                        <button type="button" x-show="permissions === 'admin'" @click="deleteMuseum(m._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);">
+                                        <button type="button" :class="permissions === 'admin' ? 'd-inline-flex' : 'd-none'" @click="deleteMuseum(m._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold align-items-center justify-content-center gap-1.5 flex-grow-1 btn-danger-subtle">
                                             <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
                                         </button>
                                     </div>
@@ -414,10 +411,10 @@
                         </div>
 
                         <div x-show="hasMore()" class="text-center mt-4">
-                            <button @click="loadMore()" class="d-inline-flex align-items-center gap-2 rounded-pill px-4 py-2 hover-lift" style="font-size:0.79rem;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);transition:all .2s;">
-                                <i class="bi bi-chevron-down" style="font-size:0.73rem;"></i>
+                            <button @click="loadMore()" class="d-inline-flex align-items-center gap-2 rounded-pill px-4 py-2 hover-lift btn-load-more">
+                                <i class="bi bi-chevron-down fs-073"></i>
                                 <span>Carica altri <span x-text="Math.min(_pageSize, filteredMuseumList().length - visibleCount)"></span></span>
-                                <span style="font-size:0.66rem;background:rgba(249,115,22,.18);color:#f97316;border-radius:999px;padding:.1rem .5rem;" x-text="filteredMuseumList().length - visibleCount + ' rimasti'"></span>
+                                <span class="badge-orange-pill fs-065" x-text="filteredMuseumList().length - visibleCount + ' rimasti'"></span>
                             </button>
                         </div>
 
@@ -454,12 +451,12 @@
                     </div>
 
                     <!-- Museum Hero Cover Banner -->
-                    <div class="glass-card rounded-4 overflow-hidden mb-4 border border-secondary border-opacity-25 max-w-1200 mx-auto position-relative shadow-lg" style="min-height: 140px;">
+                    <div class="glass-card rounded-4 overflow-hidden mb-4 border border-secondary border-opacity-25 max-w-1200 mx-auto position-relative shadow-lg min-h-140">
                         <template x-if="currentMuseum.image || currentMuseum.immagine">
-                            <div class="position-relative w-100 hero-image-container" style="height: 150px;">
+                            <div class="position-relative w-100 hero-image-container h-150">
                                 <img :src="currentMuseum.image || currentMuseum.immagine" alt="Cover Museo" class="w-100 h-100 object-fit-cover"
                                      @error="$event.target.closest('.glass-card').querySelector('.hero-image-container').style.display='none'; $event.target.closest('.glass-card').querySelector('.hero-fallback-banner').classList.remove('d-none'); $event.target.closest('.glass-card').querySelector('.hero-fallback-banner').classList.add('d-flex');">
-                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-3 p-md-4" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 60%, transparent 100%);">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-end p-3 p-md-4 hero-gradient-overlay">
                                     <div class="d-flex align-items-center gap-3 w-100 min-w-0">
                                         <div class="rounded-circle bg-orange text-white p-2.5 d-flex align-items-center justify-content-center shadow-lg icon-box-44 flex-shrink-0">
                                             <i class="bi bi-bank fs-4"></i>
@@ -477,11 +474,10 @@
                         </template>
 
                         <!-- Standard Orange Hero Fallback -->
-                        <div class="hero-fallback-banner position-relative w-100 bg-gradient-orange p-3 p-md-4 text-center flex-column align-items-center justify-content-center card-glow-orange overflow-hidden"
-                             style="min-height: 130px;"
+                        <div class="hero-fallback-banner position-relative w-100 bg-gradient-orange p-3 p-md-4 text-center flex-column align-items-center justify-content-center card-glow-orange overflow-hidden min-h-130"
                              :class="(currentMuseum.image || currentMuseum.immagine) ? 'd-none' : 'd-flex'">
                             <div class="position-absolute top-50 end-0 translate-middle-y me-3 opacity-15 pe-none d-none d-md-block">
-                                <i class="bi bi-bank text-white" style="font-size: 4.5rem;"></i>
+                                <i class="bi bi-bank text-white display-1"></i>
                             </div>
                             <div class="d-flex align-items-center gap-3 position-relative z-1 text-start w-100 max-w-1000">
                                 <div class="min-w-0 flex-grow-1">
@@ -671,7 +667,7 @@
 
                                 <template x-if="currentMuseum.image || currentMuseum.immagine">
                                     <div class="museum-image-preview-container tab-image-preview-box mt-3 overflow-hidden rounded-4 border border-secondary border-opacity-25 position-relative">
-                                        <img :src="currentMuseum.image || currentMuseum.immagine" alt="Anteprima Museo" class="w-100 object-fit-cover" style="max-height: 320px;"
+                                        <img :src="currentMuseum.image || currentMuseum.immagine" alt="Anteprima Museo" class="w-100 object-fit-cover max-h-320"
                                              @error="$event.target.closest('.museum-image-preview-container').style.display='none'; $event.target.closest('.glass-card').querySelector('.tab-fallback-banner').classList.remove('d-none'); $event.target.closest('.glass-card').querySelector('.tab-fallback-banner').classList.add('d-flex');">
                                         <div class="museum-image-overlay p-3 position-absolute top-0 end-0">
                                             <button type="button" @click="currentMuseum.image = ''; if(currentMuseum.immagine) currentMuseum.immagine = '';" 
@@ -682,11 +678,10 @@
                                     </div>
                                 </template>
 
-                                <div class="tab-fallback-banner museum-image-preview-container mt-3 overflow-hidden rounded-4 border border-orange border-opacity-30 position-relative bg-gradient-orange p-4 text-center flex-column align-items-center justify-content-center shadow-lg card-glow-orange"
-                                     style="min-height: 140px;"
+                                <div class="tab-fallback-banner museum-image-preview-container mt-3 overflow-hidden rounded-4 border border-orange border-opacity-30 position-relative bg-gradient-orange p-4 text-center flex-column align-items-center justify-content-center shadow-lg card-glow-orange min-h-140"
                                      :class="(currentMuseum.image || currentMuseum.immagine) ? 'd-none' : 'd-flex'">
                                     <div class="position-absolute top-50 start-50 translate-middle opacity-15 pe-none">
-                                        <i class="bi bi-bank text-white" style="font-size: 6rem;"></i>
+                                        <i class="bi bi-bank text-white display-1"></i>
                                     </div>
                                 </div>
                             </div>
@@ -724,7 +719,7 @@
                                                 <i class="bi bi-layers-half text-orange"></i>
                                                 <span x-text="p.nome || ('Piano ' + p.piano)"></span>
                                             </h5>
-                                            <button type="button" @click="removePianoConSale(i)" class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina questo piano">
+                                            <button type="button" @click="removePianoConSale(i)" class="btn btn-sm btn-icon-32 btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center p-0 flex-shrink-0" title="Elimina questo piano">
                                                 <i class="bi bi-trash3-fill"></i>
                                             </button>
                                         </div>
@@ -824,12 +819,12 @@
                                                             </select>
 
                                                             <button type="button" @click="armaSpostamento(o.idx, p.piano)"
-                                                                class="btn btn-sm btn-outline-light rounded-3 flex-shrink-0" title="Sposta sulla pianta">
+                                                                class="btn btn-sm btn-icon-32 btn-outline-light rounded-3 d-inline-flex align-items-center justify-content-center p-0 flex-shrink-0" title="Sposta sulla pianta">
                                                                 <i class="bi bi-arrows-move"></i>
                                                             </button>
 
                                                             <button type="button" @click="removeSala(o.idx)"
-                                                                class="btn btn-sm btn-outline-danger rounded-3 flex-shrink-0" title="Elimina punto">
+                                                                class="btn btn-sm btn-icon-32 btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center p-0 flex-shrink-0" title="Elimina punto">
                                                                 <i class="bi bi-trash3-fill"></i>
                                                             </button>
                                                         </div>

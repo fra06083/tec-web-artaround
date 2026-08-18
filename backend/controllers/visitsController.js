@@ -45,15 +45,6 @@ const getVisitById = async (req, res) => {
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
-        // Controllo permessi editor
-        if (req.user && req.user.permissions === 'editor') {
-            const userMuseums = (req.user.museums || []).map(id => id.toString());
-            const visitMuseumId = visit.museum_id ? (visit.museum_id._id ? visit.museum_id._id.toString() : visit.museum_id.toString()) : '';
-            if (!userMuseums.includes(visitMuseumId)) {
-                return res.status(403).json({ error: 'Non disponi dei permessi per accedere alla visita di questo museo' });
-            }
-        }
-
         // Se la visita è privata, vieta la fruizione individuale diretta senza PIN o permessi
         if (visit.isPrivate && !req.query.pin && (!req.user || req.user.permissions === 'studente')) {
             return res.status(403).json({ error: 'Questa visita è privata. Puoi accedervi solo tramite il codice PIN fornito dal docente.' });

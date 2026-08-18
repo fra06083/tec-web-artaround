@@ -8,7 +8,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 1050;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
 }
@@ -16,6 +16,9 @@
 .main-content {
     margin-left: 260px;
     min-height: 100vh;
+    min-width: 0;
+    max-width: calc(100vw - 260px);
+    overflow-x: hidden;
     background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
 }
 
