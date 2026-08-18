@@ -273,12 +273,12 @@ function VisitDetail() {
             }
 
             // Navigazione / Mappa / POI (Match avanzato tramite Regex)
-            if (/(mappa|bagno|toilette|uscita|caffetteria|bar|shop|bookshop|dove mi trovo)/i.test(transcript)) {
+            if (/(mappa|bagno|toilette|servizi|igienici|uscita|caffetteria|bar|shop|bookshop|dove mi trovo)/i.test(transcript)) {
                  const domandeMappa = (visita?.museum_id?.mappa?.poi || []).filter(p => p.testo && p.testo.trim() !== '');
                  let targetType = null;
                  let targetName = "";
                  
-                 if (/(bagno|toilette|servizi igienici)/i.test(transcript)) {
+                 if (/(bagno|toilette|servizi|igienici)/i.test(transcript)) {
                      targetType = 'toilette';
                      targetName = 'il bagno';
                  } else if (/(caffetteria|bar)/i.test(transcript)) {
@@ -302,6 +302,20 @@ function VisitDetail() {
                  }
                  
                  setIsMapOpen(true);
+                 return;
+            }
+
+            // Riproduzione Audio
+            if (/(ascolta|leggi|spiega|riproduci)/i.test(transcript)) {
+                 if (currentDescription) {
+                     speak(currentDescription.text);
+                     handleStudentAction('audio');
+                 }
+                 return;
+            }
+            if (/(ferma|stop|zitto|silenzio)/i.test(transcript)) {
+                 stopSpeaking();
+                 handleStudentAction('stop');
                  return;
             }
 
@@ -822,43 +836,58 @@ function VisitDetail() {
                         </div>
                     );
                 })}
-                {selectedMapPin && (
-                    <div className="map-pin-panel" onClick={e => e.stopPropagation()}>
-                        <div className="map-pin-panel__header">
-                            <div className="d-flex align-items-center gap-2 min-w-0">
-                                <span className="map-pin-panel__icon-wrap">
-                                    <i className={`bi ${POI_ICONS[selectedMapPin.tipo] || 'bi-door-open'}`}></i>
-                                </span>
-                                <div className="min-w-0">
-                                    <div className="fw-bold fs-8 text-truncate">{selectedMapPin.nome}</div>
-                                    <div className="fs-9 text-body-secondary">Piano {selectedMapPin.piano}</div>
-                                </div>
-                            </div>
-                            <button type="button" className="btn-close btn-close-sm flex-shrink-0" onClick={() => setSelectedMapPin(null)}></button>
+            </div>
+        );
+    };
+
+    const renderSelectedPinCard = () => {
+        if (!selectedMapPin) return null;
+        const roomArtworks = items.filter(it =>
+            it.sala?.nome && selectedMapPin.nome &&
+            it.sala.nome.trim().toLowerCase() === selectedMapPin.nome.trim().toLowerCase()
+        );
+        return (
+            <div className={`p-3 rounded-4 shadow-sm mb-3 border transition-all w-100 ${
+                darkMode 
+                    ? 'bg-dark text-white border-secondary border-opacity-25' 
+                    : 'bg-body-tertiary text-dark border-secondary-subtle'
+            }`} onClick={e => e.stopPropagation()}>
+                <div className="d-flex align-items-center justify-content-between gap-2">
+                    <div className="d-flex align-items-center gap-2.5 min-w-0">
+                        <span className="btn-icon-32 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                            <i className={`bi ${POI_ICONS[selectedMapPin.tipo] || 'bi-door-open'}`}></i>
+                        </span>
+                        <div className="min-w-0">
+                            <h6 className="fw-bold mb-0 text-truncate fs-6">{selectedMapPin.nome}</h6>
+                            <small className="text-body-secondary fs-075">Piano {selectedMapPin.piano}</small>
                         </div>
-                        {(() => {
-                            const arts = items.filter(it =>
-                                it.sala?.nome && selectedMapPin.nome &&
-                                it.sala.nome.trim().toLowerCase() === selectedMapPin.nome.trim().toLowerCase()
-                            );
-                            if (!arts.length) return (
-                                <p className="fs-9 text-body-secondary mb-0 mt-2">Nessuna opera del tour in questa sala.</p>
-                            );
-                            return (
-                                <div className="mt-2">
-                                    <div className="fs-9 text-uppercase fw-semibold text-body-secondary mb-1 letter-spacing-sm">Opere ({arts.length})</div>
-                                    <div className="d-flex flex-column gap-1">
-                                        {arts.map((art, i) => (
-                                            <div key={art._id || i} className="d-flex align-items-center gap-2">
-                                                <i className="bi bi-circle-fill text-orange fs-06"></i>
-                                                <span className="fs-8 fw-medium text-truncate">{art.item || art.name}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })()}
                     </div>
+                    <button 
+                        type="button" 
+                        className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} 
+                        onClick={() => setSelectedMapPin(null)}
+                        aria-label="Chiudi"
+                    ></button>
+                </div>
+
+                {roomArtworks.length > 0 ? (
+                    <div className="mt-2.5 pt-2 border-top border-secondary-subtle">
+                        <div className="text-uppercase fw-bold text-orange mb-1 fs-065 letter-spacing-sm">
+                            Opere in questa sala ({roomArtworks.length})
+                        </div>
+                        <div className="d-flex flex-column gap-1 max-h-150 overflow-y-auto pe-1">
+                            {roomArtworks.map((art, i) => (
+                                <div key={art._id || i} className="d-flex align-items-center gap-2">
+                                    <i className="bi bi-circle-fill text-orange fs-06"></i>
+                                    <span className="fs-08 fw-medium text-truncate">{art.item || art.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <p className="fs-08 text-body-secondary mb-0 mt-2 fst-italic">
+                        Nessuna opera del tour in questa sala.
+                    </p>
                 )}
             </div>
         );
@@ -1021,12 +1050,12 @@ function VisitDetail() {
 
             {/* CONTENUTO CENTRATO E STRUTTURATO */}
             <main className="flex-grow-1 d-flex flex-column w-100 overflow-hidden z-10">
-                <div className="container d-flex flex-column flex-landscape-row flex-grow-1 justify-content-center align-items-center gap-2 gap-lg-4 py-2 w-100 h-100">
+                <div className="container-fluid container-lg d-flex flex-column flex-lg-row flex-landscape-row flex-grow-1 justify-content-center align-items-center gap-3 gap-lg-4 py-2 w-100 h-100 min-h-0 overflow-hidden">
                     
                     {/* MAIN IMAGE */}
-                    <div className="w-100 w-landscape-50 h-landscape-100 d-flex flex-grow-1 justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0 min-h-landscape-0">
+                    <div className="w-100 w-lg-50 w-landscape-50 h-lg-100 h-landscape-100 d-flex justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0 min-h-landscape-0 overflow-hidden">
                     {currentItem.img_path && (
-                            <div className="position-relative d-flex align-items-center justify-content-center h-100 w-100 cursor-pointer" onClick={() => setLightboxImage(currentItem.img_path)}>
+                            <div className="position-relative d-flex align-items-center justify-content-center h-100 w-100 cursor-pointer overflow-hidden" onClick={() => setLightboxImage(currentItem.img_path)}>
                                 <img
                                     src={currentItem.img_path}
                                     alt={currentItem.item.replace(/\s*\d{10,}$/, '')}
@@ -1041,7 +1070,7 @@ function VisitDetail() {
                     </div>
 
                     {/* SCHEDA INFORMATIVA E COMANDI */}
-                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-landscape-50 h-landscape-100 max-w-800 min-h-0 overflow-hidden ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
+                    <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-lg-50 w-landscape-50 h-lg-100 h-landscape-100 max-w-800 min-h-0 overflow-hidden ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
                         <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden flex-shrink-1 min-h-0">
                             
                             <div className="flex-shrink-0">
@@ -1398,11 +1427,14 @@ function VisitDetail() {
 
                     {lightboxImage === '__mappa__' ? (
                         <div
-                            className="w-100 h-100 d-flex align-items-center justify-content-center p-2"
+                            className="w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 overflow-y-auto"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="lightbox-map-container">
+                            <div className="lightbox-map-container mb-3 position-relative">
                                 {renderMapWithPins(true)}
+                            </div>
+                            <div className="max-w-400 w-100">
+                                {renderSelectedPinCard()}
                             </div>
                         </div>
                     ) : (
@@ -1468,7 +1500,7 @@ function VisitDetail() {
 
                     {/* Pianta del piano selezionato con PIN */}
                     {piantaAttiva?.immagine ? (
-                        <div className="mb-4">
+                        <div className="mb-3">
                             {renderMapWithPins(false)}
                         </div>
                     ) : (
@@ -1479,6 +1511,9 @@ function VisitDetail() {
                             </p>
                         </div>
                     )}
+
+                    {/* POPUP SCHEDA Dettagli Sala Selezionata (Sotto la Mappa) */}
+                    {renderSelectedPinCard()}
 
                     {/* Domande a cui il museo ha risposto */}
                     {domandeMappa.length > 0 && (
@@ -1620,29 +1655,7 @@ function VisitDetail() {
                         <div className="modal-body p-0">
                             <div className="list-group list-group-flush rounded-bottom-4">
                                 
-                                <h6 className="text-uppercase fw-bold text-primary mt-3 mb-2 ms-3 letter-spacing-sm fs-7">Esplorazione</h6>
-                                <div className="d-flex align-items-center gap-3 p-3 rounded-3 bg-body-tertiary border border-secondary-subtle mb-2">
-                                    <span className="btn-icon-32 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center flex-shrink-0">
-                                        <i className="bi bi-arrows-move fs-6"></i>
-                                    </span>
-                                    <div>
-                                        <h6 className="fw-bold mb-0 fs-09">Naviga tra le opere</h6>
-                                        <p className="text-body-secondary mb-0 fs-08">Usa le frecce in basso o scorri lateralmente su schermi touch.</p>
-                                    </div>
-                                </div>
-
-                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3 letter-spacing-sm fs-7">Navigazione</h6>
-                                <div className="d-flex align-items-center gap-3 p-3 rounded-3 bg-body-tertiary border border-secondary-subtle mb-2">
-                                    <span className="btn-icon-32 rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center flex-shrink-0">
-                                        <i className="bi bi-map-fill fs-6"></i>
-                                    </span>
-                                    <div>
-                                        <h6 className="fw-bold mb-0 fs-09">Mappa del Museo</h6>
-                                        <p className="text-body-secondary mb-0 fs-08">Tocca l'icona della mappa per orientarti e vedere la tua posizione nelle sale.</p>
-                                    </div>
-                                </div>
-
-                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3 letter-spacing-sm fs-7">Personalizzazione</h6>
+                                <h6 className="text-uppercase fw-bold text-primary mt-3 mb-2 ms-3 letter-spacing-sm fs-7">Informazioni</h6>
                                 
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { const author = currentItem?.author || "Autore sconosciuto"; const title = (currentItem?.item || currentItem?.title || currentItem?.name || "Opera").replace(/\s*\d{10,}$/, ''); speak(`L'autore di quest'opera è ${author}, e si intitola ${title}.`); }} data-bs-dismiss="modal">
                                     <i className="bi bi-person-badge fs-3 text-primary opacity-75"></i>

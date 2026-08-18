@@ -505,7 +505,7 @@
                                 <i class="bi bi-map me-2"></i><span>Piantine & Piani</span>
                             </button>
                             <button type="button" class="segmented-tab" :class="{'active': formTab === 'poi'}" @click="formTab = 'poi'">
-                                <i class="bi bi-chat-square-quote me-2"></i><span>Indicazioni (POI)</span>
+                                <i class="bi bi-chat-square-quote me-2"></i><span>Indicazioni</span>
                             </button>
                         </div>
                     </div>
@@ -521,7 +521,7 @@
                                 </div>
                                 <div class="d-flex flex-column text-start min-w-0">
                                     <span class="text-white-50 text-uppercase tracking-wider fw-bold fs-8">Sezione <span class="text-orange" x-text="formTab === 'info' ? '1 / 3' : (formTab === 'map' ? '2 / 3' : '3 / 3')"></span></span>
-                                    <h6 class="fw-bold text-white fs-6 m-0 text-truncate" x-text="formTab === 'info' ? 'Informazioni Generali' : (formTab === 'map' ? 'Piantine & Piani' : 'Indicazioni Visitatori (POI)')"></h6>
+                                    <h6 class="fw-bold text-white fs-6 m-0 text-truncate" x-text="formTab === 'info' ? 'Informazioni Generali' : (formTab === 'map' ? 'Piantine & Piani' : 'Indicazioni Visitatori')"></h6>
                                 </div>
                             </div>
 
@@ -580,7 +580,7 @@
                                             <i class="bi bi-chat-square-quote fs-6"></i>
                                         </div>
                                         <div>
-                                            <div class="lh-sm text-white fs-6 fw-bold">3. Indicazioni (POI)</div>
+                                            <div class="lh-sm text-white fs-6 fw-bold">3. Indicazioni</div>
                                             <div class="text-white-50 fs-7">Risposte ai visitatori per toilette, bar...</div>
                                         </div>
                                     </div>
@@ -850,11 +850,11 @@
                             </div>
                         </div>
 
-                        <!-- TAB 3: INDICAZIONI VISITATORI (POI) -->
+                        <!-- TAB 3: INDICAZIONI VISITATORI -->
                         <div x-show="formTab === 'poi'">
                             <div class="glass-card rounded-4 p-4 p-md-5">
                                 <div class="museum-section-header mb-2">
-                                    <i class="bi bi-chat-square-quote-fill fs-5 text-orange me-2"></i> Risposte ai Visitatori (Punti di Interesse)
+                                    <i class="bi bi-chat-square-quote-fill fs-5 text-orange me-2"></i> Risposte ai Visitatori
                                 </div>
                                 <p class="small text-white-50 mb-4 pb-2 border-bottom border-white border-opacity-10">
                                     Per ogni punto d'interesse che non è una semplice sala (es: servizi igienici, bar, uscite) puoi indicare la risposta guidata da mostrare ai visitatori nell'app. Le risposte lasciate vuote non verranno mostrate.
