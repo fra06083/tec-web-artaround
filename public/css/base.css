@@ -659,6 +659,16 @@ i.bi {
     pointer-events: none;
 }
 
+/* Ticket Purchased Grayish Style */
+.ticket-purchased-grayish .ticket-body {
+    filter: grayscale(75%) opacity(0.8);
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.ticket-purchased-grayish:hover .ticket-body {
+    filter: grayscale(40%) opacity(0.95);
+}
+
 .ticket-barcode-wrapper {
     transform: rotate(90deg);
     transform-origin: center;

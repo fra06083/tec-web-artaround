@@ -148,7 +148,7 @@ function marketplaceApp() {
         },
  
         tourCountFor(museumId) {
-            return this.items.filter(t => t.museum_id && t.museum_id._id === museumId).length;
+            return this.items.filter(t => t.museum_id && t.museum_id._id === museumId && !this.isPurchased(t._id)).length;
         },
  
         // Piante ordinate per piano
@@ -299,11 +299,8 @@ function marketplaceApp() {
 
  
         get filteredItems() {
-            let result = this.items;
-            
-            // Nascondi i tour già acquistati dal marketplace
-            result = result.filter(tour => !this.isPurchased(tour._id));
- 
+            let result = [...this.items];
+
             if (this.selectedMuseumId) {
                 result = result.filter(t => t.museum_id && t.museum_id._id === this.selectedMuseumId);
             }
@@ -316,16 +313,21 @@ function marketplaceApp() {
                 });
             }
 
-            if (!this.searchQuery || this.searchQuery.trim() === '') {
-                return result;
+            if (this.searchQuery && this.searchQuery.trim() !== '') {
+                const query = this.searchQuery.toLowerCase().trim();
+                result = result.filter(tour => {
+                    const name = tour.name?.toLowerCase() || '';
+                    const museum = tour.museum_id?.museum?.toLowerCase() || '';
+                    const description = tour.description?.toLowerCase() || '';
+                    return name.includes(query) || museum.includes(query) || description.includes(query);
+                });
             }
-            
-            const query = this.searchQuery.toLowerCase().trim();
-            return result.filter(tour => {
-                const name = tour.name?.toLowerCase() || '';
-                const museum = tour.museum_id?.museum?.toLowerCase() || '';
-                const description = tour.description?.toLowerCase() || '';
-                return name.includes(query) || museum.includes(query) || description.includes(query);
+
+            // I tour non ancora acquistati compaiono per primi, quelli già acquistati vanno in fondo
+            return result.sort((a, b) => {
+                const aPurchased = this.isPurchased(a._id) ? 1 : 0;
+                const bPurchased = this.isPurchased(b._id) ? 1 : 0;
+                return aPurchased - bPurchased;
             });
         },
         toggleTag(tag) {

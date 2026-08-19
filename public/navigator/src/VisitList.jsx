@@ -448,7 +448,7 @@ function VisitList() {
                                                             <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
                                                                 <i className="bi bi-geo-fill text-orange me-1"></i> {v.items ? v.items.length : 0} tappe
                                                             </span>
-                                                            <span className={`badge rounded-pill px-2.5 py-1 fw-bold ${(!v.prezzo || Number(v.prezzo) === 0) ? 'bg-success bg-opacity-15 text-success' : 'bg-orange bg-opacity-15 text-orange'}`}>
+                                                            <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
                                                                 {(!v.prezzo || Number(v.prezzo) === 0) ? 'Gratuito' : `€ ${Number(v.prezzo).toFixed(2).replace('.', ',')}`}
                                                             </span>
                                                         </div>

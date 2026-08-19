@@ -394,14 +394,11 @@
                                                             <i class="bi me-1" :class="t.isPrivate ? 'bi-lock-fill' : 'bi-globe'"></i>
                                                             <span x-text="t.isPrivate ? 'Privata' : 'Pubblica'"></span>
                                                         </span>
-                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 ms-2" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">
+                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 ms-2" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bg-success' : 'bg-primary'">
                                                             <i class="bi me-1" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bi-gift-fill' : 'bi-tag-fill'"></i>
                                                             <span x-text="(!t.prezzo || Number(t.prezzo) === 0) ? 'Gratuito' : '€ ' + Number(t.prezzo).toFixed(2).replace('.', ',')"></span>
                                                         </span>
                                                     </div>
-                                                     <div class="text-end" x-show="t.mnemonicCode">
-                                                        <span class="badge rounded-pill px-2.5 py-1 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1.5 bg-white bg-opacity-10 border border-white border-opacity-20"><i class="bi bi-upc-scan text-orange fw-bold"></i><span x-text="t.mnemonicCode"></span></span>
-                                                     </div>
                                                 </div>
 
                                                 <!-- Middle: Core Info -->
@@ -458,13 +455,9 @@
                                                     <i class="bi" :class="t.isPrivate ? 'bi-lock-fill' : 'bi-globe'"></i>
                                                     <span x-text="t.isPrivate ? 'Privata' : 'Pubblica'"></span>
                                                 </span>
-                                                <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 fs-065 ms-1" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bg-success bg-opacity-25 text-success' : 'bg-primary bg-opacity-25 text-primary'">
+                                                <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 fs-065 ms-1" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bg-success' : 'bg-primary'">
                                                     <i class="bi" :class="(!t.prezzo || Number(t.prezzo) === 0) ? 'bi-gift-fill' : 'bi-tag-fill'"></i>
                                                     <span x-text="(!t.prezzo || Number(t.prezzo) === 0) ? 'Gratuito' : '€ ' + Number(t.prezzo).toFixed(2).replace('.', ',')"></span>
-                                                </span>
-                                                <span class="badge rounded-pill px-2.5 py-0.5 fw-bold font-monospace text-white d-inline-flex align-items-center gap-1 bg-white bg-opacity-10 border border-white border-opacity-20 fs-068 ms-1" x-show="t.mnemonicCode">
-                                                    <i class="bi bi-upc-scan text-orange fw-bold"></i>
-                                                    <span x-text="t.mnemonicCode"></span>
                                                 </span>
                                             </div>
                                             <p class="text-white-50 mb-0 line-clamp-1 fs-075" x-text="t.description || 'Nessuna descrizione.'"></p>
@@ -472,7 +465,7 @@
                                     </div>
 
                                     <!-- Soft Actions Pill Buttons -->
-                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5 border-top-subtle">
+                                    <div class="d-flex align-items-center gap-2 mt-3 pt-2">
                                         <button type="button" @click.prevent.stop="editTour(t._id)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-orange-subtle">
                                             <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                         </button>
@@ -523,7 +516,7 @@
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
                             <!-- Mobile save button -->
                             <button type="button" @click="saveTour()" 
-                                class="btn bg-orange text-white px-3 py-1.5 rounded-pill fw-bold shadow-lg d-flex d-sm-none align-items-center gap-1.5 fs-7">
+                                class="btn bg-orange text-white px-3 py-1.5 rounded-pill fw-bold shadow-lg d-flex d-sm-none align-items-center gap-2 fs-7">
                                 <i class="bi bi-cloud-arrow-up-fill fs-6"></i> Salva
                             </button>
                             <!-- Tablet save button -->
@@ -572,7 +565,7 @@
                                 </div>
                                 <!-- Section Label -->
                                 <div class="d-flex flex-column text-start min-w-0">
-                                    <span class="text-white-50 text-uppercase tracking-wider font-monospace lh-1 fs-065">Sezione Editor</span>
+                                    <span class="text-white-50 text-uppercase tracking-wider font-monospace py-1 lh-1 fs-065">Sezione Editor</span>
                                     <div class="d-flex align-items-center gap-2 fw-bold text-white fs-6 mt-1 text-truncate">
                                         <i class="bi" :class="{ 'bi-info-circle text-orange': formTab === 'info', 'bi-images text-info': formTab === 'artworks', 'bi-patch-question text-warning': formTab === 'quiz' }"></i>
                                         <span x-text="formTab === 'info' ? 'Dettagli Visita' : (formTab === 'artworks' ? 'Opere nella Visita' : 'Quiz & Domande')"></span>

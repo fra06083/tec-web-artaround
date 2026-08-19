@@ -277,7 +277,7 @@
                             <div class="col-12 col-md-8 text-center text-md-start">
                                 <h1 class="fw-black mb-3 text-white display-5 tracking-tight lh-sm" x-text="selectedMuseum.museum"></h1>
                                 <div class="d-inline-flex align-items-center gap-2" x-show="selectedMuseum.province || selectedMuseum.city">
-                                    <span class="rounded-pill px-3 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5 shadow-sm fw-medium badge-glass-hero">
+                                    <span class="rounded-pill px-3 py-1.5 fs-7 d-inline-flex align-items-center gap-2 shadow-sm fw-medium badge-glass-hero">
                                         <i class="bi bi-geo-alt-fill text-orange"></i>
                                         <span x-text="(selectedMuseum.city ? selectedMuseum.city + ' ' : '') + (selectedMuseum.province ? '(' + selectedMuseum.province + ')' : '')"></span>
                                     </span>
@@ -443,7 +443,7 @@
                                                     <i class="bi bi-upc ticket-barcode-icon" :class="darkMode ? 'text-white' : 'text-dark'"></i>
                                                 </div>
 
-                                                <h5 class="fw-black mb-3 position-relative z-1 pe-4 mt-2" x-text="tour.name"
+                                                <h5 class="fw-black mb-3 position-relative z-1 pe-4 mt-2 text-break" x-text="tour.name"
                                                     :class="darkMode ? 'text-white' : 'text-dark'"></h5>
 
                                                 <p class="small flex-grow-1 mb-3 position-relative z-1 pe-2"
@@ -452,35 +452,35 @@
 
                                                 <div class="d-flex flex-wrap gap-1 mb-3" x-show="tour.tags && tour.tags.length > 0">
                                                     <template x-for="tag in tour.tags" :key="tag">
-                                                        <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill x-small px-2 py-1"
+                                                        <span class="badge bg-orange-subtle text-orange rounded-pill x-small px-2 py-1"
                                                             x-text="tag"></span>
                                                     </template>
                                                 </div>
 
-                                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-secondary"
+                                                <div class="d-flex justify-content-between align-items-end mt-auto pt-3 border-top border-secondary"
                                                     :class="darkMode ? 'border-opacity-25' : 'border-opacity-10'">
-                                                    <div class="d-flex flex-column">
-                                                        <span class="fw-black fs-5" :class="(!tour.prezzo || Number(tour.prezzo) === 0) ? 'text-success' : 'text-orange'"
+                                                    <div class="d-flex flex-column me-2">
+                                                        <span class="fw-black fs-5 text-nowrap" :class="darkMode ? 'text-white' : 'text-dark'"
                                                               x-text="formatPrice(tour.prezzo)"></span>
-                                                        <span class="x-small fw-bold" :class="darkMode ? 'text-white-50' : 'text-secondary'"
+                                                        <span class="x-small fw-bold text-nowrap" :class="darkMode ? 'text-white-50' : 'text-secondary'"
                                                             x-text="tour.items.length + ' opere'"></span>
                                                     </div>
 
                                                     <template x-if="isPurchased(tour._id)">
-                                                        <button class="btn btn-secondary rounded-pill px-3 fw-bold btn-sm shadow-sm" disabled>
-                                                            <i class="bi bi-check-circle"></i> Acquistato
-                                                        </button>
+                                                        <span class="badge bg-success border border-success border-opacity-30 rounded-pill px-3 py-1.5 fw-bold x-small text-nowrap d-inline-flex align-items-center gap-2 mb-0.5">
+                                                            <i class="bi bi-patch-check-fill fs-6"></i> Acquistato
+                                                        </span>
                                                     </template>
                                                     <template x-if="!isPurchased(tour._id) && !isInCart(tour._id)">
                                                         <button @click="addToCart(tour)"
-                                                                class="btn btn-outline-orange rounded-pill px-3 fw-bold btn-sm shadow-sm btn-transition">
+                                                                class="btn btn-outline-orange rounded-pill px-3 py-1.5 fw-bold x-small shadow-sm btn-transition text-nowrap">
                                                             Aggiungi
                                                         </button>
                                                     </template>
                                                     <template x-if="!isPurchased(tour._id) && isInCart(tour._id)">
                                                         <button @click="var offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')); offcanvas.show();"
-                                                                class="btn bg-orange text-white rounded-pill px-3 fw-bold btn-sm shadow-sm">
-                                                            Carrello
+                                                                class="btn bg-orange text-white rounded-pill px-3 py-1.5 fw-bold x-small shadow-sm text-nowrap">
+                                                            Nel carrello
                                                         </button>
                                                     </template>
                                                 </div>
@@ -895,14 +895,14 @@
                         <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75">URL Immagine Profilo</label>
                         <div class="input-group">
                             <input type="text" class="form-control rounded-start-3" :class="darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : ''" x-model="profileForm.propic" placeholder="https://... o data:image/...">
-                            <label class="btn btn-outline-secondary rounded-end-3 mb-0 d-flex align-items-center gap-1.5 fw-bold">
+                            <label class="btn btn-outline-secondary rounded-end-3 mb-0 d-flex align-items-center gap-2 fw-bold">
                                 <i class="bi bi-upload"></i> Carica
                                 <input type="file" class="d-none" accept="image/*" @change="uploadProfileImage">
                             </label>
                         </div>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75 d-flex align-items-center gap-1.5">
+                        <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75 d-flex align-items-center gap-2">
                             <i class="bi bi-sliders text-orange"></i> Livello di Testo Preferito
                         </label>
                         <select class="form-select rounded-3 py-2.5 fw-medium" :class="darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : 'bg-white text-dark'" x-model="profileForm.preferredLevel">
