@@ -39,7 +39,8 @@ const visitSchema = new mongoose.Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'user' }, // Traccia il creatore (es. docente)
     tags: [{ type: String }], // Es. "Arte", "Storia", ecc.
     mnemonicCode: { type: String }, // Codice univoco facoltativo (es. "FeniceRossa")
-    isPrivate: { type: Boolean, default: false } // Se true, non appare nel marketplace
+    isPrivate: { type: Boolean, default: false }, // Se true, non appare nel marketplace
+    prezzo: { type: Number, default: 0 } // Se 0 o non specificato, la visita è gratuita
 });
 // 3. IL DIALOGO (Collegato all'opera)
 const languageSchema = new mongoose.Schema({

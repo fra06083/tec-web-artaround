@@ -151,13 +151,10 @@ export default function Lobby() {
     return (
         <div className={`container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center p-3 p-md-5 transition-theme position-relative overflow-hidden ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
             
-            {/* Ambient Background Glow for PC */}
             <div className="position-absolute top-50 start-50 translate-middle w-100 h-100 d-none d-md-block opacity-10 pointer-events-none ambient-glow-orange"></div>
-
 
             <div className="text-center w-100 max-w-600 position-relative z-1">
                 
-                {/* Live Room Badge */}
                 <div className="d-inline-flex align-items-center gap-2 bg-orange bg-opacity-15 text-orange px-3.5 py-2 rounded-pill mb-4 fw-bold text-uppercase tracking-wider fs-075 border border-orange border-opacity-25 shadow-sm">
                     <span className="spinner-grow spinner-grow-sm text-orange" role="status" aria-hidden="true"></span>
                     <span>Sala d'Attesa Live</span>
@@ -168,7 +165,6 @@ export default function Lobby() {
                     Codice Stanza: <span className="fw-black text-orange border-bottom border-orange border-opacity-50 pb-0.5 px-1">{pin}</span>
                 </p>
                 
-                {/* Status Alert Box */}
                 <div className={`p-4 rounded-4 mb-4 shadow-md border position-relative overflow-hidden ${darkMode ? 'bg-dark bg-opacity-80 border-secondary border-opacity-25 text-white' : 'bg-white border-light-subtle text-dark'}`}>
                     <div className="d-flex align-items-center justify-content-center gap-3">
                         {!rejected && (
@@ -180,7 +176,6 @@ export default function Lobby() {
                     </div>
                 </div>
 
-                {/* Card Selezione Livello di Testo in Lobby */}
                 {!rejected && (
                     <div className={`card shadow-sm border rounded-4 w-100 max-w-450 mx-auto mb-4 ${darkMode ? 'border-secondary border-opacity-25 bg-dark text-white' : 'border-light-subtle bg-white text-dark'}`}>
                         <div className="card-body p-4 text-start">

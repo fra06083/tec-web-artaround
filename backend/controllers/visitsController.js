@@ -61,7 +61,7 @@ const getVisitById = async (req, res) => {
 // POST /api/visite
 const createVisit = async (req, res) => {
     try {
-        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate, image } = req.body;
+        const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate, image, prezzo } = req.body;
 
         if (!name || !museum_id) {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
@@ -76,6 +76,15 @@ const createVisit = async (req, res) => {
         }
 
         const codeToSave = mnemonicCode ? String(mnemonicCode).trim().slice(0, 6) : '';
+        if (codeToSave) {
+            const existingMnemonic = await Visit.findOne({
+                mnemonicCode: { $regex: new RegExp('^' + codeToSave + '$', 'i') }
+            });
+            if (existingMnemonic) {
+                return res.status(400).json({ error: `Il codice stanza '${codeToSave}' è già in uso per la visita "${existingMnemonic.name}". Scegli un codice unico.` });
+            }
+        }
+
         const newVisit = new Visit({
             name,
             description,
@@ -86,6 +95,7 @@ const createVisit = async (req, res) => {
             tags: tags || [],
             mnemonicCode: codeToSave,
             isPrivate: isPrivate || false,
+            prezzo: Number(prezzo) > 0 ? Number(prezzo) : 0,
             createdBy: req.user ? req.user._id : (createdBy || null)
         });
 
@@ -124,7 +134,20 @@ const updateVisit = async (req, res) => {
 
         const updateData = { ...req.body };
         if (updateData.mnemonicCode !== undefined) {
-            updateData.mnemonicCode = String(updateData.mnemonicCode).trim().slice(0, 6);
+            const codeToSave = String(updateData.mnemonicCode).trim().slice(0, 6);
+            updateData.mnemonicCode = codeToSave;
+            if (codeToSave) {
+                const existingMnemonic = await Visit.findOne({
+                    _id: { $ne: req.params.id },
+                    mnemonicCode: { $regex: new RegExp('^' + codeToSave + '$', 'i') }
+                });
+                if (existingMnemonic) {
+                    return res.status(400).json({ error: `Il codice stanza '${codeToSave}' è già in uso per la visita "${existingMnemonic.name}". Scegli un codice unico.` });
+                }
+            }
+        }
+        if (updateData.prezzo !== undefined) {
+            updateData.prezzo = Number(updateData.prezzo) > 0 ? Number(updateData.prezzo) : 0;
         }
 
         const updated = await Visit.findByIdAndUpdate(

@@ -43,7 +43,8 @@ document.addEventListener('alpine:init', () => {
             pre_visit: [],
             tags: [],
             mnemonicCode: '',
-            isPrivate: false
+            isPrivate: false,
+            prezzo: 0
         },
 
         // ARTWORKS MANAGEMENT
@@ -69,11 +70,18 @@ document.addEventListener('alpine:init', () => {
         // ROOMS ACTIVE STATE
         activeRoomsMap: {},
         isRoomActive(visitId) {
-            return Boolean(this.activeRoomsMap && this.activeRoomsMap[visitId]);
+            if (!this.activeRoomsMap || !this.activeRoomsMap[visitId]) return false;
+            const room = this.activeRoomsMap[visitId];
+            return !room.teacherId || room.teacherId === this.username || this.permissions === 'admin';
+        },
+        getActiveRoomOwner(visitId) {
+            if (!this.activeRoomsMap || !this.activeRoomsMap[visitId]) return null;
+            return this.activeRoomsMap[visitId].teacherId || null;
         },
         async fetchActiveRooms() {
             try {
-                const res = await fetch('/api/rooms/active');
+                const url = this.username ? `/api/rooms/active?teacherId=${encodeURIComponent(this.username)}` : '/api/rooms/active';
+                const res = await fetch(url);
                 if (res.ok) {
                     this.activeRoomsMap = await res.json();
                 }
@@ -387,10 +395,11 @@ document.addEventListener('alpine:init', () => {
 
         
 
-        goBackFromForm() {
+        async goBackFromForm() {
             this.step = 'marketplace';
             this.selectedTourId = '';
             this.mode = null;
+            await this.fetchAllTours();
         },
         proceed() {
             if (!this.canProceed) return;
@@ -445,7 +454,8 @@ document.addEventListener('alpine:init', () => {
                 pre_visit: [],
                 tags: [],
                 mnemonicCode: '',
-                isPrivate: false
+                isPrivate: false,
+                prezzo: 0
             };
             this.selectedTourId = '';
             this.selectedArtworks = [];
@@ -491,7 +501,8 @@ document.addEventListener('alpine:init', () => {
                         pre_visit: tourData.pre_visit || [],
                         tags: tourData.tags || [],
                         mnemonicCode: tourData.mnemonicCode || '',
-                        isPrivate: tourData.isPrivate || false
+                        isPrivate: tourData.isPrivate || false,
+                        prezzo: tourData.prezzo || 0
                     };
 
                     // Load artworks in the tour
@@ -692,7 +703,8 @@ document.addEventListener('alpine:init', () => {
                         logistic_info: this.tour.logistic_info,
                         tags: this.tour.tags,
                         mnemonicCode: this.tour.mnemonicCode,
-                        isPrivate: this.tour.isPrivate
+                        isPrivate: this.tour.isPrivate,
+                        prezzo: Number(this.tour.prezzo) || 0
                     })
                 });
 
@@ -702,6 +714,7 @@ document.addEventListener('alpine:init', () => {
                         this.tour._id = data.visit._id;
                         this.quizQuestions = []; // nuova visita, nessuna domanda ancora
                     }
+                    await this.fetchAllTours();
                     this.showToast(isEdit ? "Visita aggiornata con successo!" : "Visita creata con successo!");
                 } else {
                     const err = await res.json();

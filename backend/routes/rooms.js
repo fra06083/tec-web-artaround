@@ -25,53 +25,50 @@ router.post('/create', async (req, res) => {
         return res.status(400).json({ error: "visitId è obbligatorio" });
     }
 
-    let pin;
+    // 1. Controlla se QUESTO docente (teacherId) ha già una stanza attiva per questa visita
+    if (teacherId) {
+        for (const [p, r] of activeRooms.entries()) {
+            if (r.visitId.toString() === visitId.toString() && r.teacherId === teacherId) {
+                if (r.clients.length === 0 && !r.isStarted) {
+                    r.students = [];
+                    r.currentArtworkIndex = 0;
+                }
+                return res.json({ 
+                    pin: p, 
+                    visitId: r.visitId,
+                    isStarted: r.isStarted,
+                    currentArtworkIndex: r.currentArtworkIndex || 0,
+                    isCustomPassword: Boolean(r.baseCode)
+                });
+            }
+        }
+    }
+
+    let basePin = '';
     let visit = null;
     
     try {
         visit = await Visit.findById(visitId);
         if (visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '') {
-            pin = visit.mnemonicCode.trim();
+            basePin = visit.mnemonicCode.trim();
         }
     } catch (err) {
         console.error("Errore nel recupero della visita per mnemonicCode:", err);
     }
 
-    // Controlla se esiste già una stanza attiva per questa visita (sia con mnemonicCode che con PIN generato)
-    let existingPin = pin;
-    if (!existingPin) {
-        for (const [p, r] of activeRooms.entries()) {
-            if (r.visitId.toString() === visitId.toString()) {
-                existingPin = p;
-                break;
-            }
-        }
-    }
+    let pin = basePin;
 
-    if (existingPin && activeRooms.has(existingPin)) {
-        const existingRoom = activeRooms.get(existingPin);
-        if (existingRoom.visitId.toString() === visitId.toString()) {
-            // Se non ci sono più utenti collegati E la stanza non era iniziata, resettiamo gli studenti
-            if (existingRoom.clients.length === 0 && !existingRoom.isStarted) {
-                existingRoom.students = [];
-                existingRoom.currentArtworkIndex = 0;
+    if (basePin) {
+        // Se il codice base (es: "ciao") è già occupato da un'altra stanza attiva,
+        // calcoliamo il progressivo numerico "+1", "+2", "+3"... (es: "ciao1", "ciao2")
+        if (activeRooms.has(pin)) {
+            let counter = 1;
+            while (activeRooms.has(basePin + counter)) {
+                counter++;
             }
-            if (teacherId) {
-                existingRoom.teacherId = teacherId;
-            }
-            return res.json({ 
-                pin: existingPin, 
-                visitId: existingRoom.visitId,
-                isStarted: existingRoom.isStarted,
-                currentArtworkIndex: existingRoom.currentArtworkIndex || 0,
-                isCustomPassword: Boolean(visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '')
-            });
-        } else {
-            return res.status(409).json({ error: "Questo codice è già in uso da un'altra stanza attiva." });
+            pin = basePin + counter;
         }
-    }
-
-    if (!pin) {
+    } else {
         // Fallback: Genera PIN univoco di 5 cifre
         do {
             pin = Math.floor(10000 + Math.random() * 90000).toString();
@@ -81,24 +78,24 @@ router.post('/create', async (req, res) => {
     activeRooms.set(pin, {
         visitId,
         teacherId: teacherId || null,
+        baseCode: basePin || null,
         currentArtworkIndex: 0,
         clients: [],
         students: [],
         isStarted: false,
         allowLateJoins: req.body.allowLateJoins !== false,
         pendingRequests: new Map(),
-        // --- NUOVO: stato quiz ---
         quizActive: false,
-        quizQuestions: [],   // copia completa (con correctIndex), solo server-side
-        quizAnswers: {},     // { studentName: { [questionId]: selectedIndex } }
-        quizResults: null    // array dei risultati calcolati a fine quiz
+        quizQuestions: [],
+        quizAnswers: {},
+        quizResults: null
     });
 
-    console.log(`[ROOM] Stanza creata con PIN: ${pin} per visita: ${visitId}`);
+    console.log(`[ROOM] Stanza creata con PIN: ${pin} (docente: ${teacherId}) per visita: ${visitId}`);
     res.json({ 
         pin, 
         visitId, 
-        isCustomPassword: Boolean(visit && visit.mnemonicCode && visit.mnemonicCode.trim() !== '')
+        isCustomPassword: Boolean(basePin)
     });
 });
 
@@ -142,17 +139,24 @@ router.post('/join', async (req, res) => {
     res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex, isStarted: room.isStarted });
 });
 
-// Restituisce la mappa delle stanze attive (visitId -> info stanza)
+// Restituisce la mappa delle stanze attive (opzionalmente filtrata per teacherId)
 router.get('/active', (req, res) => {
     const activeMap = {};
+    const targetTeacherId = req.query.teacherId || null;
+
     for (const [pin, room] of activeRooms.entries()) {
         if (room.visitId) {
-            activeMap[room.visitId.toString()] = {
-                pin: pin,
-                isStarted: room.isStarted,
-                studentsCount: room.students ? room.students.length : 0,
-                currentArtworkIndex: room.currentArtworkIndex || 0
-            };
+            const vid = room.visitId.toString();
+            // Se non c'è ancora nessuna stanza registrata per questa visita, o se quella trovata appartiene all'utente richiedente
+            if (!activeMap[vid] || (targetTeacherId && room.teacherId === targetTeacherId)) {
+                activeMap[vid] = {
+                    pin: pin,
+                    teacherId: room.teacherId,
+                    isStarted: room.isStarted,
+                    studentsCount: room.students ? room.students.length : 0,
+                    currentArtworkIndex: room.currentArtworkIndex || 0
+                };
+            }
         }
     }
     res.json(activeMap);
@@ -363,20 +367,20 @@ router.post('/broadcast-audio', (req, res) => {
 
 // Termina la visita e chiude la stanza
 router.post('/end', (req, res) => {
-    const { pin, visitId } = req.body;
+    const { pin, visitId, teacherId } = req.body;
     let targetPin = null;
 
     if (pin && String(pin).trim()) {
         const cleanPin = String(pin).trim().toLowerCase();
         for (const [p, r] of activeRooms.entries()) {
-            if (p.toLowerCase() === cleanPin || (visitId && r.visitId.toString() === visitId.toString())) {
+            if (p.toLowerCase() === cleanPin) {
                 targetPin = p;
                 break;
             }
         }
     } else if (visitId) {
         for (const [p, r] of activeRooms.entries()) {
-            if (r.visitId.toString() === visitId.toString()) {
+            if (r.visitId.toString() === visitId.toString() && (!teacherId || r.teacherId === teacherId)) {
                 targetPin = p;
                 break;
             }

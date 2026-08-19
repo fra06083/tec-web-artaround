@@ -39,11 +39,14 @@ function marketplaceApp() {
         isCartOpen: false,
         activeRoomsMap: {},
         isRoomActive(visitId) {
-            return Boolean(this.activeRoomsMap && this.activeRoomsMap[visitId]);
+            if (!this.activeRoomsMap || !this.activeRoomsMap[visitId]) return false;
+            const room = this.activeRoomsMap[visitId];
+            return !room.teacherId || room.teacherId === this.username || this.permissions === 'admin';
         },
         async fetchActiveRooms() {
             try {
-                const res = await fetch('/api/rooms/active');
+                const url = this.username ? `/api/rooms/active?teacherId=${encodeURIComponent(this.username)}` : '/api/rooms/active';
+                const res = await fetch(url);
                 if (res.ok) {
                     this.activeRoomsMap = await res.json();
                 }
@@ -110,7 +113,13 @@ function marketplaceApp() {
             return this.cart.length;
         },
         get cartTotal() {
-            return (this.cart.length * 12).toFixed(2).replace('.', ',');
+            const total = this.cart.reduce((sum, item) => sum + (Number(item.prezzo) || 0), 0);
+            return total === 0 ? 'Gratuito' : '€ ' + total.toFixed(2).replace('.', ',');
+        },
+        formatPrice(price) {
+            const val = Number(price);
+            if (!val || val <= 0) return 'Gratuito';
+            return '€ ' + val.toFixed(2).replace('.', ',');
         },
         // Elenco musei ricavato dalle visite già caricate: niente fetch in più.
         // Compaiono solo i musei che hanno almeno una visita pubblica, che è

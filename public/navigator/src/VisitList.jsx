@@ -151,7 +151,7 @@ function VisitList() {
                 <div className="container-lg d-flex flex-wrap align-items-center justify-content-between">
                     
                     {/* 1. LOGO */}
-                    <a className={`navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto ${darkMode ? 'text-cream' : 'text-teal'}`} href="/">
+                    <a className={`navbar-brand text-decoration-none fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto ${darkMode ? 'text-cream' : 'text-teal'}`} href="/">
                         <div className={`p-2 rounded-3 d-flex align-items-center justify-content-center ${darkMode ? 'bg-cream text-teal' : 'bg-teal text-cream'}`}>
                             <i className="bi bi-box-seam fs-5"></i>
                         </div>
@@ -444,9 +444,12 @@ function VisitList() {
                                                     )}
 
                                                     <div className={`mt-auto pt-3 border-top border-secondary ${darkMode ? 'border-opacity-25' : 'border-opacity-10'}`}>
-                                                        <div className="mb-2">
+                                                        <div className="d-flex justify-content-between align-items-center mb-2">
                                                             <span className={`x-small fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
                                                                 <i className="bi bi-geo-fill text-orange me-1"></i> {v.items ? v.items.length : 0} tappe
+                                                            </span>
+                                                            <span className={`badge rounded-pill px-2.5 py-1 fw-bold ${(!v.prezzo || Number(v.prezzo) === 0) ? 'bg-success bg-opacity-15 text-success' : 'bg-orange bg-opacity-15 text-orange'}`}>
+                                                                {(!v.prezzo || Number(v.prezzo) === 0) ? 'Gratuito' : `€ ${Number(v.prezzo).toFixed(2).replace('.', ',')}`}
                                                             </span>
                                                         </div>
                                                         <Link to={`/visit/${v._id}`} className="btn w-100 rounded-pill fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2 btn-orange-solid">

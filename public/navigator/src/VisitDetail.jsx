@@ -775,7 +775,7 @@ function VisitDetail() {
         emergenza:  'bi-sign-turn-right',
         toilette:   'bi-person-standing',
         bar:        'bi-cup-hot',
-        shop:       'bi-bag',
+        shop:       'bi-bag-handle-fill',
         scala:      'bi-sort-numeric-up',
         ascensore:  'bi-arrow-down-up',
         ostacolo:   'bi-exclamation-triangle'
@@ -805,12 +805,12 @@ function VisitDetail() {
                     return (
                         <div
                             key={s._id || idx}
-                            className="position-absolute"
+                            className={`map-pin-point ${isCurrentRoom ? 'z-idx-35' : isSelected ? 'z-idx-30' : 'z-idx-20'}`}
                             style={{
-                                left: `${posX * 100}%`,
-                                top: `${posY * 100}%`,
-                                transform: `translate(${transX}, ${transY})`,
-                                zIndex: isCurrentRoom ? 35 : isSelected ? 30 : 20
+                                '--pin-x': `${posX * 100}%`,
+                                '--pin-y': `${posY * 100}%`,
+                                '--trans-x': transX,
+                                '--trans-y': transY
                             }}
                         >
                             {isCurrentRoom ? (
@@ -842,19 +842,25 @@ function VisitDetail() {
 
     const renderSelectedPinCard = () => {
         if (!selectedMapPin) return null;
+
+        const isSala = !selectedMapPin.tipo || selectedMapPin.tipo === 'sala';
         const roomArtworks = items.filter(it =>
             it.sala?.nome && selectedMapPin.nome &&
             it.sala.nome.trim().toLowerCase() === selectedMapPin.nome.trim().toLowerCase()
         );
+
+        // Verifica se il museo ha configurato una risposta o indicazione per questo punto di interesse
+        const poiResponse = (visita.museum_id?.mappa?.poi || []).find(p => p.tipo === selectedMapPin.tipo);
+
         return (
             <div className={`p-3 rounded-4 shadow-sm mb-3 border transition-all w-100 ${
                 darkMode 
                     ? 'bg-dark text-white border-secondary border-opacity-25' 
                     : 'bg-body-tertiary text-dark border-secondary-subtle'
             }`} onClick={e => e.stopPropagation()}>
-                <div className="d-flex align-items-center justify-content-between gap-2">
-                    <div className="d-flex align-items-center gap-2.5 min-w-0">
-                        <span className="btn-icon-32 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                <div className="d-flex align-items-center justify-content-between gap-3">
+                    <div className="d-flex align-items-center gap-3 min-w-0">
+                        <span className="btn-icon-32 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0 me-1">
                             <i className={`bi ${POI_ICONS[selectedMapPin.tipo] || 'bi-door-open'}`}></i>
                         </span>
                         <div className="min-w-0">
@@ -870,7 +876,8 @@ function VisitDetail() {
                     ></button>
                 </div>
 
-                {roomArtworks.length > 0 ? (
+                {/* Se ci sono opere del tour in questa sala */}
+                {roomArtworks.length > 0 && (
                     <div className="mt-2.5 pt-2 border-top border-secondary-subtle">
                         <div className="text-uppercase fw-bold text-orange mb-1 fs-065 letter-spacing-sm">
                             Opere in questa sala ({roomArtworks.length})
@@ -884,7 +891,19 @@ function VisitDetail() {
                             ))}
                         </div>
                     </div>
-                ) : (
+                )}
+
+                {/* Se c'è un'indicazione specifica del museo per questo punto di interesse */}
+                {roomArtworks.length === 0 && poiResponse?.testo && (
+                    <div className="mt-2 pt-2 border-top border-secondary-subtle">
+                        <p className="fs-08 text-body-secondary mb-0">
+                            {poiResponse.testo}
+                        </p>
+                    </div>
+                )}
+
+                {/* Se è una sala espositiva senza opere del tour corrente */}
+                {roomArtworks.length === 0 && isSala && !poiResponse?.testo && (
                     <p className="fs-08 text-body-secondary mb-0 mt-2 fst-italic">
                         Nessuna opera del tour in questa sala.
                     </p>
@@ -913,15 +932,12 @@ function VisitDetail() {
     return (
         <div className={`vh-100 d-flex flex-column overflow-hidden position-relative ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
             
-            {/* BACKGROUND DINAMICO (Prende tutto lo schermo) */}
             {currentItem.img_path && (
                 <div className="position-absolute w-100 h-100 dynamic-bg-blur" style={{ backgroundImage: `url(${currentItem.img_path})` }}></div>
             )}
             
-            {/* NAVBAR (Restyling Premium Bootstrap 5) */}
             <header className="d-flex justify-content-between align-items-center w-100 px-3 py-3 position-relative z-1030">
                 
-                {/* SINISTRA: Back + Logo */}
                 <div className="d-flex align-items-center gap-3">
                     <Link to="/" className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40" title="Torna alla Home">
                         <i className="bi bi-arrow-left fs-5"></i>
@@ -932,16 +948,13 @@ function VisitDetail() {
                     </div>
                 </div>
 
-                {/* CENTRO: Titolo della Visita */}
                 <div className="position-absolute top-50 start-50 translate-middle text-center px-2 d-none d-md-block text-truncate z-0">
                     <div className="d-flex align-items-center justify-content-center px-3 py-1 rounded-pill bg-body-tertiary text-body-secondary small fw-medium border border-secondary-subtle shadow-sm mx-auto max-w-400 text-truncate">
                         {visita.name}
                     </div>
                 </div>
 
-                {/* DESTRA: Icone separate */}
                 <div className="d-flex align-items-center gap-2">
-                    {/* AVATAR BAR DOCENTE - PILLOLA UNICA */}
                     {role === 'teacher' && pin && (
                         <div className="d-flex align-items-center pe-3 border-end border-secondary-subtle d-none d-sm-flex me-1">
                             <div className="dropdown">
@@ -955,7 +968,7 @@ function VisitDetail() {
                                         {visibleStudents.map((student, idx) => {
                                             const action = studentActions[student];
                                             return (
-                                                <div key={idx} className="position-relative flex-shrink-0" style={{ zIndex: visibleStudents.length - idx, marginLeft: idx > 0 ? '-12px' : '0' }}>
+                                                <div key={idx} className={`position-relative flex-shrink-0 z-idx-${visibleStudents.length - idx} ${idx > 0 ? 'avatar-overlap-item' : ''}`}>
                                                     <div className={`user-avatar rounded-circle bg-secondary d-flex align-items-center justify-content-center fw-bold shadow-sm border border-2 avatar-sm-075 ${action ? 'border-orange' : ''} ${darkMode ? 'text-white border-dark' : 'text-dark border-white'}`}>
                                                         {student.charAt(0).toUpperCase()}
                                                     </div>
@@ -974,7 +987,6 @@ function VisitDetail() {
                                     <i className="bi bi-chevron-down ms-1 me-1 fs-07 text-body opacity-75"></i>
                                 </button>
 
-                                {/* DROPDOWN CON LA LISTA ATTIVITÀ DI TUTTI GLI STUDENTI */}
                                 <ul className={`dropdown-menu dropdown-menu-end animated-dropdown shadow-lg border-0 p-2 mt-2 min-w-260 ${darkMode ? 'dropdown-menu-dark' : ''}`}>
                                     <li className="px-3 pb-2 mb-2 border-bottom border-secondary border-opacity-25">
                                         <h6 className="m-0 fw-bold">Stato Studenti ({connectedStudents.length})</h6>
@@ -1011,7 +1023,6 @@ function VisitDetail() {
                         </div>
                     )}
 
-                    {/* THEME TOGGLE (Solo Icona) */}
                     <button 
                         className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
                         onClick={() => toggleDarkMode()}
@@ -1020,7 +1031,6 @@ function VisitDetail() {
                         <i className={`bi ${darkMode ? 'bi-moon-stars-fill text-body' : 'bi-sun-fill text-warning'} fs-5`}></i>
                     </button>
 
-                    {/* MAPPA TOGGLE (Solo Icona) */}
                     <button
                         className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
                         onClick={() => setIsMapOpen(true)}
@@ -1029,7 +1039,6 @@ function VisitDetail() {
                         <i className="bi bi-map-fill fs-5 text-body"></i>
                     </button>
 
-                    {/* CHAT TOGGLE (Solo Icona) */}
                     {pin && (
                         <button 
                             className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm position-relative btn-icon-40"
@@ -1048,11 +1057,9 @@ function VisitDetail() {
                 </div>
             </header>
 
-            {/* CONTENUTO CENTRATO E STRUTTURATO */}
             <main className="flex-grow-1 d-flex flex-column w-100 overflow-hidden z-10">
                 <div className="container-fluid container-lg d-flex flex-column flex-lg-row flex-landscape-row flex-grow-1 justify-content-center align-items-center gap-3 gap-lg-4 py-2 w-100 h-100 min-h-0 overflow-hidden">
                     
-                    {/* MAIN IMAGE */}
                     <div className="w-100 w-lg-50 w-landscape-50 h-lg-100 h-landscape-100 d-flex justify-content-center align-items-center flex-shrink-1 max-w-800 min-h-0 min-h-landscape-0 overflow-hidden">
                     {currentItem.img_path && (
                             <div className="position-relative d-flex align-items-center justify-content-center h-100 w-100 cursor-pointer overflow-hidden" onClick={() => setLightboxImage(currentItem.img_path)}>
@@ -1069,7 +1076,6 @@ function VisitDetail() {
                         )}
                     </div>
 
-                    {/* SCHEDA INFORMATIVA E COMANDI */}
                     <div className={`card d-flex flex-column flex-grow-1 flex-shrink-1 mt-auto mt-lg-0 mb-1 border-secondary-subtle shadow-sm w-100 w-lg-50 w-landscape-50 h-lg-100 h-landscape-100 max-w-800 min-h-0 overflow-hidden ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}>
                         <div className="card-body p-2 p-md-3 d-flex flex-column overflow-hidden flex-shrink-1 min-h-0">
                             
@@ -1090,9 +1096,7 @@ function VisitDetail() {
                                 </div>
 
 
-                                {/* BARRA DEI COMANDI REIMMAGINATA */}
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                                    {/* Lato Sinistro: Impostazioni Testo */}
                                     <div>
                                     <div className="text-body-secondary text-uppercase fw-bold mb-1 fs-065 letter-spacing-sm">Impostazioni Testo</div>
                                     <div className="d-flex align-items-center gap-2">
@@ -1111,8 +1115,7 @@ function VisitDetail() {
 
                                 </div>
                                 
-                                {/* Lato Destro: Azioni Audio/Vocali ed Info */}
-                                <div className="d-flex gap-2.5 mt-3 mt-md-0 flex-shrink-0">
+                                <div className="d-flex gap-3 mt-3 mt-md-0 flex-shrink-0">
                                     
                                     <div className="action-btn-col gap-1">
                                         <button 
@@ -1150,7 +1153,6 @@ function VisitDetail() {
                                         </span>
                                     </div>
 
-                                    {/* Info Modal Button */}
                                     <div className="action-btn-col gap-1">
                                         <button 
                                             type="button"
@@ -1168,7 +1170,6 @@ function VisitDetail() {
                             </div>
                             </div>
 
-                            {/* TESTO DESCRITTIVO SCORREVOLE */}
                             <div className="overflow-y-auto flex-grow-1 pe-2 my-1 min-h-60">
                                 <div className="fs-6 lh-base">
                                     {currentDescription ? (
@@ -1184,7 +1185,6 @@ function VisitDetail() {
                             </div>
                         </div>
                         
-                        {/* BOTTOM NAVIGATION & PROGRESSION DOTS */}
                         <div className="card-footer flex-shrink-0 bg-transparent border-top border-secondary-subtle py-2 px-2 px-sm-3 mt-auto">
                             <div className="d-flex justify-content-between align-items-center w-100 gap-1 gap-sm-2 flex-nowrap">
                                 {(!pin || role === 'teacher') ? (
@@ -1196,7 +1196,6 @@ function VisitDetail() {
                                 )}
 
                                 
-                                {/* PROGRESSIONE SMART CON PALLINI ADATTIVI E PERCENTUALE */}
                                 <div className="d-flex align-items-center justify-content-center gap-1 gap-sm-2 flex-grow-1 mx-1 min-w-0">
                                     <span className={`rounded-pill px-2 px-sm-2.5 py-1 small fw-bold d-inline-flex align-items-center gap-1 border shadow-sm flex-shrink-0 ${darkMode ? 'bg-dark text-white border-secondary border-opacity-25' : 'bg-light text-dark border-light-subtle'}`}>
                                         <span className="text-orange">{currentIndex + 1}</span>
@@ -1727,7 +1726,7 @@ function VisitDetail() {
                                 </button>
 
                                 {/* CATEGORIA NAVIGAZIONE */}
-                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Navigazione</h6>
+                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3 letter-spacing-sm fs-075">Navigazione</h6>
 
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { if(role === 'teacher' || !pin) goToNextItem(); }} data-bs-dismiss="modal">
                                     <i className="bi bi-arrow-right-circle fs-3 text-orange opacity-75"></i>
@@ -1746,7 +1745,7 @@ function VisitDetail() {
                                 </button>
 
                                 {/* CATEGORIA PERSONALIZZAZIONE */}
-                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3" style={{letterSpacing: '1px', fontSize: '0.75rem'}}>Personalizzazione</h6>
+                                <h6 className="text-uppercase fw-bold text-primary mt-4 mb-2 ms-3 letter-spacing-sm fs-075">Personalizzazione</h6>
 
                                 <button type="button" className={`list-group-item list-group-item-action d-flex align-items-center gap-3 border-secondary-subtle py-3 cursor-pointer ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`} onClick={() => { changeLevelDown(); handleStudentAction('minus'); }} data-bs-dismiss="modal">
                                     <i className="bi bi-chat-left-text fs-3 text-info opacity-75"></i>

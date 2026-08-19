@@ -120,7 +120,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                 <div className="modal-dialog modal-dialog-centered max-w-500">
                     <div className={`modal-content border-0 rounded-4 shadow-xl overflow-hidden ${isDarkMode ? 'bg-dark text-white border border-secondary border-opacity-25' : 'bg-white text-dark'}`}>
                         
-                        {/* Header */}
                         <div className="modal-header border-0 p-4 pb-2 d-flex align-items-center justify-content-between">
                             <h4 className="fw-black mb-0 d-flex align-items-center gap-2">
                                 <i className="bi bi-person-gear text-orange fs-4"></i> Modifica Profilo
@@ -128,12 +127,10 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                             <button type="button" className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} onClick={onClose}></button>
                         </div>
 
-                        {/* Body */}
                         <div className="modal-body p-4 pt-2">
                             {message && <div className="alert alert-success border-0 rounded-3 shadow-sm py-2 px-3 mb-3 d-flex align-items-center gap-2"><i className="bi bi-check-circle-fill fs-5"></i><span>{message}</span></div>}
                             {error && <div className="alert alert-danger border-0 rounded-3 shadow-sm py-2 px-3 mb-3 d-flex align-items-center gap-2"><i className="bi bi-exclamation-triangle-fill fs-5"></i><span>{error}</span></div>}
                             
-                            {/* Interactive Avatar Header */}
                             <div className="mb-4 text-center">
                                 <div className="position-relative d-inline-block">
                                     <div className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center text-white display-5 fw-black shadow-lg position-relative border border-4 border-white profile-avatar-xl">
@@ -149,8 +146,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                                 </div>
                             </div>
 
-                            
-                            {/* Username Input */}
                             <div className="mb-3">
                                 <label className="form-label fw-bold small text-uppercase tracking-wider opacity-75">Username</label>
                                 <div className="input-group has-validation">
@@ -170,7 +165,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                                 </div>
                             </div>
                             
-                            {/* Profile Image URL Input */}
                             <div className="mb-3">
                                 <label className="form-label fw-bold small text-uppercase tracking-wider opacity-75">URL Immagine Profilo</label>
                                 <div className="input-group">
@@ -188,7 +182,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                                 </div>
                             </div>
 
-                            {/* Preferred Level Select */}
                             <div className="mb-2">
                                 <label className="form-label fw-bold small text-uppercase tracking-wider opacity-75 d-flex align-items-center gap-1.5">
                                     <i className="bi bi-sliders text-orange"></i> Livello di Testo Preferito
@@ -210,7 +203,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                             </div>
                         </div>
 
-                        {/* Footer Actions */}
                         <div className="modal-footer border-0 p-4 pt-0 d-flex gap-2">
                             <button type="button" className="btn btn-secondary rounded-pill px-4 py-2 fw-bold" onClick={onClose}>Annulla</button>
                             <button type="button" className="btn btn-orange text-white rounded-pill px-4.5 py-2 fw-bold shadow-sm active-scale" onClick={handleSave}>Salva Modifiche</button>
