@@ -1112,9 +1112,9 @@ function VisitDetail() {
                                 </div>
                                 
                                 {/* Lato Destro: Azioni Audio/Vocali ed Info */}
-                                <div className="d-flex gap-3 mt-3 mt-md-0">
+                                <div className="d-flex gap-2.5 mt-3 mt-md-0 flex-shrink-0">
                                     
-                                    <div className="d-flex flex-column align-items-center gap-1">
+                                    <div className="action-btn-col gap-1">
                                         <button 
                                             onClick={() => { if(isSpeaking) { stopSpeaking(); handleStudentAction('stop'); } else { speak(currentDescription?.text); handleStudentAction('audio'); } }} 
                                             disabled={!currentDescription} 
@@ -1126,7 +1126,7 @@ function VisitDetail() {
                                     </div>
                                     
                                     {role === 'teacher' && (
-                                        <div className="d-flex flex-column align-items-center gap-1">
+                                        <div className="action-btn-col gap-1">
                                             <button 
                                                 onClick={() => { broadcastAudio(currentDescription?.text); }} 
                                                 disabled={!currentDescription} 
@@ -1138,25 +1138,26 @@ function VisitDetail() {
                                         </div>
                                     )}
 
-                                    <div className="d-flex flex-column align-items-center gap-1">
+                                    <div className="action-btn-col gap-1">
                                         <button 
                                             onClick={startVoiceRecognition} 
-                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isListeningForVoice ? 'bg-danger pulse-animation' : (isSpeaking ? 'bg-success pulse-animation' : 'bg-primary')}`}
+                                            className={`btn rounded-circle d-flex align-items-center justify-content-center shadow-sm text-white btn-icon-40 ${isListeningForVoice ? 'bg-danger pulse-animation' : 'bg-primary'}`}
                                         >
-                                            <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : (isSpeaking ? 'bi-volume-up-fill' : 'bi-mic')} fs-5`}></i>
+                                            <i className={`bi ${isListeningForVoice ? 'bi-mic-fill' : 'bi-mic'} fs-5`}></i>
                                         </button>
                                         <span className="text-body-secondary text-uppercase fw-bold fs-06 letter-spacing-sm">
-                                            {isListeningForVoice ? 'In ascolto...' : (isSpeaking ? 'In riproduzione' : 'Parla')}
+                                            {isListeningForVoice ? 'In ascolto' : 'Parla'}
                                         </span>
                                     </div>
 
                                     {/* Info Modal Button */}
-                                    <div className="d-flex flex-column align-items-center gap-1">
+                                    <div className="action-btn-col gap-1">
                                         <button 
                                             type="button"
-                                            className={`btn btn-outline-secondary rounded-circle d-flex justify-content-center align-items-center shadow-sm btn-icon-40 ${darkMode ? 'border-light text-light' : ''}`}
+                                            className={`btn border border-secondary-subtle rounded-circle d-flex justify-content-center align-items-center shadow-sm btn-icon-40 ${darkMode ? 'bg-dark text-white' : 'bg-body text-dark'}`}
                                             data-bs-toggle="modal" 
                                             data-bs-target="#commandsModal"
+                                            title="Info e Comandi"
                                         >
                                             <i className="bi bi-info-circle fs-5"></i>
                                         </button>

@@ -2428,17 +2428,17 @@ html.dark-mode body {
 }
 
 .pill-level-width {
-    width: 105px !important;
-    min-width: 105px !important;
-    max-width: 105px !important;
+    width: 6.5rem !important;
+    min-width: 6.5rem !important;
+    max-width: 6.5rem !important;
     display: inline-block !important;
     white-space: nowrap !important;
 }
 
 .pill-duration-width {
-    width: 48px !important;
-    min-width: 48px !important;
-    max-width: 48px !important;
+    width: 3rem !important;
+    min-width: 3rem !important;
+    max-width: 3rem !important;
     display: inline-block !important;
     white-space: nowrap !important;
 }
