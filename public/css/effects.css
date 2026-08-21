@@ -1644,6 +1644,12 @@ html.dark-mode body {
     box-shadow: 0 6px 18px rgba(253, 126, 20, 0.45);
 }
 
+@media (min-width: 576px) {
+    .btn-action-fixed, .w-sm-auto {
+        width: auto !important;
+    }
+}
+
 @media (max-width: 575.98px) {
     .btn-action-fixed {
         width: 100%;

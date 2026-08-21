@@ -715,7 +715,7 @@
                                 </div>
                                 <button @click="createRoom(tour._id)"
                                         :class="isRoomActive(tour._id) ? 'btn-warning text-dark fw-bold' : 'bg-orange text-white'"
-                                        class="btn btn-action-fixed ms-sm-auto flex-shrink-0 w-100 w-sm-auto">
+                                        class="btn btn-action-fixed ms-sm-auto flex-shrink-0">
                                     <i :class="isRoomActive(tour._id) ? 'bi bi-arrow-repeat' : 'bi bi-play-circle-fill'" class="fs-5 me-1"></i>
                                     <span x-text="isRoomActive(tour._id) ? 'Riprendi' : 'Avvia Live'"></span>
                                 </button>

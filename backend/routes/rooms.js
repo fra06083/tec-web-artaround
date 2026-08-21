@@ -424,10 +424,11 @@ router.post('/quiz/finish', async (req, res) => {
         for (const [studentName, answers] of Object.entries(room.quizAnswers)) {
             let score = 0;
             const details = room.quizQuestions.map(q => {
-                const selectedIndex = answers ? answers[q._id.toString()] : undefined;
-                const correct = selectedIndex === q.correctIndex;
+                const rawSelected = answers ? answers[q._id.toString()] : undefined;
+                const selectedIndex = (rawSelected !== undefined && rawSelected !== null && rawSelected !== '') ? Number(rawSelected) : undefined;
+                const correct = (selectedIndex !== undefined && !isNaN(selectedIndex) && selectedIndex === Number(q.correctIndex));
                 if (correct) score++;
-                return { question_id: q._id, selectedIndex, correct };
+                return { question_id: q._id.toString(), selectedIndex, correct };
             });
 
             results.push({ studentName, score, total, details });

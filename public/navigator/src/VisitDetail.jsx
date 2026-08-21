@@ -1389,251 +1389,383 @@ function VisitDetail() {
                             {/* RISULTATI & RESOCONTO DETTAGLIATO */}
                             {quizPhase === 'results' && quizResults && (
                                 <div className="d-flex flex-column gap-3">
-                                    {/* HEADER RESOCONTO */}
-                                    <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
-                                        <div className="d-flex align-items-center gap-2.5">
-                                            <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
-                                                <i className="bi bi-bar-chart-line-fill fs-4"></i>
-                                            </div>
-                                            <div>
-                                                <h4 className="fw-black m-0 fs-5">Resoconto Finale Quiz</h4>
-                                                <p className="small text-white-50 mb-0">Analisi risposte didattiche e quesiti più insidiosi</p>
-                                            </div>
-                                        </div>
-                                        {role === 'teacher' ? (
-                                            <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5">
-                                                <i className="bi bi-stop-circle"></i> <span>Chiudi Visita</span>
-                                            </button>
-                                        ) : (
-                                            <button onClick={() => setQuizPhase('none')} className="btn-close btn-close-white" aria-label="Chiudi"></button>
-                                        )}
-                                    </div>
-
-                                    {/* KPI SUMMARY CARDS */}
-                                    {(() => {
-                                        const totalStudents = quizResults.length;
-                                        const avgScore = totalStudents > 0 ? (quizResults.reduce((acc, r) => acc + (r.score || 0), 0) / totalStudents).toFixed(1) : 0;
-                                        const totalQuestions = quizQuestions.length || (quizResults[0]?.total || 0);
-
-                                        let hardestQuestion = null;
-                                        let maxWrongCount = -1;
-                                        quizQuestions.forEach(q => {
-                                            let wrong = 0;
-                                            quizResults.forEach(r => {
-                                                const det = r.details?.find(d => String(d.question_id) === String(q._id));
-                                                if (det && !det.correct) wrong++;
-                                            });
-                                            if (wrong > maxWrongCount) {
-                                                maxWrongCount = wrong;
-                                                hardestQuestion = { question: q.question, wrongCount: wrong, percent: totalStudents > 0 ? Math.round((wrong / totalStudents) * 100) : 0 };
-                                            }
-                                        });
-
-                                        return (
-                                            <div className="row g-2">
-                                                <div className="col-4">
-                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                        <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Media Classe</div>
-                                                        <div className="fs-5 fw-black text-orange">{avgScore} <span className="fs-07 text-white-50 fw-medium">/ {totalQuestions}</span></div>
+                                    {role === 'teacher' ? (
+                                        /* VISTA DOCENTE / CHI FA PARTIRE IL QUIZ: RESOCONTO COMPLETO */
+                                        <>
+                                            {/* HEADER RESOCONTO */}
+                                            <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
+                                                <div className="d-flex align-items-center gap-2.5">
+                                                    <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                                                        <i className="bi bi-bar-chart-line-fill fs-4"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="fw-black m-0 fs-5">Resoconto Finale Quiz</h4>
+                                                        <p className="small text-white-50 mb-0">Analisi didattica delle risposte della classe</p>
                                                     </div>
                                                 </div>
-                                                <div className="col-4">
-                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                        <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Partecipanti</div>
-                                                        <div className="fs-5 fw-black">{totalStudents} <span className="fs-07 text-white-50 fw-medium">studenti</span></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-4">
-                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                        <div className="fs-065 text-uppercase text-danger fw-bold tracking-wider mb-0.5">Più Errata</div>
-                                                        <div className="fs-5 fw-black text-danger">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-medium">errori</span></div>
-                                                    </div>
-                                                </div>
+                                                <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5">
+                                                    <i className="bi bi-stop-circle"></i> <span>Chiudi Visita</span>
+                                                </button>
                                             </div>
-                                        );
-                                    })()}
 
-                                    {/* TABS SELECTOR */}
-                                    <div className="d-flex gap-2 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
-                                        <button
-                                            type="button"
-                                            className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
-                                            onClick={() => setQuizReportTab('questions')}
-                                        >
-                                            <i className="bi bi-exclamation-triangle me-1.5"></i>Domande Più Errate
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
-                                            onClick={() => setQuizReportTab('students')}
-                                        >
-                                            <i className="bi bi-trophy me-1.5"></i>Classifica & Studenti ({quizResults.length})
-                                        </button>
-                                    </div>
-
-                                    {/* TAB 1: DOMANDE PIÙ ERRATE ED ANALISI OPZIONI */}
-                                    {quizReportTab === 'questions' && (
-                                        <div className="d-flex flex-column gap-3 max-h-400 overflow-y-auto pe-1">
+                                            {/* KPI SUMMARY CARDS */}
                                             {(() => {
-                                                if (!quizQuestions || quizQuestions.length === 0) {
-                                                    return <p className="text-center text-white-50 py-3 fst-italic">Informazioni domande non disponibili.</p>;
-                                                }
+                                                const totalStudents = quizResults.length;
+                                                const avgScore = totalStudents > 0 ? (quizResults.reduce((acc, r) => acc + (r.score || 0), 0) / totalStudents).toFixed(1) : 0;
+                                                const totalQuestions = quizQuestions.length || (quizResults[0]?.total || 0);
 
-                                                const sortedQuestions = [...quizQuestions].map((q, idx) => {
-                                                    let totalCount = 0;
-                                                    let correctCount = 0;
-                                                    const optionDistribution = {};
-
+                                                let hardestQuestion = null;
+                                                let maxWrongCount = -1;
+                                                quizQuestions.forEach(q => {
+                                                    let wrong = 0;
                                                     quizResults.forEach(r => {
                                                         const det = r.details?.find(d => String(d.question_id) === String(q._id));
-                                                        if (det) {
-                                                            totalCount++;
-                                                            if (det.correct) correctCount++;
-                                                            if (det.selectedIndex !== undefined && det.selectedIndex !== null) {
-                                                                optionDistribution[det.selectedIndex] = (optionDistribution[det.selectedIndex] || 0) + 1;
-                                                            }
-                                                        }
+                                                        if (det && !det.correct) wrong++;
                                                     });
+                                                    if (wrong > maxWrongCount) {
+                                                        maxWrongCount = wrong;
+                                                        hardestQuestion = { question: q.question, wrongCount: wrong, percent: totalStudents > 0 ? Math.round((wrong / totalStudents) * 100) : 0 };
+                                                    }
+                                                });
 
-                                                    const wrongCount = totalCount - correctCount;
-                                                    const wrongPercent = totalCount > 0 ? Math.round((wrongCount / totalCount) * 100) : 0;
-
-                                                    return { ...q, origIndex: idx, totalCount, correctCount, wrongCount, wrongPercent, optionDistribution };
-                                                }).sort((a, b) => b.wrongPercent - a.wrongPercent);
-
-                                                return sortedQuestions.map((q, qRank) => (
-                                                    <div key={q._id} className={`p-3 rounded-4 border transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
-                                                        <div className="d-flex align-items-start justify-content-between gap-2 mb-2">
-                                                            <div className="d-flex align-items-center gap-2 min-w-0">
-                                                                <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-065 flex-shrink-0 ${q.wrongPercent >= 50 ? 'bg-danger text-white' : q.wrongPercent > 0 ? 'bg-warning text-dark' : 'bg-success text-white'}`}>
-                                                                    {q.wrongPercent >= 50 ? <><i className="bi bi-exclamation-triangle-fill me-1"></i> {q.wrongPercent}% Errori</> : <><i className="bi bi-check-circle-fill me-1"></i> {100 - q.wrongPercent}% Corrette</>}
-                                                                </span>
-                                                                {qRank === 0 && q.wrongPercent > 0 && (
-                                                                    <span className="badge bg-danger-subtle text-danger border border-danger border-opacity-25 rounded-pill px-2 py-0.5 fs-065 fw-bold">
-                                                                        🔥 La più sbagliata
-                                                                    </span>
-                                                                )}
+                                                return (
+                                                    <div className="row g-2">
+                                                        <div className="col-4">
+                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Media Classe</div>
+                                                                <div className="fs-5 fw-black text-orange">{avgScore} <span className="fs-07 text-white-50 fw-medium">/ {totalQuestions}</span></div>
                                                             </div>
-                                                            <span className="fs-07 text-white-50 fw-bold">Domanda {q.origIndex + 1}</span>
                                                         </div>
-
-                                                        <h6 className="fw-bold mb-2.5 fs-6 lh-sm">{q.question}</h6>
-
-                                                        <div className="d-flex flex-column gap-1.5">
-                                                            {q.options.map((optText, optIdx) => {
-                                                                const count = q.optionDistribution[optIdx] || 0;
-                                                                const percent = q.totalCount > 0 ? Math.round((count / q.totalCount) * 100) : 0;
-                                                                const isCorrect = optIdx === q.correctIndex;
-
-                                                                return (
-                                                                    <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-15' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
-                                                                        <div
-                                                                            className={`position-absolute top-0 start-0 h-100 opacity-20 ${isCorrect ? 'bg-success' : 'bg-orange'}`}
-                                                                            style={{ width: `${percent}%`, transition: 'width 0.5s ease-in-out' }}
-                                                                        ></div>
-
-                                                                        <div className="d-flex align-items-center justify-content-between position-relative z-1 gap-2">
-                                                                            <div className="d-flex align-items-center gap-2 min-w-0">
-                                                                                {isCorrect ? (
-                                                                                    <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
-                                                                                ) : (
-                                                                                    <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 text-white-50`}></i>
-                                                                                )}
-                                                                                <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-success' : 'fw-medium'}`}>{optText}</span>
-                                                                            </div>
-
-                                                                            <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                                                                                {isCorrect && (
-                                                                                    <span className="badge bg-success text-white rounded-pill px-2 py-0.5 fs-065">Esatta</span>
-                                                                                )}
-                                                                                <span className="fs-075 fw-bold text-white-50">
-                                                                                    {count} {count === 1 ? 'voto' : 'voti'} ({percent}%)
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                        <div className="col-4">
+                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Partecipanti</div>
+                                                                <div className="fs-5 fw-black">{totalStudents} <span className="fs-07 text-white-50 fw-medium">studenti</span></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-4">
+                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-065 text-uppercase text-danger fw-bold tracking-wider mb-0.5">Più Errata</div>
+                                                                <div className="fs-5 fw-black text-danger">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-medium">errori</span></div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                ));
+                                                );
                                             })()}
-                                        </div>
-                                    )}
 
-                                    {/* TAB 2: CLASSIFICA & DETTAGLIO RISPOSTE PER STUDENTE */}
-                                    {quizReportTab === 'students' && (
-                                        <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
-                                            {[...quizResults]
-                                                .sort((a, b) => b.score - a.score)
-                                                .map((r, rankIdx) => {
-                                                    const isExpanded = expandedStudent === r.studentName;
-                                                    const percentScore = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
-                                                    const medalIcons = ['🥇', '🥈', '🥉'];
+                                            {/* TABS SELECTOR */}
+                                            <div className="d-flex gap-2 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    onClick={() => setQuizReportTab('questions')}
+                                                >
+                                                    <i className="bi bi-exclamation-triangle me-1.5"></i>Domande Più Errate
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    onClick={() => setQuizReportTab('students')}
+                                                >
+                                                    <i className="bi bi-trophy me-1.5"></i>Classifica & Studenti ({quizResults.length})
+                                                </button>
+                                            </div>
 
-                                                    return (
-                                                        <div key={r.studentName || rankIdx} className={`rounded-4 border overflow-hidden transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
-                                                            <div
-                                                                className="d-flex align-items-center justify-content-between p-3 cursor-pointer user-select-none hover-bg-tertiary"
-                                                                onClick={() => setExpandedStudent(isExpanded ? null : r.studentName)}
-                                                            >
-                                                                <div className="d-flex align-items-center gap-3 min-w-0">
-                                                                    <div className="d-flex align-items-center justify-content-center flex-shrink-0 fs-5 fw-black w-h-36">
-                                                                        {medalIcons[rankIdx] || <span className="fs-6 text-white-50">#{rankIdx + 1}</span>}
+                                            {/* TAB 1: DOMANDE PIÙ ERRATE ED ANALISI OPZIONI */}
+                                            {quizReportTab === 'questions' && (
+                                                <div className="d-flex flex-column gap-3 max-h-400 overflow-y-auto pe-1">
+                                                    {(() => {
+                                                        if (!quizQuestions || quizQuestions.length === 0) {
+                                                            return <p className="text-center text-white-50 py-3 fst-italic">Informazioni domande non disponibili.</p>;
+                                                        }
+
+                                                        const sortedQuestions = [...quizQuestions].map((q, idx) => {
+                                                            let totalCount = 0;
+                                                            let correctCount = 0;
+                                                            const optionDistribution = {};
+
+                                                            quizResults.forEach(r => {
+                                                                const det = r.details?.find(d => String(d.question_id) === String(q._id));
+                                                                if (det) {
+                                                                    totalCount++;
+                                                                    if (det.correct) correctCount++;
+                                                                    if (det.selectedIndex !== undefined && det.selectedIndex !== null) {
+                                                                        optionDistribution[det.selectedIndex] = (optionDistribution[det.selectedIndex] || 0) + 1;
+                                                                    }
+                                                                }
+                                                            });
+
+                                                            const wrongCount = totalCount - correctCount;
+                                                            const wrongPercent = totalCount > 0 ? Math.round((wrongCount / totalCount) * 100) : 0;
+
+                                                            return { ...q, origIndex: idx, totalCount, correctCount, wrongCount, wrongPercent, optionDistribution };
+                                                        }).sort((a, b) => b.wrongPercent - a.wrongPercent);
+
+                                                        return sortedQuestions.map((q, qRank) => (
+                                                            <div key={q._id} className={`p-3 rounded-4 border transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                                <div className="d-flex align-items-start justify-content-between gap-2 mb-2">
+                                                                    <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                        <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-065 flex-shrink-0 ${q.wrongPercent >= 50 ? 'bg-danger text-white' : q.wrongPercent > 0 ? 'bg-warning text-dark' : 'bg-success text-white'}`}>
+                                                                            {q.wrongPercent >= 50 ? <><i className="bi bi-exclamation-triangle-fill me-1"></i> {q.wrongPercent}% Errori</> : <><i className="bi bi-check-circle-fill me-1"></i> {100 - q.wrongPercent}% Corrette</>}
+                                                                        </span>
+                                                                        {qRank === 0 && q.wrongPercent > 0 && (
+                                                                            <span className="badge bg-danger-subtle text-danger border border-danger border-opacity-25 rounded-pill px-2 py-0.5 fs-065 fw-bold">
+                                                                                🔥 La più sbagliata
+                                                                            </span>
+                                                                        )}
                                                                     </div>
-                                                                    <div className="min-w-0">
-                                                                        <h6 className="fw-bold mb-0 text-truncate fs-6">{r.studentName}</h6>
-                                                                        <small className="text-white-50 fs-075">{r.score} su {r.total} risposte corrette ({percentScore}%)</small>
-                                                                    </div>
+                                                                    <span className="fs-07 text-white-50 fw-bold">Domanda {q.origIndex + 1}</span>
                                                                 </div>
 
-                                                                <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                                                                    <span className={`badge rounded-pill px-3 py-1.5 fw-bold fs-075 ${percentScore >= 80 ? 'bg-success text-white' : percentScore >= 50 ? 'bg-warning text-dark' : 'bg-danger text-white'}`}>
-                                                                        {r.score} / {r.total}
-                                                                    </span>
-                                                                    <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'} text-white-50 fs-6`}></i>
-                                                                </div>
-                                                            </div>
+                                                                <h6 className="fw-bold mb-2.5 fs-6 lh-sm">{q.question}</h6>
 
-                                                            {/* ESPANSIONE DETTAGLIATE RISPOSTE STUDENTE */}
-                                                            {isExpanded && (
-                                                                <div className={`p-3 border-top border-secondary border-opacity-25 d-flex flex-column gap-2 ${darkMode ? 'bg-black bg-opacity-40' : 'bg-body-tertiary'}`}>
-                                                                    <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
-                                                                        Dettaglio risposte di {r.studentName}:
-                                                                    </div>
-                                                                    {quizQuestions.map((q, qIdx) => {
-                                                                        const det = r.details?.find(d => String(d.question_id) === String(q._id));
-                                                                        const selectedOpt = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? q.options[det.selectedIndex] : 'Nessuna risposta';
-                                                                        const correctOpt = q.options[q.correctIndex];
-                                                                        const isCorrect = det?.correct;
+                                                                <div className="d-flex flex-column gap-1.5">
+                                                                    {q.options.map((optText, optIdx) => {
+                                                                        const count = q.optionDistribution[optIdx] || 0;
+                                                                        const percent = q.totalCount > 0 ? Math.round((count / q.totalCount) * 100) : 0;
+                                                                        const isCorrect = optIdx === q.correctIndex;
 
                                                                         return (
-                                                                            <div key={q._id} className={`p-2.5 rounded-3 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
-                                                                                <div className="d-flex align-items-start gap-2">
-                                                                                    <i className={`bi ${isCorrect ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'} fs-5 flex-shrink-0 mt-0.5`}></i>
-                                                                                    <div className="min-w-0 flex-grow-1">
-                                                                                        <div className="fw-bold fs-085 mb-1">{qIdx + 1}. {q.question}</div>
-                                                                                        <div className="fs-08">
-                                                                                            <span className={isCorrect ? 'text-success fw-bold' : 'text-danger fw-bold'}>
-                                                                                                Risposta data: {selectedOpt}
-                                                                                            </span>
-                                                                                            {!isCorrect && (
-                                                                                                <div className="text-success fw-semibold fs-075 mt-0.5">
-                                                                                                    <i className="bi bi-arrow-right-short"></i> Risposta esatta: {correctOpt}
-                                                                                                </div>
-                                                                                            )}
-                                                                                        </div>
+                                                                            <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-15' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
+                                                                                <div
+                                                                                    className={`position-absolute top-0 start-0 h-100 opacity-20 ${isCorrect ? 'bg-success' : 'bg-orange'}`}
+                                                                                    style={{ width: `${percent}%`, transition: 'width 0.5s ease-in-out' }}
+                                                                                ></div>
+
+                                                                                <div className="d-flex align-items-center justify-content-between position-relative z-1 gap-2">
+                                                                                    <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                                        {isCorrect ? (
+                                                                                            <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                                                                                        ) : (
+                                                                                            <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 text-white-50`}></i>
+                                                                                        )}
+                                                                                        <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-success' : 'fw-medium'}`}>{optText}</span>
+                                                                                    </div>
+
+                                                                                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                                                                        {isCorrect && (
+                                                                                            <span className="badge bg-success text-white rounded-pill px-2 py-0.5 fs-065">Esatta</span>
+                                                                                        )}
+                                                                                        <span className="fs-075 fw-bold text-white-50">
+                                                                                            {count} {count === 1 ? 'voto' : 'voti'} ({percent}%)
+                                                                                        </span>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         );
                                                                     })}
                                                                 </div>
-                                                            )}
+                                                            </div>
+                                                        ));
+                                                    })()}
+                                                </div>
+                                            )}
+
+                                            {/* TAB 2: CLASSIFICA & DETTAGLIO RISPOSTE PER STUDENTE */}
+                                            {quizReportTab === 'students' && (
+                                                <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
+                                                    {[...quizResults]
+                                                        .sort((a, b) => b.score - a.score)
+                                                        .map((r, rankIdx) => {
+                                                            const isExpanded = expandedStudent === r.studentName;
+                                                            const percentScore = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+                                                            const medalIcons = ['🥇', '🥈', '🥉'];
+
+                                                            return (
+                                                                <div key={r.studentName || rankIdx} className={`rounded-4 border overflow-hidden transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                                    <div
+                                                                        className="d-flex align-items-center justify-content-between p-3 cursor-pointer user-select-none hover-bg-tertiary"
+                                                                        onClick={() => setExpandedStudent(isExpanded ? null : r.studentName)}
+                                                                    >
+                                                                        <div className="d-flex align-items-center gap-3 min-w-0">
+                                                                            <div className="d-flex align-items-center justify-content-center flex-shrink-0 fs-5 fw-black w-h-36">
+                                                                                {medalIcons[rankIdx] || <span className="fs-6 text-white-50">#{rankIdx + 1}</span>}
+                                                                            </div>
+                                                                            <div className="min-w-0">
+                                                                                <h6 className="fw-bold mb-0 text-truncate fs-6">{r.studentName}</h6>
+                                                                                <small className="text-white-50 fs-075">{r.score} su {r.total} risposte corrette ({percentScore}%)</small>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                                                            <span className={`badge rounded-pill px-3 py-1.5 fw-bold fs-075 ${percentScore >= 80 ? 'bg-success text-white' : percentScore >= 50 ? 'bg-warning text-dark' : 'bg-danger text-white'}`}>
+                                                                                {r.score} / {r.total}
+                                                                            </span>
+                                                                            <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'} text-white-50 fs-6`}></i>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* ESPANSIONE DETTAGLIATE RISPOSTE STUDENTE */}
+                                                                    {isExpanded && (
+                                                                        <div className={`p-3 border-top border-secondary border-opacity-25 d-flex flex-column gap-2 ${darkMode ? 'bg-black bg-opacity-40' : 'bg-body-tertiary'}`}>
+                                                                            <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
+                                                                                Dettaglio risposte di {r.studentName}:
+                                                                            </div>
+                                                                            {quizQuestions.map((q, qIdx) => {
+                                                                                const det = r.details?.find(d => String(d.question_id) === String(q._id));
+                                                                                const isCorrect = det?.correct;
+                                                                                const qCorrectIdx = q.correctIndex !== undefined && q.correctIndex !== null ? Number(q.correctIndex) : -1;
+                                                                                const studentSelectedIdx = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? Number(det.selectedIndex) : -1;
+
+                                                                                return (
+                                                                                    <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
+                                                                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                                                                            <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
+                                                                                            <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : 'bg-danger text-white'}`}>
+                                                                                                {isCorrect ? 'Corretta' : 'Errata'}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        
+                                                                                        <div className="d-flex flex-column gap-1.5 mt-2">
+                                                                                            {q.options && q.options.map((optText, optIdx) => {
+                                                                                                const isCorrectOpt = optIdx === qCorrectIdx;
+                                                                                                const isStudentChoice = optIdx === studentSelectedIdx;
+
+                                                                                                let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
+                                                                                                if (isCorrectOpt) {
+                                                                                                    optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-success fw-bold";
+                                                                                                } else if (isStudentChoice && !isCorrect) {
+                                                                                                    optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
+                                                                                                }
+
+                                                                                                return (
+                                                                                                    <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
+                                                                                                        <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                                                            {isCorrectOpt ? (
+                                                                                                                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                                                                                                            ) : isStudentChoice ? (
+                                                                                                                <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
+                                                                                                            ) : (
+                                                                                                                <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
+                                                                                                            )}
+                                                                                                            <span className="text-truncate">{optText}</span>
+                                                                                                        </div>
+                                                                                                        {isCorrectOpt && (
+                                                                                                            <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
+                                                                                                                <i className="bi bi-check2 me-1"></i>Esatta
+                                                                                                            </span>
+                                                                                                        )}
+                                                                                                        {isStudentChoice && !isCorrect && (
+                                                                                                            <span className="badge bg-danger text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
+                                                                                                                Scelta dallo studente
+                                                                                                            </span>
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                );
+                                                                                            })}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        /* VISTA VISITATORE / STUDENTE: SOLO I PROPRII RISULTATI */
+                                        (() => {
+                                            const currentStudentName = user?.name || localStorage.getItem('artaround_student_name') || localStorage.getItem('studentName') || '';
+                                            const myResult = quizResults.find(r => r.studentName === currentStudentName) || quizResults[0];
+                                            const score = myResult?.score || 0;
+                                            const total = myResult?.total || quizQuestions.length;
+                                            const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+
+                                            return (
+                                                <div className="d-flex flex-column gap-3">
+                                                    {/* HEADER PERSONALE STUDENTE */}
+                                                    <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
+                                                        <div className="d-flex align-items-center gap-2.5">
+                                                            <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                                                                <i className="bi bi-patch-check-fill fs-4"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="fw-black m-0 fs-5">Esito del tuo Quiz</h4>
+                                                                <p className="small text-white-50 mb-0">Ecco il riepilogo delle tue risposte</p>
+                                                            </div>
                                                         </div>
-                                                    );
-                                                })}
-                                        </div>
+                                                        <button onClick={() => setQuizPhase('none')} className="btn-close btn-close-white" aria-label="Chiudi"></button>
+                                                    </div>
+
+                                                    {/* SCORE BANNER PERSONALE */}
+                                                    <div className={`p-3 rounded-4 text-center border ${percent >= 80 ? 'bg-success bg-opacity-15 border-success border-opacity-40' : percent >= 50 ? 'bg-warning bg-opacity-15 border-warning border-opacity-40' : 'bg-danger bg-opacity-15 border-danger border-opacity-40'}`}>
+                                                        <div className="fs-065 text-uppercase fw-bold tracking-wider text-white-50 mb-1">Punteggio Totale</div>
+                                                        <div className={`fs-2 fw-black ${percent >= 80 ? 'text-success' : percent >= 50 ? 'text-warning' : 'text-danger'}`}>
+                                                            {score} <span className="fs-6 text-white-50 fw-normal">/ {total} corrette ({percent}%)</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* ELENCO DELLE PROPRIE RISPOSTE */}
+                                                    <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
+                                                        <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
+                                                            Le tue risposte per quesito:
+                                                        </div>
+                                                        {quizQuestions.map((q, qIdx) => {
+                                                            const det = myResult?.details?.find(d => String(d.question_id) === String(q._id));
+                                                            const isCorrect = det?.correct;
+                                                            const qCorrectIdx = q.correctIndex !== undefined && q.correctIndex !== null ? Number(q.correctIndex) : -1;
+                                                            const studentSelectedIdx = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? Number(det.selectedIndex) : -1;
+
+                                                            return (
+                                                                <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
+                                                                    <div className="d-flex align-items-center justify-content-between mb-2">
+                                                                        <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
+                                                                        <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : 'bg-danger text-white'}`}>
+                                                                            {isCorrect ? 'Corretta' : 'Errata'}
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div className="d-flex flex-column gap-1.5 mt-2">
+                                                                        {q.options && q.options.map((optText, optIdx) => {
+                                                                            const isCorrectOpt = optIdx === qCorrectIdx;
+                                                                            const isStudentChoice = optIdx === studentSelectedIdx;
+
+                                                                            let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
+                                                                            if (isCorrectOpt) {
+                                                                                optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-success fw-bold";
+                                                                            } else if (isStudentChoice && !isCorrect) {
+                                                                                optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
+                                                                            }
+
+                                                                            return (
+                                                                                <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
+                                                                                    <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                                        {isCorrectOpt ? (
+                                                                                            <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                                                                                        ) : isStudentChoice ? (
+                                                                                            <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
+                                                                                        ) : (
+                                                                                            <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
+                                                                                        )}
+                                                                                        <span className="text-truncate">{optText}</span>
+                                                                                    </div>
+                                                                                    {isCorrectOpt && (
+                                                                                        <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
+                                                                                            <i className="bi bi-check2 me-1"></i>Risposta Esatta
+                                                                                        </span>
+                                                                                    )}
+                                                                                    {isStudentChoice && !isCorrect && (
+                                                                                        <span className="badge bg-danger text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
+                                                                                            La tua risposta
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+
+                                                    <button onClick={() => setQuizPhase('none')} className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100 mt-1 shadow-sm">
+                                                        Torna alla visita
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()
                                     )}
                                 </div>
                             )}
