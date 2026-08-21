@@ -1038,17 +1038,7 @@ function VisitDetail() {
                         <i className={`bi ${darkMode ? 'bi-moon-stars-fill text-body' : 'bi-sun-fill text-warning'} fs-5`}></i>
                     </button>
 
-                    {piante.length > 0 && (
-                        <button
-                            type="button"
-                            className="btn btn-sm rounded-pill px-2.5 px-sm-3 py-1.5 bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 d-flex align-items-center gap-1.5 fw-bold shadow-sm active-scale"
-                            onClick={() => setIsMapOpen(true)}
-                            title="Cambia piano / Mappa"
-                        >
-                            <i className="bi bi-layers-fill"></i>
-                            <span className="d-none d-sm-inline">{pianoAttivo !== null ? (piante.find(p => p.piano === pianoAttivo)?.nome || `Piano ${pianoAttivo}`) : 'Piano'}</span>
-                        </button>
-                    )}
+
 
                     <button
                         className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
@@ -1604,16 +1594,23 @@ function VisitDetail() {
                                                                                 const det = r.details?.find(d => String(d.question_id) === String(q._id));
                                                                                 const isCorrect = det?.correct;
                                                                                 const qCorrectIdx = q.correctIndex !== undefined && q.correctIndex !== null ? Number(q.correctIndex) : -1;
-                                                                                const studentSelectedIdx = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? Number(det.selectedIndex) : -1;
+                                                                                const studentSelectedIdx = (det?.selectedIndex !== undefined && det?.selectedIndex !== null && !isNaN(Number(det.selectedIndex))) ? Number(det.selectedIndex) : -1;
+                                                                                const isUnanswered = studentSelectedIdx === -1;
 
                                                                                 return (
-                                                                                    <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
+                                                                                    <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : (isUnanswered ? 'border-warning border-opacity-50 bg-warning bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10')}`}>
                                                                                         <div className="d-flex align-items-center justify-content-between mb-2">
                                                                                             <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
-                                                                                            <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : 'bg-danger text-white'}`}>
-                                                                                                {isCorrect ? 'Corretta' : 'Errata'}
+                                                                                            <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : (isUnanswered ? 'bg-warning text-dark' : 'bg-danger text-white')}`}>
+                                                                                                {isCorrect ? 'Corretta' : (isUnanswered ? 'Non risposto' : 'Errata')}
                                                                                             </span>
                                                                                         </div>
+
+                                                                                        {isUnanswered && (
+                                                                                            <div className="p-2 rounded-3 bg-warning bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
+                                                                                                <i className="bi bi-dash-circle-fill"></i>Nessuna risposta fornita (Conteggiato come errore)
+                                                                                            </div>
+                                                                                        )}
                                                                                         
                                                                                         <div className="d-flex flex-column gap-1.5 mt-2">
                                                                                             {q.options && q.options.map((optText, optIdx) => {
@@ -1706,17 +1703,24 @@ function VisitDetail() {
                                                             const det = myResult?.details?.find(d => String(d.question_id) === String(q._id));
                                                             const isCorrect = det?.correct;
                                                             const qCorrectIdx = q.correctIndex !== undefined && q.correctIndex !== null ? Number(q.correctIndex) : -1;
-                                                            const studentSelectedIdx = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? Number(det.selectedIndex) : -1;
+                                                            const studentSelectedIdx = (det?.selectedIndex !== undefined && det?.selectedIndex !== null && !isNaN(Number(det.selectedIndex))) ? Number(det.selectedIndex) : -1;
+                                                            const isUnanswered = studentSelectedIdx === -1;
 
                                                             return (
-                                                                <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
+                                                                <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : (isUnanswered ? 'border-warning border-opacity-50 bg-warning bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10')}`}>
                                                                     <div className="d-flex align-items-center justify-content-between mb-2">
                                                                         <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
-                                                                        <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : 'bg-danger text-white'}`}>
-                                                                            {isCorrect ? 'Corretta' : 'Errata'}
+                                                                        <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : (isUnanswered ? 'bg-warning text-dark' : 'bg-danger text-white')}`}>
+                                                                            {isCorrect ? 'Corretta' : (isUnanswered ? 'Non risposto' : 'Errata')}
                                                                         </span>
                                                                     </div>
                                                                     
+                                                                    {isUnanswered && (
+                                                                        <div className="p-2 rounded-3 bg-warning bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
+                                                                            <i className="bi bi-dash-circle-fill"></i>Non hai fornito alcuna risposta (Conteggiato come errore)
+                                                                        </div>
+                                                                    )}
+
                                                                     <div className="d-flex flex-column gap-1.5 mt-2">
                                                                         {q.options && q.options.map((optText, optIdx) => {
                                                                             const isCorrectOpt = optIdx === qCorrectIdx;

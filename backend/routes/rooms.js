@@ -444,7 +444,12 @@ router.post('/quiz/finish', async (req, res) => {
 
         room.students.forEach(name => {
             if (!room.quizAnswers[name]) {
-                results.push({ studentName: name, score: 0, total, details: [] });
+                const details = room.quizQuestions.map(q => ({
+                    question_id: q._id.toString(),
+                    selectedIndex: null,
+                    correct: false
+                }));
+                results.push({ studentName: name, score: 0, total, details });
             }
         });
 
