@@ -8,13 +8,11 @@ const artworkCtrl = require('../controllers/artworkController.js');
 const isEditor = authorize(['admin', 'editor']);
 const canManageTours = authorize(['admin', 'editor', 'docente']);
 
-// GET /api/artworks/museum/:museumId - Opere di un museo (deve venire prima di :id)
+// Rotta per recuperare le opere di un museo specifico (la rotta /museum/ va messa prima di /:id per evitare che Express la interpreti come un ID)
 router.get('/museum/:museumId', auth, canManageTours, hasMuseumAccess, artworkCtrl.getArtworksByMuseum);
-
-// GET /api/artworks - Tutte le opere (solo editor)
 router.get('/', auth, isEditor, artworkCtrl.getAllArtworks);
 
-// GET /api/artworks/public/museum/:museumId — solo dati pubblici, per il marketplace
+// Rotta pubblica leggera utilizzata dall'app visitatore senza richiesta di token JWT
 router.get('/public/museum/:museumId', async (req, res) => {
     try {
         const artworks = await Item.find({ museum_id: req.params.museumId })
@@ -27,19 +25,11 @@ router.get('/public/museum/:museumId', async (req, res) => {
     }
 });
 
-// GET /api/artworks/:id - Opera specifica
+// CRUD opere d'arte per la dashboard di editing
 router.get('/:id', auth, isEditor, artworkCtrl.getArtworkById);
-
-// GET /api/artworks/:id/descriptions
 router.get('/:id/descriptions', artworkCtrl.getDescriptionsByArtwork);
-
-// POST /api/artworks - Crea nuova opera
 router.post('/', auth, isEditor, hasMuseumAccess, artworkCtrl.createArtwork);
-
-// PUT /api/artworks/:id - Modifica opera
 router.put('/:id', auth, isEditor, artworkCtrl.updateArtwork);
-
-// DELETE /api/artworks/:id - Elimina opera
 router.delete('/:id', auth, isEditor, artworkCtrl.deleteArtwork);
 
 module.exports = router;

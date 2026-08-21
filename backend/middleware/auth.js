@@ -10,8 +10,6 @@ const auth = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Popola req.user con i dati completi dell'utente dal database
         const user = await User.findById(decoded.id).select('-password');
         if (!user) {
             return res.redirect('/login.html');
@@ -38,11 +36,11 @@ const optionalAuth = async (req, res, next) => {
             req.user = user;
         }
     } catch (err) {
-        // Ignora errori di token scaduto in optionalAuth
+        // token scaduto o non valido, prosegue come anonimo
     }
     next();
 };
-// Middleware per controllare i ruoli di admin e editor
+
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
         const userRole = (req.user?.permissions || '').toLowerCase();

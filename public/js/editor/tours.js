@@ -1,6 +1,5 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('toursManager', () => ({
-        // UI STATE
         isReady: false,
         isLoaded: false,
         isLoggedIn: false,
@@ -8,14 +7,12 @@ document.addEventListener('alpine:init', () => {
         propic: '',
         username: '',
         step: 'marketplace',
-        mode: null, // selection, form
-         // create, edit, null (non selezionato)
-        formTab: 'info', // info, artworks, quiz
+        mode: null,
+        formTab: 'info',
 
-        // ROOM STATE
         roomState: { pin: null, students: [], eventSource: null },
         isLobbyModalOpen: false,
-        visibilityFilter: 'all', // 'all', 'public', 'private'
+        visibilityFilter: 'all',
         predefinedTags: ['Arte', 'Storia', 'Scienza', 'Natura', 'Tecnologia'],
 
         newCustomTag: '',
@@ -23,7 +20,6 @@ document.addEventListener('alpine:init', () => {
             return this.tour.tags ? this.tour.tags.filter(t => !this.predefinedTags.includes(t)) : [];
         },
 
-        // DATA
         museums: [],
         availableTours: [],
         selectedMuseum: '',
@@ -31,14 +27,13 @@ document.addEventListener('alpine:init', () => {
         selectedCity: '',
         selectedTourId: '',
 
-        // TOUR DATA
         tour: {
             _id: '',
             name: '',
             description: '',
             image: '',
             museum_id: '',
-            items: [], // Array of artwork IDs
+            items: [],
             logistic_info: [],
             pre_visit: [],
             tags: [],
@@ -47,27 +42,23 @@ document.addEventListener('alpine:init', () => {
             prezzo: 0
         },
 
-        // ARTWORKS MANAGEMENT
-        availableArtworks: [], // All artworks for selected museum
-        selectedArtworks: [], // Artworks currently selected for the tour (with full data)
-        artworkSearch: '', // Search filter for available artworks
-        tourSearch: '', // Search filter for tours
-        mobileArtworksTab: 'selected', // mobile sub-tab for artworks: 'selected' | 'catalog'
-        mobileQuizTab: 'list',          // mobile sub-tab for quiz: 'list' | 'editor'
+        availableArtworks: [],
+        selectedArtworks: [],
+        artworkSearch: '',
+        tourSearch: '',
+        mobileArtworksTab: 'selected',
+        mobileQuizTab: 'list',
 
-        // QUIZ MANAGEMENT
         quizQuestions: [],
         newQuestion: { question: '', options: ['', ''], correctIndex: 0 },
         editingQuestionId: null,
 
-        // NOTIFICATIONS
         notification: {
             show: false,
             message: '',
             type: 'success'
         },
 
-        // ROOMS ACTIVE STATE
         activeRoomsMap: {},
         isRoomActive(visitId) {
             if (!this.activeRoomsMap || !this.activeRoomsMap[visitId]) return false;
@@ -88,7 +79,6 @@ document.addEventListener('alpine:init', () => {
             } catch (e) {}
         },
 
-        // TAGS MANAGEMENT
         addCustomTag() {
             const tag = this.newCustomTag.trim();
             if (tag) {
@@ -107,7 +97,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // INITIALIZATION
         async init() {
             this._restoringState = true;
             this.isLoaded = false;
@@ -123,8 +112,8 @@ document.addEventListener('alpine:init', () => {
                 const editId = urlParams.get('id');
                 const modeParam = urlParams.get('mode');
 
+                // Se arriviamo da un link diretto con id o con mode=create, scavalchiamo lo stato salvato nel localStorage
                 if (editId) {
-                    // Deep-link via URL parameter
                     this.mode = 'edit';
                     this.selectedTourId = editId;
                     const success = await this.loadTour(editId);
@@ -137,7 +126,6 @@ document.addEventListener('alpine:init', () => {
                         this.resetToSelection();
                     }
                 } else if (modeParam === 'create') {
-                    // Forced creation mode from URL query ?mode=create
                     localStorage.removeItem('artaround_tours_state');
                     this.mode = 'create';
                     this.selectedTourId = '';
@@ -163,7 +151,7 @@ document.addEventListener('alpine:init', () => {
                     this.step = 'marketplace';
                 }
 
-                // Restoration complete, safe to attach state watchers
+                // Attiviamo i watcher solo a ripristino completato per evitare salvataggi intermedi errati
                 this._restoringState = false;
 
                 this.$watch('step', () => this._saveNavState());
@@ -221,13 +209,7 @@ document.addEventListener('alpine:init', () => {
             }));
         },
 
-
-
-
-
-
-        // AUTHENTICATION
-                async checkAuth() {
+        async checkAuth() {
             try {
                 const token = localStorage.getItem('artaround_token');
                 const savedUsername = localStorage.getItem('artaround_user');
@@ -242,7 +224,6 @@ document.addEventListener('alpine:init', () => {
                     this.isLoggedIn = true;
                 }
                 
-                // CACHE LOCALE (per rendering istantaneo)
                 const savedUserDataStr = localStorage.getItem('artaround_user_data');
                 if (savedUserDataStr) {
                     try {
@@ -257,7 +238,6 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
 
-                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -275,7 +255,6 @@ document.addEventListener('alpine:init', () => {
                         this.purchasedVisits = data.user?.purchased_visits || [];
                     }
                     this.isLoggedIn = true;
-                    // AGGIORNA LA CACHE
                     localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
                     if (typeof this.logout === 'function') {
@@ -365,8 +344,7 @@ document.addEventListener('alpine:init', () => {
 
 
 
-        // TOURS
-                        get canProceed() {
+        get canProceed() {
             return this.selectedMuseum !== '';
         },
         
@@ -379,7 +357,6 @@ document.addEventListener('alpine:init', () => {
             this.artworkSearch = '';
             
             if (mode === 'edit') {
-                // Instant Marketplace navigation
                 this.step = 'marketplace';
             } else {
                 this.step = 'selection';
@@ -392,9 +369,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-
-        
-
         async goBackFromForm() {
             this.step = 'marketplace';
             this.selectedTourId = '';
@@ -406,7 +380,7 @@ document.addEventListener('alpine:init', () => {
             this.goToForm();
         },
         
-                async editTour(tourId) {
+        async editTour(tourId) {
             this.mode = 'edit';
             this.selectedTourId = tourId;
             await this.goToForm();
@@ -430,7 +404,7 @@ document.addEventListener('alpine:init', () => {
             } else if (this.mode === 'edit' && this.selectedTourId) {
                 const success = await this.loadTour(this.selectedTourId);
                 if (!success) {
-                    this.step = 'marketplace'; // return to marketplace
+                    this.step = 'marketplace';
                     return;
                 }
             }
@@ -488,8 +462,7 @@ document.addEventListener('alpine:init', () => {
                     const tourData = await res.json();
                     const museumId = tourData.museum_id ? (typeof tourData.museum_id === 'object' ? tourData.museum_id._id : tourData.museum_id) : '';
 
-                    // Sostituisco l'intero oggetto tour in una sola operazione per garantire
-                    // che Alpine.js rilevi il cambiamento e aggiorni tutti i binding del form.
+                    // Riassegniamo l'intero oggetto tour per far rilevare il cambio ad Alpine ed aggiornare i campi del form
                     this.tour = {
                         _id: tourData._id || '',
                         name: tourData.name || '',
@@ -505,9 +478,7 @@ document.addEventListener('alpine:init', () => {
                         prezzo: tourData.prezzo || 0
                     };
 
-                    // Load artworks in the tour
                     await this.fetchTourArtworks();
-                    // Load quiz questions in the tour
                     await this.fetchQuizQuestions();
                     return true;
                 } else {
@@ -526,7 +497,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // ARTWORKS
         async fetchAvailableArtworks() {
             if (!this.tour.museum_id) return;
 
@@ -556,7 +526,6 @@ document.addEventListener('alpine:init', () => {
                 if (res.ok) {
                     this.selectedArtworks = await res.json();
                 } else {
-                    // Fallback: try to get artworks from tour.items and match with availableArtworks
                     if (this.tour.items && this.tour.items.length > 0 && this.availableArtworks.length > 0) {
                         this.selectedArtworks = this.availableArtworks.filter(a =>
                             this.tour.items.includes(a._id)
@@ -566,7 +535,6 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
             } catch (e) {
-                // Fallback on error
                 if (this.tour.items && this.tour.items.length > 0 && this.availableArtworks.length > 0) {
                     this.selectedArtworks = this.availableArtworks.filter(a =>
                         this.tour.items.includes(a._id)
@@ -615,7 +583,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get filteredTours() {
-            if (!this.selectedMuseum) return []; // Non mostrare NULLA se non c'è museo
+            if (!this.selectedMuseum) return [];
 
             let tours = this.availableTours;
             tours = tours.filter(t => {
@@ -636,12 +604,9 @@ document.addEventListener('alpine:init', () => {
             return tours.reverse();
         },
 
-
-        // Add artwork locally (no need for tour._id anymore)
         addArtworkToTour(artwork) {
             if (!artwork) return;
 
-            // Check if already selected
             if (this.selectedArtworks.some(a => a._id === artwork._id)) {
                 this.showToast("Opera già selezionata", "error");
                 return;
@@ -651,13 +616,11 @@ document.addEventListener('alpine:init', () => {
             this.showToast("Opera aggiunta alla visita!");
         },
 
-        // Remove artwork locally
         removeArtworkFromTour(artworkId) {
             this.selectedArtworks = this.selectedArtworks.filter(a => a._id !== artworkId);
             this.showToast("Opera rimossa dalla visita!");
         },
 
-        // Move artwork up in the list
         moveArtworkUp(index) {
             if (index === 0) return;
             const temp = this.selectedArtworks[index];
@@ -665,7 +628,6 @@ document.addEventListener('alpine:init', () => {
             this.selectedArtworks[index - 1] = temp;
         },
 
-        // Move artwork down in the list
         moveArtworkDown(index) {
             if (index === this.selectedArtworks.length - 1) return;
             const temp = this.selectedArtworks[index];
@@ -673,14 +635,12 @@ document.addEventListener('alpine:init', () => {
             this.selectedArtworks[index + 1] = temp;
         },
 
-        // SAVE - Now saves artworks together with the tour
         async saveTour() {
             if (!this.tour.name) {
                 this.showToast("Inserisci il nome della visita", "error");
                 return;
             }
 
-            // Prepare items array from selected artworks
             const items = this.selectedArtworks.map(a => a._id);
 
             const isEdit = !!this.tour._id;
@@ -699,7 +659,7 @@ document.addEventListener('alpine:init', () => {
                         description: this.tour.description,
                         image: this.tour.image,
                         museum_id: this.tour.museum_id,
-                        items: items, // Include artworks in the save
+                        items: items,
                         logistic_info: this.tour.logistic_info,
                         tags: this.tour.tags,
                         mnemonicCode: this.tour.mnemonicCode,
@@ -712,7 +672,7 @@ document.addEventListener('alpine:init', () => {
                     const data = await res.json();
                     if (!isEdit) {
                         this.tour._id = data.visit._id;
-                        this.quizQuestions = []; // nuova visita, nessuna domanda ancora
+                        this.quizQuestions = [];
                     }
                     await this.fetchAllTours();
                     this.showToast(isEdit ? "Visita aggiornata con successo!" : "Visita creata con successo!");
@@ -727,7 +687,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // DELETE
         async deleteTour() {
             if (!this.tour._id) return;
 
@@ -753,7 +712,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // DELETE FROM LIST
         async deleteTourFromList(tourId) {
             if (!confirm("Sei sicuro di voler eliminare questa visita?")) return;
 
@@ -778,7 +736,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // --- QUIZ MANAGEMENT ---
         async fetchQuizQuestions() {
             if (!this.tour._id) return;
             try {
@@ -889,13 +846,12 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // --- ROOMS MANAGEMENT ---
         async createRoom(visitId) {
             try {
                 const response = await fetch('/api/rooms/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ visitId, teacherId: this.username, allowLateJoins: this.allowLateJoins }) // o l'ID se presente
+                    body: JSON.stringify({ visitId, teacherId: this.username, allowLateJoins: this.allowLateJoins })
                 });
 
                 if (response.ok) {
@@ -916,7 +872,6 @@ document.addEventListener('alpine:init', () => {
                     sessionStorage.setItem('activeRoomPin', data.pin);
                     sessionStorage.setItem('activeRoomVisitId', visitId);
 
-                    // Collegamento SSE
                     if (this.roomState.eventSource) {
                         this.roomState.eventSource.close();
                     }
@@ -958,7 +913,6 @@ document.addEventListener('alpine:init', () => {
                     this.showToast('Visita avviata! Gli studenti sono stati sincronizzati.', 'success');
                     sessionStorage.removeItem('activeRoomPin');
                     sessionStorage.removeItem('activeRoomVisitId');
-                    // Potremmo aprire in un'altra tab il navigator con il PIN, o generare il link
                     const teacherLink = `/navigator/visit/${this.roomState.visitId}?role=teacher&pin=${this.roomState.pin}`;
                     window.location.href = teacherLink;
                 }

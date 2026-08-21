@@ -3,11 +3,8 @@ const router = express.Router();
 const crypto = require('crypto');
 const { quizQuestion: QuizQuestion, quizResult: QuizResult, visit: Visit } = require('../models/museums.js');
 
-// Memoria RAM per le stanze
-// Struttura: { [pin]: { visitId, teacherId, currentArtworkIndex, clients: [] } }
 const activeRooms = new Map();
 
-// Helper per inviare eventi a tutti i client di una stanza
 const broadcastToRoom = (pin, eventName, data) => {
     const room = activeRooms.get(pin);
     if (!room) return;
@@ -17,7 +14,6 @@ const broadcastToRoom = (pin, eventName, data) => {
     });
 };
 
-// Crea una nuova stanza
 router.post('/create', async (req, res) => {
     const { visitId, teacherId } = req.body;
     
@@ -25,7 +21,7 @@ router.post('/create', async (req, res) => {
         return res.status(400).json({ error: "visitId è obbligatorio" });
     }
 
-    // 1. Controlla se QUESTO docente (teacherId) ha già una stanza attiva per questa visita
+// Se lo stesso docente ricrea la stanza per la stessa visita, riusiamo quella attiva senza duplicarla
     if (teacherId) {
         for (const [p, r] of activeRooms.entries()) {
             if (r.visitId.toString() === visitId.toString() && r.teacherId === teacherId) {
@@ -58,9 +54,8 @@ router.post('/create', async (req, res) => {
 
     let pin = basePin;
 
+    // Se il codice mnemonic è già occupato da un'altra stanza, aggiungiamo un numero progressivo (es. ciao1, ciao2)
     if (basePin) {
-        // Se il codice base (es: "ciao") è già occupato da un'altra stanza attiva,
-        // calcoliamo il progressivo numerico "+1", "+2", "+3"... (es: "ciao1", "ciao2")
         if (activeRooms.has(pin)) {
             let counter = 1;
             while (activeRooms.has(basePin + counter)) {
@@ -69,7 +64,6 @@ router.post('/create', async (req, res) => {
             pin = basePin + counter;
         }
     } else {
-        // Fallback: Genera PIN univoco di 5 cifre
         do {
             pin = Math.floor(10000 + Math.random() * 90000).toString();
         } while (activeRooms.has(pin));
@@ -99,7 +93,6 @@ router.post('/create', async (req, res) => {
     });
 });
 
-// Studente si unisce a una stanza (chiamata REST iniziale)
 router.post('/join', async (req, res) => {
     let { pin, studentName } = req.body;
     if (!pin || !pin.trim()) {
@@ -128,10 +121,8 @@ router.post('/join', async (req, res) => {
         return res.json({ requiresApproval: true, reqId, visitId: room.visitId });
     }
 
-    // Aggiungi nome studente alla lista
     if (studentName && !room.students.includes(studentName)) {
         room.students.push(studentName);
-        // Avvisa la lobby (docente)
         broadcastToRoom(pin, 'student-joined', { students: room.students });
         broadcastToRoom(pin, 'chat-message', { sender: 'Sistema', message: `${studentName} si è unito alla stanza.`, type: 'system', timestamp: new Date().toISOString() });
     }
@@ -139,7 +130,6 @@ router.post('/join', async (req, res) => {
     res.json({ success: true, visitId: room.visitId, currentArtworkIndex: room.currentArtworkIndex, isStarted: room.isStarted });
 });
 
-// Restituisce la mappa delle stanze attive (opzionalmente filtrata per teacherId)
 router.get('/active', (req, res) => {
     const activeMap = {};
     const targetTeacherId = req.query.teacherId || null;
@@ -147,7 +137,6 @@ router.get('/active', (req, res) => {
     for (const [pin, room] of activeRooms.entries()) {
         if (room.visitId) {
             const vid = room.visitId.toString();
-            // Se non c'è ancora nessuna stanza registrata per questa visita, o se quella trovata appartiene all'utente richiedente
             if (!activeMap[vid] || (targetTeacherId && room.teacherId === targetTeacherId)) {
                 activeMap[vid] = {
                     pin: pin,
@@ -162,7 +151,6 @@ router.get('/active', (req, res) => {
     res.json(activeMap);
 });
 
-// Verifica esistenza stanza o codice mnemonic
 router.get('/check/:pin', async (req, res) => {
     const pin = (req.params.pin || '').trim();
     if (activeRooms.has(pin)) {
@@ -185,7 +173,6 @@ router.get('/check/:pin', async (req, res) => {
     res.json({ exists: false });
 });
 
-// Connessione SSE per ascoltare gli eventi della stanza
 router.get('/events/:pin', (req, res) => {
     const { pin } = req.params;
 
@@ -193,7 +180,7 @@ router.get('/events/:pin', (req, res) => {
         return res.status(404).json({ error: "Stanza non trovata" });
     }
 
-    // Header necessari per SSE
+    // Disabilita il buffering per far funzionare lo streaming SSE anche sotto Nginx/reverse proxy
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -202,7 +189,6 @@ router.get('/events/:pin', (req, res) => {
 
     const room = activeRooms.get(pin);
 
-    // Identificativo client
     const clientId = crypto.randomUUID();
     const studentName = req.query.studentName;
     const newClient = { id: clientId, res, studentName };
@@ -216,7 +202,6 @@ router.get('/events/:pin', (req, res) => {
         }
     }
 
-    // Invia lo stato iniziale COMPLETO
     res.write(`event: connected\ndata: ${JSON.stringify({ 
         message: "Connesso alla stanza", 
         students: room.students, 
@@ -225,12 +210,12 @@ router.get('/events/:pin', (req, res) => {
         visitId: room.visitId
     })}\n\n`);
 
-    // Ping periodico per tenere viva la connessione dietro al reverse proxy
+    // Ping periodico per evitare il timeout del socket con i proxy intermedi
     const pingInterval = setInterval(() => {
         res.write(':\n\n');
     }, 25000);
 
-    // Gestione disconnessione
+    // Quando il client chiude la connessione, rimuoviamo lo studente solo se non ha altre schede aperte
     req.on('close', () => {
         clearInterval(pingInterval);
         const clientIndex = room.clients.findIndex(c => c.id === clientId);
@@ -238,7 +223,6 @@ router.get('/events/:pin', (req, res) => {
             const client = room.clients[clientIndex];
             room.clients.splice(clientIndex, 1);
             if (client.studentName) {
-                // Remove student from room.students if no other active connection has the same name
                 const hasOtherConnections = room.clients.some(c => c.studentName === client.studentName);
                 if (!hasOtherConnections) {
                     room.students = room.students.filter(s => s !== client.studentName);
@@ -249,7 +233,6 @@ router.get('/events/:pin', (req, res) => {
     });
 });
 
-// Studente o docente lascia la stanza
 router.post('/leave', (req, res) => {
     const { pin, studentName } = req.body;
     if (!activeRooms.has(pin)) {
@@ -264,8 +247,6 @@ router.post('/leave', (req, res) => {
     res.json({ success: true });
 });
 
-
-// Docente cambia opera
 router.post('/change-artwork', (req, res) => {
     const { pin, artworkIndex } = req.body;
 
@@ -276,13 +257,11 @@ router.post('/change-artwork', (req, res) => {
     const room = activeRooms.get(pin);
     room.currentArtworkIndex = artworkIndex;
 
-    // Broadcast a tutti gli studenti
     broadcastToRoom(pin, 'artwork-changed', { artworkIndex });
 
     res.json({ success: true });
 });
 
-// Docente avvia la visita
 router.post('/start', (req, res) => {
     const { pin } = req.body;
 
@@ -298,7 +277,6 @@ router.post('/start', (req, res) => {
     res.json({ success: true });
 });
 
-// Accetta richiesta di join
 router.post('/accept-join', (req, res) => {
     const { pin, reqId } = req.body;
     const room = activeRooms.get(pin);
@@ -318,7 +296,6 @@ router.post('/accept-join', (req, res) => {
     res.json({ success: true });
 });
 
-// Rifiuta richiesta di join
 router.post('/reject-join', (req, res) => {
     const { pin, reqId } = req.body;
     const room = activeRooms.get(pin);
@@ -333,7 +310,6 @@ router.post('/reject-join', (req, res) => {
     res.json({ success: true });
 });
 
-// Invia messaggio in chat
 router.post('/chat', (req, res) => {
     const { pin, sender, message, type } = req.body;
     
@@ -345,7 +321,6 @@ router.post('/chat', (req, res) => {
     res.json({ success: true });
 });
 
-// Notifica azione studente (+, -, audio)
 router.post('/student-action', (req, res) => {
     const { pin, studentName, action } = req.body;
     if (!activeRooms.has(pin)) {
@@ -355,7 +330,6 @@ router.post('/student-action', (req, res) => {
     res.json({ success: true });
 });
 
-// Broadcast audio a tutti gli studenti
 router.post('/broadcast-audio', (req, res) => {
     const { pin, text } = req.body;
     if (!activeRooms.has(pin)) {
@@ -365,7 +339,6 @@ router.post('/broadcast-audio', (req, res) => {
     res.json({ success: true });
 });
 
-// Termina la visita e chiude la stanza
 router.post('/end', (req, res) => {
     const { pin, visitId, teacherId } = req.body;
     let targetPin = null;
@@ -391,18 +364,15 @@ router.post('/end', (req, res) => {
         return res.status(404).json({ error: "Stanza non trovata" });
     }
     
-    // Avvisa tutti i client che la stanza è chiusa
     broadcastToRoom(targetPin, 'room-ended', { message: "La visita è terminata." });
     broadcastToRoom(targetPin, 'room-closed', { message: "Il docente ha terminato la visita." });
     
-    // Elimina la stanza dalla memoria
     activeRooms.delete(targetPin);
     console.log(`Stanza terminata ed eliminata: ${targetPin}`);
     
     res.json({ success: true });
 });
 
-// Docente avvia il quiz di fine visita
 router.post('/quiz/start', async (req, res) => {
     const { pin } = req.body;
     const room = activeRooms.get(pin);
@@ -419,7 +389,6 @@ router.post('/quiz/start', async (req, res) => {
         room.quizResults = null;
         room.quizActive = true;
 
-        // Versione senza risposta corretta, da mandare agli studenti
         const sanitized = questions.map(q => ({ _id: q._id, question: q.question, options: q.options }));
         broadcastToRoom(pin, 'quiz-started', { questions: sanitized });
 
@@ -430,9 +399,8 @@ router.post('/quiz/start', async (req, res) => {
     }
 });
 
-// Studente invia le risposte
 router.post('/quiz/answer', (req, res) => {
-    const { pin, studentName, answers } = req.body; // answers: { [questionId]: selectedIndex }
+    const { pin, studentName, answers } = req.body;
 
     const room = activeRooms.get(pin);
     if (!room) return res.status(404).json({ error: "Stanza non trovata" });
@@ -444,7 +412,6 @@ router.post('/quiz/answer', (req, res) => {
     res.json({ success: true });
 });
 
-// Docente termina il quiz: calcola i punteggi, li salva nel DB, li invia a tutti
 router.post('/quiz/finish', async (req, res) => {
     const { pin } = req.body;
     const room = activeRooms.get(pin);
@@ -474,7 +441,6 @@ router.post('/quiz/finish', async (req, res) => {
             });
         }
 
-        // Studenti connessi che non hanno risposto: punteggio 0
         room.students.forEach(name => {
             if (!room.quizAnswers[name]) {
                 results.push({ studentName: name, score: 0, total, details: [] });

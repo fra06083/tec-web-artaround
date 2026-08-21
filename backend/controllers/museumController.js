@@ -1,9 +1,9 @@
 const { museum: Museum, item: Item, visit: Visit } = require('../models/museums');
-// GET /api/museums
-// Ritorna tutti i musei o solo quelli assegnati al docente
+
 const getAllMuseums = async (req, res) => {
     try {
         let museums;
+        // I docenti e gli editor vedono solo i musei assegnati al proprio profilo, gli admin tutti
         if (req.user.permissions === 'docente' || req.user.permissions === 'editor') {
             const userWithMuseums = await require('../models/user.js').findById(req.user._id).populate('museums').lean();
             museums = userWithMuseums ? (userWithMuseums.museums || []) : [];
@@ -17,7 +17,6 @@ const getAllMuseums = async (req, res) => {
     }
 };
 
-// GET /api/museums/:id
 const getMuseumById = async (req, res) => {
     try {
         const museum = await Museum.findById(req.params.id).lean();
@@ -29,8 +28,6 @@ const getMuseumById = async (req, res) => {
     }
 };
 
-// POST /api/museums
-// Richiede Auth (il middleware va nella rotta - solo admin)
 const createMuseum = async (req, res) => {
     try {
         const { museum, city, province, region, address, description, image,mappa } = req.body;
@@ -69,7 +66,6 @@ const createMuseum = async (req, res) => {
     }
 };
 
-// PUT /api/museums/:id
 const updateMuseum = async (req, res) => {
     try {
         if (req.user.permissions !== 'admin') {
@@ -101,13 +97,12 @@ const updateMuseum = async (req, res) => {
     }
 };
 
-// DELETE /api/museums/:id
 const deleteMuseum = async (req, res) => {
     try {
         const deleted = await Museum.findByIdAndDelete(req.params.id);
         if (!deleted) return res.status(404).json({ error: 'Museo non trovato' });
 
-        // visite e item inerenti a quel museo devono essere cancellati
+        // pulizia a cascata di visite e opere collegate al museo
         await Visit.deleteMany({ museum_id: req.params.id });
         await Item.deleteMany({ museum_id: req.params.id });
 
@@ -118,15 +113,8 @@ const deleteMuseum = async (req, res) => {
     }
 };
 
-/* =========================================================
-   GESTIONE OPERE (ITEMS) ASSOCIATE AL MUSEO
-========================================================= */
-
-// GET /api/museums/:id/artworks
-// Recupera tutte le opere che appartengono a un determinato museo
 const getArtworksByMuseum = async (req, res) => {
     try {
-        // Assumiamo che nel modello Item ci sia un campo museum_id
         const artworks = await Item.find({ museum_id: req.params.id }).lean();
         res.json(artworks);
     } catch (error) {
@@ -135,8 +123,6 @@ const getArtworksByMuseum = async (req, res) => {
     }
 };
 
-// POST /api/artworks
-// Crea una nuova opera associata a un museo
 const createArtwork = async (req, res) => {
     try {
         const { title, artist, image, museum_id, description } = req.body;

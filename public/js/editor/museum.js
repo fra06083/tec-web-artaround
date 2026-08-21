@@ -19,7 +19,6 @@ const PIN_TIPI = [
 
 function museumManager() {
     return {
-        // --- STATO SESSIONE & NAVIGAZIONE ---
         isLoggedIn: false,
         username: '',
         permissions: '',
@@ -28,12 +27,10 @@ function museumManager() {
         isReady: false,
         isLoaded: false,
 
-        // --- DATI ---
         museums: [],
         selectedMuseumId: '',
         artworks: [],
 
-        // --- PAGINAZIONE LISTA MUSEI ---
         museumSearch: '',
         selectedCity: '',
         visibleCount: window.innerWidth < 768 ? 5 : 9,
@@ -77,7 +74,6 @@ function museumManager() {
             this.visibleCount += this._pageSize;
         },
 
-        // --- OGGETTI PER FORM (Sincronizzati con il Backend) ---
         currentMuseum: {
             museum: '',
             city: '',
@@ -90,7 +86,7 @@ function museumManager() {
         notification: {
             show: false,
             message: '',
-            type: 'success' // success o error
+            type: 'success'
         },
 
         showToast(msg, type = 'success') {
@@ -98,13 +94,11 @@ function museumManager() {
             this.notification.type = type;
             this.notification.show = true;
 
-            // Scompare automaticamente dopo 4 secondi
             setTimeout(() => {
                 this.notification.show = false;
             }, 4000);
         },
 
-        // --- AGGIORNA SAVE MUSEUM ---
         async init() {
             await this.checkAuth();
             if (this.isLoggedIn) {
@@ -132,22 +126,20 @@ function museumManager() {
             return titles[this.step] || 'Amministrazione';
         },
 
-        // --- LOGICA MUSEI ---
         async fetchMuseums() {
             try {
                 const token = localStorage.getItem('artaround_token');
 
                 const response = await fetch('/api/museums', {
-                    method: 'GET', // Anche se è il default, metterlo aiuta a leggere meglio il codice
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': token // Fondamentale: senza questo il backend ti darà 401
+                        'Authorization': token
                     }
                 });
                 if (response.ok) {
                     this.museums = await response.json();
                 } else {
-                    // Se il token è scaduto o non valido (401 o 403)
                     if (response.status === 401 || response.status === 403) {
                         this.logout();
                     } else {
@@ -175,10 +167,9 @@ function museumManager() {
             this.step = 'museum-form';
         },
 
-
         async saveMuseum() {
             const isEdit = !!this.currentMuseum._id;
-            const museumName = this.currentMuseum.museum; // Salviamo il nome per la notifica
+            const museumName = this.currentMuseum.museum;
             const url = isEdit ? `/api/museums/${this.currentMuseum._id}` : '/api/museums';
             const method = isEdit ? 'PUT' : 'POST';
 
@@ -195,11 +186,9 @@ function museumManager() {
                 if (res.ok) {
                     await this.fetchMuseums();
                     this.step = 'museum-list';
-                    // NOTIFICA SUCCESSO
                     this.showToast(`Museo "${museumName}" salvato con successo!`, 'success');
                 } else {
                     const err = await res.json();
-                    // NOTIFICA ERRORE BACKEND
                     this.showToast(err.error || "Impossibile salvare il museo.", 'error');
                 }
             } catch (e) {
@@ -494,7 +483,6 @@ function museumManager() {
                     this.isLoggedIn = true;
                 }
                 
-                // CACHE LOCALE (per rendering istantaneo)
                 const savedUserDataStr = localStorage.getItem('artaround_user_data');
                 if (savedUserDataStr) {
                     try {
@@ -509,7 +497,6 @@ function museumManager() {
                     }
                 }
 
-                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -527,7 +514,6 @@ function museumManager() {
                         this.purchasedVisits = data.user?.purchased_visits || [];
                     }
                     this.isLoggedIn = true;
-                    // AGGIORNA LA CACHE
                     localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
                     if (typeof this.logout === 'function') {

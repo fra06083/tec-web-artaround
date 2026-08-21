@@ -13,11 +13,9 @@ document.addEventListener('alpine:init', () => {
         editNameValue: '',
 
         async init() {
-            // 1. Controllo sicurezza
             const token = localStorage.getItem('artaround_token');
             if (!token) return window.location.href = '../index.html';
 
-            // PRE-CARICAMENTO ISTANTANEO DATI UTENTE (propic, name, permissions)
             const savedUserDataStr = localStorage.getItem('artaround_user_data');
             if (savedUserDataStr) {
                 try {
@@ -29,12 +27,10 @@ document.addEventListener('alpine:init', () => {
                     console.error('Error parsing saved user data', e);
                 }
             } else {
-                // Fallback username se user_data non esiste
                 this.username = localStorage.getItem('artaround_user') || '';
             }
 
             try {
-                // Verifica auth e permessi admin
                 const authRes = await fetch('/api/check', {
                     method: 'POST',
                     headers: { 'Authorization': token }
@@ -51,19 +47,15 @@ document.addEventListener('alpine:init', () => {
                 this.permissions = authData.user.permissions;
                 this.propic = authData.user.propic || '';
                 
-                // Aggiorna cache locale per le prossime volte
                 localStorage.setItem('artaround_user_data', JSON.stringify(authData.user));
 
-                // 2. Caricamento dati iniziali per la gestione
                 await this.loadMuseums();
 
-                // Carica inizialmente tutti gli utenti
                 const usersRes = await fetch('/editor/user-management/search?q=', {
                     headers: { 'Authorization': token }
                 });
                 this.users = usersRes.ok ? await usersRes.json() : [];
 
-                // Close user menu when clicking outside
                 document.addEventListener('click', (e) => {
                     const menu = document.querySelector('.mobile-user-menu');
                     const btn = document.querySelector('.mobile-user-btn');
@@ -84,7 +76,6 @@ document.addEventListener('alpine:init', () => {
             this.allMuseums = res.ok ? await res.json() : [];
         },
 
-        // Ricerca dinamica
         async searchUsers() {
             const token = localStorage.getItem('artaround_token');
             const query = this.search.trim();
@@ -94,7 +85,6 @@ document.addEventListener('alpine:init', () => {
             this.users = res.ok ? await res.json() : [];
         },
 
-        // Seleziona un utente specifico per vederne i dettagli
         async selectUser(userId) {
             const token = localStorage.getItem('artaround_token');
             const res = await fetch(`/editor/user-management/${userId}`, {
@@ -105,7 +95,6 @@ document.addEventListener('alpine:init', () => {
             this.selectedMuseumId = '';
         },
 
-        // Aggiunge un museo alla lista dell'autore
         async grantPermission() {
             if (!this.selectedMuseumId || !this.selectedUser) return;
 
@@ -117,17 +106,15 @@ document.addEventListener('alpine:init', () => {
             });
 
             if (res.ok) {
-                this.selectedUser = await res.json(); // Backend deve restituire l'utente aggiornato con .populate('museums')
+                this.selectedUser = await res.json();
                 this.selectedMuseumId = '';
                 
-                // Avviso se non ha i permessi corretti
                 if (this.selectedUser.permissions !== 'admin' && this.selectedUser.permissions !== 'editor') {
                     alert("Attenzione: l'utente non avrà accesso all'amministrazione di questo museo se non gli assegni un ruolo appropriato (es. Editor). Usa la tendina per cambiarlo.");
                 }
             }
         },
 
-        // Rimuove un museo (Revoke)
         async revokePermission(museumId) {
             const token = localStorage.getItem('artaround_token');
             const res = await fetch(`/editor/user-management/${this.selectedUser._id}/museums/${museumId}`, {
@@ -140,7 +127,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // Cambia nome utente
         async updateUsername() {
             if (!this.selectedUser || !this.editNameValue.trim()) return;
             const newName = this.editNameValue.trim();
@@ -169,7 +155,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // Elimina un utente
         async deleteUser(userId) {
             if (!confirm('Sei sicuro di voler eliminare questo utente? Questa azione è irreversibile.')) return;
 
@@ -187,7 +172,6 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        // Cambia ruolo utente
         async updateRole(newRole) {
             if (!this.selectedUser) return;
             const token = localStorage.getItem('artaround_token');
@@ -202,7 +186,7 @@ document.addEventListener('alpine:init', () => {
 
             if (res.ok) {
                 this.selectedUser = await res.json();
-                await this.searchUsers(); // Aggiorna anche la lista a sinistra
+                await this.searchUsers();
             } else {
                 const err = await res.json();
                 alert(err.error || 'Errore durante l\'aggiornamento del ruolo');

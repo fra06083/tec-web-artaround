@@ -331,14 +331,20 @@
                             </div>
                             
                             <div x-show="isLoaded && museums.length === 0" class="rounded-4 p-5 text-center mx-auto my-4 empty-state-box" x-transition.opacity>
-                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 empty-state-icon-circle">
-                                    <i class="bi bi-bank text-orange fs-4"></i>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 icon-box-52">
+                                    <i class="bi bi-bank text-white fs-4"></i>
                                 </div>
-                                <h5 class="fw-bold text-white mb-2">Nessun museo disponibile</h5>
-                                <p class="small mb-4 empty-state-text">Crea prima un museo in Gestione Musei, poi potrai aggiungere le opere.</p>
-                                <a href="/editor/museum" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
-                                    <i class="bi bi-bank"></i> Vai a Gestione Musei
-                                </a>
+                                <div x-show="permissions === 'admin'">
+                                    <h5 class="fw-bold text-white mb-2">Nessun museo disponibile</h5>
+                                    <p class="small mb-4 empty-state-text">Crea prima un museo in Gestione Musei, poi potrai aggiungere le opere.</p>
+                                    <a href="/editor/museum" class="btn bg-orange text-white rounded-pill px-4 py-2 fw-semibold shadow d-inline-flex align-items-center gap-2 hover-lift">
+                                        <i class="bi bi-bank"></i> Vai a Gestione Musei
+                                    </a>
+                                </div>
+                                <div x-show="permissions !== 'admin'">
+                                    <h5 class="fw-bold text-white mb-2">Nessun museo assegnato</h5>
+                                    <p class="small mb-0 text-white-50">Non risultano musei assegnati al tuo account Editor. Un amministratore deve prima aggiungerti a un museo per permetterti di gestirne le opere.</p>
+                                </div>
                             </div>
 
                             <div class="row g-3 g-md-4" x-show="isLoaded && filteredMuseumList().length > 0">
@@ -362,8 +368,8 @@
                             </div>
 
                             <div x-show="isLoaded && museums.length > 0 && filteredMuseumList().length === 0" class="rounded-4 p-5 text-center mx-auto my-4 empty-state-box" x-transition.opacity>
-                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 empty-state-icon-circle">
-                                    <i class="bi bi-search text-orange fs-4"></i>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 icon-box-52">
+                                    <i class="bi bi-search text-white fs-4"></i>
                                 </div>
                                 <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
                                 <p class="small mb-0 empty-state-text">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
@@ -388,8 +394,8 @@
 
                             <!-- Empty State (No Artworks in Museum) -->
                             <div x-show="!isLoadingArtworks && artworks.length === 0" class="rounded-4 p-5 text-center mx-auto my-4 empty-state-box" x-transition.opacity>
-                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 empty-state-icon-circle">
-                                    <i class="bi bi-palette text-orange fs-4"></i>
+                                <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 icon-box-52">
+                                    <i class="bi bi-palette text-white fs-4"></i>
                                 </div>
                                 <h5 class="fw-bold text-white mb-2">Nessuna opera presente</h5>
                                 <p class="small mb-4 empty-state-text">Aggiungi la prima opera al catalogo di questo museo.</p>

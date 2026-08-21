@@ -21,6 +21,7 @@ function homeApp() {
             const savedDarkMode = localStorage.getItem('artaround_darkmode');
             this.darkMode = savedDarkMode === 'true';
 
+            // Sincronizza la classe dark-mode sull'elemento radice <html> e persiste la scelta
             this.$watch('darkMode', (value) => {
                 localStorage.setItem('artaround_darkmode', value);
                 if (value) {
@@ -43,7 +44,6 @@ function homeApp() {
                 this.isLoggedIn = true;
             }
 
-            // CACHE LOCALE (per rendering istantaneo)
             const savedUserDataStr = localStorage.getItem('artaround_user_data');
             if (savedUserDataStr) {
                 try {
@@ -55,7 +55,6 @@ function homeApp() {
                 }
             }
 
-            // VALIDAZIONE IN BACKGROUND
             try {
                 const response = await fetch('/api/check', {
                     method: 'POST',
@@ -93,7 +92,7 @@ function homeApp() {
             this.profileForm.preferredLevel = localStorage.getItem('artaround_preferred_level') || 'medio';
             this.isProfileModalOpen = true;
 
-            // Chiude automaticamente qualsiasi offcanvas aperto (es. cartOffcanvas, mobileProfileOffcanvas)
+            // Chiude eventuali offcanvas mobile aperti prima di mostrare la modale del profilo
             const openOffcanvasList = document.querySelectorAll('.offcanvas.show');
             openOffcanvasList.forEach(el => {
                 if (typeof bootstrap !== 'undefined') {
@@ -103,6 +102,7 @@ function homeApp() {
             });
         },
 
+        // Validazione sincrona del formato dell'username lato client
         validateUsername(val) {
             if (val.length < 5) return "L'username deve avere almeno 5 caratteri.";
             if (/\s/.test(val)) return "Gli spazi non sono consentiti. Usa '_' o '.'.";
@@ -149,16 +149,13 @@ function homeApp() {
         },
 
         async uploadProfileImage(event) {
-            // grab the first file selected by the user
             const file = event.target.files[0];
             if (!file) return;
 
-            // wrap the file in FormData so we can send it as multipart/form-data
             const formData = new FormData();
             formData.append('image', file);
 
             try {
-                // send the file to our backend upload route
                 const token = localStorage.getItem('artaround_token');
                 const response = await fetch('/api/upload/user', {
                     method: 'POST',
@@ -168,7 +165,6 @@ function homeApp() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    // update the form state with the new URL so the UI updates instantly
                     this.profileForm.propic = data.url;
                 } else {
                     const err = await response.json();

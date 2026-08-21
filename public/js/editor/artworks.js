@@ -1,6 +1,5 @@
 function artworkManager() {
     return {
-        // UI STATE
         isReady: false,
         isLoggedIn: false,
         isLoaded: false,
@@ -8,9 +7,8 @@ function artworkManager() {
         permissions: '',
         propic: '',
         username: '',
-        step: 'artwork-museum-select', // initial state: museum selection
+        step: 'artwork-museum-select',
 
-        // DATA
         museums: [],
         artworks: [],
         selectedMuseumId: '',
@@ -19,6 +17,7 @@ function artworkManager() {
         museumSearch: '',
         selectedCity: '',
 
+        // Ricava la lista delle città senza duplicati per il filtro dei musei
         availableCities() {
             if (!this.museums || !Array.isArray(this.museums)) return [];
             const cities = this.museums
@@ -28,6 +27,7 @@ function artworkManager() {
             return [...new Set(cities)].sort();
         },
 
+        // Filtra i musei in base alla città selezionata e al testo cercato
         filteredMuseumList() {
             let list = this.museums || [];
             if (this.selectedCity) {
@@ -45,6 +45,7 @@ function artworkManager() {
             return list;
         },
 
+        // Ricerca locale sulle opere del museo per nome, autore, descrizione e sala
         filteredArtworks() {
             const q = (this.artworkSearch || '').toLowerCase();
             if (!q) return this.artworks;
@@ -56,6 +57,7 @@ function artworkManager() {
             );
         },
 
+        // Estrae un nome di sala valido gestendo sia stringhe che oggetti complessi o valori fittizi
         getSalaName(art) {
             if (!art || !art.sala || art.sala === false) return '';
             let name = '';
@@ -80,6 +82,7 @@ function artworkManager() {
             return typeof val === 'string' && val.length > 0;
         },
 
+        // Matrice per le 12 varianti di descrizione (4 registri per 3 lunghezze)
         activeDescType: 'medio',
         activeDescLength: '15s',
         descriptions: { 
@@ -89,7 +92,6 @@ function artworkManager() {
             dettagliato: { '3s': '', '15s': '', '40s': '' } 
         },
 
-        // CURRENT ARTWORK OBJECT (For Form)
         currentArtwork: {
             item: '',
             img_path: '',
@@ -97,24 +99,20 @@ function artworkManager() {
             author: '',
             license: '',
             sala: { nome: '', piano: 0 },
-
-            // remove maybe
             description: '',
-            desc_type: 'medio' // default
+            desc_type: 'medio'
         },
 
-        // NOTIFICATION
         notification: {
             show: false,
             message: '',
-            type: 'success' // 'success' or 'error'
+            type: 'success'
         },
 
-        // INITIALIZATION
         async init() {
+            // Sincronizza lo stato della navigazione se si deseleziona il museo o si torna alla scelta
             if (typeof this.$watch === 'function') {
                 this.$watch('step', (val) => {
-                    console.log('step:', val, 'selectedMuseumId:', this.selectedMuseumId);
                     if (val === 'artwork-museum-select') {
                         this.selectedMuseumId = '';
                         this.artworks = [];
@@ -123,7 +121,6 @@ function artworkManager() {
                     }
                 });
                 this.$watch('selectedMuseumId', (val) => {
-                    console.log('step:', this.step, 'selectedMuseumId:', val);
                     if (!val || val.trim() === '') {
                         this.selectedMuseumId = '';
                         this.artworks = [];
@@ -143,8 +140,8 @@ function artworkManager() {
             this.isReady = true;
         },
 
-        // AUTHENTICATION
-                async checkAuth() {
+        // Controlla il token, ripristina la cache locale per velocizzare la prima vista ed esegue la verifica backend
+        async checkAuth() {
             try {
                 const token = localStorage.getItem('artaround_token');
                 const savedUsername = localStorage.getItem('artaround_user');
@@ -159,7 +156,6 @@ function artworkManager() {
                     this.isLoggedIn = true;
                 }
                 
-                // CACHE LOCALE (per rendering istantaneo)
                 const savedUserDataStr = localStorage.getItem('artaround_user_data');
                 if (savedUserDataStr) {
                     try {
@@ -174,7 +170,6 @@ function artworkManager() {
                     }
                 }
 
-                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -192,7 +187,6 @@ function artworkManager() {
                         this.purchasedVisits = data.user?.purchased_visits || [];
                     }
                     this.isLoggedIn = true;
-                    // AGGIORNA LA CACHE
                     localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
                     if (typeof this.logout === 'function') {
@@ -211,14 +205,12 @@ function artworkManager() {
         },
 
         logout() {
-            // clear session and redirect to login
             localStorage.removeItem('artaround_token');
             localStorage.removeItem('artaround_user');
             window.location.href = '/login.html';
         },
 
         showToast(msg, type = 'success') {
-            // display notification message
             this.notification.message = msg;
             this.notification.type = type;
             this.notification.show = true;
@@ -228,7 +220,6 @@ function artworkManager() {
         },
 
         async fetchMuseums() {
-            // load available museums for dropdown
             try {
                 const token = localStorage.getItem('artaround_token');
                 if (!token) return;
@@ -244,18 +235,16 @@ function artworkManager() {
         },
 
         getMuseumName(id) {
-            // get museum name by ID
             const m = this.museums.find(museo => museo._id === id);
             return m ? m.museum : 'Selezionato';
         },
 
-        // Piani del museo selezionato, per la select della sala
         getPianiMuseo() {
             const m = this.museums.find(mu => mu._id === this.currentArtwork.museum_id);
             return [...(m?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
         },
 
-        // Solo i punti di tipo 'sala': bagni e bar non contengono opere
+        // Restituisce solo i punti di tipo 'sala' ed esclude bagni, bar o uscite
         getSaleMuseo() {
             const m = this.museums.find(mu => mu._id === this.currentArtwork.museum_id);
             const sale = (m?.mappa?.sale || []).filter(s => s.tipo === 'sala');
@@ -269,14 +258,14 @@ function artworkManager() {
             return p?.nome || ('Piano ' + piano);
         },
 
-        // La sala salvata non esiste (più) tra quelle in mappa
+        // Verifica se la sala precedentemente salvata nell'opera non esiste più nella mappa del museo
         get salaFuoriMappa() {
             const nome = this.currentArtwork.sala?.nome;
             if (!nome) return false;
             return !this.getSaleMuseo().some(s => s.nome === nome);
         },
 
-        // Scegliendo la sala si compila anche il piano
+        // Selezione della sala dal menu a tendina: imposta automaticamente il piano corrispondente
         aggiornaSala(nome) {
             if (!this.currentArtwork.sala) this.currentArtwork.sala = { nome: '', piano: null };
             this.currentArtwork.sala.nome = nome || '';
@@ -288,9 +277,7 @@ function artworkManager() {
             if (s) this.currentArtwork.sala.piano = s.piano;
         },
 
-        // ARTWORK LOGIC
         async fetchArtworks() {
-            // load artworks for selected museum
             if (!this.selectedMuseumId) {
                 this.artworks = [];
                 this.step = 'artwork-museum-select';
@@ -305,7 +292,7 @@ function artworkManager() {
 
                 if (res.ok) {
                     this.artworks = await res.json();
-                    this.step = 'artwork-list'; // show table once loaded
+                    this.step = 'artwork-list';
                 } else {
                     this.showToast("Impossibile caricare le opere", "error");
                 }
@@ -315,6 +302,7 @@ function artworkManager() {
             this.isLoadingArtworks = false;
         },
 
+        // Prepara il form per nuova opera o carica le descrizioni esistenti
         async openArtworkForm(artwork = null) {
             this.descriptions = { 
                 infantile: { '3s': '', '15s': '', '40s': '' }, 
@@ -325,9 +313,7 @@ function artworkManager() {
             this.activeDescType = 'medio';
             this.activeDescLength = '15s';
 
-            // open form for new or existing artwork
             if (artwork) {
-                // copy existing artwork data for editing
                 this.currentArtwork = {
                     _id: artwork._id,
                     item: artwork.item || '',
@@ -349,7 +335,6 @@ function artworkManager() {
                     });
                 } catch(e) { console.error(e); }
             } else {
-                // reset fields for new artwork
                 this.currentArtwork = {
                     item: '',
                     img_path: '',
@@ -364,10 +349,8 @@ function artworkManager() {
             this.step = 'artwork-form';
         },
 
+        // Salva l'opera con la prima descrizione, poi invia in sequenza le altre descrizioni compilate
         async saveArtwork() {
-
-            // create or update artwork
-            // validation
             if (!this.currentArtwork.item || !this.currentArtwork.img_path ||
                 !this.currentArtwork.museum_id || !this.currentArtwork.author || !this.currentArtwork.license) {
                 this.showToast("Compila tutti i campi obbligatori", "error");
@@ -408,7 +391,6 @@ function artworkManager() {
                 const data = await res.json();
                 const artworkId = isEdit ? this.currentArtwork._id : data.artwork._id;
 
-                // save remaining description types/lengths
                 for (const desc of allDescriptions.slice(1)) {
                     await fetch(`/api/artworks/${artworkId}`, {
                         method: 'PUT',
@@ -419,8 +401,8 @@ function artworkManager() {
 
                 if (res.ok) {
                     this.showToast(isEdit ? "Opera aggiornata con successo!" : "Nuova opera aggiunta!");
-                    await this.fetchArtworks(); // reload table
-                    this.step = 'artwork-list'; // back to list
+                    await this.fetchArtworks();
+                    this.step = 'artwork-list';
                 } else {
                     this.showToast(data.error || "Errore nel salvataggio", "error");
                 }
@@ -430,7 +412,6 @@ function artworkManager() {
         },
 
         async deleteArtwork(id) {
-            // delete artwork with confirmation
             if (!confirm("Sei sicuro di voler eliminare definitivamente questa opera?")) return;
 
             try {
@@ -441,7 +422,7 @@ function artworkManager() {
 
                 if (res.ok) {
                     this.showToast("Opera eliminata con successo");
-                    await this.fetchArtworks(); // update table
+                    await this.fetchArtworks();
                 } else {
                     this.showToast("Errore nell'eliminazione", "error");
                 }

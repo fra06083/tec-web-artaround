@@ -1,26 +1,22 @@
 function importManager() {
     return {
-        // --- STATO SESSIONE ---
         isLoggedIn: false,
         username: '',
         permissions: '',
         propic: '',
         isReady: false,
 
-        // --- DATI ---
         importedData: { museums: [], artworks: [] },
         importResults: {
             museums: { success: 0, failed: 0, errors: [] },
             artworks: { success: 0, failed: 0, errors: [] }
         },
 
-        // --- FILE UPLOAD ---
         selectedFile: null,
         isUploading: false,
         showPreview: false,
         showResults: false,
 
-        // --- NOTIFICHE ---
         notification: {
             show: false,
             message: '',
@@ -36,7 +32,6 @@ function importManager() {
             }, 4000);
         },
 
-        // --- INIZIALIZZAZIONE ---
         async init() {
             await this.checkAuth();
             if (this.isLoggedIn && this.permissions === 'admin') {
@@ -46,8 +41,7 @@ function importManager() {
             }
         },
 
-        // --- AUTENTICAZIONE ---
-                async checkAuth() {
+        async checkAuth() {
             try {
                 const token = localStorage.getItem('artaround_token');
                 const savedUsername = localStorage.getItem('artaround_user');
@@ -62,7 +56,6 @@ function importManager() {
                     this.isLoggedIn = true;
                 }
                 
-                // CACHE LOCALE (per rendering istantaneo)
                 const savedUserDataStr = localStorage.getItem('artaround_user_data');
                 if (savedUserDataStr) {
                     try {
@@ -77,7 +70,6 @@ function importManager() {
                     }
                 }
 
-                // VALIDAZIONE IN BACKGROUND
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: {
@@ -95,7 +87,6 @@ function importManager() {
                         this.purchasedVisits = data.user?.purchased_visits || [];
                     }
                     this.isLoggedIn = true;
-                    // AGGIORNA LA CACHE
                     localStorage.setItem('artaround_user_data', JSON.stringify(data.user));
                 } else {
                     if (typeof this.logout === 'function') {
@@ -119,7 +110,6 @@ function importManager() {
             window.location.href = '/login.html';
         },
 
-        // --- GESTIONE FILE ---
         handleFileSelect(event) {
             const file = event.target?.files?.[0] || event.dataTransfer?.files?.[0];
             if (!file) return;
@@ -134,6 +124,7 @@ function importManager() {
             this.parseJSONFile(file);
         },
 
+        // Legge ed esegue il parsing del file selezionato prima della validazione
         parseJSONFile(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -149,6 +140,7 @@ function importManager() {
             reader.readAsText(file);
         },
 
+        // Controlla che il file contenga almeno la lista "museums" o "artworks" in formato array
         validateAndPreview(data) {
             const errors = [];
 
@@ -175,7 +167,7 @@ function importManager() {
             this.showPreview = true;
         },
 
-        // --- IMPORTAZIONE ---
+        // Esegue l'importazione in batch di musei e opere tramite chiamate REST sequenziali
         async importData() {
             if (!this.selectedFile || !this.importedData) {
                 this.showToast('Seleziona prima un file JSON da importare', 'error');
@@ -197,7 +189,6 @@ function importManager() {
             const token = localStorage.getItem('artaround_token');
 
             try {
-                // Importa musei
                 if (this.importedData.museums && this.importedData.museums.length > 0) {
                     for (const museum of this.importedData.museums) {
                         try {
@@ -224,9 +215,8 @@ function importManager() {
                     }
                 }
 
-                // Importa opere
                 if (this.importedData.artworks && this.importedData.artworks.length > 0) {
-                    // Prima ottieni la lista dei musei per mappare i nomi agli ID
+                    // Carichiamo la lista dei musei per associare il nome dell'opera all'ID del museo salvato
                     const museumsRes = await fetch('/api/museums', {
                         headers: { 'Authorization': token }
                     });
@@ -234,7 +224,6 @@ function importManager() {
 
                     for (const artwork of this.importedData.artworks) {
                         try {
-                            // Trova l'ID del museo dal nome
                             const museum = museums.find(m => m.museum === artwork.museum_name);
                             if (!museum) {
                                 this.importResults.artworks.failed++;
@@ -285,7 +274,6 @@ function importManager() {
             }
         },
 
-        // --- RESET ---
         resetImport() {
             this.selectedFile = null;
             this.importedData = { museums: [], artworks: [] };
@@ -297,7 +285,7 @@ function importManager() {
             this.showResults = false;
         },
 
-        // --- ESEMPIO JSON ---
+        // Genera e scarica un file JSON di esempio per guidare l'utente sulla struttura corretta
         downloadExample() {
             const example = {
                 "museums": [

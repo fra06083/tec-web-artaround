@@ -2,7 +2,7 @@ const API_BASE = '/api';
 
 export async function fetchVisite() {
     const token = localStorage.getItem('artaround_token');
-    if (!token) return []; // Se non è loggato, nessuna visita
+    if (!token) return [];
 
     const res = await fetch(`${API_BASE}/my-visits`, {
         headers: {
@@ -18,7 +18,6 @@ export async function fetchMuseums() {
     if (!res.ok) return [];
     return res.json();
 }
-
 
 export async function fetchVisita(id, pin = '') {
     const token = localStorage.getItem('artaround_token');
@@ -42,7 +41,6 @@ export async function fetchDescriptionsByItem(id) {
     return res.json();
 }
 
-// Ritorna le domande quiz associate a una visita (array vuoto se non ce ne sono)
 export async function fetchQuizByVisita(id) {
     const res = await fetch(`${API_BASE}/visite/${id}/quiz`);
     if (!res.ok) throw new Error('Errore nel caricamento quiz');
@@ -50,34 +48,26 @@ export async function fetchQuizByVisita(id) {
 }
 
 export function getUser() {
-    // grab the jwt token to check if we are logged in
     const token = localStorage.getItem('artaround_token');
     if (!token) return null;
 
     let userObj = null;
     
-    // decode the base64 jwt payload
-    // we do this first because the token always has the correct user roles/permissions!
+    // decodifica il payload jwt client-side per estrarre permessi e dati utente
     try {
         userObj = JSON.parse(atob(token.split('.')[1]));
     } catch {
         return null;
     }
 
-    // grab any updated user data from local storage
-    // (e.g. if the user just updated their profile picture)
     const savedStr = localStorage.getItem('artaround_user');
     if (savedStr) {
         try {
             const parsed = JSON.parse(savedStr);
-            // merge the local storage data ON TOP of the jwt payload
-            // this way we get fresh propics without accidentally deleting permissions
             if (typeof parsed === 'object' && parsed !== null) {
                 userObj = { ...userObj, ...parsed };
             }
-        } catch (e) {
-            // ignore errors if savedStr is just a raw string like "admin"
-        }
+        } catch (e) {}
     }
 
     return userObj;

@@ -363,10 +363,22 @@
 
                             <div x-show="!selectedMuseum && filteredMuseums().length === 0" class="rounded-4 p-5 text-center mx-auto my-4 glass-card-subtle max-w-400" x-transition.opacity>
                                 <div class="d-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle bg-orange bg-opacity-15 border border-orange border-opacity-30 icon-box-52">
-                                    <i class="bi bi-search text-orange fs-5"></i>
+                                    <i class="bi text-white fs-4" :class="museums.length === 0 ? 'bi-bank' : 'bi-search'"></i>
                                 </div>
-                                <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
-                                <p class="small mb-0 text-white-50">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                                <div x-show="museums.length > 0">
+                                    <h5 class="fw-bold text-white mb-2">Nessun museo trovato</h5>
+                                    <p class="small mb-0 text-white-50">Nessun museo corrisponde alla ricerca o al luogo selezionato.</p>
+                                </div>
+                                <div x-show="museums.length === 0">
+                                    <div x-show="permissions === 'admin'">
+                                        <h5 class="fw-bold text-white mb-2">Nessun museo disponibile</h5>
+                                        <p class="small mb-0 text-white-50">Crea prima un museo in Gestione Musei per poter organizzare le visite.</p>
+                                    </div>
+                                    <div x-show="permissions !== 'admin'">
+                                        <h5 class="fw-bold text-white mb-2">Nessun museo assegnato</h5>
+                                        <p class="small mb-0 text-white-50">Non risultano musei assegnati al tuo account Editor. Chiedi a un amministratore di aggiungerti a un museo.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         

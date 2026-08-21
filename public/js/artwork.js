@@ -1,14 +1,10 @@
-// cosa diavolo è questo file? Un refuso i guess 
-// possiamo eliminarlo no?
-
 function artworkManager() {
     return {
-        // --- STATO ---
         isReady: false,
         isLoggedIn: false,
         permissions: '',
         username: '',
-        step: 'artwork-museum-select', // Stato iniziale: scelta museo
+        step: 'artwork-museum-select',
 
         museums: [],
         artworks: [],
@@ -28,7 +24,6 @@ function artworkManager() {
             type: 'success'
         },
 
-        // --- INIZIALIZZAZIONE ---
         async init() {
             await this.checkAuth();
             if (this.isLoggedIn) {
@@ -39,7 +34,6 @@ function artworkManager() {
             this.isReady = true;
         },
 
-        // --- AUTH & NAVIGAZIONE ---
         async checkAuth() {
             const token = localStorage.getItem('artaround_token');
             if (!token) return;
@@ -69,7 +63,6 @@ function artworkManager() {
             setTimeout(() => this.notification.show = false, 3000);
         },
 
-        // --- LOGICA DATI ---
         async fetchMuseums() {
             try {
                 const res = await fetch('/api/museums', {
@@ -85,7 +78,7 @@ function artworkManager() {
                 const res = await fetch(`/api/museums/${this.selectedMuseumId}/artworks`);
                 if (res.ok) {
                     this.artworks = await res.json();
-                    this.step = 'artwork-list'; // Passa alla tabella
+                    this.step = 'artwork-list';
                 }
             } catch (e) { this.showToast("Errore caricamento opere", "error"); }
         },
@@ -95,7 +88,6 @@ function artworkManager() {
             return m ? m.museum : 'Selezionato';
         },
 
-        // --- CRUD OPERE ---
         openArtworkForm(artwork = null) {
             if (artwork) {
                 this.currentArtwork = { ...artwork };

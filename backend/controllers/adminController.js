@@ -1,9 +1,8 @@
-const { visit } = require('../models/museums.js'); // used for accessing Visit data
-const User = require('../models/user.js');       // used for accessing User data
-const path = require('path');                      // used for handling file paths
+const { visit } = require('../models/museums.js');
+const User = require('../models/user.js');
+const path = require('path');
 
 module.exports = {
-    // used for sending dashboard statistics (JSON)
     getStats: async (req, res) => {
         try {
             const [publishedTours, totalUsers] = await Promise.all([
@@ -21,7 +20,6 @@ module.exports = {
         }
     },
 
-    // used for sending all tours list (JSON)
     getAllTours: async (req, res) => {
         try {
             const tours = await visit.find().populate('museum_id');
@@ -31,31 +29,22 @@ module.exports = {
         }
     },
 
-    // used for serving the protected HTML file
     serveDashboard: (req, res) => {
-        // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/dashboard.html'));
     },
     serveMuseums: (req, res) => {
-        // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/museum.html'));
     },
     serveArtworks: (req, res) => {
-        // sends physical file from the views folder
         res.sendFile(path.join(__dirname, "../views/editor/artworks.html"));
     },
     serveTours: (req, res) => {
-        // sends the physical file from the "views" folder
         res.sendFile(path.join(__dirname, '../views/editor/tours.html'));
     },
     serveUsersManagement: (req, res) => {
-        // Nota: adminController è in 'controllers/', quindi serve '../views/...'
         res.sendFile(path.join(__dirname, '../views/editor/users.html'));
     },
     serveImporter: (req, res) => {
-        // Nota: adminController è in 'controllers/', quindi serve '../views/...'
         res.sendFile(path.join(__dirname, '../views/editor/import.html'));
     }
-
-
 };

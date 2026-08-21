@@ -1,23 +1,18 @@
-
 const express = require('express');
-const router = express.Router();             // used for creating modular route handlers
-const { auth, authorize } = require('../middleware/auth.js'); // used for protecting routes
-const museumCtrl = require('../controllers/museumController.js'); // used for logici
+const router = express.Router();
+const { auth, authorize } = require('../middleware/auth.js');
+const museumCtrl = require('../controllers/museumController.js');
+
 const isAdmin = authorize(["admin"]);
 const isEditor = authorize(['admin', 'editor']);
-// CREATE NEW MUSEUM (protected)
-router.post("/", auth, isAdmin, museumCtrl.createMuseum);
-// GET MUSEUM BY ID
-router.get('/:id', museumCtrl.getMuseumById);
 
-// DELETE MUSEUM (PROTECTED!)
+// La creazione e cancellazione del museo è riservata agli admin, l'aggiornamento è consentito anche agli editor assegnati
+router.post("/", auth, isAdmin, museumCtrl.createMuseum);
+router.get('/:id', museumCtrl.getMuseumById);
 router.delete('/:id', auth, isAdmin, museumCtrl.deleteMuseum);
-// EDIT MUSEUM (PROTECTED!)
 router.put('/:id', auth, isEditor, museumCtrl.updateMuseum);
 
-
-
-
-// GET MUSEUM (PROTECTED)
+// Restituisce l'elenco dei musei filtrato in base al ruolo dell'utente loggato
 router.get("/", auth, authorize(['admin', 'editor', 'docente']), museumCtrl.getAllMuseums);
+
 module.exports = router;

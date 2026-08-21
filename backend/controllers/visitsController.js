@@ -1,8 +1,5 @@
 const { visit: Visit, museum: Museum, quizQuestion: QuizQuestion } = require('../models/museums');
 
-// GET /api/visite
-// Ritorna le visite. Se l'utente loggato è un docente e manage=true, ritorna solo le sue.
-// Se l'utente è un editor e manage=true, ritorna solo quelle dei musei assegnati.
 const getAllVisits = async (req, res) => {
     try {
         let query = {};
@@ -18,7 +15,6 @@ const getAllVisits = async (req, res) => {
                 query = { isPrivate: { $ne: true } };
             }
         } else {
-            // Marketplace / Navigator pubblico: mostra SOLO visite non private
             query = { isPrivate: { $ne: true } };
         }
 
@@ -36,7 +32,6 @@ const getAllVisits = async (req, res) => {
     }
 };
 
-// GET /api/visite/:id
 const getVisitById = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id)
@@ -45,7 +40,7 @@ const getVisitById = async (req, res) => {
             .lean();
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
-        // Se la visita è privata, vieta la fruizione individuale diretta senza PIN o permessi
+        // le visite private richiedono il pin se l'utente non e' lo staff
         if (visit.isPrivate && !req.query.pin && (!req.user || req.user.permissions === 'studente')) {
             return res.status(403).json({ error: 'Questa visita è privata. Puoi accedervi solo tramite il codice PIN fornito dal docente.' });
         }
@@ -57,8 +52,6 @@ const getVisitById = async (req, res) => {
     }
 };
 
-
-// POST /api/visite
 const createVisit = async (req, res) => {
     try {
         const { name, description, museum_id, logistic_info, items, createdBy, tags, mnemonicCode, isPrivate, image, prezzo } = req.body;
@@ -67,7 +60,6 @@ const createVisit = async (req, res) => {
             return res.status(400).json({ error: 'Nome e museo sono obbligatori' });
         }
 
-        // Controllo permessi editor
         if (req.user && req.user.permissions === 'editor') {
             const userMuseums = (req.user.museums || []).map(id => id.toString());
             if (!userMuseums.includes(museum_id ? museum_id.toString() : '')) {
@@ -107,20 +99,17 @@ const createVisit = async (req, res) => {
     }
 };
 
-// PUT /api/visite/:id
 const updateVisit = async (req, res) => {
     try {
         const visitToUpdate = await Visit.findById(req.params.id);
         if (!visitToUpdate) return res.status(404).json({ error: 'Visita non trovata' });
 
-        // Controllo permessi docente
         if (req.user && req.user.permissions === 'docente') {
             if (!visitToUpdate.createdBy || visitToUpdate.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
             }
         }
 
-        // Controllo permessi editor
         if (req.user && req.user.permissions === 'editor') {
             const userMuseums = (req.user.museums || []).map(id => id.toString());
             const visitMuseumId = visitToUpdate.museum_id ? visitToUpdate.museum_id.toString() : '';
@@ -162,20 +151,17 @@ const updateVisit = async (req, res) => {
     }
 };
 
-// DELETE /api/visite/:id
 const deleteVisit = async (req, res) => {
     try {
         const visitToDelete = await Visit.findById(req.params.id);
         if (!visitToDelete) return res.status(404).json({ error: 'Visita non trovata' });
 
-        // Controllo permessi docente
         if (req.user && req.user.permissions === 'docente') {
             if (!visitToDelete.createdBy || visitToDelete.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a eliminare questa visita' });
             }
         }
 
-        // Controllo permessi editor
         if (req.user && req.user.permissions === 'editor') {
             const userMuseums = (req.user.museums || []).map(id => id.toString());
             const visitMuseumId = visitToDelete.museum_id ? visitToDelete.museum_id.toString() : '';
@@ -192,7 +178,6 @@ const deleteVisit = async (req, res) => {
     }
 };
 
-// GET /api/visite/:id/items
 const getItemsByVisit = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id)
@@ -206,7 +191,6 @@ const getItemsByVisit = async (req, res) => {
     }
 };
 
-// POST /api/visite/:id/items -> aggiunge un item (ObjectId) alla visita
 const addItemToVisit = async (req, res) => {
     try {
         const { item_id } = req.body;
@@ -223,7 +207,6 @@ const addItemToVisit = async (req, res) => {
             }
         }
 
-        // Evita duplicati
         if (visit.items.map(id => id.toString()).includes(item_id)) {
             return res.status(400).json({ error: 'Item già presente nella visita' });
         }
@@ -237,7 +220,6 @@ const addItemToVisit = async (req, res) => {
     }
 };
 
-// DELETE /api/visite/:id/items/:itemId
 const removeItemFromVisit = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id);
@@ -262,7 +244,6 @@ const removeItemFromVisit = async (req, res) => {
     }
 };
 
-// GET /api/visite/:id/quiz
 const getQuizByVisit = async (req, res) => {
     try {
         const questions = await QuizQuestion.find({ visit_id: req.params.id })
@@ -275,7 +256,6 @@ const getQuizByVisit = async (req, res) => {
     }
 };
 
-// POST /api/visite/:id/quiz
 const addQuizQuestion = async (req, res) => {
     try {
         const { question, options, correctIndex, order } = req.body;
@@ -290,7 +270,6 @@ const addQuizQuestion = async (req, res) => {
         const visit = await Visit.findById(req.params.id);
         if (!visit) return res.status(404).json({ error: 'Visita non trovata' });
 
-        // Controllo permessi docente (stesso pattern di updateVisit)
         if (req.user && req.user.permissions === 'docente') {
             if (!visit.createdBy || visit.createdBy.toString() !== req.user._id.toString()) {
                 return res.status(403).json({ error: 'Non sei autorizzato a modificare questa visita' });
@@ -321,7 +300,6 @@ const addQuizQuestion = async (req, res) => {
     }
 };
 
-// PUT /api/visite/:id/quiz/:questionId
 const updateQuizQuestion = async (req, res) => {
     try {
         const { question, options, correctIndex, order } = req.body;
@@ -359,7 +337,6 @@ const updateQuizQuestion = async (req, res) => {
     }
 };
 
-// DELETE /api/visite/:id/quiz/:questionId
 const removeQuizQuestion = async (req, res) => {
     try {
         const visit = await Visit.findById(req.params.id);

@@ -1,6 +1,5 @@
 const { item: Item, language: Language } = require('../models/museums.js');
 
-// GET /api/artworks
 const getAllArtworks = async (req, res) => {
     try {
         let query = {};
@@ -16,7 +15,6 @@ const getAllArtworks = async (req, res) => {
     }
 };
 
-// GET /api/artworks/:id
 const getArtworkById = async (req, res) => {
     try {
         const artwork = await Item.findById(req.params.id).populate('museum_id').lean();
@@ -28,7 +26,6 @@ const getArtworkById = async (req, res) => {
     }
 };
 
-// GET /api/museums/:museumId/artworks
 const getArtworksByMuseum = async (req, res) => {
     try {
         const artworks = await Item.find({ museum_id: req.params.museumId }).lean();
@@ -39,11 +36,9 @@ const getArtworksByMuseum = async (req, res) => {
     }
 };
 
-// GET /api/artworks/:id/descriptions
 const getDescriptionsByArtwork = async (req, res) => {
     try {
         const artworkId = req.params.id;
-        // search in the collection language for all documents with that specific id
         const descriptions = await Language.find({ item_id: artworkId }).lean();
 
         if (!descriptions) return res.status(404).json({ error: 'Nessuna descrizione trovata' });
@@ -55,12 +50,10 @@ const getDescriptionsByArtwork = async (req, res) => {
     }
 };
 
-// POST /api/artworks
 const createArtwork = async (req, res) => {
     try {
        const { item, img_path, museum_id, author, license, sala, description, desc_type, desc_length } = req.body;
 
-        // for the moment the description is mandatory..
         if (!item || !img_path || !museum_id || !author || !license || !description) {
             return res.status(400).json({
                 error: 'Campi obbligatori mancanti: item, img_path, museum_id, author, license'
@@ -85,7 +78,6 @@ const createArtwork = async (req, res) => {
         await newArtwork.save();
 
         const newLanguage = new Language({
-            // default
             type: desc_type || 'medio',
             text: description,
             length: desc_length || '15s',
@@ -102,7 +94,6 @@ const createArtwork = async (req, res) => {
     }
 };
 
-// PUT /api/artworks/:id
 const updateArtwork = async (req, res) => {
     try {
         const existingItem = await Item.findById(req.params.id);
@@ -123,6 +114,7 @@ const updateArtwork = async (req, res) => {
             { returnDocument: 'after', runValidators: true }
         );
 
+        // Aggiorna la descrizione specifica per combinazione (tipo, durata) o la crea se non esiste ancora
         await Language.findOneAndUpdate(
             { item_id: req.params.id, type: desc_type || 'medio', length: desc_length || '15s' },
             { $set: {
@@ -143,7 +135,6 @@ const updateArtwork = async (req, res) => {
     }
 };
 
-// DELETE /api/artworks/:id
 const deleteArtwork = async (req, res) => {
     try {
         const existingItem = await Item.findById(req.params.id);

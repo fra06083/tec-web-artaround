@@ -7,7 +7,7 @@ export default function Lobby() {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     
-    // Recupera PIN e visitId da URL o da sessionStorage (per recupero dopo refresh)
+    // recupero pin/visitId al refresh
     const pin = query.get('pin') || sessionStorage.getItem('activeRoomPin');
     const visitId = query.get('visitId') || sessionStorage.getItem('activeRoomVisitId');
     const pending = query.get('pending');
@@ -51,7 +51,6 @@ export default function Lobby() {
             return;
         }
 
-        // Salva in sessionStorage per recupero in caso di refresh
         sessionStorage.setItem('activeRoomPin', pin);
         if (visitId) sessionStorage.setItem('activeRoomVisitId', visitId);
 
@@ -69,7 +68,6 @@ export default function Lobby() {
 
                 const effectiveVisitId = visitId || data.visitId;
 
-                // Se la visita e' gia' iniziata e lo studente non e' in attesa di approvazione
                 if (data.isStarted && !pending && effectiveVisitId) {
                     setStatus('Visita già avviata! Sto caricando...');
                     navigate(`/visit/${effectiveVisitId}?pin=${pin}&index=${data.currentArtworkIndex || 0}`);

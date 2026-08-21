@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const userCtrl = require('../controllers/userManagementController');
 const adminCtrl = require('../controllers/adminController');
-const { auth, authorize } = require('../middleware/auth'); // Il guardiano
+const { auth, authorize } = require('../middleware/auth');
 const isAdmin = authorize(["admin"]);
-// Pagina HTML (Protetta: solo chi è loggato può vederla)
+
+// Pagina di amministrazione utenti (riservata agli amministratori)
 router.get('/', auth, isAdmin, adminCtrl.serveUsersManagement);
 
-// API per il frontend (Alpine.js)
+// API REST per la gestione di ruoli, credenziali e permessi museali
 router.get('/search', auth, isAdmin, userCtrl.searchUsers);
 router.get('/:id', auth, isAdmin, userCtrl.getUserById);
 router.put('/:id/role', auth, isAdmin, userCtrl.updateUserRole);

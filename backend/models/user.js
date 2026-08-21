@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// STRUTTURA DI UN ADMIN/USER
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,

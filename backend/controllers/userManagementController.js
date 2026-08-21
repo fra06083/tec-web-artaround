@@ -1,10 +1,9 @@
-const User = require('../models/user'); // Il tuo modello ibrido
+const User = require('../models/user');
 const path = require('path');
 const bcrypt = require('bcrypt');
 
 module.exports = {
 
-    // Cerca utenti per nome, ruolo (permissions) o ID
     searchUsers: async (req, res) => {
         try {
             const q = (req.query.q || '').trim();
@@ -16,7 +15,7 @@ module.exports = {
                 const searchRegex = new RegExp(q, 'i');
                 const lowerQ = q.toLowerCase();
 
-                // Mappatura flessibile italiano/inglese per i ruoli
+                // per far funzionare i sinonimi nelle ricerche dei ruoli
                 const roleMatches = [];
                 if (/^(editor|autore|autori|scrittore|creatore)/i.test(lowerQ)) {
                     roleMatches.push('editor');
@@ -62,7 +61,7 @@ module.exports = {
     getUserById: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-                .populate('museums', 'museum region provence'); // Popola i dettagli dei musei
+                .populate('museums', 'museum region provence');
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
             res.json(user);
@@ -71,17 +70,13 @@ module.exports = {
         }
     },
 
-    // grant permission
     grantMuseumPermission: async (req, res) => {
         try {
             const { id, museumId } = req.params;
-            // $addToSet evita di aggiungere due volte lo stesso museo
-            // Aggiorna anche i permessi a 'editor' se l'utente è 'visitatore'
             const user = await User.findById(id);
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // Aggiungi solo il museo
             const updateData = { $addToSet: { museums: museumId } };
 
             const updatedUser = await User.findByIdAndUpdate(
@@ -96,7 +91,6 @@ module.exports = {
         }
     },
 
-    // revoke permission
     revokeMuseumPermission: async (req, res) => {
         try {
             const { id, museumId } = req.params;
@@ -112,19 +106,16 @@ module.exports = {
         }
     },
 
-    // delete user (solo se non è admin)
     deleteUser: async (req, res) => {
         try {
             const user = await User.findById(req.params.id);
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // 1. Non permettere di eliminare sé stessi
             if (user._id.toString() === req.user._id.toString()) {
                 return res.status(403).json({ error: "Non puoi eliminare il tuo stesso account" });
             }
 
-            // 2. Solo il master "admin" può eliminare altri admin
             if (user.permissions === 'admin' && req.user.permissions !== 'admin') {
                 return res.status(403).json({ error: "Solo l'admin può eliminare altri amministratori" });
             }
@@ -136,13 +127,11 @@ module.exports = {
         }
     },
 
-    // update user role
     updateUserRole: async (req, res) => {
         try {
             const { id } = req.params;
             const { permissions } = req.body;
             
-            // Check if valid role
             const validRoles = ["visitatore", "editor", "docente", "admin"];
             if (!validRoles.includes(permissions)) {
                 return res.status(400).json({ error: "Ruolo non valido" });
@@ -163,7 +152,6 @@ module.exports = {
         }
     },
 
-    // update user name
     updateUserName: async (req, res) => {
         try {
             const { id } = req.params;
@@ -176,7 +164,7 @@ module.exports = {
             const user = await User.findById(id);
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // Controlla se il nome esiste già (siccome il model richiede che 'name' sia unique)
+            // escape regex per evitare caratteri speciali nel nome
             const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const existing = await User.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
             if (existing && existing._id.toString() !== id) {
@@ -196,7 +184,6 @@ module.exports = {
         }
     },
 
-    // update user password (forzata da parte dell'admin)
     updateUserPassword: async (req, res) => {
         try {
             const { id } = req.params;
@@ -209,7 +196,6 @@ module.exports = {
             const user = await User.findById(id);
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
-            // Solo admin master o admin può cambiare la password ad un altro utente
             if (user.permissions === 'admin' && req.user._id.toString() !== user._id.toString() && req.user.permissions !== 'admin') {
                 return res.status(403).json({ error: "Permessi insufficienti per modificare questo utente" });
             }

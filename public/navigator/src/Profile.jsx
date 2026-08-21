@@ -48,7 +48,6 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
             }
         }
 
-        // Salva sempre localmente le preferenze del livello di testo
         localStorage.setItem('artaround_preferred_level', preferredLevel);
         if (name) {
             localStorage.setItem('artaround_student_name', name);

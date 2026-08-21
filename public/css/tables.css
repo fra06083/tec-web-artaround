@@ -84,15 +84,6 @@
 }
 
 /* --- Utility Immagini --- */
-.img-thumbnail-custom {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
 .table-row-custom:hover .img-thumbnail-custom {
     transform: scale(1.1) rotate(2deg);
@@ -101,16 +92,6 @@
 }
 
 /* --- Badges & Actions --- */
-.badge-province {
-    background: rgba(253, 126, 20, 0.15);
-    color: #fd7e14;
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 0.4em 0.8em;
-    border: 1px solid rgba(253, 126, 20, 0.3);
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(253, 126, 20, 0.1);
-}
 
 .btn-action {
     padding: 0.4rem 0.6rem;

@@ -16,7 +16,6 @@
     z-index: 9999;
 }
 
-
 .custom-toast {
     min-width: 320px;
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
