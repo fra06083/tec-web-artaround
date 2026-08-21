@@ -76,6 +76,8 @@ function VisitDetail() {
     const [quizSubmitted, setQuizSubmitted] = useState(false);
     const [quizResults, setQuizResults] = useState(null); // array [{ studentName, score, total, details }]
     const [studentsSubmitted, setStudentsSubmitted] = useState([]); // nomi studenti che hanno gia' inviato (vista docente)
+    const [quizReportTab, setQuizReportTab] = useState('questions'); // 'questions' | 'students'
+    const [expandedStudent, setExpandedStudent] = useState(null);
     
     // Voice commands
     const [isListeningForVoice, setIsListeningForVoice] = useState(false);
@@ -122,17 +124,19 @@ function VisitDetail() {
         }
     }, [isChatOpen, chatMessages]);
 
-    // All'apertura della mappa mostra il piano dell'opera corrente
+    // Sincronizza automaticamente il piano attivo con il piano dell'opera corrente (Piano A, Piano B...)
     useEffect(() => {
-        if (!isMapOpen) return;
-        const sala = items[currentIndex]?.sala;
+        if (!items || items.length === 0) return;
+        const currentItem = items[currentIndex];
+        const sala = currentItem?.sala;
         const piani = [...(visita?.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
+
         if (sala?.piano !== undefined && sala?.piano !== null) {
             setPianoAttivo(sala.piano);
-        } else if (piani.length > 0) {
+        } else if (piani.length > 0 && (pianoAttivo === null || pianoAttivo === undefined)) {
             setPianoAttivo(piani[0].piano);
         }
-    }, [isMapOpen, currentIndex, items, visita]);
+    }, [currentIndex, items, visita]);
     
     // Ferma la sintesi vocale
     const stopSpeaking = useCallback(() => {
@@ -638,6 +642,9 @@ function VisitDetail() {
 
         eventSource.addEventListener('quiz-results', (e) => {
             const data = JSON.parse(e.data);
+            if (data.questions && data.questions.length > 0) {
+                setQuizQuestions(data.questions);
+            }
             setQuizResults(data.results || []);
             setQuizPhase('results');
         });
@@ -1031,6 +1038,18 @@ function VisitDetail() {
                         <i className={`bi ${darkMode ? 'bi-moon-stars-fill text-body' : 'bi-sun-fill text-warning'} fs-5`}></i>
                     </button>
 
+                    {piante.length > 0 && (
+                        <button
+                            type="button"
+                            className="btn btn-sm rounded-pill px-2.5 px-sm-3 py-1.5 bg-orange bg-opacity-15 text-orange border border-orange border-opacity-30 d-flex align-items-center gap-1.5 fw-bold shadow-sm active-scale"
+                            onClick={() => setIsMapOpen(true)}
+                            title="Cambia piano / Mappa"
+                        >
+                            <i className="bi bi-layers-fill"></i>
+                            <span className="d-none d-sm-inline">{pianoAttivo !== null ? (piante.find(p => p.piano === pianoAttivo)?.nome || `Piano ${pianoAttivo}`) : 'Piano'}</span>
+                        </button>
+                    )}
+
                     <button
                         className="btn border-0 rounded-circle d-flex align-items-center justify-content-center p-2 bg-body-tertiary text-body shadow-sm btn-icon-40"
                         onClick={() => setIsMapOpen(true)}
@@ -1299,8 +1318,8 @@ function VisitDetail() {
             {/* QUIZ OVERLAY (monitoraggio docente / risposta studente / risultati) */}
             {pin && quizPhase !== 'none' && (
                 <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3 bg-black-85 z-2000">
-                    <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 w-100 max-w-600 max-h-90vh overflow-y-auto ${darkMode ? 'bg-dark bg-opacity-90 text-white' : 'bg-white text-dark'}`}>
-                        <div className="card-body p-4 p-md-5">
+                    <div className={`card border-0 rounded-4 shadow-lg glass-blur-15 w-100 max-w-700 max-h-90vh overflow-y-auto ${darkMode ? 'bg-dark bg-opacity-95 text-white' : 'bg-white text-dark'}`}>
+                        <div className="card-body p-3.5 p-md-4">
 
                             {/* DOCENTE: monitoraggio quiz in corso */}
                             {role === 'teacher' && quizPhase === 'active' && (
@@ -1322,7 +1341,7 @@ function VisitDetail() {
                                         </div>
                                     </div>
                                     <button onClick={finishQuiz} className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100">
-                                        <i className="bi bi-flag-fill me-2"></i>Termina Quiz e mostra risultati
+                                        <i className="bi bi-flag-fill me-2"></i>Termina Quiz e genera resoconto
                                     </button>
                                 </>
                             )}
@@ -1363,47 +1382,260 @@ function VisitDetail() {
                                 <div className="text-center py-4">
                                     <div className="spinner-border text-orange mb-3" role="status"></div>
                                     <h5 className="fw-bold">Risposte inviate!</h5>
-                                    <p className={textMuted}>In attesa che il docente concluda il quiz...</p>
+                                    <p className={textMuted}>In attesa che il docente concluda il quiz per mostrare il resoconto completo...</p>
                                 </div>
                             )}
 
-                            {/* RISULTATI (docente e studente) */}
+                            {/* RISULTATI & RESOCONTO DETTAGLIATO */}
                             {quizPhase === 'results' && quizResults && (
-                                <>
-                                    <h3 className="fw-black mb-3"><i className="bi bi-bar-chart-fill text-orange me-2"></i>Risultati Quiz</h3>
+                                <div className="d-flex flex-column gap-3">
+                                    {/* HEADER RESOCONTO */}
+                                    <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
+                                        <div className="d-flex align-items-center gap-2.5">
+                                            <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                                                <i className="bi bi-bar-chart-line-fill fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h4 className="fw-black m-0 fs-5">Resoconto Finale Quiz</h4>
+                                                <p className="small text-white-50 mb-0">Analisi risposte didattiche e quesiti più insidiosi</p>
+                                            </div>
+                                        </div>
+                                        {role === 'teacher' ? (
+                                            <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5">
+                                                <i className="bi bi-stop-circle"></i> <span>Chiudi Visita</span>
+                                            </button>
+                                        ) : (
+                                            <button onClick={() => setQuizPhase('none')} className="btn-close btn-close-white" aria-label="Chiudi"></button>
+                                        )}
+                                    </div>
 
-                                    {role === 'teacher' ? (
-                                        <div className="d-flex flex-column gap-2 mb-4">
+                                    {/* KPI SUMMARY CARDS */}
+                                    {(() => {
+                                        const totalStudents = quizResults.length;
+                                        const avgScore = totalStudents > 0 ? (quizResults.reduce((acc, r) => acc + (r.score || 0), 0) / totalStudents).toFixed(1) : 0;
+                                        const totalQuestions = quizQuestions.length || (quizResults[0]?.total || 0);
+
+                                        let hardestQuestion = null;
+                                        let maxWrongCount = -1;
+                                        quizQuestions.forEach(q => {
+                                            let wrong = 0;
+                                            quizResults.forEach(r => {
+                                                const det = r.details?.find(d => String(d.question_id) === String(q._id));
+                                                if (det && !det.correct) wrong++;
+                                            });
+                                            if (wrong > maxWrongCount) {
+                                                maxWrongCount = wrong;
+                                                hardestQuestion = { question: q.question, wrongCount: wrong, percent: totalStudents > 0 ? Math.round((wrong / totalStudents) * 100) : 0 };
+                                            }
+                                        });
+
+                                        return (
+                                            <div className="row g-2">
+                                                <div className="col-4">
+                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                        <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Media Classe</div>
+                                                        <div className="fs-5 fw-black text-orange">{avgScore} <span className="fs-07 text-white-50 fw-medium">/ {totalQuestions}</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                        <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Partecipanti</div>
+                                                        <div className="fs-5 fw-black">{totalStudents} <span className="fs-07 text-white-50 fw-medium">studenti</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-4">
+                                                    <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                        <div className="fs-065 text-uppercase text-danger fw-bold tracking-wider mb-0.5">Più Errata</div>
+                                                        <div className="fs-5 fw-black text-danger">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-medium">errori</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {/* TABS SELECTOR */}
+                                    <div className="d-flex gap-2 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
+                                        <button
+                                            type="button"
+                                            className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                            onClick={() => setQuizReportTab('questions')}
+                                        >
+                                            <i className="bi bi-exclamation-triangle me-1.5"></i>Domande Più Errate
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                            onClick={() => setQuizReportTab('students')}
+                                        >
+                                            <i className="bi bi-trophy me-1.5"></i>Classifica & Studenti ({quizResults.length})
+                                        </button>
+                                    </div>
+
+                                    {/* TAB 1: DOMANDE PIÙ ERRATE ED ANALISI OPZIONI */}
+                                    {quizReportTab === 'questions' && (
+                                        <div className="d-flex flex-column gap-3 max-h-400 overflow-y-auto pe-1">
+                                            {(() => {
+                                                if (!quizQuestions || quizQuestions.length === 0) {
+                                                    return <p className="text-center text-white-50 py-3 fst-italic">Informazioni domande non disponibili.</p>;
+                                                }
+
+                                                const sortedQuestions = [...quizQuestions].map((q, idx) => {
+                                                    let totalCount = 0;
+                                                    let correctCount = 0;
+                                                    const optionDistribution = {};
+
+                                                    quizResults.forEach(r => {
+                                                        const det = r.details?.find(d => String(d.question_id) === String(q._id));
+                                                        if (det) {
+                                                            totalCount++;
+                                                            if (det.correct) correctCount++;
+                                                            if (det.selectedIndex !== undefined && det.selectedIndex !== null) {
+                                                                optionDistribution[det.selectedIndex] = (optionDistribution[det.selectedIndex] || 0) + 1;
+                                                            }
+                                                        }
+                                                    });
+
+                                                    const wrongCount = totalCount - correctCount;
+                                                    const wrongPercent = totalCount > 0 ? Math.round((wrongCount / totalCount) * 100) : 0;
+
+                                                    return { ...q, origIndex: idx, totalCount, correctCount, wrongCount, wrongPercent, optionDistribution };
+                                                }).sort((a, b) => b.wrongPercent - a.wrongPercent);
+
+                                                return sortedQuestions.map((q, qRank) => (
+                                                    <div key={q._id} className={`p-3 rounded-4 border transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                        <div className="d-flex align-items-start justify-content-between gap-2 mb-2">
+                                                            <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-065 flex-shrink-0 ${q.wrongPercent >= 50 ? 'bg-danger text-white' : q.wrongPercent > 0 ? 'bg-warning text-dark' : 'bg-success text-white'}`}>
+                                                                    {q.wrongPercent >= 50 ? <><i className="bi bi-exclamation-triangle-fill me-1"></i> {q.wrongPercent}% Errori</> : <><i className="bi bi-check-circle-fill me-1"></i> {100 - q.wrongPercent}% Corrette</>}
+                                                                </span>
+                                                                {qRank === 0 && q.wrongPercent > 0 && (
+                                                                    <span className="badge bg-danger-subtle text-danger border border-danger border-opacity-25 rounded-pill px-2 py-0.5 fs-065 fw-bold">
+                                                                        🔥 La più sbagliata
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <span className="fs-07 text-white-50 fw-bold">Domanda {q.origIndex + 1}</span>
+                                                        </div>
+
+                                                        <h6 className="fw-bold mb-2.5 fs-6 lh-sm">{q.question}</h6>
+
+                                                        <div className="d-flex flex-column gap-1.5">
+                                                            {q.options.map((optText, optIdx) => {
+                                                                const count = q.optionDistribution[optIdx] || 0;
+                                                                const percent = q.totalCount > 0 ? Math.round((count / q.totalCount) * 100) : 0;
+                                                                const isCorrect = optIdx === q.correctIndex;
+
+                                                                return (
+                                                                    <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-15' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
+                                                                        <div
+                                                                            className={`position-absolute top-0 start-0 h-100 opacity-20 ${isCorrect ? 'bg-success' : 'bg-orange'}`}
+                                                                            style={{ width: `${percent}%`, transition: 'width 0.5s ease-in-out' }}
+                                                                        ></div>
+
+                                                                        <div className="d-flex align-items-center justify-content-between position-relative z-1 gap-2">
+                                                                            <div className="d-flex align-items-center gap-2 min-w-0">
+                                                                                {isCorrect ? (
+                                                                                    <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                                                                                ) : (
+                                                                                    <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 text-white-50`}></i>
+                                                                                )}
+                                                                                <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-success' : 'fw-medium'}`}>{optText}</span>
+                                                                            </div>
+
+                                                                            <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                                                                {isCorrect && (
+                                                                                    <span className="badge bg-success text-white rounded-pill px-2 py-0.5 fs-065">Esatta</span>
+                                                                                )}
+                                                                                <span className="fs-075 fw-bold text-white-50">
+                                                                                    {count} {count === 1 ? 'voto' : 'voti'} ({percent}%)
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ));
+                                            })()}
+                                        </div>
+                                    )}
+
+                                    {/* TAB 2: CLASSIFICA & DETTAGLIO RISPOSTE PER STUDENTE */}
+                                    {quizReportTab === 'students' && (
+                                        <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
                                             {[...quizResults]
                                                 .sort((a, b) => b.score - a.score)
-                                                .map(r => (
-                                                    <div key={r.studentName} className={`d-flex justify-content-between align-items-center p-3 rounded-3 ${darkMode ? 'bg-secondary bg-opacity-10' : 'bg-light'}`}>
-                                                        <span className="fw-bold">{r.studentName}</span>
-                                                        <span className="badge bg-orange text-white rounded-pill px-3 py-2">{r.score}/{r.total}</span>
-                                                    </div>
-                                                ))}
-                                        </div>
-                                    ) : (
-                                        (() => {
-                                            const studentName = user?.name || localStorage.getItem('studentName');
-                                            const myResult = quizResults.find(r => r.studentName === studentName);
-                                            return myResult ? (
-                                                <div className="text-center py-4">
-                                                    <h1 className="display-3 fw-black text-orange mb-0">{myResult.score}/{myResult.total}</h1>
-                                                    <p className={textMuted}>Il tuo punteggio</p>
-                                                </div>
-                                            ) : (
-                                                <p className={`text-center ${textMuted}`}>Non hai completato il quiz in tempo.</p>
-                                            );
-                                        })()
-                                    )}
+                                                .map((r, rankIdx) => {
+                                                    const isExpanded = expandedStudent === r.studentName;
+                                                    const percentScore = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+                                                    const medalIcons = ['🥇', '🥈', '🥉'];
 
-                                    {role === 'teacher' && (
-                                        <button onClick={handleEndVisit} className="btn btn-danger text-white rounded-pill px-4 py-2 fw-bold w-100">
-                                            <i className="bi bi-stop-circle me-2"></i>Termina Visita
-                                        </button>
+                                                    return (
+                                                        <div key={r.studentName || rankIdx} className={`rounded-4 border overflow-hidden transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                            <div
+                                                                className="d-flex align-items-center justify-content-between p-3 cursor-pointer user-select-none hover-bg-tertiary"
+                                                                onClick={() => setExpandedStudent(isExpanded ? null : r.studentName)}
+                                                            >
+                                                                <div className="d-flex align-items-center gap-3 min-w-0">
+                                                                    <div className="d-flex align-items-center justify-content-center flex-shrink-0 fs-5 fw-black w-h-36">
+                                                                        {medalIcons[rankIdx] || <span className="fs-6 text-white-50">#{rankIdx + 1}</span>}
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <h6 className="fw-bold mb-0 text-truncate fs-6">{r.studentName}</h6>
+                                                                        <small className="text-white-50 fs-075">{r.score} su {r.total} risposte corrette ({percentScore}%)</small>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                                                    <span className={`badge rounded-pill px-3 py-1.5 fw-bold fs-075 ${percentScore >= 80 ? 'bg-success text-white' : percentScore >= 50 ? 'bg-warning text-dark' : 'bg-danger text-white'}`}>
+                                                                        {r.score} / {r.total}
+                                                                    </span>
+                                                                    <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'} text-white-50 fs-6`}></i>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* ESPANSIONE DETTAGLIATE RISPOSTE STUDENTE */}
+                                                            {isExpanded && (
+                                                                <div className={`p-3 border-top border-secondary border-opacity-25 d-flex flex-column gap-2 ${darkMode ? 'bg-black bg-opacity-40' : 'bg-body-tertiary'}`}>
+                                                                    <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
+                                                                        Dettaglio risposte di {r.studentName}:
+                                                                    </div>
+                                                                    {quizQuestions.map((q, qIdx) => {
+                                                                        const det = r.details?.find(d => String(d.question_id) === String(q._id));
+                                                                        const selectedOpt = det?.selectedIndex !== undefined && det?.selectedIndex !== null ? q.options[det.selectedIndex] : 'Nessuna risposta';
+                                                                        const correctOpt = q.options[q.correctIndex];
+                                                                        const isCorrect = det?.correct;
+
+                                                                        return (
+                                                                            <div key={q._id} className={`p-2.5 rounded-3 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10'}`}>
+                                                                                <div className="d-flex align-items-start gap-2">
+                                                                                    <i className={`bi ${isCorrect ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'} fs-5 flex-shrink-0 mt-0.5`}></i>
+                                                                                    <div className="min-w-0 flex-grow-1">
+                                                                                        <div className="fw-bold fs-085 mb-1">{qIdx + 1}. {q.question}</div>
+                                                                                        <div className="fs-08">
+                                                                                            <span className={isCorrect ? 'text-success fw-bold' : 'text-danger fw-bold'}>
+                                                                                                Risposta data: {selectedOpt}
+                                                                                            </span>
+                                                                                            {!isCorrect && (
+                                                                                                <div className="text-success fw-semibold fs-075 mt-0.5">
+                                                                                                    <i className="bi bi-arrow-right-short"></i> Risposta esatta: {correctOpt}
+                                                                                                </div>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
                                     )}
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -1483,18 +1715,48 @@ function VisitDetail() {
                     )}
 
                     {/* Selettore dei piani */}
-                    {piante.length > 1 && (
-                        <div className="d-flex flex-wrap gap-2 mb-3">
-                            {piante.map(p => (
-                                <button
-                                    key={p.piano}
-                                    type="button"
-                                    onClick={() => setPianoAttivo(p.piano)}
-                                    className={`btn btn-sm rounded-pill px-3 ${p.piano === pianoAttivo ? 'bg-orange text-white' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
-                                >
-                                    {p.nome}
-                                </button>
-                            ))}
+                    {piante.length > 0 && (
+                        <div className="mb-3">
+                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                <span className="fs-075 text-uppercase fw-bold text-orange letter-spacing-sm">
+                                    <i className="bi bi-layers-fill me-1"></i>Piani del museo
+                                </span>
+                                {currentItem.sala?.piano !== undefined && currentItem.sala?.piano !== null && currentItem.sala?.piano !== pianoAttivo && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-link p-0 text-orange fs-075 text-decoration-none fw-bold"
+                                        onClick={() => setPianoAttivo(currentItem.sala.piano)}
+                                    >
+                                        <i className="bi bi-crosshair me-1"></i>Torna al piano dell'opera ({pianoOpera?.nome || `Piano ${currentItem.sala.piano}`})
+                                    </button>
+                                )}
+                            </div>
+                            <div className="d-flex flex-wrap gap-2">
+                                {piante.map(p => {
+                                    const isArtworkOnThisFloor = currentItem.sala?.piano === p.piano;
+                                    const isSelectedFloor = p.piano === pianoAttivo;
+                                    return (
+                                        <button
+                                            key={p.piano}
+                                            type="button"
+                                            onClick={() => setPianoAttivo(p.piano)}
+                                            className={`btn btn-sm rounded-pill px-3 py-1.5 d-flex align-items-center gap-1.5 fw-bold transition-all ${
+                                                isSelectedFloor
+                                                    ? 'bg-orange text-white shadow-sm border border-orange'
+                                                    : (darkMode ? 'btn-outline-light border-secondary border-opacity-50' : 'btn-outline-dark border-secondary-subtle')
+                                            }`}
+                                        >
+                                            <i className={`bi ${isArtworkOnThisFloor ? 'bi-geo-alt-fill text-warning' : 'bi-layers'}`}></i>
+                                            <span>{p.nome || `Piano ${p.piano}`}</span>
+                                            {isArtworkOnThisFloor && (
+                                                <span className={`badge rounded-pill px-1.5 py-0.5 ms-1 fs-065 ${isSelectedFloor ? 'bg-white text-orange' : 'bg-orange text-white'}`}>
+                                                    Opera qui
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
 

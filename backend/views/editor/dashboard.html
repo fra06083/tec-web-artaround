@@ -648,28 +648,28 @@
 
     <!-- Modale Selezione Visita -->
     <div class="modal fade modal-backdrop-dark" tabindex="-1" :class="{ 'show d-block': isVisitSelectionModalOpen }" x-show="isVisitSelectionModalOpen" x-transition>
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg bg-dark text-white overflow-hidden">
+        <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg bg-dark text-white overflow-hidden mw-100">
                 
                 <!-- Modal Header -->
-                <div class="modal-header border-bottom border-secondary border-opacity-25 p-4 bg-secondary bg-opacity-10 align-items-center">
-                    <div class="d-flex align-items-center gap-3">
+                <div class="modal-header border-bottom border-secondary border-opacity-25 p-3 p-sm-4 bg-secondary bg-opacity-10 align-items-center">
+                    <div class="d-flex align-items-center gap-2.5 gap-sm-3 min-w-0">
                         <div class="modal-header-icon flex-shrink-0">
                             <i class="bi bi-broadcast"></i>
                         </div>
-                        <div>
-                            <h4 class="fw-black text-white m-0 fs-5">Avvia Sessione Live</h4>
-                            <p class="text-white-50 small mb-0">Seleziona la visita guidata da proiettare per la classe</p>
+                        <div class="min-w-0">
+                            <h4 class="fw-black text-white m-0 fs-6 fs-sm-5 text-truncate">Avvia Sessione Live</h4>
+                            <p class="text-white-50 small mb-0 text-truncate">Seleziona la visita guidata da proiettare per la classe</p>
                         </div>
                     </div>
-                    <button type="button" class="btn-close btn-close-white ms-auto" @click="closeVisitSelection()"></button>
+                    <button type="button" class="btn-close btn-close-white ms-auto flex-shrink-0" @click="closeVisitSelection()"></button>
                 </div>
 
                 <!-- Modal Body -->
-                <div class="modal-body p-4">
+                <div class="modal-body p-3 p-sm-4">
 
                     <!-- Search Input -->
-                    <div x-show="items.length > 0" class="mb-4">
+                    <div x-show="items.length > 0" class="mb-3 mb-sm-4">
                         <div class="input-group modal-search-box overflow-hidden">
                             <span class="input-group-text bg-transparent border-0 text-orange ps-3">
                                 <i class="bi bi-search"></i>
@@ -680,7 +680,7 @@
                     </div>
                     
                     <!-- Empty State -->
-                    <div x-show="items.length === 0" class="text-center py-5 text-white-50">
+                    <div x-show="items.length === 0" class="text-center py-4 py-sm-5 text-white-50">
                         <div class="modal-header-icon mx-auto mb-3 opacity-50">
                             <i class="bi bi-inbox fs-2"></i>
                         </div>
@@ -692,21 +692,21 @@
                     </div>
                     
                     <!-- Visit Cards List -->
-                    <div x-show="items.length > 0" class="d-flex flex-column gap-3 max-h-400 overflow-y-auto pe-1">
+                    <div x-show="items.length > 0" class="d-flex flex-column gap-2.5 gap-sm-3 max-h-400 overflow-y-auto pe-1">
                         <template x-for="tour in filteredSelectionVisits" :key="tour._id">
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 tour-selection-card">
-                                <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2.5 gap-sm-3 tour-selection-card w-100 overflow-hidden">
+                                <div class="d-flex align-items-center gap-2.5 gap-sm-3 min-w-0 flex-grow-1">
                                     <div class="tour-selection-icon flex-shrink-0">
                                         <i class="bi bi-journal-richtext"></i>
                                     </div>
-                                    <div class="min-w-0">
+                                    <div class="min-w-0 flex-grow-1">
                                         <h6 class="fw-bold m-0 text-white text-truncate fs-6" x-text="tour.name || 'Visita senza titolo'"></h6>
-                                        <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
-                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption">
-                                                <i class="bi bi-bank me-1 text-orange"></i>
-                                                <span x-text="(tour.museum_id && tour.museum_id.museum) ? tour.museum_id.museum : 'Museo non specificato'"></span>
+                                        <div class="d-flex flex-wrap align-items-center gap-1.5 gap-sm-2 mt-1 min-w-0">
+                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption mw-100 overflow-hidden text-truncate">
+                                                <i class="bi bi-bank me-1 text-orange flex-shrink-0"></i>
+                                                <span class="text-truncate" x-text="(tour.museum_id && tour.museum_id.museum) ? tour.museum_id.museum : 'Museo non specificato'"></span>
                                             </span>
-                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption">
+                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption flex-shrink-0">
                                                 <i class="bi bi-images me-1 text-orange"></i>
                                                 <span x-text="(tour.items ? tour.items.length : 0) + ' opere'"></span>
                                             </span>
@@ -715,7 +715,7 @@
                                 </div>
                                 <button @click="createRoom(tour._id)"
                                         :class="isRoomActive(tour._id) ? 'btn-warning text-dark fw-bold' : 'bg-orange text-white'"
-                                        class="btn btn-action-fixed ms-sm-auto flex-shrink-0">
+                                        class="btn btn-action-fixed ms-sm-auto flex-shrink-0 w-100 w-sm-auto">
                                     <i :class="isRoomActive(tour._id) ? 'bi bi-arrow-repeat' : 'bi bi-play-circle-fill'" class="fs-5 me-1"></i>
                                     <span x-text="isRoomActive(tour._id) ? 'Riprendi' : 'Avvia Live'"></span>
                                 </button>
@@ -736,26 +736,26 @@
 
     <!-- Modale Lobby Stanza -->
     <div class="modal fade modal-backdrop-dark" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" x-show="isLobbyModalOpen" x-transition>
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg text-center bg-dark text-white overflow-hidden">
-                <div class="modal-header border-0 pb-0">
+        <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg text-center bg-dark text-white overflow-hidden mw-100">
+                <div class="modal-header border-0 pb-0 p-3 p-sm-4">
                     <button type="button" class="btn-close btn-close-white ms-auto" @click="closeLobby()"></button>
                 </div>
-                <div class="modal-body p-4 p-sm-5">
+                <div class="modal-body p-3 p-sm-5">
 
                     <div class="play-circle mx-auto mb-4 animate-pulse">
                         <i class="bi bi-broadcast"></i>
                     </div>
 
-                    <h3 class="fw-black text-white mb-2 fs-3">La Stanza Live è Pronta!</h3>
-                    <p class="text-white-50 mb-4 mw-480-center">
+                    <h3 class="fw-black text-white mb-2 fs-4 fs-sm-3">La Stanza Live è Pronta!</h3>
+                    <p class="text-white-50 mb-4 mw-480-center small">
                         Gli studenti possono accedere inserendo questo codice PIN oppure la password impostata nella visita:
                     </p>
 
                     <!-- Big PIN Box -->
-                    <div class="p-4 rounded-4 bg-secondary bg-opacity-10 border border-orange border-opacity-30 mw-480-center mb-4">
+                    <div class="p-3 p-sm-4 rounded-4 bg-secondary bg-opacity-10 border border-orange border-opacity-30 mw-480-center mb-4">
                         <div class="small text-uppercase tracking-widest text-orange fw-bold mb-1">Codice PIN Classe</div>
-                        <div class="display-2 fw-black text-white ls-5 user-select-all text-truncate overflow-hidden mw-100 px-2" x-text="roomState.pin"></div>
+                        <div class="display-3 display-sm-2 fw-black text-white ls-5 user-select-all text-truncate overflow-hidden mw-100 px-2" x-text="roomState.pin"></div>
                         <small class="text-white-50 mt-1 d-block">
                             <i class="bi bi-info-circle me-1"></i> Se la visita ha una password, gli studenti possono usare direttamente quella.
                         </small>
@@ -788,7 +788,7 @@
 
                     <!-- Start Button -->
                     <button @click="startVisit()"
-                            class="btn btn-lg bg-orange text-white rounded-pill px-5 py-3 fw-bold shadow-sm transform hover-lift"
+                            class="btn btn-lg bg-orange text-white rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-bold shadow-sm transform hover-lift w-100 w-sm-auto"
                             :disabled="roomState.students.length === 0">
                         <i class="bi bi-play-circle-fill me-2"></i> Avvia Sessione per la Classe
                     </button>

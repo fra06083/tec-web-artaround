@@ -148,7 +148,7 @@ function marketplaceApp() {
         },
  
         tourCountFor(museumId) {
-            return this.items.filter(t => t.museum_id && t.museum_id._id === museumId && !this.isPurchased(t._id)).length;
+            return this.items.filter(t => t.museum_id && t.museum_id._id === museumId).length;
         },
  
         // Piante ordinate per piano

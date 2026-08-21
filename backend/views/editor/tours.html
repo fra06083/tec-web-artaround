@@ -1116,26 +1116,26 @@
 
     <!-- Modale Lobby -->
     <div class="modal fade modal-backdrop-dark" tabindex="-1" :class="{ 'show d-block': isLobbyModalOpen }" x-show="isLobbyModalOpen" x-transition>
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg text-center bg-dark text-white overflow-hidden">
-                <div class="modal-header border-0 pb-0">
+        <div class="modal-dialog modal-dialog-centered modal-lg mx-auto">
+            <div class="modal-content rounded-4 border border-secondary border-opacity-25 shadow-lg text-center bg-dark text-white overflow-hidden mw-100">
+                <div class="modal-header border-0 pb-0 p-3 p-sm-4">
                     <button type="button" class="btn-close btn-close-white ms-auto" @click="closeLobby()"></button>
                 </div>
-                <div class="modal-body p-4 p-sm-5">
+                <div class="modal-body p-3 p-sm-5">
 
                     <div class="play-circle mx-auto mb-4 animate-pulse">
                         <i class="bi bi-broadcast"></i>
                     </div>
 
-                    <h3 class="fw-black text-white mb-2 fs-3">La Stanza Live è Pronta!</h3>
-                    <p class="text-white-50 mb-4 mw-480-center">
+                    <h3 class="fw-black text-white mb-2 fs-4 fs-sm-3">La Stanza Live è Pronta!</h3>
+                    <p class="text-white-50 mb-4 mw-480-center small">
                         Gli studenti possono accedere inserendo questo codice PIN oppure la password impostata nella visita:
                     </p>
 
                     <!-- Big PIN Box -->
-                    <div class="p-4 rounded-4 bg-secondary bg-opacity-10 border border-orange border-opacity-30 mw-480-center mb-4">
+                    <div class="p-3 p-sm-4 rounded-4 bg-secondary bg-opacity-10 border border-orange border-opacity-30 mw-480-center mb-4">
                         <div class="small text-uppercase tracking-widest text-orange fw-bold mb-1">Codice PIN Classe</div>
-                        <div class="display-2 fw-black text-white ls-5 user-select-all text-truncate overflow-hidden mw-100 px-2" x-text="roomState.pin"></div>
+                        <div class="display-3 display-sm-2 fw-black text-white ls-5 user-select-all text-truncate overflow-hidden mw-100 px-2" x-text="roomState.pin"></div>
                         <small class="text-white-50 mt-1 d-block">
                             <i class="bi bi-info-circle me-1"></i> Se la visita ha una password, gli studenti possono usare direttamente quella.
                         </small>
@@ -1168,7 +1168,7 @@
 
                     <!-- Start Button -->
                     <button @click="startVisit()"
-                            class="btn btn-lg bg-orange text-white rounded-pill px-5 py-3 fw-bold shadow-sm transform hover-lift"
+                            class="btn btn-lg bg-orange text-white rounded-pill px-4 px-sm-5 py-2.5 py-sm-3 fw-bold shadow-sm transform hover-lift w-100 w-sm-auto"
                             :disabled="roomState.students.length === 0">
                         <i class="bi bi-play-circle-fill me-2"></i> Avvia Sessione per la Classe
                     </button>

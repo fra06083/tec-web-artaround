@@ -1649,6 +1649,47 @@ html.dark-mode body {
         width: 100%;
         margin-top: 6px;
     }
+
+    .modal-dialog {
+        margin: 0.5rem auto !important;
+        width: calc(100vw - 1rem) !important;
+        max-width: calc(100vw - 1rem) !important;
+    }
+
+    .modal-content {
+        max-width: 100% !important;
+    }
+
+    .modal-body {
+        padding: 1rem 0.85rem !important;
+    }
+
+    .modal-header {
+        padding: 1rem 0.85rem !important;
+    }
+
+    .tour-selection-card {
+        padding: 12px 14px !important;
+        border-radius: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .tour-selection-icon {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+        font-size: 1.05rem !important;
+    }
+
+    .modal-header-icon {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        font-size: 1.1rem !important;
+    }
 }
 
 .modal-search-box {
@@ -1674,15 +1715,6 @@ html.dark-mode body {
 .tour-selection-card:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(253, 126, 20, 0.35);
-}
-
-    padding: 14px 18px;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-}
-
-.tour-selection-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(253, 126, 20, 0.35);
     transform: translateY(-2px);
 }
 
@@ -1691,6 +1723,10 @@ html.dark-mode body {
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.75);
     font-weight: 500;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Museum Card Selection & Hover */

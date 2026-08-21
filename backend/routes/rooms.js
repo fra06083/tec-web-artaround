@@ -447,12 +447,19 @@ router.post('/quiz/finish', async (req, res) => {
             }
         });
 
+        const questionsData = room.quizQuestions.map(q => ({
+            _id: q._id.toString(),
+            question: q.question,
+            options: q.options,
+            correctIndex: q.correctIndex
+        }));
+
         room.quizActive = false;
         room.quizResults = results;
 
-        broadcastToRoom(pin, 'quiz-results', { results });
+        broadcastToRoom(pin, 'quiz-results', { results, questions: questionsData });
 
-        res.json({ success: true, results });
+        res.json({ success: true, results, questions: questionsData });
     } catch (err) {
         console.error("Errore chiusura quiz:", err);
         res.status(500).json({ error: "Errore interno del server" });
