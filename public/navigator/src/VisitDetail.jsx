@@ -419,12 +419,25 @@ function VisitDetail() {
 
     // --- QUIZ: azioni studente ---
     const selectQuizAnswer = (questionId, optionIndex) => {
-        setQuizAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
+        setQuizAnswers(prev => {
+            const next = { ...prev, [questionId]: optionIndex };
+            if (pin) {
+                const studentName = user?.name || localStorage.getItem('artaround_student_name') || localStorage.getItem('studentName');
+                if (studentName) {
+                    fetch('/api/rooms/quiz/answer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pin, studentName, answers: next })
+                    }).catch(err => console.error("Errore sync risposta quiz:", err));
+                }
+            }
+            return next;
+        });
     };
 
     const submitQuizAnswers = async () => {
         if (!pin) return;
-        const studentName = user?.name || localStorage.getItem('studentName');
+        const studentName = user?.name || localStorage.getItem('artaround_student_name') || localStorage.getItem('studentName');
         if (!studentName) return;
         try {
             await fetch('/api/rooms/quiz/answer', {
@@ -775,17 +788,22 @@ function VisitDetail() {
     const piante = [...(visita.museum_id?.mappa?.piante || [])].sort((a, b) => a.piano - b.piano);
     const piantaAttiva = piante.find(p => p.piano === pianoAttivo);
 
-    const POI_ICONS = {
-        sala:       'bi-door-open',
-        ingresso:   'bi-box-arrow-in-right',
-        uscita:     'bi-box-arrow-right',
-        emergenza:  'bi-sign-turn-right',
-        toilette:   'bi-person-standing',
-        bar:        'bi-cup-hot',
-        shop:       'bi-bag-handle-fill',
-        scala:      'bi-sort-numeric-up',
-        ascensore:  'bi-arrow-down-up',
-        ostacolo:   'bi-exclamation-triangle'
+    const getPoiIcon = (s) => {
+        if (!s) return 'bi-geo-alt-fill';
+        const tipoKey = (s.tipo || '').trim().toLowerCase();
+        const nomeKey = (s.nome || '').trim().toLowerCase();
+        
+        if (tipoKey === 'shop' || tipoKey === 'bookshop' || nomeKey.includes('shop') || nomeKey.includes('store')) return 'bi-bag-fill';
+        if (tipoKey === 'bar' || tipoKey === 'caffetteria' || nomeKey.includes('bar') || nomeKey.includes('caffè')) return 'bi-cup-hot-fill';
+        if (tipoKey === 'toilette' || tipoKey === 'wc' || nomeKey.includes('wc') || nomeKey.includes('bagno')) return 'bi-droplet-fill';
+        if (tipoKey === 'ingresso' || nomeKey.includes('ingresso')) return 'bi-box-arrow-in-right';
+        if (tipoKey === 'uscita' || nomeKey.includes('uscita')) return 'bi-box-arrow-right';
+        if (tipoKey === 'emergenza') return 'bi-sign-turn-right-fill';
+        if (tipoKey === 'scala' || tipoKey === 'scale') return 'bi-stairs';
+        if (tipoKey === 'ascensore') return 'bi-arrow-down-up';
+        if (tipoKey === 'sala') return 'bi-door-open-fill';
+
+        return 'bi-geo-alt-fill';
     };
 
     const renderMapWithPins = (isLightbox = false) => {
@@ -804,7 +822,7 @@ function VisitDetail() {
                     const isCurrentRoom = currentItem?.sala?.nome && s.nome &&
                         currentItem.sala.nome.trim().toLowerCase() === s.nome.trim().toLowerCase();
                     const isSelected = selectedMapPin?.nome === s.nome;
-                    const icon = POI_ICONS[s.tipo] || 'bi-door-open';
+                    const icon = getPoiIcon(s);
                     const posX = s.x || 0;
                     const posY = s.y || 0;
                     const transX = posX < 0.20 ? '0%' : posX > 0.80 ? '-100%' : '-50%';
@@ -868,7 +886,7 @@ function VisitDetail() {
                 <div className="d-flex align-items-center justify-content-between gap-3">
                     <div className="d-flex align-items-center gap-3 min-w-0">
                         <span className="btn-icon-32 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0 me-1">
-                            <i className={`bi ${POI_ICONS[selectedMapPin.tipo] || 'bi-door-open'}`}></i>
+                            <i className={`bi ${getPoiIcon(selectedMapPin)}`}></i>
                         </span>
                         <div className="min-w-0">
                             <h6 className="fw-bold mb-0 text-truncate fs-6">{selectedMapPin.nome}</h6>
@@ -1359,10 +1377,10 @@ function VisitDetail() {
                                     ))}
                                     <button
                                         onClick={submitQuizAnswers}
-                                        disabled={Object.keys(quizAnswers).length < quizQuestions.length}
-                                        className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100 mt-2"
+                                        disabled={Object.keys(quizAnswers).length === 0}
+                                        className="btn bg-orange text-white rounded-pill px-4 py-2 fw-bold w-100 mt-2 shadow-sm active-scale"
                                     >
-                                        Invia risposte
+                                        Invia risposte {Object.keys(quizAnswers).length > 0 ? `(${Object.keys(quizAnswers).length}/${quizQuestions.length})` : ''}
                                     </button>
                                 </>
                             )}
@@ -1383,17 +1401,16 @@ function VisitDetail() {
                                         /* VISTA DOCENTE / CHI FA PARTIRE IL QUIZ: RESOCONTO COMPLETO */
                                         <>
                                             {/* HEADER RESOCONTO */}
-                                            <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
-                                                <div className="d-flex align-items-center gap-2.5">
+                                            <div className="d-flex align-items-center justify-content-between gap-2 pb-3 border-bottom border-secondary border-opacity-25">
+                                                <div className="d-flex align-items-center gap-2 min-w-0">
                                                     <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
                                                         <i className="bi bi-bar-chart-line-fill fs-4"></i>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="fw-black m-0 fs-5">Resoconto Finale Quiz</h4>
-                                                        <p className="small text-white-50 mb-0">Analisi didattica delle risposte della classe</p>
+                                                    <div className="min-w-0 px-1">
+                                                        <h4 className="fw-black m-0 fs-5 text-wrap">Resoconto Finale Quiz</h4>
                                                     </div>
                                                 </div>
-                                                <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5">
+                                                <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5 flex-shrink-0 ms-1">
                                                     <i className="bi bi-stop-circle"></i> <span>Chiudi Visita</span>
                                                 </button>
                                             </div>
@@ -1405,37 +1422,39 @@ function VisitDetail() {
                                                 const totalQuestions = quizQuestions.length || (quizResults[0]?.total || 0);
 
                                                 let hardestQuestion = null;
-                                                let maxWrongCount = -1;
+                                                let maxWrongPercent = -1;
                                                 quizQuestions.forEach(q => {
                                                     let wrong = 0;
+                                                    const totalCount = quizResults.length;
                                                     quizResults.forEach(r => {
                                                         const det = r.details?.find(d => String(d.question_id) === String(q._id));
                                                         if (det && !det.correct) wrong++;
                                                     });
-                                                    if (wrong > maxWrongCount) {
-                                                        maxWrongCount = wrong;
-                                                        hardestQuestion = { question: q.question, wrongCount: wrong, percent: totalStudents > 0 ? Math.round((wrong / totalStudents) * 100) : 0 };
+                                                    const percent = totalCount > 0 ? Math.round((wrong / totalCount) * 100) : 0;
+                                                    if (percent > maxWrongPercent) {
+                                                        maxWrongPercent = percent;
+                                                        hardestQuestion = { question: q.question, wrongCount: wrong, percent };
                                                     }
                                                 });
 
                                                 return (
                                                     <div className="row g-2">
                                                         <div className="col-4">
-                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                                <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Media Classe</div>
-                                                                <div className="fs-5 fw-black text-orange">{avgScore} <span className="fs-07 text-white-50 fw-medium">/ {totalQuestions}</span></div>
+                                                            <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-06 text-uppercase text-orange fw-bold tracking-wider mb-1 text-truncate">Media Classe</div>
+                                                                <div className="fs-6 fs-sm-5 fw-black text-orange lh-1">{avgScore} <span className="fs-07 text-white-50 fw-normal">/ {totalQuestions}</span></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-4">
-                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                                <div className="fs-065 text-uppercase text-orange fw-bold tracking-wider mb-0.5">Partecipanti</div>
-                                                                <div className="fs-5 fw-black">{totalStudents} <span className="fs-07 text-white-50 fw-medium">studenti</span></div>
+                                                            <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-06 text-uppercase text-orange fw-bold tracking-wider mb-1 text-truncate">Partecipanti</div>
+                                                                <div className="fs-6 fs-sm-5 fw-black text-white lh-1">{totalStudents} <span className="fs-07 text-white-50 fw-normal">stud.</span></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-4">
-                                                            <div className={`p-2.5 rounded-3 text-center border ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
-                                                                <div className="fs-065 text-uppercase text-danger fw-bold tracking-wider mb-0.5">Più Errata</div>
-                                                                <div className="fs-5 fw-black text-danger">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-medium">errori</span></div>
+                                                            <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
+                                                                <div className="fs-06 text-uppercase text-danger fw-bold tracking-wider mb-1 text-truncate">Più Errata</div>
+                                                                <div className="fs-6 fs-sm-5 fw-black text-danger lh-1">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-normal">err.</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1443,26 +1462,26 @@ function VisitDetail() {
                                             })()}
 
                                             {/* TABS SELECTOR */}
-                                            <div className="d-flex gap-2 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
+                                            <div className="d-flex gap-1.5 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
                                                 <button
                                                     type="button"
-                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
                                                     onClick={() => setQuizReportTab('questions')}
                                                 >
-                                                    <i className="bi bi-exclamation-triangle me-1.5"></i>Domande Più Errate
+                                                    <i className="bi bi-exclamation-triangle me-1"></i>Domande Errate
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 fw-bold transition-all ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
                                                     onClick={() => setQuizReportTab('students')}
                                                 >
-                                                    <i className="bi bi-trophy me-1.5"></i>Classifica & Studenti ({quizResults.length})
+                                                    <i className="bi bi-trophy me-1"></i>Classifica ({quizResults.length})
                                                 </button>
                                             </div>
 
                                             {/* TAB 1: DOMANDE PIÙ ERRATE ED ANALISI OPZIONI */}
                                             {quizReportTab === 'questions' && (
-                                                <div className="d-flex flex-column gap-3 max-h-400 overflow-y-auto pe-1">
+                                                <div className="d-flex flex-column gap-3 max-h-50vh overflow-y-auto pe-1 custom-scrollbar">
                                                     {(() => {
                                                         if (!quizQuestions || quizQuestions.length === 0) {
                                                             return <p className="text-center text-white-50 py-3 fst-italic">Informazioni domande non disponibili.</p>;
@@ -1499,7 +1518,7 @@ function VisitDetail() {
                                                                         </span>
                                                                         {qRank === 0 && q.wrongPercent > 0 && (
                                                                             <span className="badge bg-danger-subtle text-danger border border-danger border-opacity-25 rounded-pill px-2 py-0.5 fs-065 fw-bold">
-                                                                                🔥 La più sbagliata
+                                                                                La più sbagliata
                                                                             </span>
                                                                         )}
                                                                     </div>
@@ -1515,7 +1534,7 @@ function VisitDetail() {
                                                                         const isCorrect = optIdx === q.correctIndex;
 
                                                                         return (
-                                                                            <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-15' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
+                                                                            <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-25 border-opacity-60' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
                                                                                 <div
                                                                                     className={`position-absolute top-0 start-0 h-100 opacity-20 ${isCorrect ? 'bg-success' : 'bg-orange'}`}
                                                                                     style={{ width: `${percent}%`, transition: 'width 0.5s ease-in-out' }}
@@ -1524,11 +1543,11 @@ function VisitDetail() {
                                                                                 <div className="d-flex align-items-center justify-content-between position-relative z-1 gap-2">
                                                                                     <div className="d-flex align-items-center gap-2 min-w-0">
                                                                                         {isCorrect ? (
-                                                                                            <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
+                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
                                                                                         ) : (
                                                                                             <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 text-white-50`}></i>
                                                                                         )}
-                                                                                        <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-success' : 'fw-medium'}`}>{optText}</span>
+                                                                                        <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-white' : 'fw-medium'}`}>{optText}</span>
                                                                                     </div>
 
                                                                                     <div className="d-flex align-items-center gap-2 flex-shrink-0">
@@ -1552,7 +1571,7 @@ function VisitDetail() {
 
                                             {/* TAB 2: CLASSIFICA & DETTAGLIO RISPOSTE PER STUDENTE */}
                                             {quizReportTab === 'students' && (
-                                                <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
+                                                <div className="d-flex flex-column gap-2 max-h-50vh overflow-y-auto pe-1 custom-scrollbar">
                                                     {[...quizResults]
                                                         .sort((a, b) => b.score - a.score)
                                                         .map((r, rankIdx) => {
@@ -1586,7 +1605,7 @@ function VisitDetail() {
 
                                                                     {/* ESPANSIONE DETTAGLIATE RISPOSTE STUDENTE */}
                                                                     {isExpanded && (
-                                                                        <div className={`p-3 border-top border-secondary border-opacity-25 d-flex flex-column gap-2 ${darkMode ? 'bg-black bg-opacity-40' : 'bg-body-tertiary'}`}>
+                                                                        <div className={`p-3 border-top border-secondary border-opacity-25 d-flex flex-column gap-2 max-h-300 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-black bg-opacity-40' : 'bg-body-tertiary'}`}>
                                                                             <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
                                                                                 Dettaglio risposte di {r.studentName}:
                                                                             </div>
@@ -1607,41 +1626,42 @@ function VisitDetail() {
                                                                                         </div>
 
                                                                                         {isUnanswered && (
-                                                                                            <div className="p-2 rounded-3 bg-warning bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
+                                                                                            <div className="p-2 rounded-3 bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
                                                                                                 <i className="bi bi-dash-circle-fill"></i>Nessuna risposta fornita (Conteggiato come errore)
                                                                                             </div>
                                                                                         )}
                                                                                         
                                                                                         <div className="d-flex flex-column gap-1.5 mt-2">
                                                                                             {q.options && q.options.map((optText, optIdx) => {
-                                                                                                const isCorrectOpt = optIdx === qCorrectIdx;
                                                                                                 const isStudentChoice = optIdx === studentSelectedIdx;
+                                                                                                const isThisOptionCorrect = (qCorrectIdx >= 0 && optIdx === qCorrectIdx) || (isStudentChoice && isCorrect);
+                                                                                                const isThisOptionWrongChoice = isStudentChoice && !isCorrect;
 
                                                                                                 let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
-                                                                                                if (isCorrectOpt) {
-                                                                                                    optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-success fw-bold";
-                                                                                                } else if (isStudentChoice && !isCorrect) {
+                                                                                                if (isThisOptionCorrect) {
+                                                                                                    optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold";
+                                                                                                } else if (isThisOptionWrongChoice) {
                                                                                                     optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
                                                                                                 }
 
                                                                                                 return (
                                                                                                     <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
                                                                                                         <div className="d-flex align-items-center gap-2 min-w-0">
-                                                                                                            {isCorrectOpt ? (
-                                                                                                                <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
-                                                                                                            ) : isStudentChoice ? (
+                                                                                                            {isThisOptionCorrect ? (
+                                                                                                                <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
+                                                                                                            ) : isThisOptionWrongChoice ? (
                                                                                                                 <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
                                                                                                             ) : (
                                                                                                                 <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
                                                                                                             )}
                                                                                                             <span className="text-truncate">{optText}</span>
                                                                                                         </div>
-                                                                                                        {isCorrectOpt && (
+                                                                                                        {isThisOptionCorrect && (
                                                                                                             <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
                                                                                                                 <i className="bi bi-check2 me-1"></i>Esatta
                                                                                                             </span>
                                                                                                         )}
-                                                                                                        {isStudentChoice && !isCorrect && (
+                                                                                                        {isThisOptionWrongChoice && (
                                                                                                             <span className="badge bg-danger text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
                                                                                                                 Scelta dallo studente
                                                                                                             </span>
@@ -1674,8 +1694,8 @@ function VisitDetail() {
                                                 <div className="d-flex flex-column gap-3">
                                                     {/* HEADER PERSONALE STUDENTE */}
                                                     <div className="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary border-opacity-25">
-                                                        <div className="d-flex align-items-center gap-2.5">
-                                                            <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0">
+                                                        <div className="d-flex align-items-center gap-3.5">
+                                                            <div className="btn-icon-42 rounded-circle bg-orange bg-opacity-15 text-orange d-flex align-items-center justify-content-center flex-shrink-0 me-1">
                                                                 <i className="bi bi-patch-check-fill fs-4"></i>
                                                             </div>
                                                             <div>
@@ -1687,15 +1707,15 @@ function VisitDetail() {
                                                     </div>
 
                                                     {/* SCORE BANNER PERSONALE */}
-                                                    <div className={`p-3 rounded-4 text-center border ${percent >= 80 ? 'bg-success bg-opacity-15 border-success border-opacity-40' : percent >= 50 ? 'bg-warning bg-opacity-15 border-warning border-opacity-40' : 'bg-danger bg-opacity-15 border-danger border-opacity-40'}`}>
-                                                        <div className="fs-065 text-uppercase fw-bold tracking-wider text-white-50 mb-1">Punteggio Totale</div>
-                                                        <div className={`fs-2 fw-black ${percent >= 80 ? 'text-success' : percent >= 50 ? 'text-warning' : 'text-danger'}`}>
-                                                            {score} <span className="fs-6 text-white-50 fw-normal">/ {total} corrette ({percent}%)</span>
+                                                    <div className={`p-3.5 rounded-4 text-center border ${percent >= 80 ? 'bg-success bg-opacity-15 border-success border-opacity-40' : percent >= 50 ? 'bg-warning bg-opacity-15 border-warning border-opacity-40' : 'bg-danger bg-opacity-15 border-danger border-opacity-40'}`}>
+                                                        <div className="fs-065 pt-1 text-uppercase fw-bold tracking-wider text-white mb-1">Punteggio Totale</div>
+                                                        <div className="fs-2 fw-black text-white">
+                                                            {score} <span className="fs-6 text-white fw-normal">/ {total} corrette ({percent}%)</span>
                                                         </div>
                                                     </div>
 
                                                     {/* ELENCO DELLE PROPRIE RISPOSTE */}
-                                                    <div className="d-flex flex-column gap-2 max-h-400 overflow-y-auto pe-1">
+                                                    <div className="d-flex flex-column gap-2 max-h-50vh overflow-y-auto pe-1 custom-scrollbar">
                                                         <div className="fs-065 text-uppercase fw-bold text-orange letter-spacing-sm mb-1">
                                                             Le tue risposte per quesito:
                                                         </div>
@@ -1716,41 +1736,42 @@ function VisitDetail() {
                                                                     </div>
                                                                     
                                                                     {isUnanswered && (
-                                                                        <div className="p-2 rounded-3 bg-warning bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
+                                                                        <div className="p-2 rounded-3 bg-opacity-15 border border-warning border-opacity-30 text-warning fs-075 fw-bold d-flex align-items-center gap-1.5 mb-2">
                                                                             <i className="bi bi-dash-circle-fill"></i>Non hai fornito alcuna risposta (Conteggiato come errore)
                                                                         </div>
                                                                     )}
 
                                                                     <div className="d-flex flex-column gap-1.5 mt-2">
                                                                         {q.options && q.options.map((optText, optIdx) => {
-                                                                            const isCorrectOpt = optIdx === qCorrectIdx;
                                                                             const isStudentChoice = optIdx === studentSelectedIdx;
+                                                                            const isThisOptionCorrect = (qCorrectIdx >= 0 && optIdx === qCorrectIdx) || (isStudentChoice && isCorrect);
+                                                                            const isThisOptionWrongChoice = isStudentChoice && !isCorrect;
 
                                                                             let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
-                                                                            if (isCorrectOpt) {
-                                                                                optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-success fw-bold";
-                                                                            } else if (isStudentChoice && !isCorrect) {
+                                                                            if (isThisOptionCorrect) {
+                                                                                optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold";
+                                                                            } else if (isThisOptionWrongChoice) {
                                                                                 optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
                                                                             }
 
                                                                             return (
                                                                                 <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
                                                                                     <div className="d-flex align-items-center gap-2 min-w-0">
-                                                                                        {isCorrectOpt ? (
-                                                                                            <i className="bi bi-check-circle-fill text-success fs-5 flex-shrink-0"></i>
-                                                                                        ) : isStudentChoice ? (
+                                                                                        {isThisOptionCorrect ? (
+                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
+                                                                                        ) : isThisOptionWrongChoice ? (
                                                                                             <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
                                                                                         ) : (
                                                                                             <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
                                                                                         )}
                                                                                         <span className="text-truncate">{optText}</span>
                                                                                     </div>
-                                                                                    {isCorrectOpt && (
+                                                                                    {isThisOptionCorrect && (
                                                                                         <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
                                                                                             <i className="bi bi-check2 me-1"></i>Risposta Esatta
                                                                                         </span>
                                                                                     )}
-                                                                                    {isStudentChoice && !isCorrect && (
+                                                                                    {isThisOptionWrongChoice && (
                                                                                         <span className="badge bg-danger text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
                                                                                             La tua risposta
                                                                                         </span>

@@ -147,19 +147,23 @@ export default function Lobby() {
     };
 
     return (
-        <div className={`container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center p-3 p-md-5 transition-theme position-relative overflow-hidden ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}>
-            
-            <div className="position-absolute top-50 start-50 translate-middle w-100 h-100 d-none d-md-block opacity-10 pointer-events-none ambient-glow-orange"></div>
+        <div 
+            className={`container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center p-3 p-md-5 transition-theme position-relative overflow-hidden ${darkMode ? 'bg-black text-white' : 'marketplace-light text-dark'}`}
+            style={{
+                background: darkMode 
+                    ? 'radial-gradient(circle at 50% 50%, rgba(253, 126, 20, 0.15) 0%, rgba(10, 10, 10, 0.95) 55%, #000000 90%)'
+                    : 'radial-gradient(circle at 50% 50%, rgba(253, 126, 20, 0.10) 0%, #f8f9fa 80%)'
+            }}
+        >
 
-            <div className="text-center w-100 max-w-600 position-relative z-1">
+            <div className="d-flex flex-column align-items-center text-center w-100 max-w-600 mx-auto position-relative z-1 px-3">
                 
-                <div className="d-inline-flex align-items-center gap-2 bg-orange bg-opacity-15 text-orange px-3.5 py-2 rounded-pill mb-4 fw-bold text-uppercase tracking-wider fs-075 border border-orange border-opacity-25 shadow-sm">
-                    <span className="spinner-grow spinner-grow-sm text-orange" role="status" aria-hidden="true"></span>
-                    <span>Sala d'Attesa Live</span>
+                <div className="d-inline-flex align-items-center justify-content-center bg-orange text-white px-4 py-2.5 rounded-pill mb-4 fw-bold text-uppercase tracking-wider fs-075 border border-orange shadow-sm text-center">
+                    <span class="py-2">Sala d'Attesa Live</span>
                 </div>
 
-                <h1 className="fw-black mb-2 display-6 tracking-tight">Sei nella Sala d'Attesa</h1>
-                <p className={`lead mb-4 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
+                <h1 className="fw-black mb-2 fs-3 fs-sm-2 text-center text-wrap w-100">Sei nella Sala d'Attesa</h1>
+                <p className={`lead mb-4 text-center fs-6 fs-sm-5 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
                     Codice Stanza: <span className="fw-black text-orange border-bottom border-orange border-opacity-50 pb-0.5 px-1">{pin}</span>
                 </p>
                 
@@ -190,7 +194,7 @@ export default function Lobby() {
                                 <option value="medio">Medio (Standard bilanciato)</option>
                                 <option value="dettagliato">Dettagliato (Approfondito completo)</option>
                             </select>
-                            <div className="form-text small opacity-75 mt-2">
+                            <div className="form-text text-white small opacity-75 mt-2">
                                 Puoi personalizzare il tuo livello di spiegazione direttamente qui prima dell'avvio della visita.
                             </div>
                         </div>
@@ -210,7 +214,7 @@ export default function Lobby() {
                                         <h6 className="fw-bold mb-0 text-uppercase text-orange tracking-wider fs-075 d-flex align-items-center gap-2">
                                             <i className="bi bi-people-fill fs-6"></i> Partecipanti Connessi
                                         </h6>
-                                        <span className="badge rounded-pill bg-orange bg-opacity-15 text-orange fw-bold fs-7 px-2.5 py-1">
+                                        <span className="badge mx-2 rounded-pill bg-orange bg-opacity-15 text-orange fw-bold fs-7 px-2.5 py-1">
                                             {students.length} {students.length === 1 ? 'studente' : 'studenti'}
                                         </span>
                                     </div>

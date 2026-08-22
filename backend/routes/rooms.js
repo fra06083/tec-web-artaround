@@ -420,44 +420,59 @@ router.post('/quiz/finish', async (req, res) => {
     try {
         const total = room.quizQuestions.length;
         const results = [];
+        const processedStudents = new Set();
 
-        for (const [studentName, answers] of Object.entries(room.quizAnswers)) {
-            let score = 0;
-            const details = room.quizQuestions.map(q => {
-                const rawSelected = answers ? answers[q._id.toString()] : undefined;
-                const selectedIndex = (rawSelected !== undefined && rawSelected !== null && rawSelected !== '') ? Number(rawSelected) : undefined;
-                const correct = (selectedIndex !== undefined && !isNaN(selectedIndex) && selectedIndex === Number(q.correctIndex));
-                if (correct) score++;
-                return { question_id: q._id.toString(), selectedIndex, correct };
-            });
+        // Process students who submitted draft or final answers
+        if (room.quizAnswers) {
+            for (const [studentName, answers] of Object.entries(room.quizAnswers)) {
+                if (!studentName) continue;
+                processedStudents.add(studentName);
+                let score = 0;
+                const details = room.quizQuestions.map(q => {
+                    const qIdStr = q._id ? q._id.toString() : '';
+                    const rawSelected = answers ? (answers[qIdStr] !== undefined ? answers[qIdStr] : answers[q._id]) : undefined;
+                    const selectedIndex = (rawSelected !== undefined && rawSelected !== null && rawSelected !== '') ? Number(rawSelected) : null;
+                    const correct = (selectedIndex !== null && !isNaN(selectedIndex) && selectedIndex === Number(q.correctIndex));
+                    if (correct) score++;
+                    return { question_id: qIdStr, selectedIndex, correct };
+                });
 
-            results.push({ studentName, score, total, details });
+                results.push({ studentName, score, total, details });
 
-            await QuizResult.create({
-                visit_id: room.visitId,
-                studentName,
-                score,
-                total,
-                details
+                try {
+                    await QuizResult.create({
+                        visit_id: room.visitId,
+                        studentName,
+                        score,
+                        total,
+                        details
+                    });
+                } catch (dbErr) {
+                    console.error("Errore salvataggio DB QuizResult:", dbErr);
+                }
+            }
+        }
+
+        // Process students in room who haven't submitted any answer
+        if (room.students) {
+            room.students.forEach(name => {
+                if (name && !processedStudents.has(name)) {
+                    processedStudents.add(name);
+                    const details = room.quizQuestions.map(q => ({
+                        question_id: q._id ? q._id.toString() : '',
+                        selectedIndex: null,
+                        correct: false
+                    }));
+                    results.push({ studentName: name, score: 0, total, details });
+                }
             });
         }
 
-        room.students.forEach(name => {
-            if (!room.quizAnswers[name]) {
-                const details = room.quizQuestions.map(q => ({
-                    question_id: q._id.toString(),
-                    selectedIndex: null,
-                    correct: false
-                }));
-                results.push({ studentName: name, score: 0, total, details });
-            }
-        });
-
         const questionsData = room.quizQuestions.map(q => ({
-            _id: q._id.toString(),
+            _id: q._id ? q._id.toString() : '',
             question: q.question,
             options: q.options,
-            correctIndex: q.correctIndex
+            correctIndex: Number(q.correctIndex)
         }));
 
         room.quizActive = false;

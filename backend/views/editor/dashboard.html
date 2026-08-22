@@ -179,7 +179,7 @@
                                         </div>
                                         <h4 class="fw-black text-white mb-1">Inizia Visita</h4>
                                         <p class="text-white mb-0 opacity-85 small flex-grow-1 d-flex align-items-center justify-content-center">
-                                            Avvia una sessione live proiettata o con PIN per la classe.
+                                            Avvia una sessione live con un codice.
                                         </p>
                                         <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
                                             <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
@@ -342,7 +342,7 @@
                                     </div>
                                     <h3 class="fw-black text-white mb-1 fs-card-title">Inizia Visita</h3>
                                     <p class="text-white mb-0 opacity-85 small flex-grow-1 d-flex align-items-center justify-content-center">
-                                        Avvia una sessione live con la password della visita o un PIN automatico.
+                                        Avvia una sessione live con un codice.
                                     </p>
                                     <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
                                         <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
@@ -507,7 +507,7 @@
                                     </div>
                                     <h3 class="fw-black text-white mb-1 fs-card-title">Inizia Visita</h3>
                                     <p class="text-white mb-0 opacity-85 small flex-grow-1 d-flex align-items-center justify-content-center">
-                                        Avvia una sessione live con la password della visita o un PIN automatico.
+                                        Avvia una sessione live con un codice.
                                     </p>
                                     <div class="mt-3 btn bg-orange text-white rounded-pill px-4 py-2 fw-bold shadow-lg flex-shrink-0 d-inline-flex align-items-center justify-content-center gap-2">
                                         <i class="bi bi-play-circle-fill fs-6"></i> <span>Avvia ora</span>
@@ -657,9 +657,9 @@
                         <div class="modal-header-icon flex-shrink-0">
                             <i class="bi bi-broadcast"></i>
                         </div>
-                        <div class="min-w-0">
-                            <h4 class="fw-black text-white m-0 fs-6 fs-sm-5 text-truncate">Avvia Sessione Live</h4>
-                            <p class="text-white-50 small mb-0 text-truncate">Seleziona la visita guidata da proiettare per la classe</p>
+                        <div class="min-w-0 px-2">
+                            <h4 class="fw-black text-white m-0 fs-6 fs-sm-5">Avvia Sessione Live</h4>
+                            <p class="text-white-50 small mb-0 fs-075 lh-sm">Seleziona la visita guidata da proiettare per la classe</p>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white ms-auto flex-shrink-0" @click="closeVisitSelection()"></button>
@@ -692,33 +692,35 @@
                     </div>
                     
                     <!-- Visit Cards List -->
-                    <div x-show="items.length > 0" class="d-flex flex-column gap-2.5 gap-sm-3 max-h-400 overflow-y-auto pe-1">
+                    <div x-show="items.length > 0" class="d-flex flex-column gap-2.5 max-h-450 overflow-y-auto pe-1">
                         <template x-for="tour in filteredSelectionVisits" :key="tour._id">
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2.5 gap-sm-3 tour-selection-card w-100 overflow-hidden">
-                                <div class="d-flex align-items-center gap-2.5 gap-sm-3 min-w-0 flex-grow-1">
-                                    <div class="tour-selection-icon flex-shrink-0">
-                                        <i class="bi bi-journal-richtext"></i>
-                                    </div>
-                                    <div class="min-w-0 flex-grow-1">
-                                        <h6 class="fw-bold m-0 text-white text-truncate fs-6" x-text="tour.name || 'Visita senza titolo'"></h6>
-                                        <div class="d-flex flex-wrap align-items-center gap-1.5 gap-sm-2 mt-1 min-w-0">
-                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption mw-100 overflow-hidden text-truncate">
-                                                <i class="bi bi-bank me-1 text-orange flex-shrink-0"></i>
-                                                <span class="text-truncate" x-text="(tour.museum_id && tour.museum_id.museum) ? tour.museum_id.museum : 'Museo non specificato'"></span>
-                                            </span>
-                                            <span class="badge badge-glass-subtle rounded-pill px-2.5 py-1 fs-caption flex-shrink-0">
-                                                <i class="bi bi-images me-1 text-orange"></i>
-                                                <span x-text="(tour.items ? tour.items.length : 0) + ' opere'"></span>
-                                            </span>
+                            <div class="tour-selection-card w-100 p-3 my-2">
+                                <div class="d-flex align-items-center justify-content-between gap-2.5">
+                                    <div class="d-flex align-items-center gap-2.5 min-w-0 flex-grow-1">
+                                        <div class="tour-selection-icon flex-shrink-0 d-flex align-items-center justify-content-center rounded-3 bg-orange bg-opacity-15 text-orange">
+                                            <i class="bi bi-journal-richtext fs-5"></i>
+                                        </div>
+                                        <div class="min-w-0 flex-grow-1 px-2">
+                                            <h6 class="fw-bold m-0 text-white fs-6" x-text="tour.name || 'Visita senza titolo'"></h6>
+                                            <div class="d-flex flex-wrap align-items-center gap-1.5 mt-1 min-w-0">
+                                                <span class="badge badge-glass-subtle rounded-pill px-2 py-0.5 fs-caption text-truncate">
+                                                    <i class="bi bi-bank me-1 text-orange flex-shrink-0"></i>
+                                                    <span x-text="(tour.museum_id && tour.museum_id.museum) ? tour.museum_id.museum : 'Museo non specificato'"></span>
+                                                </span>
+                                                <span class="badge badge-glass-subtle rounded-pill px-2 py-0.5 fs-caption flex-shrink-0">
+                                                    <i class="bi bi-images me-1 text-orange"></i>
+                                                    <span x-text="(tour.items ? tour.items.length : 0) + ' opere'"></span>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <button @click="createRoom(tour._id)"
+                                            :class="isRoomActive(tour._id) ? 'btn-warning text-dark' : 'btn-orange text-white'"
+                                            class="btn btn-sm rounded-pill fw-bold px-3 py-2 flex-shrink-0 d-inline-flex align-items-center gap-1">
+                                        <i :class="isRoomActive(tour._id) ? 'bi bi-arrow-repeat' : 'bi bi-play-circle-fill'" class="fs-6"></i>
+                                        <span x-text="isRoomActive(tour._id) ? 'Riprendi' : 'Avvia'"></span>
+                                    </button>
                                 </div>
-                                <button @click="createRoom(tour._id)"
-                                        :class="isRoomActive(tour._id) ? 'btn-warning text-dark fw-bold' : 'bg-orange text-white'"
-                                        class="btn btn-action-fixed ms-sm-auto flex-shrink-0">
-                                    <i :class="isRoomActive(tour._id) ? 'bi bi-arrow-repeat' : 'bi bi-play-circle-fill'" class="fs-5 me-1"></i>
-                                    <span x-text="isRoomActive(tour._id) ? 'Riprendi' : 'Avvia Live'"></span>
-                                </button>
                             </div>
                         </template>
 
@@ -749,16 +751,13 @@
 
                     <h3 class="fw-black text-white mb-2 fs-4 fs-sm-3">La Stanza Live è Pronta!</h3>
                     <p class="text-white-50 mb-4 mw-480-center small">
-                        Gli studenti possono accedere inserendo questo codice PIN oppure la password impostata nella visita:
+                        Gli studenti possono accedere inserendo questo codice:
                     </p>
 
                     <!-- Big PIN Box -->
                     <div class="p-3 p-sm-4 rounded-4 bg-secondary bg-opacity-10 border border-orange border-opacity-30 mw-480-center mb-4">
                         <div class="small text-uppercase tracking-widest text-orange fw-bold mb-1">Codice PIN Classe</div>
                         <div class="display-3 display-sm-2 fw-black text-white ls-5 user-select-all text-truncate overflow-hidden mw-100 px-2" x-text="roomState.pin"></div>
-                        <small class="text-white-50 mt-1 d-block">
-                            <i class="bi bi-info-circle me-1"></i> Se la visita ha una password, gli studenti possono usare direttamente quella.
-                        </small>
                     </div>
 
                     <!-- Students List -->
@@ -780,7 +779,7 @@
                             <template x-if="roomState.students.length === 0">
                                 <div class="py-3 text-white-50 fst-italic fs-body-sm d-flex align-items-center gap-2">
                                     <span class="spinner-border spinner-border-sm text-orange me-1" role="status"></span>
-                                    In attesa che gli studenti inseriscano il PIN...
+                                    In attesa che gli studenti inseriscano il codice...
                                 </div>
                             </template>
                         </div>
