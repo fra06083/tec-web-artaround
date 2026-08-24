@@ -308,14 +308,26 @@
 
                                     <div class="row g-3">
                                         <div class="col-md-8">
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text bg-body border-secondary-subtle text-body-secondary">
+                                                    <i class="bi bi-search text-orange"></i>
+                                                </span>
+                                                <input type="text" x-model="museumSearch"
+                                                       class="form-control bg-body border-secondary-subtle text-body shadow-none"
+                                                       placeholder="Cerca museo per nome, regione o provincia...">
+                                                <button x-show="museumSearch" @click="museumSearch = ''" class="btn btn-outline-secondary border-secondary-subtle" type="button" title="Cancella ricerca">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </div>
+
                                             <select x-model="selectedMuseumId" class="form-select border-secondary-subtle bg-body text-body p-2 shadow-none">
-                                                <option value="">-- Seleziona un museo dalla lista --</option>
-                                                <template x-for="m in allMuseums" :key="m._id">
-                                                    <option :value="m._id" x-text="m.museum"></option>
+                                                <option value="" x-text="availableMuseums.length === 0 ? (allMuseums.length > 0 && selectedUser.museums && selectedUser.museums.length === allMuseums.length ? '-- Tutti i musei sono già stati assegnati --' : '-- Nessun museo trovato --') : '-- Seleziona un museo dalla lista (' + availableMuseums.length + ' disponibili) --'"></option>
+                                                <template x-for="m in availableMuseums" :key="m._id">
+                                                    <option :value="m._id" x-text="m.museum + (m.region ? ' (' + m.region + ')' : '')"></option>
                                                 </template>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-4 d-flex align-items-end">
                                             <button @click="grantPermission()"
                                                     class="btn btn-primary w-100 fw-bold p-2"
                                                     :disabled="!selectedMuseumId">

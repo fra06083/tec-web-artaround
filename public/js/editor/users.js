@@ -9,8 +9,31 @@ document.addEventListener('alpine:init', () => {
         allMuseums: [],
         selectedUser: null,
         selectedMuseumId: '',
+        museumSearch: '',
         isEditingName: false,
         editNameValue: '',
+
+        get availableMuseums() {
+            if (!this.selectedUser) return [];
+
+            const assignedIds = new Set((this.selectedUser.museums || []).map(m =>
+                (typeof m === 'object' && m !== null && m._id) ? m._id.toString() : (m ? m.toString() : '')
+            ));
+
+            let available = (this.allMuseums || []).filter(m => m && m._id && !assignedIds.has(m._id.toString()));
+
+            if (this.museumSearch && this.museumSearch.trim() !== '') {
+                const query = this.museumSearch.trim().toLowerCase();
+                available = available.filter(m => {
+                    const name = (m.museum || '').toLowerCase();
+                    const region = (m.region || '').toLowerCase();
+                    const province = (m.province || '').toLowerCase();
+                    return name.includes(query) || region.includes(query) || province.includes(query);
+                });
+            }
+
+            return available;
+        },
 
         async init() {
             const token = localStorage.getItem('artaround_token');
@@ -93,6 +116,7 @@ document.addEventListener('alpine:init', () => {
             if (!res.ok) return;
             this.selectedUser = await res.json();
             this.selectedMuseumId = '';
+            this.museumSearch = '';
         },
 
         async grantPermission() {
@@ -108,6 +132,7 @@ document.addEventListener('alpine:init', () => {
             if (res.ok) {
                 this.selectedUser = await res.json();
                 this.selectedMuseumId = '';
+                this.museumSearch = '';
                 
                 if (this.selectedUser.permissions !== 'admin' && this.selectedUser.permissions !== 'editor') {
                     alert("Attenzione: l'utente non avrà accesso all'amministrazione di questo museo se non gli assegni un ruolo appropriato (es. Editor). Usa la tendina per cambiarlo.");
