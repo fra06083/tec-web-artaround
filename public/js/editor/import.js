@@ -223,13 +223,8 @@ function importManager() {
                             const museumNameClean = (museum.museum || '').trim().toLowerCase();
                             const exists = existingMuseums.find(m => (m.museum || '').trim().toLowerCase() === museumNameClean);
 
-                            // Normalizza le coordinate x, y della mappa
-                            if (museum.mappa && Array.isArray(museum.mappa.sale)) {
-                                museum.mappa.sale = museum.mappa.sale.map(s => ({
-                                    ...s,
-                                    x: (typeof s.x === 'number' && s.x > 1) ? s.x / 100 : (s.x || 0),
-                                    y: (typeof s.y === 'number' && s.y > 1) ? s.y / 100 : (s.y || 0)
-                                }));
+                            if (museum.mappa) {
+                                museum.mappa = (typeof MapUtils !== 'undefined') ? MapUtils.normalizeMappaData(museum) : museum.mappa;
                             }
 
                             if (exists) {

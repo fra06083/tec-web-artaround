@@ -6,12 +6,11 @@ import ProfileModal from './Profile';
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 const LENGTHS = ['3s', '15s', '40s'];
 
-// Domanda e icona per ogni tipo di punto di interesse della mappa.
-// Se il museo non inserisce la risposta, la domanda non viene mostrata.
-const POI_INFO = {
-    toilette: { icona: 'bi-droplet-fill', domanda: 'Dove sono i servizi igienici?' },
-    bar:      { icona: 'bi-cup-hot-fill', domanda: "Dov'è la caffetteria?" },
-    shop:     { icona: 'bi-bag-fill',     domanda: "Dov'è il bookshop?" }
+const normalizeCoordinate = (val) => {
+    const num = parseFloat(val);
+    if (isNaN(num)) return 0;
+    const normalized = num > 1 ? num / 100 : num;
+    return Math.max(0, Math.min(1, normalized));
 };
 
 function VisitDetail() {
@@ -823,8 +822,8 @@ function VisitDetail() {
                         currentItem.sala.nome.trim().toLowerCase() === s.nome.trim().toLowerCase();
                     const isSelected = selectedMapPin?.nome === s.nome;
                     const icon = getPoiIcon(s);
-                    const posX = s.x || 0;
-                    const posY = s.y || 0;
+                    const posX = normalizeCoordinate(s.x);
+                    const posY = normalizeCoordinate(s.y);
                     const transX = posX < 0.20 ? '0%' : posX > 0.80 ? '-100%' : '-50%';
                     const transY = posY < 0.10 ? '0%' : posY > 0.90 ? '-100%' : '-50%';
                     return (

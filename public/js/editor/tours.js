@@ -53,6 +53,19 @@ document.addEventListener('alpine:init', () => {
         newQuestion: { question: '', options: ['', ''], correctIndex: 0 },
         editingQuestionId: null,
 
+        activeTourPiano: 0,
+        get currentTourMuseum() {
+            if (!this.tour || !this.tour.museum_id) return null;
+            const museumId = typeof this.tour.museum_id === 'object' ? this.tour.museum_id._id : this.tour.museum_id;
+            const m = this.museums.find(x => String(x._id) === String(museumId));
+            if (!m) return null;
+            const mappa = (typeof MapUtils !== 'undefined') ? MapUtils.normalizeMappaData(m) : m.mappa;
+            return {
+                ...m,
+                mappa
+            };
+        },
+
         notification: {
             show: false,
             message: '',

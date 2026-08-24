@@ -138,7 +138,11 @@ function museumManager() {
                     }
                 });
                 if (response.ok) {
-                    this.museums = await response.json();
+                    const data = await response.json();
+                    this.museums = data.map(m => ({
+                        ...m,
+                        mappa: this.normalizeMappa(m)
+                    }));
                 } else {
                     if (response.status === 401 || response.status === 403) {
                         this.logout();
@@ -241,19 +245,13 @@ function museumManager() {
             }
         },
 
-        // Garantisce che mappa esista e che le coordinate x, y siano normalizzate tra 0 ed 1
+        // Garantisce la presenza ed il posizionamento pulito della mappa tramite MapUtils
         normalizeMappa(m) {
-            const mappa = m.mappa || {};
-            const sale = (mappa.sale || []).map(s => ({
-                ...s,
-                x: (typeof s.x === 'number' && s.x > 1) ? s.x / 100 : (s.x || 0),
-                y: (typeof s.y === 'number' && s.y > 1) ? s.y / 100 : (s.y || 0)
-            }));
+            const norm = (typeof MapUtils !== 'undefined') ? MapUtils.normalizeMappaData(m) : { piante: m?.mappa?.piante || [], sale: m?.mappa?.sale || [], poi: m?.mappa?.poi || [] };
             return {
-                piante: mappa.piante ? [...mappa.piante] : [],
-                sale: sale,
+                ...norm,
                 poi: POI_TIPI.map(t => {
-                    const esistente = (mappa.poi || []).find(p => p.tipo === t.tipo);
+                    const esistente = (norm.poi || []).find(p => p.tipo === t.tipo);
                     return { tipo: t.tipo, piano: esistente?.piano ?? 0, testo: esistente?.testo || '' };
                 })
             };
