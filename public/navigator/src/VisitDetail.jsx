@@ -6,6 +6,18 @@ import ProfileModal from './Profile';
 const LEVELS = ['infantile', 'semplice', 'medio', 'dettagliato'];
 const LENGTHS = ['3s', '15s', '40s'];
 
+const POI_INFO = {
+    toilette: { icona: 'bi-droplet-fill', domanda: 'Dove sono i servizi igienici?' },
+    bar: { icona: 'bi-cup-hot-fill', domanda: "Dov'è la caffetteria?" },
+    shop: { icona: 'bi-bag-fill', domanda: "Dov'è il bookshop?" },
+    ingresso: { icona: 'bi-box-arrow-in-right', domanda: "Dov'è l'ingresso?" },
+    uscita: { icona: 'bi-box-arrow-right', domanda: "Dov'è l'uscita?" },
+    emergenza: { icona: 'bi-sign-turn-right-fill', domanda: "Dove sono le uscite di emergenza?" },
+    scala: { icona: 'bi-stairs', domanda: "Dove sono le scale?" },
+    ascensore: { icona: 'bi-arrow-down-up', domanda: "Dov'è l'ascensore?" },
+    ostacolo: { icona: 'bi-exclamation-triangle', domanda: "Ci sono ostacoli all'accessibilità?" }
+};
+
 const normalizeCoordinate = (val) => {
     const num = parseFloat(val);
     if (isNaN(num)) return 0;
