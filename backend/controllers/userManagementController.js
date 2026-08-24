@@ -78,6 +78,9 @@ module.exports = {
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
 
             const updateData = { $addToSet: { museums: museumId } };
+            if (user.permissions === 'visitatore') {
+                updateData.$set = { permissions: 'editor' };
+            }
 
             const updatedUser = await User.findByIdAndUpdate(
                 id,

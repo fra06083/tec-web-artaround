@@ -13,6 +13,11 @@ document.addEventListener('alpine:init', () => {
         isEditingName: false,
         editNameValue: '',
 
+        get selectedMuseum() {
+            if (!this.selectedMuseumId) return null;
+            return (this.allMuseums || []).find(m => m._id === this.selectedMuseumId) || null;
+        },
+
         get availableMuseums() {
             if (!this.selectedUser) return [];
 
@@ -22,17 +27,30 @@ document.addEventListener('alpine:init', () => {
 
             let available = (this.allMuseums || []).filter(m => m && m._id && !assignedIds.has(m._id.toString()));
 
+            const selectedM = this.selectedMuseum;
             if (this.museumSearch && this.museumSearch.trim() !== '') {
-                const query = this.museumSearch.trim().toLowerCase();
-                available = available.filter(m => {
-                    const name = (m.museum || '').toLowerCase();
-                    const region = (m.region || '').toLowerCase();
-                    const province = (m.province || '').toLowerCase();
-                    return name.includes(query) || region.includes(query) || province.includes(query);
-                });
+                if (!selectedM || this.museumSearch.trim().toLowerCase() !== (selectedM.museum || '').toLowerCase()) {
+                    const query = this.museumSearch.trim().toLowerCase();
+                    available = available.filter(m => {
+                        const name = (m.museum || '').toLowerCase();
+                        const region = (m.region || '').toLowerCase();
+                        const province = (m.province || '').toLowerCase();
+                        return name.includes(query) || region.includes(query) || province.includes(query);
+                    });
+                }
             }
 
             return available;
+        },
+
+        selectMuseum(m) {
+            this.selectedMuseumId = m._id;
+            this.museumSearch = m.museum;
+        },
+
+        clearMuseumSelection() {
+            this.selectedMuseumId = '';
+            this.museumSearch = '';
         },
 
         async init() {
@@ -133,10 +151,7 @@ document.addEventListener('alpine:init', () => {
                 this.selectedUser = await res.json();
                 this.selectedMuseumId = '';
                 this.museumSearch = '';
-                
-                if (this.selectedUser.permissions !== 'admin' && this.selectedUser.permissions !== 'editor') {
-                    alert("Attenzione: l'utente non avrà accesso all'amministrazione di questo museo se non gli assegni un ruolo appropriato (es. Editor). Usa la tendina per cambiarlo.");
-                }
+                await this.searchUsers();
             }
         },
 

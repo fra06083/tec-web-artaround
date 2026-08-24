@@ -384,3 +384,41 @@ body.login-page[data-bs-theme="dark"] .login-shape {
 .btn-reveal-icon:hover .reveal-icon {
     transform: translateX(5px);
 }
+
+/* Custom Searchable Select Combobox */
+.custom-select-popup {
+    max-height: 270px;
+    z-index: 1050;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.custom-select-item {
+    cursor: pointer;
+    position: relative;
+    border-left: 3px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-select-item:hover {
+    background: linear-gradient(90deg, rgba(253, 126, 20, 0.18) 0%, rgba(253, 126, 20, 0.03) 100%);
+    border-left-color: #fd7e14;
+    padding-left: 1.15rem !important;
+}
+
+.custom-select-item:hover .fw-bold {
+    color: #fd7e14 !important;
+}
+
+.custom-select-item.selected-item {
+    background: linear-gradient(90deg, rgba(253, 126, 20, 0.22) 0%, rgba(253, 126, 20, 0.05) 100%);
+    border-left-color: #fd7e14;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.transition-transform {
+    transition: transform 0.2s ease;
+}

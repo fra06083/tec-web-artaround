@@ -306,32 +306,64 @@
                                     </h6>
                                     <p class="small text-body-secondary mb-4">L'utente potrà creare tour e modificare opere solo per il museo selezionato.</p>
 
-                                    <div class="row g-3">
-                                        <div class="col-md-8">
-                                            <div class="input-group mb-2">
-                                                <span class="input-group-text bg-body border-secondary-subtle text-body-secondary">
-                                                    <i class="bi bi-search text-orange"></i>
-                                                </span>
-                                                <input type="text" x-model="museumSearch"
-                                                       class="form-control bg-body border-secondary-subtle text-body shadow-none"
-                                                       placeholder="Cerca museo per nome, regione o provincia...">
-                                                <button x-show="museumSearch" @click="museumSearch = ''" class="btn btn-outline-secondary border-secondary-subtle" type="button" title="Cancella ricerca">
-                                                    <i class="bi bi-x-lg"></i>
-                                                </button>
-                                            </div>
+                                    <div class="row g-2 g-md-3 align-items-end">
+                                        <div class="col-12 col-md-8">
+                                            <div class="position-relative" x-data="{ open: false }" @click.outside="open = false">
+                                                <!-- Integrated Searchable Select Input Group -->
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-body border-secondary-subtle text-body-secondary">
+                                                        <i class="bi bi-bank text-orange"></i>
+                                                    </span>
+                                                    <input type="text"
+                                                           x-model="museumSearch"
+                                                           @focus="open = true"
+                                                           @click="open = true"
+                                                           @input="open = true; if (selectedMuseumId && museumSearch !== (selectedMuseum ? selectedMuseum.museum : '')) selectedMuseumId = '';"
+                                                           @keydown.escape="open = false"
+                                                           class="form-control bg-body border-secondary-subtle text-body shadow-none py-2"
+                                                           :placeholder="selectedMuseum ? selectedMuseum.museum : 'Scrivi per cercare e seleziona un museo...'">
+                                                    <button x-show="museumSearch || selectedMuseumId"
+                                                            @click="clearMuseumSelection(); open = true"
+                                                            class="btn btn-outline-secondary border-secondary-subtle"
+                                                            type="button"
+                                                            title="Azzera selezione">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                    <button @click="open = !open" class="btn btn-outline-secondary border-secondary-subtle px-3" type="button">
+                                                        <i class="bi bi-chevron-down transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                                                    </button>
+                                                </div>
 
-                                            <select x-model="selectedMuseumId" class="form-select border-secondary-subtle bg-body text-body p-2 shadow-none">
-                                                <option value="" x-text="availableMuseums.length === 0 ? (allMuseums.length > 0 && selectedUser.museums && selectedUser.museums.length === allMuseums.length ? '-- Tutti i musei sono già stati assegnati --' : '-- Nessun museo trovato --') : '-- Seleziona un museo dalla lista (' + availableMuseums.length + ' disponibili) --'"></option>
-                                                <template x-for="m in availableMuseums" :key="m._id">
-                                                    <option :value="m._id" x-text="m.museum + (m.region ? ' (' + m.region + ')' : '')"></option>
-                                                </template>
-                                            </select>
+                                                <!-- Floating Dropdown Menu Popup -->
+                                                <div x-show="open"
+                                                     x-transition.opacity.duration.150ms
+                                                     class="position-absolute start-0 end-0 mt-1 bg-body border border-secondary-subtle rounded-3 shadow-lg overflow-auto custom-select-popup"
+                                                     style="display: none; z-index: 1050; max-height: 260px;">
+                                                    
+                                                    <template x-for="m in availableMuseums" :key="m._id">
+                                                        <div @click="selectMuseum(m); open = false"
+                                                             class="px-3 py-2.5 custom-select-item d-flex justify-content-between align-items-center border-bottom border-secondary-subtle"
+                                                             :class="selectedMuseumId === m._id ? 'selected-item text-orange fw-bold' : 'text-body'">
+                                                            <div class="pe-2">
+                                                                <div class="fw-bold fs-6" x-text="m.museum"></div>
+                                                                <small class="text-body-secondary d-block" x-text="[m.region, m.province].filter(Boolean).join(', ')"></small>
+                                                            </div>
+                                                            <i x-show="selectedMuseumId === m._id" class="bi bi-check2 text-orange fs-5 flex-shrink-0"></i>
+                                                        </div>
+                                                    </template>
+
+                                                    <div x-show="availableMuseums.length === 0" class="px-3 py-3 text-center text-body-secondary small">
+                                                        <i class="bi bi-exclamation-circle me-1 text-orange opacity-75"></i>
+                                                        <span x-text="allMuseums.length > 0 && selectedUser.museums && selectedUser.museums.length === allMuseums.length ? 'Tutti i musei sono già stati assegnati a questo utente.' : 'Nessun museo corrisponde alla ricerca.'"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4 d-flex align-items-end">
+                                        <div class="col-12 col-md-4">
                                             <button @click="grantPermission()"
-                                                    class="btn btn-primary w-100 fw-bold p-2"
+                                                    class="btn btn-primary w-100 fw-bold py-2 shadow-sm"
                                                     :disabled="!selectedMuseumId">
-                                                Conferma Accesso
+                                                <i class="bi bi-plus-lg me-1"></i> Conferma Accesso
                                             </button>
                                         </div>
                                     </div>
