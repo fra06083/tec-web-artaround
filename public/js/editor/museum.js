@@ -245,7 +245,6 @@ function museumManager() {
             }
         },
 
-        // Garantisce la presenza ed il posizionamento pulito della mappa tramite MapUtils
         normalizeMappa(m) {
             const norm = (typeof MapUtils !== 'undefined') ? MapUtils.normalizeMappaData(m) : { piante: m?.mappa?.piante || [], sale: m?.mappa?.sale || [], poi: m?.mappa?.poi || [] };
             return {
