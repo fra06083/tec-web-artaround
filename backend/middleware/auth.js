@@ -2,9 +2,15 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.js');
 
 const auth = async (req, res, next) => {
-    const token = req.cookies?.artaround_token || req.query.token;
+    let token = req.cookies?.artaround_token || req.query.token || req.headers.authorization;
+    if (token && token.startsWith('Bearer ')) {
+        token = token.slice(7);
+    }
 
     if (!token) {
+        if (req.originalUrl && req.originalUrl.startsWith('/api/')) {
+            return res.status(401).json({ error: "Non autorizzato. Token mancante." });
+        }
         return res.redirect('/login.html');
     }
 
@@ -12,12 +18,18 @@ const auth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.id).select('-password');
         if (!user) {
+            if (req.originalUrl && req.originalUrl.startsWith('/api/')) {
+                return res.status(401).json({ error: "Utente non trovato." });
+            }
             return res.redirect('/login.html');
         }
 
         req.user = user;
         next();
     } catch (err) {
+        if (req.originalUrl && req.originalUrl.startsWith('/api/')) {
+            return res.status(401).json({ error: "Token non valido o scaduto." });
+        }
         res.redirect('/login.html');
     }
 };

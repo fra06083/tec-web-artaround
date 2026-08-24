@@ -241,12 +241,17 @@ function museumManager() {
             }
         },
 
-        // Garantisce che mappa esista e che ci sia una riga per ogni domanda prevista
+        // Garantisce che mappa esista e che le coordinate x, y siano normalizzate tra 0 ed 1
         normalizeMappa(m) {
             const mappa = m.mappa || {};
+            const sale = (mappa.sale || []).map(s => ({
+                ...s,
+                x: (typeof s.x === 'number' && s.x > 1) ? s.x / 100 : (s.x || 0),
+                y: (typeof s.y === 'number' && s.y > 1) ? s.y / 100 : (s.y || 0)
+            }));
             return {
                 piante: mappa.piante ? [...mappa.piante] : [],
-                sale: mappa.sale ? [...mappa.sale] : [],
+                sale: sale,
                 poi: POI_TIPI.map(t => {
                     const esistente = (mappa.poi || []).find(p => p.tipo === t.tipo);
                     return { tipo: t.tipo, piano: esistente?.piano ?? 0, testo: esistente?.testo || '' };

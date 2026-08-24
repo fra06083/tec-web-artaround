@@ -241,14 +241,16 @@
                 <div x-show="showPreview && !showResults" class="animate__animated animate__fadeIn">
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                                 <div>
-                                    <h2 class="fw-bold mb-1">Anteprima Importazione</h2>
-                                    <p class="text-white-50 mb-0">Rivedi i dati prima di confermare l'importazione.</p>
+                                    <h2 class="fw-bold mb-1 text-white">Anteprima Importazione</h2>
+                                    <p class="text-white-50 mb-0">Rivedi i dati estratti dal file JSON prima di avviare l'importazione.</p>
                                 </div>
-                                <button @click="resetImport()" class="btn btn-slate">
-                                    <i class="bi bi-arrow-left me-1"></i> Torna indietro
-                                </button>
+                                <div>
+                                    <button @click="resetImport()" class="btn btn-dark border border-secondary border-opacity-25 text-white-50 px-3 py-2 rounded-3 fw-bold">
+                                        <i class="bi bi-arrow-left me-1"></i> Torna indietro
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -317,6 +319,38 @@
                                 </div>
                             </div>
                         </template>
+
+                        <!-- Visite / Tours -->
+                        <template x-if="importedData.tours && importedData.tours.length > 0">
+                            <div class="col-12">
+                                <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm">
+                                    <h5 class="fw-bold mb-3 text-orange">
+                                        <i class="bi bi-pencil-square me-2"></i> Visite da importare
+                                        <span class="badge bg-orange ms-2" x-text="importedData.tours.length"></span>
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-hover m-0 align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Titolo Visita</th>
+                                                    <th>Museo</th>
+                                                    <th>Opere incluse</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template x-for="t in importedData.tours" :key="t.name">
+                                                    <tr>
+                                                        <td class="fw-bold" x-text="t.name"></td>
+                                                        <td x-text="t.museum_name"></td>
+                                                        <td x-text="Array.isArray(t.items) ? t.items.length + ' opere' : '0 opere'"></td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
 
                     <div class="mt-4 text-end">
@@ -338,34 +372,51 @@
 
                 <!-- RISULTATI IMPORTAZIONE -->
                 <div x-show="showResults" class="animate__animated animate__fadeIn">
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h2 class="fw-bold mb-1">Risultati Importazione</h2>
-                            <p class="text-white-50 mb-0">Riepilogo dell'operazione completata.</p>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1 text-white">Risultati Importazione</h2>
+                            <p class="text-white-50 mb-0">Riepilogo dell'operazione completata e dettagli delle risorse elaborate.</p>
                         </div>
                     </div>
 
+                    <!-- Schede Dettaglio Risultati -->
                     <div class="row g-4 mb-4">
                         <!-- Musei -->
-                        <div class="col-md-6">
-                            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm">
-                                <h5 class="fw-bold mb-3">
+                        <div :class="importedData.tours && importedData.tours.length > 0 ? 'col-12 col-md-4' : 'col-12 col-md-6'">
+                            <div class="card bg-secondary bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 shadow-sm h-100">
+                                <h5 class="fw-bold mb-3 text-white d-flex align-items-center">
                                     <i class="bi bi-bank me-2 text-orange"></i> Musei
                                 </h5>
-                                <div class="d-flex gap-4 mb-3">
-                                    <div class="text-center">
-                                        <div class="fs-3 fw-bold text-success" x-text="importResults.museums.success"></div>
-                                        <div class="small text-white-50">Importati</div>
+                                <div class="d-flex gap-3 mb-3">
+                                    <div class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 text-center flex-grow-1">
+                                        <div class="fs-2 fw-black text-success" x-text="importResults.museums.success"></div>
+                                        <div class="small fw-bold text-success-subtle text-uppercase">Importati Nuovi</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="fs-3 fw-bold text-danger" x-text="importResults.museums.failed"></div>
-                                        <div class="small text-white-50">Falliti</div>
+                                    <div class="p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 text-center flex-grow-1">
+                                        <div class="fs-2 fw-black text-info" x-text="importResults.museums.skipped"></div>
+                                        <div class="small fw-bold text-info-subtle text-uppercase">Già Presenti</div>
                                     </div>
+                                    <template x-if="importResults.museums.failed > 0">
+                                        <div class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 text-center flex-grow-1">
+                                            <div class="fs-2 fw-black text-danger" x-text="importResults.museums.failed"></div>
+                                            <div class="small fw-bold text-danger-subtle text-uppercase">Falliti</div>
+                                        </div>
+                                    </template>
                                 </div>
+                                <template x-if="importResults.museums.skippedList.length > 0">
+                                    <div class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 text-info small mb-2 rounded-3">
+                                        <strong>Già presenti nel sistema:</strong>
+                                        <ul class="mb-0 mt-1 ps-3">
+                                            <template x-for="item in importResults.museums.skippedList" :key="item">
+                                                <li x-text="item"></li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
                                 <template x-if="importResults.museums.errors.length > 0">
-                                    <div class="alert alert-danger small">
-                                        <strong>Errori:</strong>
-                                        <ul class="mb-0 mt-2">
+                                    <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger small mb-0 rounded-3">
+                                        <strong>Errori di importazione:</strong>
+                                        <ul class="mb-0 mt-1 ps-3">
                                             <template x-for="err in importResults.museums.errors" :key="err">
                                                 <li x-text="err"></li>
                                             </template>
@@ -376,25 +427,41 @@
                         </div>
 
                         <!-- Opere -->
-                        <div class="col-md-6">
-                            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 shadow-sm">
-                                <h5 class="fw-bold mb-3">
+                        <div :class="importedData.tours && importedData.tours.length > 0 ? 'col-12 col-md-4' : 'col-12 col-md-6'">
+                            <div class="card bg-secondary bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 shadow-sm h-100">
+                                <h5 class="fw-bold mb-3 text-white d-flex align-items-center">
                                     <i class="bi bi-palette me-2 text-orange"></i> Opere
                                 </h5>
-                                <div class="d-flex gap-4 mb-3">
-                                    <div class="text-center">
-                                        <div class="fs-3 fw-bold text-success" x-text="importResults.artworks.success"></div>
-                                        <div class="small text-white-50">Importate</div>
+                                <div class="d-flex gap-3 mb-3">
+                                    <div class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 text-center flex-grow-1">
+                                        <div class="fs-2 fw-black text-success" x-text="importResults.artworks.success"></div>
+                                        <div class="small fw-bold text-success-subtle text-uppercase">Importate Nuove</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="fs-3 fw-bold text-danger" x-text="importResults.artworks.failed"></div>
-                                        <div class="small text-white-50">Fallite</div>
+                                    <div class="p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 text-center flex-grow-1">
+                                        <div class="fs-2 fw-black text-info" x-text="importResults.artworks.skipped"></div>
+                                        <div class="small fw-bold text-info-subtle text-uppercase">Già Presenti</div>
                                     </div>
+                                    <template x-if="importResults.artworks.failed > 0">
+                                        <div class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 text-center flex-grow-1">
+                                            <div class="fs-2 fw-black text-danger" x-text="importResults.artworks.failed"></div>
+                                            <div class="small fw-bold text-danger-subtle text-uppercase">Fallite</div>
+                                        </div>
+                                    </template>
                                 </div>
+                                <template x-if="importResults.artworks.skippedList.length > 0">
+                                    <div class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 text-info small mb-2 rounded-3">
+                                        <strong>Già presenti nel sistema:</strong>
+                                        <ul class="mb-0 mt-1 ps-3">
+                                            <template x-for="item in importResults.artworks.skippedList" :key="item">
+                                                <li x-text="item"></li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
                                 <template x-if="importResults.artworks.errors.length > 0">
-                                    <div class="alert alert-danger small">
-                                        <strong>Errori:</strong>
-                                        <ul class="mb-0 mt-2">
+                                    <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger small mb-0 rounded-3">
+                                        <strong>Errori di importazione:</strong>
+                                        <ul class="mb-0 mt-1 ps-3">
                                             <template x-for="err in importResults.artworks.errors" :key="err">
                                                 <li x-text="err"></li>
                                             </template>
@@ -403,11 +470,58 @@
                                 </template>
                             </div>
                         </div>
+
+                        <!-- Visite / Tours -->
+                        <template x-if="importedData.tours && importedData.tours.length > 0">
+                            <div class="col-12 col-md-4">
+                                <div class="card bg-secondary bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 shadow-sm h-100">
+                                    <h5 class="fw-bold mb-3 text-white d-flex align-items-center">
+                                        <i class="bi bi-pencil-square me-2 text-orange"></i> Visite
+                                    </h5>
+                                    <div class="d-flex gap-3 mb-3">
+                                        <div class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 text-center flex-grow-1">
+                                            <div class="fs-2 fw-black text-success" x-text="importResults.tours.success"></div>
+                                            <div class="small fw-bold text-success-subtle text-uppercase">Importate Nuove</div>
+                                        </div>
+                                        <div class="p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 text-center flex-grow-1">
+                                            <div class="fs-2 fw-black text-info" x-text="importResults.tours.skipped"></div>
+                                            <div class="small fw-bold text-info-subtle text-uppercase">Già Presenti</div>
+                                        </div>
+                                        <template x-if="importResults.tours.failed > 0">
+                                            <div class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 text-center flex-grow-1">
+                                                <div class="fs-2 fw-black text-danger" x-text="importResults.tours.failed"></div>
+                                                <div class="small fw-bold text-danger-subtle text-uppercase">Fallite</div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <template x-if="importResults.tours.skippedList.length > 0">
+                                        <div class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 text-info small mb-2 rounded-3">
+                                            <strong>Già presenti nel sistema:</strong>
+                                            <ul class="mb-0 mt-1 ps-3">
+                                                <template x-for="item in importResults.tours.skippedList" :key="item">
+                                                    <li x-text="item"></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                    <template x-if="importResults.tours.errors.length > 0">
+                                        <div class="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger small mb-0 rounded-3">
+                                            <strong>Errori di importazione:</strong>
+                                            <ul class="mb-0 mt-1 ps-3">
+                                                <template x-for="err in importResults.tours.errors" :key="err">
+                                                    <li x-text="err"></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
                     </div>
 
-                    <div class="text-end">
-                        <button @click="resetImport()" class="btn btn-orange">
-                            <i class="bi bi-plus-circle me-1"></i> Nuova Importazione
+                    <div class="mt-4 text-end">
+                        <button @click="resetImport()" class="btn btn-orange py-2.5 px-4 fw-bold">
+                            <i class="bi bi-file-earmark-plus me-1.5"></i> Nuova Importazione
                         </button>
                     </div>
                 </div>

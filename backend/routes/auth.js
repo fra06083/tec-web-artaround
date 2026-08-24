@@ -77,7 +77,11 @@ router.post('/register', async (req, res) => {
 });
 
 const authenticateToken = (req, res, next) => {
-    const token = req.headers.authorization;
+    let token = req.cookies?.artaround_token || req.headers.authorization || req.query.token;
+
+    if (token && token.startsWith('Bearer ')) {
+        token = token.slice(7);
+    }
 
     if (!token) {
         return res.status(401).json({ error: 'Accesso negato. Token mancante.' });

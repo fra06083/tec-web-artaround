@@ -309,10 +309,10 @@
                         <div class="d-none d-sm-block">
                             <div class="row g-4">
                                 <template x-for="m in visibleMuseums()" :key="m._id">
-                                    <div class="col-12 col-md-6 col-xl-4">
-                                        <div class="glass-card h-100 rounded-4 overflow-hidden position-relative group transition-all transform hover-lift border-start border-4 border-orange">
+                                    <div class="col-12 col-md-6 col-xl-4 d-flex">
+                                        <div class="glass-card h-100 w-100 rounded-4 overflow-hidden position-relative group transition-all transform hover-lift border-start border-4 border-orange d-flex flex-column">
 
-                                            <div class="position-relative overflow-hidden d-flex align-items-center justify-content-center h-140 icon-box-orange-grad">
+                                            <div class="position-relative overflow-hidden d-flex align-items-center justify-content-center h-140 icon-box-orange-grad flex-shrink-0">
                                                 <i class="bi bi-bank text-white display-1 opacity-22"></i>
                                                 <img x-show="m.image || m.immagine"
                                                      :src="m.image || m.immagine || ''"
@@ -344,10 +344,10 @@
                                                 </div>
 
                                                 <div class="mt-auto pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center gap-2">
-                                                    <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn bg-orange text-white rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
+                                                    <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn bg-orange text-white rounded-pill px-3 py-2 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1.5 transform hover-lift w-50 flex-grow-1">
                                                         <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                                     </button>
-                                                    <button type="button" :class="permissions === 'admin' ? 'd-inline-flex' : 'd-none'" @click="deleteMuseum(m._id)" class="btn btn-outline-danger rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm align-items-center justify-content-center gap-1 transform hover-lift flex-grow-1 min-w-0">
+                                                    <button type="button" :class="permissions === 'admin' ? 'd-inline-flex' : 'd-none'" @click="deleteMuseum(m._id)" class="btn btn-outline-danger rounded-pill px-3 py-2 fs-7 fw-bold shadow-sm align-items-center justify-content-center gap-1.5 transform hover-lift w-50 flex-grow-1">
                                                         <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
                                                     </button>
                                                 </div>

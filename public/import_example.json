@@ -1,33 +1,126 @@
 {
-    "museums": [
-        {
-            "museum": "Galleria degli Uffizi",
-            "city": "Firenze",
-            "province": "FI",
-            "region": "Toscana",
-            "address": "Piazzale degli Uffizi, 6",
-            "description": "Uno dei musei più famosi al mondo per le sue straordinarie collezioni di sculture antiche e di pitture.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Uffizi_Firenze.jpg/1200px-Uffizi_Firenze.jpg"
-        }
-    ],
-    "artworks": [
-        {
-            "item": "La Nascita di Venere",
-            "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1200px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
-            "museum_name": "Galleria degli Uffizi",
-            "author": "Sandro Botticelli",
-            "license": "Pubblico Dominio",
-            "description": "Dipinto a tempera su tela di lino realizzato da Sandro Botticelli. Celebra l'ideale rinascimentale di bellezza e amore puro.",
-            "desc_type": "medio"
-        },
-        {
-            "item": "La Primavera",
-            "img_path": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Botticelli-primavera.jpg/1200px-Botticelli-primavera.jpg",
-            "museum_name": "Galleria degli Uffizi",
-            "author": "Sandro Botticelli",
-            "license": "Pubblico Dominio",
-            "description": "Un'opera chiave del Rinascimento italiano, allegoria dell'amore e della natura. Rappresenta Venere al centro, attorniata da divinità mitologiche in un giardino rigoglioso.",
-            "desc_type": "dettagliato"
-        }
-    ]
+  "museums": [
+    {
+      "museum": "Museo d'Arte Moderna e Contemporanea",
+      "city": "Milano",
+      "province": "MI",
+      "region": "Lombardia",
+      "address": "Via della Spiga, 24",
+      "description": "Un'iconica istituzione culturale situata nel cuore di Milano, dedicata alle espressioni artistiche del Novecento e del nuovo millennio.",
+      "image": "/img/ritratto_donna_luce.jpg",
+      "mappa": {
+        "piante": [
+          {
+            "piano": 0,
+            "nome": "Piano Terra - Galleria Principale",
+            "immagine": "/img/piantina_museo_esempio.jpg"
+          }
+        ],
+        "sale": [
+          {
+            "nome": "Ingresso Principale",
+            "piano": 0,
+            "x": 0.5,
+            "y": 0.8,
+            "tipo": "ingresso",
+            "risposta": "Benvenuto all'Ingresso Principale del Museo."
+          },
+          {
+            "nome": "Sala del Novecento",
+            "piano": 0,
+            "x": 0.5,
+            "y": 0.33,
+            "tipo": "sala",
+            "risposta": "Benvenuto nella Sala del Novecento!"
+          },
+          {
+            "nome": "Salone delle Sculture",
+            "piano": 0,
+            "x": 0.77,
+            "y": 0.33,
+            "tipo": "sala",
+            "risposta": "Qui trovi le sculture tridimensionali contemporanee."
+          },
+          {
+            "nome": "Caffetteria del Museo",
+            "piano": 0,
+            "x": 0.83,
+            "y": 0.8,
+            "tipo": "bar",
+            "risposta": "La caffetteria offre pause ristoro e snack leggeri."
+          }
+        ],
+        "poi": [
+          {
+            "tipo": "toilette",
+            "piano": 0,
+            "testo": "Servizi igienici al piano terra accanto alle scale."
+          },
+          {
+            "tipo": "bar",
+            "piano": 0,
+            "testo": "Caffetteria e Bistro del Museo."
+          },
+          {
+            "tipo": "shop",
+            "piano": 0,
+            "testo": "Bookshop all'ingresso."
+          }
+        ]
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "item": "Ritratto di Donna in Luce",
+      "img_path": "/img/ritratto_donna_luce.jpg",
+      "museum_name": "Museo d'Arte Moderna e Contemporanea",
+      "author": "Mario Rossi",
+      "license": "CC BY 4.0",
+      "description": "Una celebre opera a olio su tela realizzata nei primi anni del Novecento, caratterizzata da giochi di luce caldi ed espressivi.",
+      "desc_type": "medio",
+      "sala": {
+        "nome": "Sala del Novecento",
+        "piano": 0
+      }
+    },
+    {
+      "item": "Dinamismo Astratto in Bronzo",
+      "img_path": "/img/dinamismo_astratto_bronzo.jpg",
+      "museum_name": "Museo d'Arte Moderna e Contemporanea",
+      "author": "Giulia Bianchi",
+      "license": "Pubblico Dominio",
+      "description": "Scultura tridimensionale in bronzo spazzolato che esplora il movimento ed il ritmo nello spazio contemporaneo.",
+      "desc_type": "dettagliato",
+      "sala": {
+        "nome": "Salone delle Sculture",
+        "piano": 0
+      }
+    }
+  ],
+  "tours": [
+    {
+      "name": "Percorso Grandi Capolavori del Novecento",
+      "description": "Un tour guidato completo tra le opere e le sculture più importanti della collezione milanese.",
+      "image": "/img/ritratto_donna_luce.jpg",
+      "museum_name": "Museo d'Arte Moderna e Contemporanea",
+      "items": [
+        "Ritratto di Donna in Luce",
+        "Dinamismo Astratto in Bronzo"
+      ],
+      "logistic_info": [
+        "Ingresso principale da Via della Spiga, 24",
+        "Durata stimata del percorso: 50 minuti",
+        "Accessibilità completa per sedie a rotelle"
+      ],
+      "tags": [
+        "Arte",
+        "Milano",
+        "Novecento",
+        "Scultura"
+      ],
+      "prezzo": 0,
+      "isPrivate": false
+    }
+  ]
 }
