@@ -390,8 +390,8 @@ function VisitList() {
                                                 
                                                 {/* Top part (Image) */}
                                                 <div className="ticket-top position-relative overflow-hidden bg-dark">
-                                                    {v.museum_id && v.museum_id.image ? (
-                                                        <img src={v.museum_id.image} alt="Museum" className="w-100 h-100 object-fit-cover" />
+                                                    {(v.image || (v.museum_id && v.museum_id.image)) ? (
+                                                        <img src={v.image || v.museum_id.image} alt={v.name} className="w-100 h-100 object-fit-cover" />
                                                     ) : (
                                                         <div className="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
                                                             <i className="bi bi-image fs-1"></i>

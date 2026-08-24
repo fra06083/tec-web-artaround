@@ -188,7 +188,7 @@
                             <!-- Integrated Location Pin Select -->
                             <div class="d-flex align-items-center bg-orange bg-opacity-15 rounded-pill border border-orange border-opacity-30 px-2 py-1 ms-1 me-1">
                                 <i class="bi bi-geo-alt-fill text-orange me-1 fs-7"></i>
-                                <select class="form-select border-0 bg-transparent text-orange shadow-none cursor-pointer fs-7 fw-bold p-0 pe-3 pill-level-width" x-model="selectedCity">
+                                <select class="form-select border-0 bg-transparent text-center text-orange shadow-none cursor-pointer fs-7 fw-bold p-0 pe-3 pill-level-width" x-model="selectedCity">
                                     <option value="" class="text-dark">Tutti</option>
                                     <template x-for="city in availableCities()" :key="city">
                                         <option :value="city" x-text="city" class="text-dark"></option>
@@ -204,7 +204,7 @@
                                     <i class="bi bi-cloud-arrow-up-fill fs-6"></i>
                                 </div>
                                 <div class="min-w-0 flex-grow-1">
-                                    <p class="text-white fs-7 mb-0 lh-sm">
+                                    <p class="text-white fs-7 mb-0 px-2 lh-sm">
                                         Vuoi caricare un museo e le sue opere da file di configurazione? 
                                         <a href="/editor/import" class="text-orange fw-bold text-decoration-underline ms-1">clicca qui</a>
                                     </p>
@@ -397,7 +397,7 @@
                                     </div>
 
                                     <!-- Soft Actions Pill Buttons -->
-                                    <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5 border-top-subtle">
+                                    <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top-subtle">
                                         <button type="button" @click="formTab='info';openMuseumForm(m);" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-orange-subtle">
                                             <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                         </button>
