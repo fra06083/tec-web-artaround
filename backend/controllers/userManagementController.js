@@ -61,7 +61,7 @@ module.exports = {
     getUserById: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-                .populate('museums', 'museum region provence');
+                .populate('museums', 'museum region province');
 
             if (!user) return res.status(404).json({ error: "Utente non trovato" });
             res.json(user);
@@ -83,7 +83,7 @@ module.exports = {
                 id,
                 updateData,
                 { returnDocument: 'after' }
-            ).populate('museums', 'museum region provence');
+            ).populate('museums', 'museum region province');
 
             res.json(updatedUser);
         } catch (error) {
@@ -98,7 +98,7 @@ module.exports = {
                 id,
                 { $pull: { museums: museumId } },
                 { returnDocument: 'after' }
-            ).populate('museums', 'museum region provence');
+            ).populate('museums', 'museum region province');
 
             res.json(user);
         } catch (error) {
@@ -144,7 +144,7 @@ module.exports = {
                 id,
                 { $set: { permissions: permissions } },
                 { returnDocument: 'after', runValidators: true }
-            ).populate('museums', 'museum region provence');
+            ).populate('museums', 'museum region province');
 
             res.json(updatedUser);
         } catch (error) {
@@ -175,7 +175,7 @@ module.exports = {
                 id,
                 { $set: { name: name.trim() } },
                 { returnDocument: 'after', runValidators: true }
-            ).populate('museums', 'museum region provence');
+            ).populate('museums', 'museum region province');
 
             res.json(updatedUser);
         } catch (error) {
