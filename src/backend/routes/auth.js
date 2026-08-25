@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
 const User = require('../models/user');
+const { deleteLocalFile } = require('../utils/fileUtils');
 
 router.post('/login', async (req, res) => {
     try {

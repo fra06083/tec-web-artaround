@@ -2,6 +2,7 @@ const User = require('../models/user');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
+const { deleteLocalFile } = require('../utils/fileUtils');
 
 module.exports = {
 

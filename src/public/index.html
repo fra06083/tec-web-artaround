@@ -471,6 +471,11 @@
                                     <img :src="profileForm.propic" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover propic-fade-in" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
                                 </template>
                             </div>
+                            <template x-if="profileForm.propic">
+                                <button type="button" @click="removeProfileImage()" class="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-md border border-2 border-white hover-scale remove-propic-btn" style="width: 32px; height: 32px; z-index: 5;" title="Rimuovi foto">
+                                    <i class="bi bi-x-lg fs-6"></i>
+                                </button>
+                            </template>
                             <label class="position-absolute bottom-0 end-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center shadow-md cursor-pointer border border-2 border-white hover-scale camera-badge-btn" title="Carica nuova foto">
                                 <i class="bi bi-camera-fill fs-6"></i>
                                 <input type="file" class="d-none" accept="image/*" @change="uploadProfileImage">
@@ -493,10 +498,16 @@
                             </template>
                         </div>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-uppercase tracking-wider opacity-75">URL Immagine Profilo</label>
                         <div class="input-group">
                             <input type="text" class="form-control rounded-start-3" :class="darkMode ? 'bg-dark text-white border-secondary border-opacity-50' : ''" x-model="profileForm.propic" placeholder="https://... o data:image/...">
+                            <template x-if="profileForm.propic">
+                                <button type="button" class="btn btn-outline-danger d-flex align-items-center justify-content-center px-3" @click="removeProfileImage()" title="Rimuovi foto">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </template>
                             <label class="btn btn-outline-secondary rounded-end-3 mb-0 d-flex align-items-center gap-1.5 fw-bold">
                                 <i class="bi bi-upload"></i> Carica
                                 <input type="file" class="d-none" accept="image/*" @change="uploadProfileImage">

@@ -148,6 +148,10 @@ function homeApp() {
             }
         },
 
+        removeProfileImage() {
+            this.profileForm.propic = '';
+        },
+
         async uploadProfileImage(event) {
             const file = event.target.files[0];
             if (!file) return;

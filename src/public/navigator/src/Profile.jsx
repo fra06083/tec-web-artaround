@@ -79,6 +79,12 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
     };
 
 
+    const handleRemovePropic = () => {
+        setPropic('');
+        setMessage('');
+        setError('');
+    };
+
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -138,6 +144,11 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                                             <img src={propic} className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover propic-fade-in" alt="Avatar" onLoad={(e) => e.target.classList.add('loaded')} onError={(e) => e.target.classList.remove('loaded')} />
                                         )}
                                     </div>
+                                    {propic && (
+                                        <button type="button" onClick={handleRemovePropic} className="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-md border border-2 border-white hover-scale remove-propic-btn" style={{ width: '32px', height: '32px', zIndex: 5 }} title="Rimuovi foto">
+                                            <i className="bi bi-x-lg fs-6"></i>
+                                        </button>
+                                    )}
                                     <label className="position-absolute bottom-0 end-0 bg-orange text-white rounded-circle d-flex align-items-center justify-content-center shadow-md cursor-pointer border border-2 border-white hover-scale camera-badge-btn" title="Carica nuova foto">
                                         <i className="bi bi-camera-fill fs-6"></i>
                                         <input type="file" className="d-none" accept="image/*" onChange={handleFileUpload} />
@@ -174,6 +185,11 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }) {
                                         value={propic} 
                                         onChange={(e) => setPropic(e.target.value)} 
                                     />
+                                    {propic && (
+                                        <button type="button" className="btn btn-outline-danger d-flex align-items-center justify-content-center px-3" onClick={handleRemovePropic} title="Rimuovi foto">
+                                            <i className="bi bi-x-lg"></i>
+                                        </button>
+                                    )}
                                     <label className="btn btn-outline-secondary rounded-end-3 mb-0 d-flex align-items-center gap-1.5 fw-bold">
                                         <i className="bi bi-upload"></i> Carica
                                         <input type="file" className="d-none" accept="image/*" onChange={handleFileUpload} />

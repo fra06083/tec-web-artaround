@@ -697,6 +697,10 @@ function marketplaceApp() {
             }
         },
 
+        removeProfileImage() {
+            this.profileForm.propic = '';
+        },
+
         async uploadProfileImage(event) {
             // grab the first file selected by the user
             const file = event.target.files[0];
