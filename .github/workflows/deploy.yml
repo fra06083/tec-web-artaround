@@ -19,7 +19,7 @@ jobs:
             cd /home/web/site252632/html/
             git fetch origin main
             git reset --hard origin/main
-            cd /home/web/site252632/html/public/navigator/
+            cd /home/web/site252632/html/src/public/navigator/
             
             # PULIZIA SPAZIO (Cache e Log)
             /usr/local/node/node-20/bin/npm cache clean --force
