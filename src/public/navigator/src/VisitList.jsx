@@ -64,29 +64,28 @@ function VisitList() {
     };
 
     useEffect(() => {
-        // Applica la classe dark-mode a body
-        if (darkMode) {
-            document.body.classList.add('dark-mode');
-            document.documentElement.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-            document.documentElement.classList.remove('dark-mode');
-        }
-
-        // Sincronizza dark mode con localStorage
-        const handleStorageChange = () => {
-            const newDarkMode = getDarkMode();
-            setDarkModeState(newDarkMode);
-            if (newDarkMode) {
+        const applyThemeClasses = (isDark) => {
+            if (isDark) {
                 document.body.classList.add('dark-mode');
+                document.body.classList.remove('marketplace-light');
                 document.documentElement.classList.add('dark-mode');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
             } else {
+                document.body.classList.add('marketplace-light');
                 document.body.classList.remove('dark-mode');
                 document.documentElement.classList.remove('dark-mode');
+                document.documentElement.removeAttribute('data-bs-theme');
             }
         };
 
+        const handleStorageChange = () => {
+            const newDarkMode = getDarkMode();
+            setDarkModeState(newDarkMode);
+            applyThemeClasses(newDarkMode);
+        };
+
         window.addEventListener('storage', handleStorageChange);
+        applyThemeClasses(darkMode);
 
         // Carica utente
         const initUser = async () => {
@@ -105,8 +104,6 @@ function VisitList() {
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
-            document.body.classList.remove('dark-mode');
-            document.documentElement.classList.remove('dark-mode');
         };
     }, [darkMode]);
 

@@ -2485,3 +2485,135 @@ button.btn-info.shadow-lg:hover {
 .desktop-role-pill-badge i {
     color: #ff6b00 !important;
 }
+
+/* Quiz Component CSS Styles */
+.quiz-score-banner {
+    padding: 1.25rem;
+    border-radius: 1rem;
+    text-align: center;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.25s ease-in-out;
+}
+
+.quiz-score-banner[data-score-status="green"] {
+    background-color: var(--bs-success-bg-subtle, #d1e7dd);
+    border-color: rgba(25, 135, 84, 0.4);
+}
+
+.quiz-score-banner[data-score-status="orange"] {
+    background-color: rgba(253, 126, 20, 0.12);
+    border-color: rgba(253, 126, 20, 0.4);
+}
+
+.quiz-score-banner[data-score-status="red"] {
+    background-color: var(--bs-danger-bg-subtle, #f8d7da);
+    border-color: rgba(220, 53, 69, 0.4);
+}
+
+.quiz-score-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.quiz-score-banner[data-score-status="green"] .quiz-score-title { color: #198754; }
+.quiz-score-banner[data-score-status="orange"] .quiz-score-title { color: #e85d04; }
+.quiz-score-banner[data-score-status="red"] .quiz-score-title { color: #dc3545; }
+
+.quiz-score-value {
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.quiz-score-banner[data-score-status="green"] .quiz-score-value { color: #198754; }
+.quiz-score-banner[data-score-status="orange"] .quiz-score-value { color: #e85d04; }
+.quiz-score-banner[data-score-status="red"] .quiz-score-value { color: #dc3545; }
+
+.quiz-score-total {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.quiz-score-badge {
+    border-radius: 50rem;
+    padding: 0.35em 0.8em;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.quiz-score-banner[data-score-status="green"] .quiz-score-badge { background-color: #198754; color: #ffffff; }
+.quiz-score-banner[data-score-status="orange"] .quiz-score-badge { background-color: #fd7e14; color: #ffffff; }
+.quiz-score-banner[data-score-status="red"] .quiz-score-badge { background-color: #dc3545; color: #ffffff; }
+
+/* Dark Mode Quiz Overrides */
+.dark-mode .quiz-score-banner[data-score-status="green"] {
+    background-color: rgba(25, 135, 84, 0.2);
+    border-color: rgba(25, 135, 84, 0.5);
+}
+
+.dark-mode .quiz-score-banner[data-score-status="orange"] {
+    background-color: rgba(253, 126, 20, 0.2);
+    border-color: rgba(253, 126, 20, 0.5);
+}
+
+.dark-mode .quiz-score-banner[data-score-status="red"] {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.5);
+}
+
+.dark-mode .quiz-score-banner[data-score-status="green"] .quiz-score-title,
+.dark-mode .quiz-score-banner[data-score-status="green"] .quiz-score-value { color: #4ade80; }
+
+.dark-mode .quiz-score-banner[data-score-status="orange"] .quiz-score-title,
+.dark-mode .quiz-score-banner[data-score-status="orange"] .quiz-score-value { color: #fb923c; }
+
+.dark-mode .quiz-score-banner[data-score-status="red"] .quiz-score-title,
+.dark-mode .quiz-score-banner[data-score-status="red"] .quiz-score-value { color: #f87171; }
+
+.dark-mode .quiz-score-total { color: #ffffff; }
+
+/* Quiz Option Button CSS */
+.quiz-option-btn {
+    text-align: left;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    background-color: transparent;
+    color: #212529;
+    transition: all 0.2s ease-in-out;
+}
+
+.quiz-option-btn:hover {
+    background-color: rgba(253, 126, 20, 0.08);
+    border-color: #fd7e14;
+    color: #fd7e14;
+}
+
+.quiz-option-btn.selected {
+    background-color: #fd7e14 !important;
+    border-color: #fd7e14 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(253, 126, 20, 0.4);
+}
+
+.dark-mode .quiz-option-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.dark-mode .quiz-option-btn:hover {
+    background-color: rgba(253, 126, 20, 0.15);
+    border-color: #fd7e14;
+    color: #ffffff;
+}
+
+/* Quiz Rank Badge CSS */
+.quiz-rank-badge[data-score-status="green"] { background-color: #198754; color: #ffffff; }
+.quiz-rank-badge[data-score-status="orange"] { background-color: #fd7e14; color: #ffffff; }
+.quiz-rank-badge[data-score-status="red"] { background-color: #dc3545; color: #ffffff; }
+

@@ -96,34 +96,32 @@ function VisitDetail() {
 
     // Azzera i messaggi non letti se la chat è aperta e scrolla in basso
     useEffect(() => {
-        const handleStorageChange = () => {
-            const newDarkMode = getDarkMode();
-            setDarkModeState(newDarkMode);
-            if (newDarkMode) {
+        const applyThemeClasses = (isDark) => {
+            if (isDark) {
                 document.body.classList.add('dark-mode');
+                document.body.classList.remove('marketplace-light');
                 document.documentElement.classList.add('dark-mode');
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
             } else {
+                document.body.classList.add('marketplace-light');
                 document.body.classList.remove('dark-mode');
                 document.documentElement.classList.remove('dark-mode');
                 document.documentElement.removeAttribute('data-bs-theme');
             }
         };
 
-        window.addEventListener('storage', handleStorageChange);
-        
-        // Setup iniziale
-        if (darkMode) {
-            document.body.classList.add('dark-mode');
-            document.documentElement.classList.add('dark-mode');
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            document.documentElement.classList.remove('dark-mode');
-            document.documentElement.removeAttribute('data-bs-theme');
-        }
+        const handleStorageChange = () => {
+            const newDarkMode = getDarkMode();
+            setDarkModeState(newDarkMode);
+            applyThemeClasses(newDarkMode);
+        };
 
-        return () => window.removeEventListener('storage', handleStorageChange);
+        window.addEventListener('storage', handleStorageChange);
+        applyThemeClasses(darkMode);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, [darkMode]);
 
     useEffect(() => {
@@ -1420,7 +1418,7 @@ function VisitDetail() {
                                                         key={oi}
                                                         type="button"
                                                         onClick={() => selectQuizAnswer(q._id, oi)}
-                                                        className={`btn text-start rounded-3 py-2 px-3 ${quizAnswers[q._id] === oi ? 'bg-orange text-white border-orange shadow-sm' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
+                                                        className={`btn quiz-option-btn ${quizAnswers[q._id] === oi ? 'selected' : ''}`}
                                                     >
                                                         {opt}
                                                     </button>
@@ -1690,11 +1688,11 @@ function VisitDetail() {
                                                                                                 const isThisOptionCorrect = (qCorrectIdx >= 0 && optIdx === qCorrectIdx) || (isStudentChoice && isCorrect);
                                                                                                 const isThisOptionWrongChoice = isStudentChoice && !isCorrect;
 
-                                                                                                let optClass = darkMode ? "border border-secondary border-opacity-20 text-white-50 opacity-60" : "border border-secondary-subtle text-secondary bg-light";
+                                                                                                let optClass = darkMode ? "border border-secondary border-opacity-40 text-white bg-dark bg-opacity-40" : "border border-secondary-subtle text-dark bg-light";
                                                                                                 if (isThisOptionCorrect) {
-                                                                                                    optClass = darkMode ? "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold" : "border border-success bg-success bg-opacity-10 text-dark fw-bold";
+                                                                                                    optClass = darkMode ? "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold" : "border border-success bg-success bg-opacity-15 text-dark fw-bold";
                                                                                                 } else if (isThisOptionWrongChoice) {
-                                                                                                    optClass = darkMode ? "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold" : "border border-danger bg-danger bg-opacity-10 text-danger fw-bold";
+                                                                                                    optClass = darkMode ? "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-white fw-bold" : "border border-danger bg-danger bg-opacity-15 text-danger fw-bold";
                                                                                                 }
 
                                                                                                 return (
@@ -1705,9 +1703,9 @@ function VisitDetail() {
                                                                                                             ) : isThisOptionWrongChoice ? (
                                                                                                                 <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
                                                                                                             ) : (
-                                                                                                                <i className={`bi bi-circle fs-5 flex-shrink-0 ${darkMode ? 'opacity-40' : 'text-secondary'}`}></i>
+                                                                                                                <i className={`bi bi-circle fs-5 flex-shrink-0 ${darkMode ? 'text-white-50' : 'text-secondary'}`}></i>
                                                                                                             )}
-                                                                                                            <span className={`text-truncate ${darkMode ? '' : 'text-dark'}`}>{optText}</span>
+                                                                                                            <span className={`text-truncate ${darkMode ? 'text-white' : 'text-dark'}`}>{optText}</span>
                                                                                                         </div>
                                                                                                         {isThisOptionCorrect && (
                                                                                                             <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
@@ -1760,12 +1758,23 @@ function VisitDetail() {
                                                     </div>
 
                                                     {/* SCORE BANNER PERSONALE */}
-                                                    <div className={`p-3.5 rounded-4 text-center border shadow-sm ${percent >= 80 ? (darkMode ? 'bg-success bg-opacity-20 border-success border-opacity-40' : 'bg-success-subtle border-success border-opacity-40') : percent >= 50 ? (darkMode ? 'bg-warning bg-opacity-20 border-warning border-opacity-40' : 'bg-warning-subtle border-warning border-opacity-40') : (darkMode ? 'bg-danger bg-opacity-20 border-danger border-opacity-40' : 'bg-danger-subtle border-danger border-opacity-40')}`}>
-                                                        <div className={`fs-07 pt-1 text-uppercase fw-black tracking-wider mb-1 ${percent >= 80 ? 'text-success' : percent >= 50 ? (darkMode ? 'text-warning' : 'text-warning-emphasis') : 'text-danger'}`}>Punteggio Totale</div>
-                                                        <div className={`fs-2 fw-black ${percent >= 80 ? 'text-success' : percent >= 50 ? (darkMode ? 'text-warning' : 'text-dark') : 'text-danger'}`}>
-                                                            {score} <span className={`fs-6 fw-bold ${darkMode ? 'text-white-50' : 'text-dark'}`}>/ {total} corrette ({percent}%)</span>
-                                                        </div>
-                                                    </div>
+                                                    {(() => {
+                                                        const scoreStatus = percent >= 75 ? 'green' : percent >= 40 ? 'orange' : 'red';
+                                                        const labelText = percent >= 75 ? 'Ottimo Risultato' : percent >= 40 ? 'Buon Lavoro' : 'Gravemente Insufficiente';
+
+                                                        return (
+                                                            <div className="quiz-score-banner" data-score-status={scoreStatus}>
+                                                                <div className="quiz-score-title">
+                                                                    Punteggio Totale • {labelText}
+                                                                </div>
+                                                                <div className="d-flex align-items-baseline justify-content-center gap-2">
+                                                                    <span className="quiz-score-value">{score}</span>
+                                                                    <span className="quiz-score-total">/ {total} corrette</span>
+                                                                    <span className="quiz-score-badge">{percent}%</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
 
                                                     {/* ELENCO DELLE PROPRIE RISPOSTE */}
                                                     <div className="d-flex flex-column gap-2 max-h-50vh overflow-y-auto pe-1 custom-scrollbar">
