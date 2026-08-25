@@ -1760,10 +1760,10 @@ function VisitDetail() {
                                                     </div>
 
                                                     {/* SCORE BANNER PERSONALE */}
-                                                    <div className={`p-3.5 rounded-4 text-center border ${percent >= 80 ? 'bg-success bg-opacity-15 border-success border-opacity-40' : percent >= 50 ? 'bg-warning bg-opacity-15 border-warning border-opacity-40' : 'bg-danger bg-opacity-15 border-danger border-opacity-40'}`}>
-                                                        <div className={`fs-065 pt-1 text-uppercase fw-bold tracking-wider mb-1 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>Punteggio Totale</div>
-                                                        <div className={`fs-2 fw-black ${darkMode ? 'text-white' : 'text-dark'}`}>
-                                                            {score} <span className={`fs-6 fw-normal ${darkMode ? 'text-white-50' : 'text-secondary'}`}>/ {total} corrette ({percent}%)</span>
+                                                    <div className={`p-3.5 rounded-4 text-center border shadow-sm ${percent >= 80 ? (darkMode ? 'bg-success bg-opacity-20 border-success border-opacity-40' : 'bg-success-subtle border-success border-opacity-40') : percent >= 50 ? (darkMode ? 'bg-warning bg-opacity-20 border-warning border-opacity-40' : 'bg-warning-subtle border-warning border-opacity-40') : (darkMode ? 'bg-danger bg-opacity-20 border-danger border-opacity-40' : 'bg-danger-subtle border-danger border-opacity-40')}`}>
+                                                        <div className={`fs-07 pt-1 text-uppercase fw-black tracking-wider mb-1 ${percent >= 80 ? 'text-success' : percent >= 50 ? (darkMode ? 'text-warning' : 'text-warning-emphasis') : 'text-danger'}`}>Punteggio Totale</div>
+                                                        <div className={`fs-2 fw-black ${percent >= 80 ? 'text-success' : percent >= 50 ? (darkMode ? 'text-warning' : 'text-dark') : 'text-danger'}`}>
+                                                            {score} <span className={`fs-6 fw-bold ${darkMode ? 'text-white-50' : 'text-dark'}`}>/ {total} corrette ({percent}%)</span>
                                                         </div>
                                                     </div>
 
