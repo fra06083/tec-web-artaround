@@ -1413,14 +1413,14 @@ function VisitDetail() {
                                     <h3 className="fw-black mb-3"><i className="bi bi-patch-question text-orange me-2"></i>Quiz finale</h3>
                                     {quizQuestions.map((q, qi) => (
                                         <div key={q._id} className="mb-4">
-                                            <h6 className="fw-bold mb-2">{qi + 1}. {q.question}</h6>
+                                            <h6 className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>{qi + 1}. {q.question}</h6>
                                             <div className="d-flex flex-column gap-2">
                                                 {q.options.map((opt, oi) => (
                                                     <button
                                                         key={oi}
                                                         type="button"
                                                         onClick={() => selectQuizAnswer(q._id, oi)}
-                                                        className={`btn text-start rounded-3 py-2 px-3 ${quizAnswers[q._id] === oi ? 'bg-orange text-white' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
+                                                        className={`btn text-start rounded-3 py-2 px-3 ${quizAnswers[q._id] === oi ? 'bg-orange text-white border-orange shadow-sm' : (darkMode ? 'btn-outline-light' : 'btn-outline-dark')}`}
                                                     >
                                                         {opt}
                                                     </button>
@@ -1442,7 +1442,7 @@ function VisitDetail() {
                             {role !== 'teacher' && quizPhase === 'active' && quizSubmitted && (
                                 <div className="text-center py-4">
                                     <div className="spinner-border text-orange mb-3" role="status"></div>
-                                    <h5 className="fw-bold">Risposte inviate!</h5>
+                                    <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Risposte inviate!</h5>
                                     <p className={textMuted}>In attesa che il docente concluda il quiz per mostrare il resoconto completo...</p>
                                 </div>
                             )}
@@ -1460,7 +1460,7 @@ function VisitDetail() {
                                                         <i className="bi bi-bar-chart-line-fill fs-4"></i>
                                                     </div>
                                                     <div className="min-w-0 px-1">
-                                                        <h4 className="fw-black m-0 fs-5 text-wrap">Resoconto Finale Quiz</h4>
+                                                        <h4 className={`fw-black m-0 fs-5 text-wrap ${darkMode ? 'text-white' : 'text-dark'}`}>Resoconto Finale Quiz</h4>
                                                     </div>
                                                 </div>
                                                 <button onClick={handleEndVisit} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1.5 fw-bold shadow-sm d-flex align-items-center gap-1.5 flex-shrink-0 ms-1">
@@ -1495,19 +1495,19 @@ function VisitDetail() {
                                                         <div className="col-4">
                                                             <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
                                                                 <div className="fs-06 text-uppercase text-orange fw-bold tracking-wider mb-1 text-truncate">Media Classe</div>
-                                                                <div className="fs-6 fs-sm-5 fw-black text-orange lh-1">{avgScore} <span className="fs-07 text-white-50 fw-normal">/ {totalQuestions}</span></div>
+                                                                <div className="fs-6 fs-sm-5 fw-black text-orange lh-1">{avgScore} <span className={`fs-07 fw-normal ${darkMode ? 'text-white-50' : 'text-secondary'}`}>/ {totalQuestions}</span></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-4">
                                                             <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
                                                                 <div className="fs-06 text-uppercase text-orange fw-bold tracking-wider mb-1 text-truncate">Partecipanti</div>
-                                                                <div className="fs-6 fs-sm-5 fw-black text-white lh-1">{totalStudents} <span className="fs-07 text-white-50 fw-normal">stud.</span></div>
+                                                                <div className={`fs-6 fs-sm-5 fw-black lh-1 ${darkMode ? 'text-white' : 'text-dark'}`}>{totalStudents} <span className={`fs-07 fw-normal ${darkMode ? 'text-white-50' : 'text-secondary'}`}>stud.</span></div>
                                                             </div>
                                                         </div>
                                                         <div className="col-4">
                                                             <div className={`p-2 p-sm-2.5 rounded-3 text-center border h-100 d-flex flex-column justify-content-center ${darkMode ? 'bg-black bg-opacity-40 border-secondary border-opacity-25' : 'bg-light border-light-subtle'}`}>
                                                                 <div className="fs-06 text-uppercase text-danger fw-bold tracking-wider mb-1 text-truncate">Più Errata</div>
-                                                                <div className="fs-6 fs-sm-5 fw-black text-danger lh-1">{hardestQuestion?.percent || 0}% <span className="fs-07 text-white-50 fw-normal">err.</span></div>
+                                                                <div className="fs-6 fs-sm-5 fw-black text-danger lh-1">{hardestQuestion?.percent || 0}% <span className={`fs-07 fw-normal ${darkMode ? 'text-white-50' : 'text-secondary'}`}>err.</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1515,17 +1515,17 @@ function VisitDetail() {
                                             })()}
 
                                             {/* TABS SELECTOR */}
-                                            <div className="d-flex gap-1.5 p-1 rounded-pill bg-secondary bg-opacity-15 border border-secondary border-opacity-25">
+                                            <div className={`d-flex gap-1.5 p-1 rounded-pill border ${darkMode ? 'bg-secondary bg-opacity-15 border-secondary border-opacity-25' : 'bg-light border-secondary-subtle'}`}>
                                                 <button
                                                     type="button"
-                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'questions' ? 'bg-orange text-white shadow-sm' : (darkMode ? 'text-white-50' : 'text-secondary')}`}
                                                     onClick={() => setQuizReportTab('questions')}
                                                 >
                                                     <i className="bi bi-exclamation-triangle me-1"></i>Domande Errate
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : 'text-white-50'}`}
+                                                    className={`btn btn-sm rounded-pill flex-grow-1 py-1.5 px-2 fw-bold fs-075 transition-all text-truncate ${quizReportTab === 'students' ? 'bg-orange text-white shadow-sm' : (darkMode ? 'text-white-50' : 'text-secondary')}`}
                                                     onClick={() => setQuizReportTab('students')}
                                                 >
                                                     <i className="bi bi-trophy me-1"></i>Classifica ({quizResults.length})
@@ -1537,7 +1537,7 @@ function VisitDetail() {
                                                 <div className="d-flex flex-column gap-3 max-h-50vh overflow-y-auto pe-1 custom-scrollbar">
                                                     {(() => {
                                                         if (!quizQuestions || quizQuestions.length === 0) {
-                                                            return <p className="text-center text-white-50 py-3 fst-italic">Informazioni domande non disponibili.</p>;
+                                                            return <p className={`text-center py-3 fst-italic ${darkMode ? 'text-white-50' : 'text-secondary'}`}>Informazioni domande non disponibili.</p>;
                                                         }
 
                                                         const sortedQuestions = [...quizQuestions].map((q, idx) => {
@@ -1563,7 +1563,7 @@ function VisitDetail() {
                                                         }).sort((a, b) => b.wrongPercent - a.wrongPercent);
 
                                                         return sortedQuestions.map((q, qRank) => (
-                                                            <div key={q._id} className={`p-3 rounded-4 border transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                            <div key={q._id} className={`p-3 rounded-4 border transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body-tertiary border-secondary-subtle shadow-sm'}`}>
                                                                 <div className="d-flex align-items-start justify-content-between gap-2 mb-2">
                                                                     <div className="d-flex align-items-center gap-2 min-w-0">
                                                                         <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-065 flex-shrink-0 ${q.wrongPercent >= 50 ? 'bg-danger text-white' : q.wrongPercent > 0 ? 'bg-warning text-dark' : 'bg-success text-white'}`}>
@@ -1575,10 +1575,10 @@ function VisitDetail() {
                                                                             </span>
                                                                         )}
                                                                     </div>
-                                                                    <span className="fs-07 text-white-50 fw-bold">Domanda {q.origIndex + 1}</span>
+                                                                    <span className={`fs-07 fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>Domanda {q.origIndex + 1}</span>
                                                                 </div>
 
-                                                                <h6 className="fw-bold mb-2.5 fs-6 lh-sm">{q.question}</h6>
+                                                                <h6 className={`fw-bold mb-2.5 fs-6 lh-sm ${darkMode ? 'text-white' : 'text-dark'}`}>{q.question}</h6>
 
                                                                 <div className="d-flex flex-column gap-1.5">
                                                                     {q.options.map((optText, optIdx) => {
@@ -1587,7 +1587,7 @@ function VisitDetail() {
                                                                         const isCorrect = optIdx === q.correctIndex;
 
                                                                         return (
-                                                                            <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-25 border-opacity-60' : (count > 0 ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-transparent opacity-50')}`}>
+                                                                            <div key={optIdx} className={`p-2 rounded-3 border position-relative overflow-hidden ${isCorrect ? 'border-success bg-success bg-opacity-25 border-opacity-60' : (count > 0 ? (darkMode ? 'border-secondary border-opacity-30 bg-secondary bg-opacity-10' : 'border-secondary-subtle bg-light') : 'border-transparent opacity-50')}`}>
                                                                                 <div
                                                                                     className={`position-absolute top-0 start-0 h-100 opacity-20 ${isCorrect ? 'bg-success' : 'bg-orange'}`}
                                                                                     style={{ width: `${percent}%`, transition: 'width 0.5s ease-in-out' }}
@@ -1596,18 +1596,18 @@ function VisitDetail() {
                                                                                 <div className="d-flex align-items-center justify-content-between position-relative z-1 gap-2">
                                                                                     <div className="d-flex align-items-center gap-2 min-w-0">
                                                                                         {isCorrect ? (
-                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
+                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0 text-success"></i>
                                                                                         ) : (
-                                                                                            <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 text-white-50`}></i>
+                                                                                            <i className={`bi ${count > 0 ? 'bi-x-circle-fill text-danger' : 'bi-circle'} fs-5 flex-shrink-0 ${darkMode ? 'text-white-50' : 'text-secondary'}`}></i>
                                                                                         )}
-                                                                                        <span className={`fs-085 text-truncate ${isCorrect ? 'fw-bold text-white' : 'fw-medium'}`}>{optText}</span>
+                                                                                        <span className={`fs-085 text-truncate ${isCorrect ? (darkMode ? 'fw-bold text-white' : 'fw-bold text-dark') : (darkMode ? 'fw-medium text-white' : 'fw-medium text-dark')}`}>{optText}</span>
                                                                                     </div>
 
                                                                                     <div className="d-flex align-items-center gap-2 flex-shrink-0">
                                                                                         {isCorrect && (
                                                                                             <span className="badge bg-success text-white rounded-pill px-2 py-0.5 fs-065">Esatta</span>
                                                                                         )}
-                                                                                        <span className="fs-075 fw-bold text-white-50">
+                                                                                        <span className={`fs-075 fw-bold ${darkMode ? 'text-white-50' : 'text-secondary'}`}>
                                                                                             {count} {count === 1 ? 'voto' : 'voti'} ({percent}%)
                                                                                         </span>
                                                                                     </div>
@@ -1633,18 +1633,18 @@ function VisitDetail() {
                                                             const medalIcons = ['🥇', '🥈', '🥉'];
 
                                                             return (
-                                                                <div key={r.studentName || rankIdx} className={`rounded-4 border overflow-hidden transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body border-secondary-subtle shadow-sm'}`}>
+                                                                <div key={r.studentName || rankIdx} className={`rounded-4 border overflow-hidden transition-all ${darkMode ? 'bg-secondary bg-opacity-10 border-secondary border-opacity-25' : 'bg-body-tertiary border-secondary-subtle shadow-sm'}`}>
                                                                     <div
                                                                         className="d-flex align-items-center justify-content-between p-3 cursor-pointer user-select-none hover-bg-tertiary"
                                                                         onClick={() => setExpandedStudent(isExpanded ? null : r.studentName)}
                                                                     >
                                                                         <div className="d-flex align-items-center gap-3 min-w-0">
                                                                             <div className="d-flex align-items-center justify-content-center flex-shrink-0 fs-5 fw-black w-h-36">
-                                                                                {medalIcons[rankIdx] || <span className="fs-6 text-white-50">#{rankIdx + 1}</span>}
+                                                                                {medalIcons[rankIdx] || <span className={`fs-6 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>#{rankIdx + 1}</span>}
                                                                             </div>
                                                                             <div className="min-w-0">
-                                                                                <h6 className="fw-bold mb-0 text-truncate fs-6">{r.studentName}</h6>
-                                                                                <small className="text-white-50 fs-075">{r.score} su {r.total} risposte corrette ({percentScore}%)</small>
+                                                                                <h6 className={`fw-bold mb-0 text-truncate fs-6 ${darkMode ? 'text-white' : 'text-dark'}`}>{r.studentName}</h6>
+                                                                                <small className={`fs-075 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>{r.score} su {r.total} risposte corrette ({percentScore}%)</small>
                                                                             </div>
                                                                         </div>
 
@@ -1652,7 +1652,7 @@ function VisitDetail() {
                                                                             <span className={`badge rounded-pill px-3 py-1.5 fw-bold fs-075 ${percentScore >= 80 ? 'bg-success text-white' : percentScore >= 50 ? 'bg-warning text-dark' : 'bg-danger text-white'}`}>
                                                                                 {r.score} / {r.total}
                                                                             </span>
-                                                                            <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'} text-white-50 fs-6`}></i>
+                                                                            <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'} ${darkMode ? 'text-white-50' : 'text-secondary'} fs-6`}></i>
                                                                         </div>
                                                                     </div>
 
@@ -1672,7 +1672,7 @@ function VisitDetail() {
                                                                                 return (
                                                                                     <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : (isUnanswered ? 'border-warning border-opacity-50 bg-warning bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10')}`}>
                                                                                         <div className="d-flex align-items-center justify-content-between mb-2">
-                                                                                            <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
+                                                                                            <div className={`fw-bold fs-6 ${darkMode ? 'text-white' : 'text-dark'}`}>{qIdx + 1}. {q.question}</div>
                                                                                             <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : (isUnanswered ? 'bg-warning text-dark' : 'bg-danger text-white')}`}>
                                                                                                 {isCorrect ? 'Corretta' : (isUnanswered ? 'Non risposto' : 'Errata')}
                                                                                             </span>
@@ -1690,24 +1690,24 @@ function VisitDetail() {
                                                                                                 const isThisOptionCorrect = (qCorrectIdx >= 0 && optIdx === qCorrectIdx) || (isStudentChoice && isCorrect);
                                                                                                 const isThisOptionWrongChoice = isStudentChoice && !isCorrect;
 
-                                                                                                let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
+                                                                                                let optClass = darkMode ? "border border-secondary border-opacity-20 text-white-50 opacity-60" : "border border-secondary-subtle text-secondary bg-light";
                                                                                                 if (isThisOptionCorrect) {
-                                                                                                    optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold";
+                                                                                                    optClass = darkMode ? "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold" : "border border-success bg-success bg-opacity-10 text-dark fw-bold";
                                                                                                 } else if (isThisOptionWrongChoice) {
-                                                                                                    optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
+                                                                                                    optClass = darkMode ? "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold" : "border border-danger bg-danger bg-opacity-10 text-danger fw-bold";
                                                                                                 }
 
                                                                                                 return (
                                                                                                     <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
                                                                                                         <div className="d-flex align-items-center gap-2 min-w-0">
                                                                                                             {isThisOptionCorrect ? (
-                                                                                                                <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
+                                                                                                                <i className="bi bi-check-circle-fill fs-5 flex-shrink-0 text-success"></i>
                                                                                                             ) : isThisOptionWrongChoice ? (
                                                                                                                 <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
                                                                                                             ) : (
-                                                                                                                <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
+                                                                                                                <i className={`bi bi-circle fs-5 flex-shrink-0 ${darkMode ? 'opacity-40' : 'text-secondary'}`}></i>
                                                                                                             )}
-                                                                                                            <span className="text-truncate">{optText}</span>
+                                                                                                            <span className={`text-truncate ${darkMode ? '' : 'text-dark'}`}>{optText}</span>
                                                                                                         </div>
                                                                                                         {isThisOptionCorrect && (
                                                                                                             <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
@@ -1752,18 +1752,18 @@ function VisitDetail() {
                                                                 <i className="bi bi-patch-check-fill fs-4"></i>
                                                             </div>
                                                             <div>
-                                                                <h4 className="fw-black m-0 fs-5">Esito del tuo Quiz</h4>
-                                                                <p className="small text-white-50 mb-0">Ecco il riepilogo delle tue risposte</p>
+                                                                <h4 className={`fw-black m-0 fs-5 ${darkMode ? 'text-white' : 'text-dark'}`}>Esito del tuo Quiz</h4>
+                                                                <p className={`small mb-0 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>Ecco il riepilogo delle tue risposte</p>
                                                             </div>
                                                         </div>
-                                                        <button onClick={() => setQuizPhase('none')} className="btn-close btn-close-white" aria-label="Chiudi"></button>
+                                                        <button onClick={() => setQuizPhase('none')} className={`btn-close ${darkMode ? 'btn-close-white' : ''}`} aria-label="Chiudi"></button>
                                                     </div>
 
                                                     {/* SCORE BANNER PERSONALE */}
                                                     <div className={`p-3.5 rounded-4 text-center border ${percent >= 80 ? 'bg-success bg-opacity-15 border-success border-opacity-40' : percent >= 50 ? 'bg-warning bg-opacity-15 border-warning border-opacity-40' : 'bg-danger bg-opacity-15 border-danger border-opacity-40'}`}>
-                                                        <div className="fs-065 pt-1 text-uppercase fw-bold tracking-wider text-white mb-1">Punteggio Totale</div>
-                                                        <div className="fs-2 fw-black text-white">
-                                                            {score} <span className="fs-6 text-white fw-normal">/ {total} corrette ({percent}%)</span>
+                                                        <div className={`fs-065 pt-1 text-uppercase fw-bold tracking-wider mb-1 ${darkMode ? 'text-white-50' : 'text-secondary'}`}>Punteggio Totale</div>
+                                                        <div className={`fs-2 fw-black ${darkMode ? 'text-white' : 'text-dark'}`}>
+                                                            {score} <span className={`fs-6 fw-normal ${darkMode ? 'text-white-50' : 'text-secondary'}`}>/ {total} corrette ({percent}%)</span>
                                                         </div>
                                                     </div>
 
@@ -1782,7 +1782,7 @@ function VisitDetail() {
                                                             return (
                                                                 <div key={q._id} className={`p-3 rounded-4 border ${isCorrect ? 'border-success border-opacity-50 bg-success bg-opacity-10' : (isUnanswered ? 'border-warning border-opacity-50 bg-warning bg-opacity-10' : 'border-danger border-opacity-50 bg-danger bg-opacity-10')}`}>
                                                                     <div className="d-flex align-items-center justify-content-between mb-2">
-                                                                        <div className="fw-bold fs-6 text-white">{qIdx + 1}. {q.question}</div>
+                                                                        <div className={`fw-bold fs-6 ${darkMode ? 'text-white' : 'text-dark'}`}>{qIdx + 1}. {q.question}</div>
                                                                         <span className={`badge rounded-pill px-2.5 py-1 fw-bold fs-07 flex-shrink-0 ${isCorrect ? 'bg-success text-white' : (isUnanswered ? 'bg-warning text-dark' : 'bg-danger text-white')}`}>
                                                                             {isCorrect ? 'Corretta' : (isUnanswered ? 'Non risposto' : 'Errata')}
                                                                         </span>
@@ -1800,33 +1800,33 @@ function VisitDetail() {
                                                                             const isThisOptionCorrect = (qCorrectIdx >= 0 && optIdx === qCorrectIdx) || (isStudentChoice && isCorrect);
                                                                             const isThisOptionWrongChoice = isStudentChoice && !isCorrect;
 
-                                                                            let optClass = "border border-secondary border-opacity-20 text-white-50 opacity-60";
+                                                                            let optClass = darkMode ? "border border-secondary border-opacity-20 text-white-50 opacity-60" : "border border-secondary-subtle text-secondary bg-light";
                                                                             if (isThisOptionCorrect) {
-                                                                                optClass = "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold";
+                                                                                optClass = darkMode ? "border border-success border-opacity-80 bg-success bg-opacity-25 text-white fw-bold" : "border border-success bg-success bg-opacity-10 text-dark fw-bold";
                                                                             } else if (isThisOptionWrongChoice) {
-                                                                                optClass = "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold";
+                                                                                optClass = darkMode ? "border border-danger border-opacity-80 bg-danger bg-opacity-25 text-danger fw-bold" : "border border-danger bg-danger bg-opacity-10 text-danger fw-bold";
                                                                             }
 
                                                                             return (
                                                                                 <div key={optIdx} className={`p-2.5 rounded-3 d-flex align-items-center justify-content-between fs-085 ${optClass}`}>
                                                                                     <div className="d-flex align-items-center gap-2 min-w-0">
                                                                                         {isThisOptionCorrect ? (
-                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0"></i>
+                                                                                            <i className="bi bi-check-circle-fill fs-5 flex-shrink-0 text-success"></i>
                                                                                         ) : isThisOptionWrongChoice ? (
                                                                                             <i className="bi bi-x-circle-fill text-danger fs-5 flex-shrink-0"></i>
                                                                                         ) : (
-                                                                                            <i className="bi bi-circle fs-5 flex-shrink-0 opacity-40"></i>
+                                                                                            <i className={`bi bi-circle fs-5 flex-shrink-0 ${darkMode ? 'opacity-40' : 'text-secondary'}`}></i>
                                                                                         )}
-                                                                                        <span className="text-truncate">{optText}</span>
+                                                                                        <span className={`text-truncate ${darkMode ? '' : 'text-dark'}`}>{optText}</span>
                                                                                     </div>
                                                                                     {isThisOptionCorrect && (
                                                                                         <span className="badge bg-success text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
-                                                                                            <i className="bi bi-check2 me-1"></i>Risposta Esatta
+                                                                                            <i className="bi bi-check2 me-1"></i>Esatta
                                                                                         </span>
                                                                                     )}
                                                                                     {isThisOptionWrongChoice && (
                                                                                         <span className="badge bg-danger text-white rounded-pill px-2.5 py-1 fs-065 ms-2 flex-shrink-0 fw-bold">
-                                                                                            La tua risposta
+                                                                                            Scelta dallo studente
                                                                                         </span>
                                                                                     )}
                                                                                 </div>
