@@ -1,20 +1,5 @@
 const { item: Item, language: Language, visit: Visit } = require('../models/museums.js');
-const path = require('path');
-const fs = require('fs');
-
-const deleteLocalFile = (imgPath) => {
-    if (!imgPath || typeof imgPath !== 'string') return;
-    const filePath = (path.isAbsolute(imgPath) && fs.existsSync(imgPath))
-        ? imgPath
-        : path.join(__dirname, '../../public', imgPath.replace(/^\//, ''));
-    try {
-        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            fs.unlinkSync(filePath);
-        }
-    } catch (err) {
-        console.error("Errore durante l'eliminazione del file:", err);
-    }
-};
+const { deleteLocalFile } = require('../utils/fileUtils');
 
 const getAllArtworks = async (req, res) => {
     try {
@@ -164,16 +149,9 @@ const deleteArtwork = async (req, res) => {
             }
         }
 
-        // 1. Cancella immagine da disco
         deleteLocalFile(existingItem.img_path);
-
-        // 2. Cancella le descrizioni associate (language)
         await Language.deleteMany({ item_id: artworkId });
-
-        // 3. Rimuovi l'opera dalla lista delle visite che la includono
         await Visit.updateMany({}, { $pull: { items: artworkId } });
-
-        // 4. Elimina il record dell'opera
         await Item.findByIdAndDelete(artworkId);
         res.json({ message: 'Opera e file associati eliminati con successo' });
     } catch (error) {

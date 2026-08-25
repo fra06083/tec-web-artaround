@@ -124,20 +124,7 @@ module.exports = {
                 return res.status(403).json({ error: "Solo l'admin può eliminare altri amministratori" });
             }
 
-            // Cancella il file se esiste effettivamente su disco ed è un file (non una directory)
-            if (user.propic && typeof user.propic === 'string') {
-                const filePath = (path.isAbsolute(user.propic) && fs.existsSync(user.propic))
-                    ? user.propic
-                    : path.join(__dirname, '../../public', user.propic.replace(/^\//, ''));
-
-                try {
-                    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-                        fs.unlinkSync(filePath);
-                    }
-                } catch (err) {
-                    console.error("Errore durante l'eliminazione del file da disco:", err);
-                }
-            }
+            deleteLocalFile(user.propic);
 
             await User.findByIdAndDelete(req.params.id);
             res.json({ message: "Utente eliminato con successo" });

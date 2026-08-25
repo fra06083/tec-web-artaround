@@ -1,21 +1,6 @@
 const { museum: Museum, item: Item, visit: Visit, language: Language, quizQuestion: QuizQuestion, quizResult: QuizResult } = require('../models/museums');
 const User = require('../models/user');
-const path = require('path');
-const fs = require('fs');
-
-const deleteLocalFile = (imgPath) => {
-    if (!imgPath || typeof imgPath !== 'string') return;
-    const filePath = (path.isAbsolute(imgPath) && fs.existsSync(imgPath))
-        ? imgPath
-        : path.join(__dirname, '../../public', imgPath.replace(/^\//, ''));
-    try {
-        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            fs.unlinkSync(filePath);
-        }
-    } catch (err) {
-        console.error("Errore durante l'eliminazione del file:", err);
-    }
-};
+const { deleteLocalFile } = require('../utils/fileUtils');
 
 const getAllMuseums = async (req, res) => {
     try {
@@ -127,7 +112,6 @@ const deleteMuseum = async (req, res) => {
         const visits = await Visit.find({ museum_id: museumId });
         const visitIds = visits.map(v => v._id);
 
-        // 2. Cancella da disco tutte le immagini associate (copertina museo, piante dei piani, opere, visite)
         deleteLocalFile(museumToDelete.image);
         if (museumToDelete.mappa && Array.isArray(museumToDelete.mappa.piante)) {
             museumToDelete.mappa.piante.forEach(p => deleteLocalFile(p.immagine));
@@ -135,7 +119,6 @@ const deleteMuseum = async (req, res) => {
         items.forEach(i => deleteLocalFile(i.img_path));
         visits.forEach(v => deleteLocalFile(v.image));
 
-        // 3. Cancella in cascata descrizioni (language), domande quiz, risultati quiz e riferimenti ad opere nelle visite
         if (itemIds.length > 0) {
             await Language.deleteMany({ item_id: { $in: itemIds } });
             await Visit.updateMany({}, { $pull: { items: { $in: itemIds } } });
@@ -145,7 +128,6 @@ const deleteMuseum = async (req, res) => {
             await QuizResult.deleteMany({ visit_id: { $in: visitIds } });
         }
 
-        // 4. Rimuovi i riferimenti al museo e alle visite eliminate dagli utenti
         await User.updateMany(
             {},
             {
@@ -156,7 +138,6 @@ const deleteMuseum = async (req, res) => {
             }
         );
 
-        // 5. Elimina dal DB le visite, le opere e il museo stesso
         await Visit.deleteMany({ museum_id: museumId });
         await Item.deleteMany({ museum_id: museumId });
         await Museum.findByIdAndDelete(museumId);

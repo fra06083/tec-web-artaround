@@ -1,21 +1,6 @@
 const { visit: Visit, museum: Museum, quizQuestion: QuizQuestion, quizResult: QuizResult } = require('../models/museums');
 const User = require('../models/user');
-const path = require('path');
-const fs = require('fs');
-
-const deleteLocalFile = (imgPath) => {
-    if (!imgPath || typeof imgPath !== 'string') return;
-    const filePath = (path.isAbsolute(imgPath) && fs.existsSync(imgPath))
-        ? imgPath
-        : path.join(__dirname, '../../public', imgPath.replace(/^\//, ''));
-    try {
-        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            fs.unlinkSync(filePath);
-        }
-    } catch (err) {
-        console.error("Errore durante l'eliminazione del file:", err);
-    }
-};
+const { deleteLocalFile } = require('../utils/fileUtils');
 
 const getAllVisits = async (req, res) => {
     try {
@@ -188,17 +173,10 @@ const deleteVisit = async (req, res) => {
             }
         }
 
-        // 1. Cancella immagine da disco
         deleteLocalFile(visitToDelete.image);
-
-        // 2. Cancella domande quiz e risultati del quiz associati
         await QuizQuestion.deleteMany({ visit_id: visitId });
         await QuizResult.deleteMany({ visit_id: visitId });
-
-        // 3. Rimuovi la visita dall'elenco delle visite acquistate dagli utenti
         await User.updateMany({}, { $pull: { purchased_visits: visitId } });
-
-        // 4. Elimina la visita dal DB
         await Visit.findByIdAndDelete(visitId);
         res.json({ message: 'Visita e dati associati eliminati con successo' });
     } catch (error) {

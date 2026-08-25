@@ -141,21 +141,10 @@ router.put('/profile', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Utente non trovato' });
         }
 
-        // Se l'immagine profilo è cambiata, elimina la vecchia immagine dal disco se esiste effettivamente ed è un file
         const oldPropic = currentUser.propic;
         const newPropic = propic || "";
-        if (oldPropic && oldPropic !== newPropic && typeof oldPropic === 'string') {
-            const filePath = (path.isAbsolute(oldPropic) && fs.existsSync(oldPropic))
-                ? oldPropic
-                : path.join(__dirname, '../../public', oldPropic.replace(/^\//, ''));
-
-            try {
-                if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-                    fs.unlinkSync(filePath);
-                }
-            } catch (err) {
-                console.error("Errore durante l'eliminazione del file da disco:", err);
-            }
+        if (oldPropic && oldPropic !== newPropic) {
+            deleteLocalFile(oldPropic);
         }
 
         const user = await User.findByIdAndUpdate(
