@@ -149,24 +149,54 @@ function VisitDetail() {
         }
     }, [currentIndex, items, visita]);
     
+    // Token per invalidare gli handler dell'audio precedente
+    const speakTokenRef = useRef(0);
+    const isSpeakingRef = useRef(false);
+
     // Ferma la sintesi vocale
     const stopSpeaking = useCallback(() => {
+        speakTokenRef.current++;
         window.speechSynthesis.cancel();
+        isSpeakingRef.current = false;
         setIsSpeaking(false);
     }, []);
 
-    // Leggi il testo ad alta voce
+    // Leggi il testo ad alta voce (interrompe sempre l'audio precedente)
     const speak = useCallback((text) => {
-        stopSpeaking();
-        if (!text) return;
+        speakTokenRef.current++;
+        const token = speakTokenRef.current;
+        window.speechSynthesis.cancel();
+
+        if (!text) {
+            isSpeakingRef.current = false;
+            setIsSpeaking(false);
+            return;
+        }
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'it-IT';
         utterance.rate = 1;
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
-        window.speechSynthesis.speak(utterance);
+        // Se nel frattempo è arrivato un nuovo comando, ignora questi eventi
+        utterance.onend = () => {
+            if (speakTokenRef.current !== token) return;
+            isSpeakingRef.current = false;
+            setIsSpeaking(false);
+        };
+        utterance.onerror = () => {
+            if (speakTokenRef.current !== token) return;
+            isSpeakingRef.current = false;
+            setIsSpeaking(false);
+        };
+
+        isSpeakingRef.current = true;
         setIsSpeaking(true);
-    }, [stopSpeaking]);
+
+        // Piccolo ritardo: Chrome ignora speak() se chiamato subito dopo cancel()
+        setTimeout(() => {
+            if (speakTokenRef.current !== token) return;
+            window.speechSynthesis.speak(utterance);
+        }, 120);
+    }, []);
 
     // Dimmi di più / dimmi di meno
     const changeLevelUp = () => {
@@ -686,6 +716,7 @@ function VisitDetail() {
             if (!proceed) return;
         }
 
+        stopSpeaking();
         setCurrentIndex(newIndex);
         
         if (pin && role === 'teacher') {
@@ -726,6 +757,18 @@ function VisitDetail() {
     const currentDescription = descriptions.find(d => d.type === selectedType && d.length === selectedLength) 
                              || descriptions.find(d => d.type === selectedType) 
                              || descriptions[0];
+
+    // Se cambia livello o durata mentre l'audio sta andando,
+    // interrompe il vecchio e fa ripartire subito il nuovo testo
+    useEffect(() => {
+        if (!isSpeakingRef.current) return;
+        if (currentDescription?.text) {
+            speak(currentDescription.text);
+        } else {
+            stopSpeaking();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedType, selectedLength]);       
 
     const toggleDarkMode = () => {
         const newValue = !darkMode;
