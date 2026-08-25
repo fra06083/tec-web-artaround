@@ -145,38 +145,38 @@ function VisitList() {
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
             <header className={`navbar fixed-top w-100 py-3 desktop-navbar transition-theme border-0 shadow-sm ${bgNavbar}`}>
-                <div className="container-lg d-flex flex-wrap align-items-center justify-content-between">
+                <div className="container-lg d-flex flex-nowrap align-items-center justify-content-between">
                     
-                    {/* 1. LOGO */}
-                    <a className={`navbar-brand text-decoration-none fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto ${darkMode ? 'text-cream' : 'text-teal'}`} href="/">
+                    {/* 1. BRAND LOGO */}
+                    <a className="navbar-brand text-decoration-none fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-0 flex-shrink-0" href="/">
                         <div className={`p-2 rounded-3 d-flex align-items-center justify-content-center ${darkMode ? 'bg-cream text-teal' : 'bg-teal text-cream'}`}>
                             <i className="bi bi-box-seam fs-5"></i>
                         </div>
                         <div className="d-flex align-items-center">
-                            <span className="ls-minus-1 fw-bold fs-4">ArtAround</span>
-                            <span className="fs-5 text-secondary fw-medium ms-2 opacity-50">| Navigator</span>
+                            <span className={`ls-minus-1 fw-bold fs-4 ${darkMode ? 'text-cream' : 'text-teal'}`}>ArtAround</span>
+                            <span className="fs-5 text-secondary fw-medium ms-2 opacity-50 d-none d-sm-inline">| Navigator</span>
                         </div>
                     </a>
 
                     {/* 2. MOBILE CONTROLS */}
                     <div className="d-flex d-lg-none align-items-center gap-2 order-2">
                         <button 
+                            type="button" 
                             className={`btn btn-link p-1 shadow-none ${darkMode ? 'text-white' : 'text-dark'}`} 
                             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
                         >
                             <i className="bi bi-search fs-5"></i>
                         </button>
-
-                        <button
-                        className={`btn btn-link p-1 shadow-none theme-btn-mobile ${darkMode ? 'text-white' : 'text-dark'}`}
-                        onClick={toggleDarkMode}
+                        <button 
+                            className={`btn btn-link p-1 shadow-none theme-btn-mobile ${darkMode ? 'text-white' : 'text-dark'}`}
+                            onClick={toggleDarkMode}
                         >
                             <i className={`bi fs-5 ${darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'}`}></i>
                         </button>
                     </div>
 
                     {/* 3. DESKTOP SEARCH BAR */}
-                    <div className="d-none d-lg-flex align-items-center flex-grow-1 mx-4 nav-search-container order-lg-2">
+                    <div className="d-none d-lg-flex align-items-center flex-grow-1 mx-2 mx-xl-3 nav-search-container order-lg-2" style={{ maxWidth: '240px' }}>
                         <div className="search-input-wrapper w-100">
                             <i className="bi bi-search search-icon"></i>
                             <input 
@@ -190,28 +190,20 @@ function VisitList() {
                         <div className="search-glow"></div>
                     </div>
 
-                    {/* 4. DESKTOP THEME TOGGLE */}
-                    <button 
-                        className={`btn btn-link p-1 shadow-none order-lg-4 ms-2 d-none d-lg-flex ${darkMode ? 'text-white' : 'text-dark'}`} 
-                        onClick={toggleDarkMode}
-                    >
-                        <i className={`bi fs-5 ${darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'}`}></i>
-                    </button>
-
-                    {/* 5. DESKTOP LINKS */}
-                    <div className="d-none d-lg-flex align-items-center gap-3 ms-auto order-3 order-lg-3">
-                        <a href="/navigator/" className={`nav-link fw-bold px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-cream' : 'text-darkgrey'}`}>
+                    {/* 4. DESKTOP LINKS */}
+                    <div className="d-none d-lg-flex align-items-center gap-2 gap-xl-3 ms-auto order-3 order-lg-3 flex-shrink-0">
+                        <a href="/navigator/" className={`nav-link fw-bold px-3 px-xl-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-cream' : 'text-darkgrey'}`}>
                             <i className="bi bi-compass fs-5 text-terracotta"></i> Naviga
                         </a>
 
-                        <a href="/editor-marketplace/" className={`nav-link fw-bold px-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-cream' : 'text-darkgrey'}`}>
+                        <a href="/editor-marketplace/" className={`nav-link fw-bold px-3 px-xl-4 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 nav-hover-premium ${darkMode ? 'text-cream' : 'text-darkgrey'}`}>
                             <i className="bi bi-shop fs-5 text-terracotta"></i> Marketplace
                         </a>
 
-                        <div className={`vr mx-2 ${darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'}`}></div>
+                        <div className={`vr mx-1 mx-xl-2 ${darkMode ? 'bg-cream opacity-25' : 'bg-dark opacity-25'}`}></div>
 
                         {!user ? (
-                            <a href="/login.html?redirect=/navigator/" className="btn bg-teal text-cream rounded-pill px-4 fw-bold shadow-sm btn-reveal-icon">
+                            <a href="/login.html?redirect=/navigator/" className="btn rounded-pill px-3 px-xl-4 fw-bold shadow-sm btn-reveal-icon border-white bg-teal text-cream text-nowrap">
                                 <span>Sign in</span>
                                 <i className="bi bi-arrow-right-short reveal-icon"></i>
                             </a>
@@ -266,10 +258,15 @@ function VisitList() {
                                 )}
                             </div>
                         )}
-
-
-
                     </div>
+
+                    {/* 5. DESKTOP THEME TOGGLE */}
+                    <button 
+                        className={`btn btn-link p-1 shadow-none order-lg-4 ms-2 d-none d-lg-flex flex-shrink-0 ${darkMode ? 'text-white' : 'text-dark'}`} 
+                        onClick={toggleDarkMode}
+                    >
+                        <i className={`bi fs-5 ${darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'}`}></i>
+                    </button>
                 </div>
 
                 {/* 5. MOBILE SEARCH POPUP DROPDOWN */}
@@ -325,7 +322,7 @@ function VisitList() {
                                 onChange={(e) => setRoomPin(e.target.value)}
                             />
                             <button 
-                                className="btn btn-premium-red rounded-end-pill px-5 fw-bold shadow-sm d-flex align-items-center btn-transition"
+                                className="btn btn-premium-red rounded-end-pill px-3 px-md-5 text-nowrap fw-bold shadow-sm d-flex align-items-center btn-transition"
                                 onClick={handleJoinLiveTour}
                             >
                                 <i className="bi bi-link-45deg me-1 fs-5"></i> Entra
