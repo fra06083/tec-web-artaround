@@ -5,21 +5,33 @@ const path = require('path');
 const fs = require('fs');
 const { auth, authorize } = require('../middleware/auth.js');
 
+const getPublicDir = () => {
+    const candidates = [
+        path.join(__dirname, '../../public'),
+        path.join(__dirname, '../../../src/public'),
+        path.join(__dirname, '../../src/public')
+    ];
+    for (const dir of candidates) {
+        if (fs.existsSync(dir)) return dir;
+    }
+    return path.join(__dirname, '../../public');
+};
+
 // Configurazione storage Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // La tipologia (museums, artworks, users) è passata come parametro nella rotta
         const type = req.params.type; 
-        let dest = path.join(__dirname, '../../public/images/misc');
+        const publicDir = getPublicDir();
+        let dest = path.join(publicDir, 'images/misc');
 
         if (type === 'museum') {
-            dest = path.join(__dirname, '../../public/images/museums');
+            dest = path.join(publicDir, 'images/museums');
         } else if (type === 'artwork') {
-            dest = path.join(__dirname, '../../public/images/artworks');
+            dest = path.join(publicDir, 'images/artworks');
         } else if (type === 'user') {
-            dest = path.join(__dirname, '../../public/images/users');
+            dest = path.join(publicDir, 'images/users');
         } else if (type === 'visit') {
-            dest = path.join(__dirname, '../../public/images/visits');
+            dest = path.join(publicDir, 'images/visits');
         }
 
         // Crea la cartella se non esiste
