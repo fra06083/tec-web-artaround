@@ -291,8 +291,9 @@ function VisitList() {
             </header>
 
             {/* HERO E CONNECT */}
-            <div className="container-lg py-4 mt-5 pt-5">
-                <div className="rounded-5 p-4 p-md-5 mb-5 navigator-hero-gradient shadow-lg position-relative">
+            <main className="flex-grow-1 p-3 p-lg-5 pt-5 mt-5">
+                <div className="container-lg flex-grow-1 py-2 py-lg-4">
+                    <div className="rounded-5 p-4 p-md-5 mb-5 navigator-hero-gradient shadow-lg position-relative">
                     <div className="row align-items-center position-relative z-1">
                         <div className="col-12 col-md-8 text-center text-md-start">
                             <h1 className="fw-black text-white display-4 mb-3 tracking-tight">Esplora le Visite</h1>
@@ -477,7 +478,8 @@ function VisitList() {
                     );
                 })()}
 
-            </div>
+                </div>
+            </main>
 
             {/* FOOTER */}
             <footer className={`${bgFooter} py-4 mt-auto pb-5 mb-5 pb-lg-4 mb-lg-0`}>
