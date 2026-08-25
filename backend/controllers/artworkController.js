@@ -1,4 +1,20 @@
-const { item: Item, language: Language } = require('../models/museums.js');
+const { item: Item, language: Language, visit: Visit } = require('../models/museums.js');
+const path = require('path');
+const fs = require('fs');
+
+const deleteLocalFile = (imgPath) => {
+    if (!imgPath || typeof imgPath !== 'string') return;
+    const filePath = (path.isAbsolute(imgPath) && fs.existsSync(imgPath))
+        ? imgPath
+        : path.join(__dirname, '../../public', imgPath.replace(/^\//, ''));
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            fs.unlinkSync(filePath);
+        }
+    } catch (err) {
+        console.error("Errore durante l'eliminazione del file:", err);
+    }
+};
 
 const getAllArtworks = async (req, res) => {
     try {
@@ -137,7 +153,8 @@ const updateArtwork = async (req, res) => {
 
 const deleteArtwork = async (req, res) => {
     try {
-        const existingItem = await Item.findById(req.params.id);
+        const artworkId = req.params.id;
+        const existingItem = await Item.findById(artworkId);
         if (!existingItem) return res.status(404).json({ error: 'Opera non trovata' });
 
         if (req.user && req.user.permissions !== 'admin') {
@@ -147,8 +164,18 @@ const deleteArtwork = async (req, res) => {
             }
         }
 
-        await Item.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Opera eliminata con successo' });
+        // 1. Cancella immagine da disco
+        deleteLocalFile(existingItem.img_path);
+
+        // 2. Cancella le descrizioni associate (language)
+        await Language.deleteMany({ item_id: artworkId });
+
+        // 3. Rimuovi l'opera dalla lista delle visite che la includono
+        await Visit.updateMany({}, { $pull: { items: artworkId } });
+
+        // 4. Elimina il record dell'opera
+        await Item.findByIdAndDelete(artworkId);
+        res.json({ message: 'Opera e file associati eliminati con successo' });
     } catch (error) {
         console.error('Errore nell\'eliminazione dell\'opera:', error);
         res.status(500).json({ error: 'Errore interno del server' });

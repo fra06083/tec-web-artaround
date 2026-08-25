@@ -1,4 +1,21 @@
-const { museum: Museum, item: Item, visit: Visit } = require('../models/museums');
+const { museum: Museum, item: Item, visit: Visit, language: Language, quizQuestion: QuizQuestion, quizResult: QuizResult } = require('../models/museums');
+const User = require('../models/user');
+const path = require('path');
+const fs = require('fs');
+
+const deleteLocalFile = (imgPath) => {
+    if (!imgPath || typeof imgPath !== 'string') return;
+    const filePath = (path.isAbsolute(imgPath) && fs.existsSync(imgPath))
+        ? imgPath
+        : path.join(__dirname, '../../public', imgPath.replace(/^\//, ''));
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            fs.unlinkSync(filePath);
+        }
+    } catch (err) {
+        console.error("Errore durante l'eliminazione del file:", err);
+    }
+};
 
 const getAllMuseums = async (req, res) => {
     try {
@@ -99,14 +116,52 @@ const updateMuseum = async (req, res) => {
 
 const deleteMuseum = async (req, res) => {
     try {
-        const deleted = await Museum.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ error: 'Museo non trovato' });
+        const museumId = req.params.id;
+        const museumToDelete = await Museum.findById(museumId);
+        if (!museumToDelete) return res.status(404).json({ error: 'Museo non trovato' });
 
-        // pulizia a cascata di visite e opere collegate al museo
-        await Visit.deleteMany({ museum_id: req.params.id });
-        await Item.deleteMany({ museum_id: req.params.id });
+        // 1. Trova opere e visite per la pulizia a cascata
+        const items = await Item.find({ museum_id: museumId });
+        const itemIds = items.map(i => i._id);
 
-        res.json({ message: 'Museo eliminato con successo' });
+        const visits = await Visit.find({ museum_id: museumId });
+        const visitIds = visits.map(v => v._id);
+
+        // 2. Cancella da disco tutte le immagini associate (copertina museo, piante dei piani, opere, visite)
+        deleteLocalFile(museumToDelete.image);
+        if (museumToDelete.mappa && Array.isArray(museumToDelete.mappa.piante)) {
+            museumToDelete.mappa.piante.forEach(p => deleteLocalFile(p.immagine));
+        }
+        items.forEach(i => deleteLocalFile(i.img_path));
+        visits.forEach(v => deleteLocalFile(v.image));
+
+        // 3. Cancella in cascata descrizioni (language), domande quiz, risultati quiz e riferimenti ad opere nelle visite
+        if (itemIds.length > 0) {
+            await Language.deleteMany({ item_id: { $in: itemIds } });
+            await Visit.updateMany({}, { $pull: { items: { $in: itemIds } } });
+        }
+        if (visitIds.length > 0) {
+            await QuizQuestion.deleteMany({ visit_id: { $in: visitIds } });
+            await QuizResult.deleteMany({ visit_id: { $in: visitIds } });
+        }
+
+        // 4. Rimuovi i riferimenti al museo e alle visite eliminate dagli utenti
+        await User.updateMany(
+            {},
+            {
+                $pull: {
+                    museums: museumId,
+                    purchased_visits: { $in: visitIds }
+                }
+            }
+        );
+
+        // 5. Elimina dal DB le visite, le opere e il museo stesso
+        await Visit.deleteMany({ museum_id: museumId });
+        await Item.deleteMany({ museum_id: museumId });
+        await Museum.findByIdAndDelete(museumId);
+
+        res.json({ message: 'Museo, visite, opere e file associati eliminati con successo' });
     } catch (error) {
         console.error('Errore nell\'eliminazione del museo:', error);
         res.status(500).json({ error: 'Errore interno del server' });
