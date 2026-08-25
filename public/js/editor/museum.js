@@ -256,6 +256,14 @@ function museumManager() {
             };
         },
 
+        formatMappaStats(m) {
+            const nPiani = (m && m.mappa && m.mappa.piante) ? m.mappa.piante.length : 0;
+            const nSale = (m && m.mappa && m.mappa.sale) ? m.mappa.sale.length : 0;
+            const pianoLabel = nPiani === 1 ? '1 piano' : `${nPiani} piani`;
+            const saleLabel = nSale === 1 ? '1 sala' : `${nSale} sale`;
+            return `${pianoLabel} · ${saleLabel}`;
+        },
+
         getDomanda(tipo) {
             const t = POI_TIPI.find(x => x.tipo === tipo);
             return t ? t.domanda : tipo;

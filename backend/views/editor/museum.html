@@ -324,17 +324,17 @@
 
                                             <div class="p-4 d-flex flex-column flex-grow-1">
 
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                                                     <template x-if="m.region || m.city">
-                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1 badge-orange-subtle">
-                                                            <i class="bi bi-geo-alt-fill"></i>
-                                                            <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
+                                                        <span class="badge rounded-pill px-3 py-1 fw-bold fs-7 d-inline-flex align-items-center gap-1 badge-orange-subtle text-truncate max-w-100">
+                                                            <i class="bi bi-geo-alt-fill flex-shrink-0"></i>
+                                                            <span class="text-truncate" x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
                                                         </span>
                                                     </template>
                                                     <template x-if="m.mappa && (m.mappa.piante || m.mappa.sale)">
                                                         <span class="badge bg-secondary bg-opacity-50 text-white-50 fs-7 px-2.5 py-1 d-inline-flex align-items-center gap-1">
                                                             <i class="bi bi-layers text-orange opacity-75"></i>
-                                                            <span x-text="(m.mappa&&m.mappa.piante?m.mappa.piante.length:0)+' piani · '+(m.mappa&&m.mappa.sale?m.mappa.sale.length:0)+' sale'"></span>
+                                                            <span x-text="formatMappaStats(m)"></span>
                                                         </span>
                                                     </template>
                                                 </div>
@@ -381,15 +381,15 @@
                                             <h6 class="fw-bold text-white mb-1 tracking-tight text-truncate fs-6" x-text="m.museum"></h6>
                                             <div class="d-flex flex-wrap align-items-center gap-1.5 mb-1">
                                                 <template x-if="m.city || m.region">
-                                                    <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 badge-orange-subtle fs-065">
-                                                        <i class="bi bi-geo-alt-fill"></i>
-                                                        <span x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
+                                                    <span class="badge rounded-pill px-2 py-0.5 fw-bold d-inline-flex align-items-center gap-1 badge-orange-subtle fs-065 text-truncate max-w-100">
+                                                        <i class="bi bi-geo-alt-fill flex-shrink-0"></i>
+                                                        <span class="text-truncate" x-text="m.city && m.region ? m.city+' · '+m.region : (m.city || m.region || '')"></span>
                                                     </span>
                                                 </template>
                                                 <template x-if="m.mappa">
                                                     <span class="badge bg-secondary bg-opacity-40 text-white-50 px-2 py-0.5 d-inline-flex align-items-center gap-1 fs-065">
                                                         <i class="bi bi-layers text-orange opacity-75"></i>
-                                                        <span x-text="(m.mappa&&m.mappa.piante?m.mappa.piante.length:0)+' piani · '+(m.mappa&&m.mappa.sale?m.mappa.sale.length:0)+' sale'"></span>
+                                                        <span x-text="formatMappaStats(m)"></span>
                                                     </span>
                                                 </template>
                                             </div>

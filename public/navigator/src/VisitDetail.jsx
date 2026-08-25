@@ -869,7 +869,6 @@ function VisitDetail() {
                     src={piantaAttiva.immagine}
                     alt={`Pianta - ${piantaAttiva.nome}`}
                     className={`map-pin-img${isLightbox ? ' map-pin-img--lightbox' : ''}`}
-                    onClick={() => !isLightbox && setLightboxImage('__mappa__')}
                     draggable={false}
                 />
                 {saleAttive.map((s, idx) => {
