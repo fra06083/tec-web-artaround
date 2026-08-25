@@ -265,13 +265,13 @@
                                         <i class="bi bi-bank2 me-2 text-primary"></i> Musei sotto la sua gestione
                                     </h5>
 
-                                    <div class="table-responsive rounded-3 border border-secondary-subtle overflow-hidden">
+                                    <div class="table-responsive rounded-3 border border-secondary-subtle">
                                         <table class="table table-hover m-0 align-middle">
                                             <thead class="bg-body-secondary">
                                                 <tr>
                                                     <th class="ps-3 py-3 text-body-secondary fw-bold text-uppercase">NOME MUSEO</th>
                                                     <th class="py-3 text-body-secondary fw-bold text-uppercase">REGIONE / CITTÀ</th>
-                                                    <th class="text-end pe-3 py-3 text-body-secondary fw-bold text-uppercase">AZIONI</th>
+                                                    <th class="text-center py-3 text-body-secondary fw-bold text-uppercase px-3" style="min-width: 10rem;">AZIONI</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -282,7 +282,7 @@
                                                             <span class="text-body fw-medium" x-text="m.region"></span>
                                                             <small class="text-body-secondary d-block" x-text="m.province"></small>
                                                         </td>
-                                                        <td class="text-end pe-3 py-3">
+                                                        <td class="text-center py-3 px-3">
                                                             <button @click="revokePermission(m._id)"
                                                                     class="btn btn-sm btn-outline-danger">
                                                                 <i class="bi bi-x-circle-fill me-1"></i> Revoca Accesso

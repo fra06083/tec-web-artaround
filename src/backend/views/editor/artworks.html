@@ -406,15 +406,15 @@
 
                             <!-- Desktop Table -->
                             <div x-show="!isLoadingArtworks && filteredArtworks().length > 0" class="d-none d-md-block">
-                                <div class="table-responsive rounded-4 shadow-lg overflow-hidden border border-secondary border-opacity-25">
+                                <div class="table-responsive rounded-4 shadow-lg border border-secondary border-opacity-25 bg-dark bg-opacity-40">
                                     <table class="table table-dark table-hover align-middle m-0">
                                         <thead class="thead-custom">
                                             <tr>
-                                                <th class="ps-4 py-3 text-uppercase">Opera</th>
-                                                <th class="py-3 text-uppercase">Autore</th>
-                                                <th class="py-3 text-uppercase">Ubicazione / Sala</th>
-                                                <th class="py-3 text-uppercase">Licenza</th>
-                                                <th class="text-end pe-4 py-3 text-uppercase">Azioni</th>
+                                                <th class="ps-4 py-3 text-uppercase" style="min-width: 14rem;">Opera</th>
+                                                <th class="py-3 text-uppercase" style="min-width: 10rem;">Autore</th>
+                                                <th class="py-3 text-uppercase" style="min-width: 11rem;">Ubicazione / Sala</th>
+                                                <th class="py-3 text-uppercase" style="min-width: 8rem;">Licenza</th>
+                                                <th class="text-center py-3 text-uppercase px-3" style="min-width: 15rem;">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -429,7 +429,7 @@
                                                                      class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1" alt=""
                                                                      @error="$el.style.display='none'">
                                                             </div>
-                                                            <span class="fw-bold text-white fs-6" x-text="art.item"></span>
+                                                            <span class="fw-bold text-white fs-6 text-break" x-text="art.item"></span>
                                                         </div>
                                                     </td>
                                                     <td class="py-3">
@@ -452,8 +452,8 @@
                                                     <td class="py-3">
                                                         <span class="badge bg-secondary bg-opacity-50 text-white-50 font-monospace fs-7 px-2" x-show="art.license" x-text="art.license"></span>
                                                     </td>
-                                                    <td class="text-end pe-4 py-3">
-                                                        <div class="d-inline-flex gap-2">
+                                                    <td class="text-center py-3 px-3">
+                                                        <div class="d-inline-flex align-items-center justify-content-center gap-2">
                                                             <button type="button" @click="openArtworkForm(art)"
                                                                     class="btn bg-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift" title="Modifica">
                                                                 <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>

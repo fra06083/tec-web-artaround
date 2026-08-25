@@ -3,12 +3,12 @@
 ========================================================= */
 
 .table-responsive {
-    border-radius: 16px;
-    overflow-x: auto;
+    border-radius: 1rem;
+    overflow-x: auto !important;
     overflow-y: hidden;
     background: rgba(30, 30, 47, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.2);
     /* Custom Scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(253, 126, 20, 0.5) rgba(255, 255, 255, 0.02);
