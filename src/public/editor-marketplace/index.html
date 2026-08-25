@@ -37,19 +37,19 @@
             <div class="container-lg d-flex flex-wrap flex-lg-nowrap align-items-center justify-content-between">
                 
                 <!-- 1. LOGO -->
-                <a class="navbar-brand fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-auto" href="../index.html">
+                <a class="navbar-brand text-decoration-none fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-0 flex-shrink-0" href="../index.html">
                     <div class="p-2 rounded-3 d-flex align-items-center justify-content-center"
                         :class="darkMode ? 'bg-cream text-teal' : 'bg-teal text-cream'">
                         <i class="bi bi-box-seam fs-5"></i>
                     </div>
                     <div class="d-flex align-items-center">
-                        <span :class="darkMode ? 'text-cream' : 'text-teal'" class="fw-bold ls-minus-1">ArtAround</span>
+                        <span :class="darkMode ? 'text-cream' : 'text-teal'" class="fw-bold ls-minus-1 fs-4">ArtAround</span>
                         <span class="fs-5 text-secondary fw-medium ms-2 opacity-50 d-none d-sm-inline">| Marketplace</span>
                     </div>
                 </a>
 
                 <!-- 2. MOBILE CONTROLS -->
-                <div class="d-flex d-lg-none align-items-center gap-2 order-2">
+                <div class="d-flex d-lg-none align-items-center gap-2 order-2 ms-auto">
                     <button type="button" class="btn btn-link p-1 shadow-none" :class="darkMode ? 'text-white' : 'text-dark'" @click="mobileSearchOpen = !mobileSearchOpen">
                         <i class="bi bi-search fs-5"></i>
                     </button>
@@ -60,7 +60,7 @@
 
 
                 <!-- 3. DESKTOP SEARCH BAR -->
-                <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-4 nav-search-container order-lg-2">
+                <div class="d-none d-lg-flex align-items-center flex-grow-1 mx-3 mx-xl-4 nav-search-container order-lg-2">
                     <div class="search-input-wrapper w-100">
                         <i class="bi bi-search search-icon"></i>
                         <input type="text" class="search-input w-100" placeholder="Cerca visite..." x-model="searchQuery">
@@ -68,8 +68,8 @@
                     <div class="search-glow"></div>
                 </div>
 
-                <!-- 3. DESKTOP THEME TOGGLE -->
-                <button class="btn btn-link p-1 shadow-none order-lg-4 ms-2 d-none d-lg-flex" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
+                <!-- 4. DESKTOP THEME TOGGLE -->
+                <button class="btn btn-link p-1 shadow-none order-lg-4 ms-2 d-none d-lg-flex flex-shrink-0" :class="darkMode ? 'text-white' : 'text-dark'" @click="darkMode = !darkMode">
                     <i class="bi fs-5" :class="darkMode ? 'bi-moon-stars-fill' : 'bi-sun-fill text-warning'"></i>
                 </button>
 
@@ -197,10 +197,10 @@
                                 :class="darkMode ? 'text-white' : 'text-dark'">
                                 <i class="bi bi-geo-alt-fill text-orange"></i> Musei disponibili
                             </h4>
-                            <div class="ms-3 flex-grow-1 border-bottom"
+                            <div class="ms-3 me-3 flex-grow-1 border-bottom"
                                 :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
                         </div>
-                        <div class="position-relative">
+                        <div class="position-relative flex-shrink-0">
                             <label for="museumSearch" class="visually-hidden">Cerca un museo</label>
                             <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
                             <input type="text" id="museumSearch"
@@ -211,14 +211,14 @@
 
                     <div class="row g-4">
                         <template x-for="m in filteredMuseums" :key="m._id">
-                            <div class="col-12 col-md-6 col-lg-4">
+                            <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch">
                                 <button type="button" @click="selectMuseum(m._id)"
-                                        class="btn text-start p-0 border-0 w-100 h-100 rounded-4 overflow-hidden shadow-sm hover-lift"
+                                        class="btn text-start p-0 border-0 w-100 d-flex flex-column rounded-4 overflow-hidden shadow-sm hover-lift"
                                         :class="darkMode ? 'bg-dark-grey' : 'bg-white'">
-                                    <div class="position-relative bg-dark h-120 overflow-hidden">
+                                    <div class="position-relative bg-dark h-180 overflow-hidden flex-shrink-0">
                                         <template x-if="m.image">
                                             <img :src="m.image" :alt="'Foto di ' + m.museum"
-                                                class="w-100 h-100 object-fit-cover">
+                                                class="w-100 h-100 object-fit-cover object-position-top">
                                         </template>
                                         <template x-if="!m.image">
                                             <div class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
@@ -227,16 +227,19 @@
                                         </template>
                                         <div class="position-absolute top-0 start-0 w-100 h-100 ticket-vignette"></div>
                                     </div>
-                                    <div class="p-4">
+                                    <div class="p-4 d-flex flex-column flex-grow-1 w-100">
                                         <h5 class="fw-black mb-1" :class="darkMode ? 'text-white' : 'text-dark'"
                                             x-text="m.museum"></h5>
                                         <p class="small mb-2" :class="darkMode ? 'text-white-50' : 'text-secondary'" x-text="m.province || ''"></p>
 
-                                        <p class="small mb-3 break-word" x-show="m.description"
+                                        <p class="small mb-3 break-word flex-grow-1" x-show="m.description"
                                             :class="darkMode ? 'text-white-50' : 'text-secondary'"
                                             x-text="m.description && m.description.length > 120 ? m.description.substring(0, 120) + '...' : m.description"></p>
-                                        <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill px-3 py-2"
-                                            x-text="tourCountFor(m._id) + (tourCountFor(m._id) === 1 ? ' tour' : ' tour')"></span>
+                                        
+                                        <div class="mt-auto pt-2">
+                                            <span class="badge bg-orange-subtle text-orange border border-orange border-opacity-25 rounded-pill px-3 py-2"
+                                                x-text="tourCountFor(m._id) + (tourCountFor(m._id) === 1 ? ' tour' : ' tour')"></span>
+                                        </div>
                                     </div>
                                 </button>
                             </div>

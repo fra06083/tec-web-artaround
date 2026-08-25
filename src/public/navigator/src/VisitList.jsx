@@ -145,7 +145,7 @@ function VisitList() {
         <div className={`min-vh-100 d-flex flex-column ${bgMain}`}>
             {/* NAVBAR */}
             <header className={`navbar fixed-top w-100 py-3 desktop-navbar transition-theme border-0 shadow-sm ${bgNavbar}`}>
-                <div className="container-lg d-flex flex-nowrap align-items-center justify-content-between">
+                <div className="container-lg d-flex flex-wrap flex-lg-nowrap align-items-center justify-content-between gap-2 gap-lg-3">
                     
                     {/* 1. BRAND LOGO */}
                     <a className="navbar-brand text-decoration-none fw-black fs-4 m-0 d-flex align-items-center gap-2 order-1 me-0 flex-shrink-0" href="/">
@@ -159,7 +159,7 @@ function VisitList() {
                     </a>
 
                     {/* 2. MOBILE CONTROLS */}
-                    <div className="d-flex d-lg-none align-items-center gap-2 order-2">
+                    <div className="d-flex d-lg-none align-items-center gap-2 order-2 ms-auto">
                         <button 
                             type="button" 
                             className={`btn btn-link p-1 shadow-none ${darkMode ? 'text-white' : 'text-dark'}`} 
@@ -176,7 +176,7 @@ function VisitList() {
                     </div>
 
                     {/* 3. DESKTOP SEARCH BAR */}
-                    <div className="d-none d-lg-flex align-items-center flex-grow-1 mx-2 mx-xl-3 nav-search-container order-lg-2" style={{ maxWidth: '240px' }}>
+                    <div className="d-none d-lg-flex align-items-center flex-grow-1 mx-3 mx-xl-4 nav-search-container order-lg-2">
                         <div className="search-input-wrapper w-100">
                             <i className="bi bi-search search-icon"></i>
                             <input 
@@ -379,14 +379,14 @@ function VisitList() {
                         <>
                             <div className="row g-4 mt-2 mb-4">
                                 {displayedVisite.map(v => (
-                                    <div key={v._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
-                                        <div className="card ticket-card h-100 border-0 bg-transparent">
-                                            <div className="ticket-body h-100 d-flex flex-column">
+                                    <div key={v._id} className="col-12 col-md-6 col-lg-4 col-xl-3 d-flex align-items-stretch">
+                                        <div className="card ticket-card h-100 border-0 bg-transparent w-100">
+                                            <div className="ticket-body h-100 d-flex flex-column w-100">
                                                 
                                                 {/* Top part (Image) */}
                                                 <div className="ticket-top position-relative overflow-hidden bg-dark">
                                                     {(v.image || (v.museum_id && v.museum_id.image)) ? (
-                                                        <img src={v.image || v.museum_id.image} alt={v.name} className="w-100 h-100 object-fit-cover" />
+                                                        <img src={v.image || v.museum_id.image} alt={v.name} className="w-100 h-100 object-fit-cover object-position-top" />
                                                     ) : (
                                                         <div className="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
                                                             <i className="bi bi-image fs-1"></i>

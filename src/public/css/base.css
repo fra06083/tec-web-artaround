@@ -463,6 +463,10 @@ i.bi {
 .w-h-48 { width: 3rem !important; height: 3rem !important; aspect-ratio: 1 / 1 !important; flex-shrink: 0 !important; }
 .min-w-0 { min-width: 0; }
 .h-120 { height: 120px; }
+.h-180 { height: 180px; }
+.h-200 { height: 200px; }
+.object-position-center { object-position: center; }
+.object-position-top { object-position: top center !important; }
 .z-1100 { z-index: 1100; }
 
 .max-h-400 { max-height: 400px; }
