@@ -465,8 +465,8 @@ i.bi {
 .h-120 { height: 120px; }
 .h-180 { height: 180px; }
 .h-200 { height: 200px; }
-.object-position-center { object-position: center; }
-.object-position-top { object-position: top center !important; }
+.object-position-center { object-position: center center !important; }
+.object-position-top { object-position: center 25% !important; }
 .z-1100 { z-index: 1100; }
 
 .max-h-400 { max-height: 400px; }

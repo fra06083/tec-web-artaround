@@ -425,10 +425,10 @@
 
                                             <div class="ticket-top position-relative overflow-hidden bg-dark">
                                                 <template x-if="tour.image">
-                                                    <img :src="tour.image" alt="" class="w-100 h-100 object-fit-cover">
+                                                    <img :src="tour.image" alt="" class="w-100 h-100 object-fit-cover object-position-center">
                                                 </template>
                                                 <template x-if="!tour.image && tour.museum_id && tour.museum_id.image">
-                                                    <img :src="tour.museum_id.image" alt="" class="w-100 h-100 object-fit-cover">
+                                                    <img :src="tour.museum_id.image" alt="" class="w-100 h-100 object-fit-cover object-position-center">
                                                 </template>
                                                 <template x-if="!tour.image && (!tour.museum_id || !tour.museum_id.image)">
                                                     <div class="bg-gradient-orange w-100 h-100 d-flex align-items-center justify-content-center text-white">
