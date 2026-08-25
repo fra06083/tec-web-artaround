@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/user');
 
 router.post('/login', async (req, res) => {
@@ -134,9 +136,31 @@ router.put('/profile', authenticateToken, async (req, res) => {
             }
         }
 
+        const currentUser = await User.findById(userId);
+        if (!currentUser) {
+            return res.status(404).json({ error: 'Utente non trovato' });
+        }
+
+        // Se l'immagine profilo è cambiata, elimina la vecchia immagine dal disco se esiste effettivamente ed è un file
+        const oldPropic = currentUser.propic;
+        const newPropic = propic || "";
+        if (oldPropic && oldPropic !== newPropic && typeof oldPropic === 'string') {
+            const filePath = (path.isAbsolute(oldPropic) && fs.existsSync(oldPropic))
+                ? oldPropic
+                : path.join(__dirname, '../../public', oldPropic.replace(/^\//, ''));
+
+            try {
+                if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+                    fs.unlinkSync(filePath);
+                }
+            } catch (err) {
+                console.error("Errore durante l'eliminazione del file da disco:", err);
+            }
+        }
+
         const user = await User.findByIdAndUpdate(
             userId,
-            { name, propic: propic || "" },
+            { name, propic: newPropic },
             { returnDocument: 'after' }
         );
 

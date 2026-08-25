@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcrypt');
 
 module.exports = {
@@ -121,6 +122,21 @@ module.exports = {
 
             if (user.permissions === 'admin' && req.user.permissions !== 'admin') {
                 return res.status(403).json({ error: "Solo l'admin può eliminare altri amministratori" });
+            }
+
+            // Cancella il file se esiste effettivamente su disco ed è un file (non una directory)
+            if (user.propic && typeof user.propic === 'string') {
+                const filePath = (path.isAbsolute(user.propic) && fs.existsSync(user.propic))
+                    ? user.propic
+                    : path.join(__dirname, '../../public', user.propic.replace(/^\//, ''));
+
+                try {
+                    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+                        fs.unlinkSync(filePath);
+                    }
+                } catch (err) {
+                    console.error("Errore durante l'eliminazione del file da disco:", err);
+                }
             }
 
             await User.findByIdAndDelete(req.params.id);
