@@ -44,20 +44,18 @@ app.use('/marketplace', express.static(path.join(publicDir, 'editor-marketplace'
 app.use('/navigator', express.static(path.join(publicDir, 'navigator/dist')));
 app.use(express.static(publicDir));
 
-const dbUser = process.env.MONGO_USER;
-const dbPwd = process.env.MONGO_PWD;
-const dbHost = process.env.MONGO_HOST;
-const PORT = process.env.PORT || 27017;
+// Connessione MongoDB originale del professore
+const dbUser = process.env.MONGO_USER ? process.env.MONGO_USER.trim() : "site252632";
+const dbPwd = process.env.MONGO_PWD ? process.env.MONGO_PWD.trim() : "Yahh6auf";
+const dbHost = process.env.MONGO_HOST ? process.env.MONGO_HOST.trim() : "mongo_site252632";
+const PORT = (process.env.PORT && process.env.PORT.trim() !== "8000" && process.env.PORT.trim()) || "27017";
 const dbName = "musei";
 
-// connessione mongodb con credenziali admin
 if (dbUser && dbPwd && dbHost) {
     const MONGODB_URI = `mongodb://${dbUser}:${dbPwd}@${dbHost}:${PORT}/${dbName}?authSource=admin&writeConcern=majority`;
     mongoose.connect(MONGODB_URI)
         .then(() => console.log('Connesso a MongoDB!!'))
         .catch((err) => console.error('<!>> Errore di connessione a MongoDB:', err));
-} else {
-    console.error('ATTENZIONE: Variabili di ambiente MongoDB mancanti. Il file .env è su Gocker?');
 }
 
 const authRoutes = require("./src/backend/routes/auth.js");
@@ -79,7 +77,7 @@ app.use("/editor/user-management", userManagementRoutes);
 app.use("/api/upload", uploadRoutes);
 
 // fallback per le rotte client-side del navigator (SPA)
-app.get('/navigator/{*path}', (req, res) => {
+app.get(/^\/navigator/, (req, res) => {
     res.sendFile(path.join(publicDir, 'navigator/dist/index.html'));
 });
 
