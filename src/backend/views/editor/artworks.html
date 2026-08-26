@@ -176,7 +176,7 @@
                             <div class="d-flex align-items-center justify-content-between gap-3 my-3 p-3 rounded-4 glass-card border border-orange border-opacity-30 shadow-sm bg-gradient-orange-subtle">
                                 <div class="d-flex align-items-center gap-3 min-w-0">
                                     <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0 icon-box-38 border border-orange border-opacity-30 bg-orange bg-opacity-20">
-                                        <i class="bi bi-bank text-orange fs-6"></i>
+                                        <i class="bi bi-bank fs-6"></i>
                                     </div>
                                     <div class="min-w-0 flex-grow-1">
                                         <p class="text-white-50 fs-8 fw-bold m-0 text-uppercase tracking-wider">Museo Selezionato</p>
@@ -215,7 +215,7 @@
                             <!-- Integrated Location Pin Select (when choosing museum) -->
                             <div class="d-flex align-items-center bg-orange bg-opacity-15 rounded-pill border border-orange border-opacity-30 px-2.5 py-1 ms-1 me-1" x-show="!selectedMuseumId">
                                 <i class="bi bi-geo-alt-fill text-orange me-1 fs-7"></i>
-                                <select class="form-select border-0 bg-transparent text-orange shadow-none cursor-pointer fs-7 fw-bold p-0 pe-3 pill-level-width" x-model="selectedCity">
+                                <select class="form-select border-0 bg-transparent text-orange shadow-none text-center cursor-pointer fs-7 fw-bold p-0 pe-3 pill-level-width" x-model="selectedCity">
                                     <option value="" class="text-dark">Tutti</option>
                                     <template x-for="city in availableCities()" :key="city">
                                         <option :value="city" x-text="city" class="text-dark"></option>
@@ -410,11 +410,11 @@
                                     <table class="table table-dark table-hover align-middle m-0">
                                         <thead class="thead-custom">
                                             <tr>
-                                                <th class="ps-4 py-3 text-uppercase" style="min-width: 14rem;">Opera</th>
-                                                <th class="py-3 text-uppercase" style="min-width: 10rem;">Autore</th>
-                                                <th class="py-3 text-uppercase" style="min-width: 11rem;">Ubicazione / Sala</th>
-                                                <th class="py-3 text-uppercase" style="min-width: 8rem;">Licenza</th>
-                                                <th class="text-center py-3 text-uppercase px-3" style="min-width: 15rem;">Azioni</th>
+                                                <th class="ps-4 py-3 text-uppercase">Opera</th>
+                                                <th class="py-3 text-uppercase">Autore</th>
+                                                <th class="py-3 text-uppercase">Ubicazione / Sala</th>
+                                                <th class="py-3 text-uppercase">Licenza</th>
+                                                <th class="text-end py-3 text-uppercase text-center pe-4 text-nowrap">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -452,14 +452,14 @@
                                                     <td class="py-3">
                                                         <span class="badge bg-secondary bg-opacity-50 text-white-50 font-monospace fs-7 px-2" x-show="art.license" x-text="art.license"></span>
                                                     </td>
-                                                    <td class="text-center py-3 px-3">
-                                                        <div class="d-inline-flex align-items-center justify-content-center gap-2">
+                                                    <td class="text-center py-3 pe-4">
+                                                        <div class="d-inline-flex align-items-center justify-content-end gap-2 text-nowrap">
                                                             <button type="button" @click="openArtworkForm(art)"
-                                                                    class="btn bg-orange text-white rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift" title="Modifica">
+                                                                    class="btn bg-orange text-white rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift text-nowrap" title="Modifica">
                                                                 <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                                             </button>
                                                             <button type="button" @click="deleteArtwork(art._id)"
-                                                                    class="btn btn-outline-danger rounded-pill px-3 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift" title="Elimina">
+                                                                    class="btn btn-outline-danger rounded-pill px-2.5 py-1.5 fs-7 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-1 hover-lift text-nowrap" title="Elimina">
                                                                 <i class="bi bi-trash3-fill fs-7"></i> <span>Elimina</span>
                                                             </button>
                                                         </div>
@@ -506,7 +506,7 @@
                                         </div>
 
                                         <!-- Soft Actions Pill Buttons -->
-                                        <div class="d-flex align-items-center gap-2.5 mt-3 pt-2.5 card-mobile-divider">
+                                        <div class="d-flex align-items-center gap-2 mt-3 pt-2 card-mobile-divider">
                                             <button type="button" @click="openArtworkForm(art)" class="btn btn-sm rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center justify-content-center gap-1.5 flex-grow-1 btn-soft-orange">
                                                 <i class="bi bi-pencil-fill fs-7"></i> <span>Modifica</span>
                                             </button>
