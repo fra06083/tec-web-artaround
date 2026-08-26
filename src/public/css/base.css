@@ -556,6 +556,15 @@ i.bi {
     left: 200%;
 }
 
+/* Tour Section Layout */
+.tour-title-divider {
+    width: 80px;
+}
+
+.filter-pills-container {
+    min-width: 0;
+}
+
 /* Ticket Top / Dashed Divider */
 .ticket-top {
     height: 180px;

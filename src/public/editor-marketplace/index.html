@@ -324,26 +324,28 @@
                     <!-- ---------- TAB VISITE ---------- -->
                     <div x-show="museumView === 'visite'">
 
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
-                            <div class="d-flex align-items-center flex-grow-1">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center mb-4 gap-3">
+                            <div class="d-flex align-items-center flex-shrink-0 me-md-2">
                                 <h4 class="fw-black mb-0 d-flex align-items-center gap-2 text-nowrap"
                                     :class="darkMode ? 'text-white' : 'text-dark'">
                                     <i class="bi bi-stars text-orange"></i> Tour disponibili
                                 </h4>
-                                <div class="ms-3 flex-grow-1 border-bottom"
+                                <div class="ms-3 border-bottom flex-shrink-0 tour-title-divider"
                                     :class="darkMode ? 'border-secondary border-opacity-50' : 'border-secondary border-opacity-25'"></div>
                             </div>
 
-                            <!-- FILTRI DESKTOP (pills) — invariati -->
-                            <div class="d-none d-md-block overflow-x-auto hide-scrollbar ms-md-4 mw-100">
-                                <div class="d-flex flex-nowrap gap-2 pb-1 pe-1 align-items-center">
-                                    <div class="position-relative me-2">
-                                        <label for="tagSearch" class="visually-hidden">Cerca categoria</label>
-                                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
-                                        <input type="text" id="tagSearch"
-                                            class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5 w-auto"
-                                            placeholder="Cerca categoria..." x-model="tagSearchQuery">
-                                    </div>
+                            <!-- Barra di ricerca ancorata in posizione fissa -->
+                            <div class="position-relative d-none d-md-block flex-shrink-0">
+                                <label for="tagSearch" class="visually-hidden">Cerca categoria</label>
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small"></i>
+                                <input type="text" id="tagSearch"
+                                    class="form-control rounded-pill border-secondary border-opacity-25 shadow-sm ps-5 w-auto"
+                                    placeholder="Cerca categoria..." x-model="tagSearchQuery">
+                            </div>
+
+                            <!-- FILTRI DESKTOP (pills a destra della barra con min-width stabile) -->
+                            <div class="d-none d-md-block overflow-x-auto hide-scrollbar flex-grow-1 filter-pills-container">
+                                <div class="d-flex flex-nowrap gap-2 pb-1 pe-1 align-items-center justify-content-start">
                                     <button @click="toggleTag('Tutti')"
                                             :class="{'active bg-orange text-white border-orange': selectedTags.length === 0}"
                                             class="btn filter-pill rounded-pill px-4 text-nowrap shadow-sm">Tutte</button>
