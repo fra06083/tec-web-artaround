@@ -51,6 +51,9 @@ incaricata di spedire mail (sempre e solo dall'indirizzo studio.unibo.it) e tene
 * _Descrivere qui l'organizzazione interna di queste directory_
 L'organizzazione del progetto rispetta la struttura MVC (Model-View-Controller) con separazione tra il backend server-side in Node.js/Express e le due applicazioni frontend (l'Editor-Marketplace statico/Alpine.js e il Navigator in React):
 
+
+
+```
 /                               # Root di progetto
 ├── README.md
 ├── package.json                # Dipendenze globali di root
@@ -84,8 +87,7 @@ L'organizzazione del progetto rispetta la struttura MVC (Model-View-Controller) 
         ├── dist/               # Bundle di produzione compilato da Vite e servito da Express
         ├── package.json        # Dipendenze dell'applicazione React Navigator
         └── vite.config.js      # Configurazione Vite
-
-
+```
 ## Tecnologie utilizzate:
 
 #### Server-side
